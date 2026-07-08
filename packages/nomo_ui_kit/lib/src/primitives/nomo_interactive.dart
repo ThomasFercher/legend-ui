@@ -81,9 +81,7 @@ class _NomoInteractiveState extends State<NomoInteractive> {
           behavior: HitTestBehavior.opaque,
           onTapDown: _enabled ? (_) => setState(() => _pressed = true) : null,
           onTapUp: _enabled ? (_) => setState(() => _pressed = false) : null,
-          onTapCancel: _enabled
-              ? () => setState(() => _pressed = false)
-              : null,
+          onTapCancel: _enabled ? () => setState(() => _pressed = false) : null,
           onTap: _enabled ? widget.onTap : null,
           child: widget.builder(context, states),
         ),

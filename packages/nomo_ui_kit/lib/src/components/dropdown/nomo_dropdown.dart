@@ -1,0 +1,227 @@
+import 'package:flutter/widgets.dart';
+import 'package:nomo_ui_kit/src/annotations/annotations.dart';
+import 'package:nomo_ui_kit/src/components/dropdown/nomo_dropdown.theme.g.dart';
+import 'package:nomo_ui_kit/src/primitives/nomo_anchored_overlay.dart';
+import 'package:nomo_ui_kit/src/primitives/nomo_interactive.dart';
+import 'package:nomo_ui_kit/src/primitives/nomo_surface.dart';
+import 'package:nomo_ui_kit/src/theme/nomo_theme.dart';
+import 'package:nomo_ui_kit/src/tokens/nomo_tokens.dart';
+
+/// An entry of [NomoDropdown]. One item model — legacy shipped two
+/// dropdown implementations with two item models (legacy-docs 06).
+class NomoDropdownItem<T> {
+  const NomoDropdownItem({required this.value, required this.label});
+
+  final T value;
+  final String label;
+}
+
+/// The one dropdown: an anchored menu over a field-like trigger,
+/// built on [NomoAnchoredOverlay] + [NomoInteractive] + [NomoSurface].
+@NomoThemeable()
+class NomoDropdown<T> extends StatefulWidget {
+  const NomoDropdown({
+    required this.items,
+    required this.onChanged,
+    super.key,
+    this.value,
+    this.placeholder,
+    this.enabled = true,
+    this.menuBackground,
+    this.menuBorderRadius,
+    this.menuShadows,
+    this.itemPadding,
+    this.textStyle,
+  });
+
+  final List<NomoDropdownItem<T>> items;
+  final ValueChanged<T> onChanged;
+  final T? value;
+  final String? placeholder;
+  final bool enabled;
+
+  @Themed(defaultsTo: 't.colors.surface')
+  final Color? menuBackground;
+
+  @Themed(defaultsTo: 't.sizes.borderRadiusMd')
+  final BorderRadius? menuBorderRadius;
+
+  @Themed(defaultsTo: 't.shadows.medium')
+  final List<BoxShadow>? menuShadows;
+
+  @Themed(
+    defaultsTo:
+        'EdgeInsets.symmetric(horizontal: t.sizes.md, '
+        'vertical: t.sizes.sm)',
+  )
+  final EdgeInsetsGeometry? itemPadding;
+
+  @Themed(defaultsTo: 't.typography.b2')
+  final TextStyle? textStyle;
+
+  @override
+  State<NomoDropdown<T>> createState() => _NomoDropdownState<T>();
+}
+
+class _NomoDropdownState<T> extends State<NomoDropdown<T>> {
+  final _controller = OverlayPortalController();
+
+  NomoDropdownTheme _theme(BuildContext context) => NomoDropdownTheme.of(
+    context,
+    NomoDropdownThemeNullable(
+      menuBackground: widget.menuBackground,
+      menuBorderRadius: widget.menuBorderRadius,
+      menuShadows: widget.menuShadows,
+      itemPadding: widget.itemPadding,
+      textStyle: widget.textStyle,
+    ),
+  );
+
+  void _select(T value) {
+    _controller.hide();
+    setState(() {});
+    widget.onChanged(value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = _theme(context);
+    final tokens = NomoTheme.of(context).tokens;
+    final selected = widget.items
+        .where((item) => item.value == widget.value)
+        .firstOrNull;
+
+    return NomoAnchoredOverlay(
+      controller: _controller,
+      offset: Offset(0, tokens.sizes.xs),
+      onDismiss: () {
+        _controller.hide();
+        setState(() {});
+      },
+      overlay: (context) => _menu(theme, tokens),
+      child: NomoInteractive(
+        enabled: widget.enabled,
+        semanticLabel: selected?.label ?? widget.placeholder,
+        onTap: () {
+          _controller.toggle();
+          setState(() {});
+        },
+        builder: (context, states) {
+          final foreground = states.disabled
+              ? tokens.colors.onDisabled
+              : tokens.colors.foreground1;
+          return NomoSurface(
+            color: states.disabled
+                ? tokens.colors.disabled
+                : tokens.colors.background1,
+            borderRadius: theme.menuBorderRadius,
+            border: Border.all(
+              color: states.focused || _controller.isShowing
+                  ? tokens.colors.primary
+                  : tokens.colors.background3,
+              width: tokens.sizes.borderWidth,
+            ),
+            padding: theme.itemPadding,
+            duration: const Duration(milliseconds: 120),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: tokens.sizes.sm,
+              children: [
+                Text(
+                  selected?.label ?? widget.placeholder ?? '',
+                  style: theme.textStyle.copyWith(
+                    color: selected == null
+                        ? tokens.colors.foreground3
+                        : foreground,
+                  ),
+                ),
+                _Caret(color: foreground, open: _controller.isShowing),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _menu(NomoDropdownTheme theme, NomoTokens tokens) {
+    return NomoSurface(
+      color: theme.menuBackground,
+      borderRadius: theme.menuBorderRadius,
+      shadows: theme.menuShadows,
+      clip: true,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final item in widget.items)
+            NomoInteractive(
+              semanticLabel: item.label,
+              onTap: () => _select(item.value),
+              builder: (context, states) {
+                return NomoSurface(
+                  color: states.hovered || states.focused
+                      ? tokens.colors.background2
+                      : theme.menuBackground,
+                  padding: theme.itemPadding,
+                  child: Text(
+                    item.label,
+                    style: theme.textStyle.copyWith(
+                      color: item.value == widget.value
+                          ? tokens.colors.primary
+                          : tokens.colors.foreground1,
+                    ),
+                  ),
+                );
+              },
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Caret extends StatelessWidget {
+  const _Caret({required this.color, required this.open});
+
+  final Color color;
+  final bool open;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedRotation(
+      turns: open ? 0.5 : 0,
+      duration: const Duration(milliseconds: 120),
+      child: CustomPaint(
+        size: const Size(10, 6),
+        painter: _CaretPainter(color),
+      ),
+    );
+  }
+}
+
+class _CaretPainter extends CustomPainter {
+  const _CaretPainter(this.color);
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width / 2, size.height)
+      ..lineTo(size.width, 0);
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.6
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_CaretPainter oldDelegate) => color != oldDelegate.color;
+}

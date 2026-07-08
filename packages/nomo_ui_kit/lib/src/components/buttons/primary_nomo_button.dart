@@ -49,7 +49,8 @@ class PrimaryNomoButton extends StatelessWidget {
   final Color? foreground;
 
   @Themed(
-    defaultsTo: 'EdgeInsets.symmetric(horizontal: t.sizes.md, '
+    defaultsTo:
+        'EdgeInsets.symmetric(horizontal: t.sizes.md, '
         'vertical: t.sizes.sm)',
   )
   final EdgeInsetsGeometry? padding;
