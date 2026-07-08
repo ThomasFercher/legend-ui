@@ -1,7 +1,9 @@
 # 09 — Rewrite Proposal: The Slim Approach
 
-> Status: **theory / RFC** — this chapter proposes the architecture for the full rewrite.
-> It is grounded in the problem inventory of [01 — Overview](01-overview.md) §4 and the detailed chapters. Nothing here is implemented yet.
+> Status: **accepted** (2026-07-09) — the architecture for the full rewrite.
+> Grounded in the problem inventory of [01 — Overview](01-overview.md) §4 and the detailed chapters.
+> **Decisions locked**: annotation-driven codegen stays (§2); consumer widgets get identical theming support via the open Type-keyed registry (§2.3); the generator is a **published standalone CLI, `nomo_gen`** — chosen over build_runner (§5.3); repo becomes a Dart workspace (§6).
+> Implementation happens on the `rewrite` branch; this document is copied there as `docs/DESIGN.md` and evolves with the code.
 
 ## 1. Goals and non-goals
 
@@ -183,7 +185,7 @@ Note what §2.3's open Type-keyed registry already bought us: **no generation st
 | **Beyond codegen** | scaffolding (`nomo_gen create component`), migration codemods for kit upgrades, `nomo_gen doctor` (validate a consumer's theme setup), icon table generation (§4) — one tool, many subcommands | codegen only; everything else needs a separate CLI anyway |
 | **Versioning** | dev dep pins per-project (reproducible); global activation risks team version drift → prefer dev dep, stamp generator version into output, `--check` verifies | pinned per-project like any dev dep |
 
-### 5.3 Verdict: **yes — standalone CLI, published, CLI-first; build_runner as a thin optional wrapper**
+### 5.3 Verdict: **standalone CLI, published, CLI-first; build_runner as a thin optional wrapper** *(DECIDED 2026-07-09)*
 
 The consumer-facing requirement *strengthens* the CLI case rather than weakening it, for three reasons:
 
