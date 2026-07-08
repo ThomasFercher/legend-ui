@@ -15,9 +15,10 @@
    3. app-theme component override (per color/sizing mode)
    4. delegate/kit defaults
    5. annotation-declared default on the widget (derived from tokens)
-4. **Self-contained repo**: `git clone && flutter pub get && flutter test` must work with no sibling checkouts. The generator lives *inside this repo*.
-5. **Keep the good ideas**: delegate-driven color×sizing modes, responsive shell, near-zero runtime deps (see 01 §5).
-6. **Honest API surface**: `lib/src/` + curated barrel, semver, no typos, tested, CI that runs.
+4. **Consumer widgets are first-class citizens**: dependents of the kit don't just consume the shipped components — they can author their own widgets and give them **identical theming support**: the same decorator declaration, the same generated artifacts, the same five-level resolution, plugged into the same `NomoThemeData`. A consumer defining their widget's theme must look exactly like the kit defining `PrimaryNomoButton`'s theme. This makes the generator a **published, consumer-facing product**, not an internal maintainer tool — with major consequences for tooling choice (§5) and theme architecture (§2.3).
+5. **Self-contained repo**: `git clone && flutter pub get && flutter test` must work with no sibling checkouts. The generator is developed *inside this repo* (and published from it).
+6. **Keep the good ideas**: delegate-driven color×sizing modes, responsive shell, near-zero runtime deps (see 01 §5).
+7. **Honest API surface**: `lib/src/` + curated barrel, semver, no typos, tested, CI that runs.
 
 **Non-goals**
 
@@ -82,9 +83,40 @@ A leaner artifact set than legacy's ~10 (namespaced, so no colliding top-level `
 | `merge` / `copyWith` / `lerp` | layering + animated theme switches (`lerp` only for fields that opt in) |
 | `PrimaryNomoButtonThemeOverride` | the level-2 inherited widget |
 | `PrimaryNomoButtonTheme.of(context)` | static resolver walking levels 1→5 (replaces free-function `getFromContext`) |
-| aggregate registry (one file, whole kit) | wires every component theme into `NomoThemeData`, generated — no manual lists |
 
 The multi-level resolution semantics are **identical at every level of the stack**: an app can restyle one button subtree (level 2), reskin all buttons per theme mode (level 3), ship kit-wide defaults (level 4), or accept token-derived defaults (level 5) — and a plain constructor argument still always wins (level 1).
+
+**No aggregate registry — the theme is an open, Type-keyed registry.** This is the load-bearing decision that makes consumer widgets (§1 goal 4) possible. Legacy wired every component into `NomoThemeData` through a generated aggregate file plus manual `@NomoThemeUtils` lists — a *closed* set only the kit could extend. Instead, `NomoThemeData` holds component themes the way Flutter holds `ThemeExtension`s:
+
+```dart
+class NomoThemeData {
+  final NomoTokens tokens;
+  final Map<Type, NomoComponentTheme> components;   // open — anyone can add entries
+}
+```
+
+Each generated `XTheme.of(context)` resolves level 3 via `theme.components[XTheme]` and falls back to its own token-derived defaults. Consequences:
+
+- **Consumer symmetry for free**: a dependent annotates their own widget, runs the generator, and registers `BalanceCardTheme` in the same map next to the kit's entries — same declaration, same artifacts, same resolution, zero kit changes:
+
+  ```dart
+  // in the consumer's app — identical workflow to the kit's own components
+  @NomoThemeable()
+  class BalanceCard extends StatelessWidget {
+    @Themed(defaultsTo: 't.colors.surface')
+    final Color? background;
+    ...
+  }
+  // generator emits balance_card.theme.g.dart → BalanceCardTheme(+Nullable, Override, .of)
+
+  NomoThemeData(
+    tokens: myTokens,
+    components: { ...nomoDefaults, BalanceCardTheme: BalanceCardThemeNullable(...) },
+  )
+  ```
+
+- **Every generated file depends only on its own widget file.** No cross-file, cross-package, or whole-project analysis step exists anywhere — generation is embarrassingly parallel, trivially incremental, and works identically whether the tool is a CLI or a build_runner builder (§5).
+- The legacy aggregate-registry artifact and both manual registration lists disappear outright.
 
 ### 2.4 Decouple responsiveness and animation from theming
 
@@ -123,46 +155,82 @@ Legacy ships a 14.5k-line FontAwesome fork, ~632 KB of TTFs, and a reflection ma
 2. FontAwesome moves to an **optional sibling package** (`nomo_icons`), regenerated from upstream metadata, marked `@staticIconProvider`, with **no `allIcons` reflection map** in the library. Apps that need name→icon lookup (the icon-gallery use case) opt in via a separate deferred import or generate the map into their own app.
 3. Result: consumers pay only for the glyphs they use; the kit loses ~17k LOC and 632 KB of assets.
 
-## 5. The new generator: CLI-first, build_runner optional
+## 5. The generator: a consumer-facing tool — standalone CLI vs build_runner
 
-The generator is rebuilt from scratch **inside this repo**. Requirements, each fixing a documented legacy failure (03):
+### 5.1 The requirement that reframes everything
+
+Goal 4 (§1) makes the generator part of the **product**: dependents annotate *their own* widgets and generate the same theming plumbing the kit's components get. That kills the earlier framing of "maintainers are the only codegen users — keep it in `tool/`". The generator must now be:
+
+- **published** (consumers `dart pub add --dev nomo_gen` or globally activate it),
+- runnable against **arbitrary consumer packages**, not just this repo,
+- excellent at **diagnostics**, because its users didn't write it and will hold its errors against the kit,
+- stable in output format, because consumer `.g.dart` files are committed in *their* repos.
+
+Note what §2.3's open Type-keyed registry already bought us: **no generation step needs whole-project or cross-package analysis** — each annotated widget file maps to exactly one output file. Both candidate tools can do that job; the choice is about ergonomics, dependency mechanics, and what else the tool can do.
+
+### 5.2 Head-to-head under the consumer-facing constraint
+
+| Criterion | Standalone CLI (`nomo_gen`) | build_runner Builder |
+|---|---|---|
+| **Familiarity** | new tool to learn (one command) | the ecosystem standard — consumers already run it for freezed / json_serializable / riverpod_generator |
+| **Workflow integration** | second watch process next to an existing `build_runner watch` | folds into the watch process most Flutter apps already have |
+| **Dependency mechanics** | as a dev dep: only `analyzer` (+ `args`) enters the consumer's dev graph — no `build`/`build_runner`/`source_gen` chain; globally activated: **zero** footprint, fully isolated resolution | must co-resolve `analyzer`/`build`/`source_gen` with every other generator the consumer uses — the classic lock-step pain; a kit should not be the package that blocks a consumer's freezed upgrade |
+| **Speed** | analyze only annotated files, no build-graph hashing; cold runs in seconds, warm watch near-instant | full build-graph initialization every cold run (tens of seconds in real apps), even for one changed widget |
+| **Debuggability** | plain `main()`, run under a debugger, readable stack traces | builder failures surface through build_runner's log plumbing |
+| **Diagnostics UX** | owns its output: `file:line` errors, colored output, `--fix` suggestions, exit codes | constrained to build_runner's error reporting |
+| **Staleness protection** | output can go stale → mitigated by `nomo_gen --check` in CI (and a version stamp in file headers) | `build_runner watch` keeps outputs fresh automatically; per-build check |
+| **IDE story** | committed `.g.dart` = full navigation; no plugin needed | same (also committed), plus some IDEs auto-trigger builds |
+| **Beyond codegen** | scaffolding (`nomo_gen create component`), migration codemods for kit upgrades, `nomo_gen doctor` (validate a consumer's theme setup), icon table generation (§4) — one tool, many subcommands | codegen only; everything else needs a separate CLI anyway |
+| **Versioning** | dev dep pins per-project (reproducible); global activation risks team version drift → prefer dev dep, stamp generator version into output, `--check` verifies | pinned per-project like any dev dep |
+
+### 5.3 Verdict: **yes — standalone CLI, published, CLI-first; build_runner as a thin optional wrapper**
+
+The consumer-facing requirement *strengthens* the CLI case rather than weakening it, for three reasons:
+
+1. **Dependency hygiene is now a product feature.** The moment `nomo_gen` is in every consumer's dev graph, a build_runner-based generator makes the kit a permanent participant in the ecosystem's `analyzer`/`build` version lock-step. A lean CLI (`analyzer` only, wide constraints) — or global activation with zero footprint — keeps the kit from ever being the reason a consumer's unrelated codegen breaks. Legacy already demonstrated where generator coupling pain leads (03; 01 §4.1.1).
+2. **The kit needs a CLI anyway.** Scaffolding new themed components, a `doctor` for mis-registered themes, migration codemods between kit versions, icon regeneration — these are consumer-facing needs no Builder can serve. Once `nomo_gen` exists for those, theme generation is one more subcommand, and shipping *two* mandatory tools would be worse than one.
+3. **The architecture removed build_runner's trump card.** Incremental build-graph tracking pays off for expensive, interdependent generation. §2.3 made generation one-file-in/one-file-out with no cross-file analysis — a workload where build_runner's machinery is pure overhead and a watch loop over annotated files is trivial to implement correctly.
+
+The honest cost: consumers who live in `build_runner watch` get a second process to run (or forget to run). That is real friction, and it is exactly the group a **thin optional `nomo_gen_builder` package** serves: a ~50-line Builder wrapping the same emission core, published separately so only the people who opt in inherit the version lock-step. The parsing/emission core stays packaging-agnostic; the CLI is the reference frontend and the only *required* one. CI freshness (`nomo_gen --check`) is documented as the standard consumer setup either way.
+
+Requirements for the rebuilt core, each fixing a documented legacy failure (03):
 
 | Requirement | Legacy failure it fixes |
 |---|---|
 | Parse via `package:analyzer` **AST**, never `toSource()` string-slicing | index-math default extraction, "cut at last comma if contains 'lerp'", the `@NomoConstant` `replaceAll` bug |
-| Validate and **diagnose**: type/category mismatches, non-null annotated params, missing token references → hard errors with file:line | size fields silently landing in the color bucket and being color-lerped |
-| **Zero naming conventions**: discovery by annotation scan; the aggregate registry is generated output, not hand-maintained input | themeName↔field derivation, `@NomoThemeUtils` manual lists, `<themeName>Theme` constant matching |
+| Validate and **diagnose** with `file:line` errors: type/category mismatches, non-null annotated params, missing token references, unregistered themes | size fields silently landing in the color bucket and being color-lerped |
+| **Zero naming conventions**: discovery by annotation scan only | themeName↔field derivation, `@NomoThemeUtils` manual lists, `<themeName>Theme` constant matching |
 | Namespaced emission (static `.of()`, no top-level free functions) | 26 colliding `getFromContext` symbols, `hide` in every barrel |
-| Deterministic, formatted, committed output | opaque regeneration diffs |
-
-**Packaging — CLI first (recommended), build_runner as an optional wrapper:**
-
-- **Primary: `dart run nomo_gen`** — an in-repo `tool/` CLI (or a `nomo_gen` package in this repo if we adopt a workspace layout). Run on demand while developing components (`nomo_gen watch` for iteration), output committed, freshness enforced by a CI step that reruns it and fails on diff. Consumers of the kit never install or run any codegen — they receive committed `.g.dart` files. No `build_runner`/`analyzer` version lock-step leaks into consumers' dev dependencies.
-- **Optional later: a thin `build_runner` Builder** wrapping the same core library, for contributors who prefer `build_runner watch` integration. The parsing/emission core is packaging-agnostic, so this is additive, not a fork.
-- Rationale for CLI-first: kit maintainers are the only codegen users; a CLI is faster to run, trivial to debug (plain `main()`), has no build-graph coupling, and matches how the icon tables (§4) are regenerated anyway — one tool, two subcommands (`nomo_gen themes`, `nomo_gen icons`).
+| Deterministic, formatted, version-stamped, committed output | opaque regeneration diffs, undetectable staleness |
+| One-file-in/one-file-out, no cross-file analysis (guaranteed by §2.3) | aggregate builders, whole-kit regeneration |
 
 Dart macros — which would have made annotations expand with zero tooling — were discontinued by the Dart team in early 2025, so an explicit generator remains the right call; the CLI keeps it as small and ownable as possible.
 
 ## 6. Package & repo structure
 
+A **Dart workspace** (stable since Dart 3.6) inside this single repo — the generator is a real published package now (§5.1), but the legacy sibling-repo mistake is not repeated:
+
 ```
-lib/
-  nomo_ui_kit.dart          # THE barrel — the only supported import
-  src/
-    annotations/            # @NomoThemeable, @Themed — the decorator contract
-    tokens/                 # NomoTokens, colors, sizes, typography, shadows, responsive values
-    theme/                  # NomoTheme widget, NomoThemeData, delegate
-    primitives/             # surface, interactive, overlay engine, text core, field core
-    components/             # public components + their committed *.g.dart theme files
-    shell/                  # NomoApp, NomoScaffold, app bar, sider, bottom bar, body
-tool/
-  nomo_gen/                 # the generator CLI (themes + icons), dev-only, in-repo
-example/                    # gallery app — every component, no empty stubs
-test/                       # required from day one (incl. generator golden tests)
+packages/
+  nomo_ui_kit/              # the kit
+    lib/
+      nomo_ui_kit.dart      # THE barrel — the only supported import
+      src/
+        annotations/        # @NomoThemeable, @Themed — the decorator contract (re-exported; consumers need it)
+        tokens/             # NomoTokens, colors, sizes, typography, shadows, responsive values
+        theme/              # NomoTheme widget, NomoThemeData (open Type-keyed registry), delegate
+        primitives/         # surface, interactive, overlay engine, text core, field core
+        components/         # public components + their committed *.g.dart theme files
+        shell/              # NomoApp, NomoScaffold, app bar, sider, bottom bar, body
+  nomo_gen/                 # the CLI: themes + icons + create + doctor + codemods — PUBLISHED for consumers
+  nomo_gen_builder/         # optional thin build_runner wrapper around nomo_gen's core (§5.3)
+  nomo_icons/               # optional FontAwesome package (§4)
+example/                    # gallery app — every component, no empty stubs; doubles as the consumer-workflow fixture
+test/                       # per package; incl. generator golden tests
 ```
 
-- **`lib/src/` + single barrel** ends the deep-import free-for-all; everything exported is deliberate API (fixes 01 §4.1.5). Generated theme classes are re-exported through the barrel deliberately.
-- Nothing outside this repo is needed to build; the old generator repo is archived.
+- **`lib/src/` + single barrel** ends the deep-import free-for-all; everything exported is deliberate API (fixes 01 §4.1.5). Generated theme classes and the annotations are re-exported through the barrel deliberately.
+- Nothing outside this repo is needed to build; the old generator repo is archived. Same-repo workspace = generator and kit evolve in lock-step and are tested against each other in every PR — the annotation contract can never drift from the tool again.
 - Router stays decoupled: the kit takes a `RouterConfig` like legacy `NomoApp`, but `NomoBody` loses its router-coupled `copyWith` (04).
 
 ## 7. Quality gates (day-one, not retrofit)
@@ -177,7 +245,7 @@ test/                       # required from day one (incl. generator golden test
 
 ## 8. Migration & sequencing
 
-1. **Phase 0 — validate the theory**: build `tokens/`, the annotation contract, and a **minimal `nomo_gen themes`** (parse one fixture widget, emit the §2.3 artifact set); port **one** hard component (PrimaryNomoButton) + one overlay (dropdown) end-to-end on it. Measure: handwritten LOC per component, generated LOC per property (target: well under legacy's ~35), resolution ergonomics at all five levels, theme-switch performance. Revisit §2/§5 if targets are missed.
+1. **Phase 0 — validate the theory**: build `tokens/`, the annotation contract, the open `NomoThemeData` registry, and a **minimal `nomo_gen themes`** (parse one fixture widget, emit the §2.3 artifact set); port **one** hard component (PrimaryNomoButton) + one overlay (dropdown) end-to-end on it — **and run the full consumer workflow once**: annotate a widget in `example/` (as if it were a third-party app), generate, register it in the theme map, override it at all five levels. Measure: handwritten LOC per component, generated LOC per property (target: well under legacy's ~35), resolution ergonomics, consumer-workflow friction, theme-switch performance. Revisit §2/§5 if targets are missed.
 2. **Phase 1 — primitives complete**: overlay engine, text core, field core; golden-test infrastructure; `nomo_gen` hardened (diagnostics, `--check`, watch mode).
 3. **Phase 2 — component ports** in dependency order (buttons → surfaces → menus/selection → input/form → shell), consolidating duplicates per §3. Each port closes out the corresponding legacy bugs from 01 §4.2 with a regression test.
 4. **Phase 3 — icons unbundling** (`nomo_gen icons`) + example-app rebuild (no stubs) + docs.
@@ -191,4 +259,5 @@ test/                       # required from day one (incl. generator golden test
 4. Does anything real depend on `NomoText` auto-fit (deleted upstream but API still public)? If yes, `NomoFittedText`; if no, drop.
 5. Does the Nomo App need the name→IconData lookup at runtime, or only the example gallery? Determines how aggressive §4.2 can be.
 6. Snackbar: keep ScaffoldMessenger interop, or move fully onto the overlay engine and drop the last Material service dependency?
-7. Repo layout for the generator: `tool/` script vs. a proper `nomo_gen` package in a Dart workspace within this repo (workspaces are stable since Dart 3.6) — decide when Phase 0 starts.
+7. `nomo_gen` distribution default for consumers: dev dependency (per-project pinning, `analyzer` enters their dev graph with wide constraints) vs `dart pub global activate` (zero dependency footprint, but team version drift — mitigated by the version stamp + `--check`). Leaning dev-dependency as the documented default with global activation as the escape hatch; confirm with real consumer feedback in Phase 1.
+8. Does the level-3 map key on the theme class (`components[BalanceCardTheme]`) suffice, or do consumers need *variant* registration (one widget, several named themes, e.g. `BalanceCard.compact`)? If yes, key by `(Type, name)` — decide before the map's API ships.
