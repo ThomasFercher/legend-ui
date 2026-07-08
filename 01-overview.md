@@ -92,7 +92,7 @@ These findings are drawn from the detailed chapters; each chapter cites file pat
 
 The rewrite should not discard these *ideas*, which are sound and battle-tested in the Nomo App:
 
-1. **The resolution precedence** — widget param → local override → global theme → default — is a good, predictable model. Only its *implementation* (35 LOC/property of codegen) is the problem.
+1. **The resolution precedence** — widget param → local override → global theme → default — is a good, predictable model, and so is **declaring component themes via annotations on the widget** and generating the plumbing. Only the *generator implementation* (string-slicing extraction, naming conventions, colliding symbols, external path dependency) is the problem — the rewrite keeps annotation-driven codegen and rebuilds the generator (see [09](09-rewrite-proposal.md)).
 2. **A delegate-driven theme** with orthogonal color mode × sizing mode, and typography assembled from both.
 3. **First-class responsive shell** (app bar / sider / bottom bar switching by breakpoint) as a kit concern rather than an app concern.
 4. **Zero runtime dependencies** as a design constraint (currently true except for `flutter_svg` and the misplaced generator dep).

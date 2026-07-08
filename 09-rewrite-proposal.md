@@ -7,11 +7,17 @@
 
 **Goals**
 
-1. **Slim**: an order of magnitude less machinery per component. Target ≤ ~40 handwritten lines of theming code per component instead of ~239 generated ones.
-2. **No `nomo_ui_generator`**: the custom build_runner generator is retired entirely (explicit project goal). Whatever code generation survives must be trivial, in-repo, and optional to the build.
-3. **Self-contained repo**: `git clone && flutter pub get && flutter test` must work with no sibling checkouts.
-4. **Keep the good ideas**: resolution precedence (param → local override → global theme → default), delegate-driven color×sizing modes, responsive shell, near-zero runtime deps (see 01 §5).
-5. **Honest API surface**: `lib/src/` + curated barrel, semver, no typos, tested, CI that runs.
+1. **Slim**: an order of magnitude less machinery per component — but *slim in what we write and maintain*, not necessarily in what is generated. Code generation stays: it saves real time and keeps component theming uniform. What must shrink is the fragility and convention-magic around it.
+2. **Replace `nomo_ui_generator`, keep the codegen model**: the current generator implementation is retired (broken external path dependency, string-slicing of annotation source, unchecked naming conventions — see [03](03-code-generation.md)). Component themes remain **declared with decorators (annotations) on the widget itself** — the widget is the single source of truth from which theme data is generated.
+3. **Configurability and defaults at every level**: the layered resolution model is the product. Every themed property must be settable at each of these levels, nearest wins:
+   1. widget constructor parameter
+   2. local subtree override (`…ThemeOverride`-style inherited widget)
+   3. app-theme component override (per color/sizing mode)
+   4. delegate/kit defaults
+   5. annotation-declared default on the widget (derived from tokens)
+4. **Self-contained repo**: `git clone && flutter pub get && flutter test` must work with no sibling checkouts. The generator lives *inside this repo*.
+5. **Keep the good ideas**: delegate-driven color×sizing modes, responsive shell, near-zero runtime deps (see 01 §5).
+6. **Honest API surface**: `lib/src/` + curated barrel, semver, no typos, tested, CI that runs.
 
 **Non-goals**
 
@@ -19,11 +25,11 @@
 - Backwards compatibility with legacy deep imports. The Nomo App migrates deliberately, component by component.
 - Supporting Material's theming system. We interoperate with Material widgets where practical but do not mirror `ThemeData`.
 
-## 2. The core idea: design away the need for codegen
+## 2. Theming model: decorators on the widget, layers all the way down
 
-The legacy generator exists to produce, per component: a data class, nullable variant, `lerp`, `copyWith`, override InheritedWidget, and a 3-layer `getFromContext` resolver — ~10 artifacts × 26 components. The rewrite replaces all of that with **one generic mechanism plus one small handwritten style class per component**.
+The legacy insight worth keeping: **annotating the widget's fields and generating the theme plumbing from them** means a component's themable surface is declared exactly once, next to the code that uses it. The rewrite keeps this and fixes the implementation.
 
-### 2.1 Design tokens (the only global theme)
+### 2.1 Design tokens (the global base layer)
 
 A single immutable `NomoTokens` object holds the primitives — nothing component-specific:
 
@@ -36,65 +42,56 @@ class NomoTokens {
 }
 ```
 
-Handwritten, with handwritten `copyWith`/`lerp` — this is written **once**, not per component, so the boilerplate argument for codegen disappears.
+Handwritten once, with handwritten `copyWith`/`lerp`. Annotation defaults on components reference tokens, so a token change propagates to every component default without touching component code.
 
-### 2.2 Component styles are plain classes with a resolve hook
+### 2.2 Declaring a component theme (the decorator contract)
 
-Each component gets exactly one small style class deriving its defaults *from tokens*:
+The widget declares its themable properties inline — same spirit as legacy `@NomoComponentThemeData`, with a cleaned-up schema:
 
 ```dart
-class NomoButtonStyle {
+@NomoThemeable()
+class PrimaryNomoButton extends StatelessWidget {
+  /// Defaults are expressions over tokens (t), not baked literals.
+  @Themed(defaultsTo: 't.colors.primary')
   final Color? background;
+
+  @Themed(defaultsTo: 'EdgeInsets.all(t.sizes.md)')
   final EdgeInsetsGeometry? padding;
+
+  @Themed(defaultsTo: 't.sizes.radiusMd', lerp: false)
   final BorderRadius? radius;
-  // ...
-
-  const NomoButtonStyle({this.background, this.padding, this.radius});
-
-  /// Fill unset fields from tokens — replaces generated defaults + constants.
-  NomoButtonStyle withDefaults(NomoTokens t) => NomoButtonStyle(
-        background: background ?? t.colors.primary,
-        padding: padding ?? EdgeInsets.all(t.sizes.md),
-        radius: radius ?? t.sizes.radiusMd,
-      );
-
-  NomoButtonStyle merge(NomoButtonStyle? other) => /* other-wins, ~5 lines */;
+  ...
 }
 ```
 
-Key differences from legacy:
+Contract fixes relative to legacy (see 03 for the failure modes being fixed):
 
-- **All fields nullable, all constructor defaults null.** This fixes the systemic legacy bug where non-null constructor defaults made theme values unreachable (01 §4.2).
-- Defaults come from tokens *at resolve time*, so a token change propagates without touching component code.
-- `copyWith`/`lerp` are only written where actually needed (styles that animate). Most don't need `lerp` at all — see §2.4.
+- **One annotation kind, typed by the field** — no more `@NomoColorField` vs `@NomoSizingField` bucket mix-ups (the wrong-bucket/color-lerping bug class disappears; the generator infers category from the Dart type and validates it).
+- **All annotated constructor params are nullable with null defaults** — the generator *enforces* this, fixing the legacy bug where non-null constructor defaults made theme values unreachable.
+- **Defaults are token expressions**, resolved at theme-build time, not frozen constants.
+- **No naming conventions**: the generator discovers annotated widgets by scanning the source tree; registration lists (`@NomoThemeUtils`) are generated, never hand-maintained.
 
-### 2.3 One generic resolution primitive
+### 2.3 What gets generated per component
 
-The legacy precedence chain is kept but implemented once:
+A leaner artifact set than legacy's ~10 (namespaced, so no colliding top-level `getFromContext` / no `hide` rituals):
 
-```dart
-class NomoStyle<S> extends InheritedTheme { final S style; ... }
+| Artifact | Purpose |
+|---|---|
+| `PrimaryNomoButtonTheme` (style class) | all annotated fields, non-null, resolved |
+| `PrimaryNomoButtonThemeNullable` | sparse overrides for levels 1–3 |
+| `merge` / `copyWith` / `lerp` | layering + animated theme switches (`lerp` only for fields that opt in) |
+| `PrimaryNomoButtonThemeOverride` | the level-2 inherited widget |
+| `PrimaryNomoButtonTheme.of(context)` | static resolver walking levels 1→5 (replaces free-function `getFromContext`) |
+| aggregate registry (one file, whole kit) | wires every component theme into `NomoThemeData`, generated — no manual lists |
 
-extension StyleResolve on BuildContext {
-  S resolveStyle<S>(S Function(NomoTokens) fromTheme, {S? local}) { ... }
-}
-```
-
-Resolution order (identical semantics to legacy, one implementation instead of 26 generated ones):
-
-1. widget constructor params (merged last, they win)
-2. nearest `NomoStyle<NomoButtonStyle>` ancestor (replaces every generated `…ThemeOverride`)
-3. the app theme's style registry (`NomoThemeData.buttonStyle`, plain fields — no naming-convention magic, no `@NomoThemeUtils` aggregate lists)
-4. `withDefaults(tokens)`
-
-A component's total theming cost: the style class (§2.2, ~25–40 lines) + one `context.resolveStyle` call. **No generated files, no `hide getFromContext`, no registration conventions.**
+The multi-level resolution semantics are **identical at every level of the stack**: an app can restyle one button subtree (level 2), reskin all buttons per theme mode (level 3), ship kit-wide defaults (level 4), or accept token-derived defaults (level 5) — and a plain constructor argument still always wins (level 1).
 
 ### 2.4 Decouple responsiveness and animation from theming
 
 Two legacy design decisions multiply each other's cost: breakpoints are theme swaps, and theme swaps lerp *all* ~48 component classes at 60 fps (01 §4.1.3). The rewrite separates the three concerns:
 
 - **Responsiveness**: a lightweight `NomoBreakpoints` InheritedModel exposing the current tier (`compact / medium / expanded`) and the raw width. Widgets and the shell read the tier directly; the *theme does not change* when the window resizes. Sizing values that genuinely vary per tier are expressed as `NomoResponsive<T>` values (`T resolve(tier)`) inside tokens.
-- **Theme switching** (light/dark/brand): swaps the `NomoTokens` object. Animation happens at the *consumer* via implicit animations on resolved values (`AnimatedContainer`, `AnimatedDefaultTextStyle`, or a tiny `AnimatedTokens` widget that lerps only the token object — one lerp, not 48). Component styles are re-derived, not tweened.
+- **Theme switching** (light/dark/brand): swaps `NomoTokens` and re-derives component themes. Animation lerps the token object once (plus the opt-in `lerp: true` component fields), instead of tweening 48 full data classes every frame.
 - **Interaction animation** (hover/press/focus): stays inside components, driven by a shared interaction-state primitive (§3.1).
 
 This removes `MetricReactor` + `ThemeAnimator` + the whole-app 400 ms rebuild storm, and fixes the stale-tween jump bug class by construction.
@@ -111,7 +108,7 @@ The ~26 legacy components rebuild on top of **five kit-internal primitives** (al
 | `NomoTextCore` (styled text; explicit `NomoFittedText` variant if auto-fit returns) | NomoText's dead `fit` API — fit becomes a separate, honest widget instead of 7 dead params |
 | `NomoFieldCore` (thin wrapper over Flutter's `EditableText`) | The 1,535-line CupertinoTextField fork and its broken slotted render box — we stop vendoring Flutter internals |
 
-Public components then become thin compositions (`PrimaryNomoButton` = `NomoInteractive` + `NomoSurface` + slot layout). Consolidations while porting:
+Public components then become thin compositions (`PrimaryNomoButton` = `NomoInteractive` + `NomoSurface` + slot layout), each carrying its `@NomoThemeable` declaration. Consolidations while porting:
 
 - **One dropdown** (menu + button unified, one item model), **one switch** (no Cupertino fork — build on `NomoInteractive`), **one modal sheet** (actually implemented this time).
 - **`NomoRouteBody` → `NomoBody`** with a single sliver-based mode; convenience constructors cover the legacy use cases instead of six exclusive flag-modes.
@@ -126,23 +123,25 @@ Legacy ships a 14.5k-line FontAwesome fork, ~632 KB of TTFs, and a reflection ma
 2. FontAwesome moves to an **optional sibling package** (`nomo_icons`), regenerated from upstream metadata, marked `@staticIconProvider`, with **no `allIcons` reflection map** in the library. Apps that need name→icon lookup (the icon-gallery use case) opt in via a separate deferred import or generate the map into their own app.
 3. Result: consumers pay only for the glyphs they use; the kit loses ~17k LOC and 632 KB of assets.
 
-## 5. Replacing the generator: build_runner vs CLI vs none
+## 5. The new generator: CLI-first, build_runner optional
 
-The explicit goal is retiring `nomo_ui_generator`. Three options were considered:
+The generator is rebuilt from scratch **inside this repo**. Requirements, each fixing a documented legacy failure (03):
 
-| | A — No codegen | B — build_runner generator | C — standalone CLI |
-|---|---|---|---|
-| Boilerplate per component | ~25–40 LOC handwritten | ~0 handwritten, ~200+ generated | ~0 handwritten, generated on demand |
-| Build integration | none needed | hooks every `pub run build_runner` build; slow; version-locks `analyzer`/`build` across consumers | run manually / in CI; no build-graph coupling |
-| Failure modes | none (it's just code) | the exact fragility we're escaping (source-string parsing, stale outputs, `--delete-conflicting-outputs` rituals) | stale output possible → needs a CI freshness check |
-| IDE experience | perfect (plain Dart, jump-to-def) | generated parts, weaker navigation | same as A for committed output |
-| Dependency footprint | zero | `build_runner` + `source_gen` + `analyzer` in every consumer's dev deps | dev-only `tool/` dir or separate package; consumers never see it |
+| Requirement | Legacy failure it fixes |
+|---|---|
+| Parse via `package:analyzer` **AST**, never `toSource()` string-slicing | index-math default extraction, "cut at last comma if contains 'lerp'", the `@NomoConstant` `replaceAll` bug |
+| Validate and **diagnose**: type/category mismatches, non-null annotated params, missing token references → hard errors with file:line | size fields silently landing in the color bucket and being color-lerped |
+| **Zero naming conventions**: discovery by annotation scan; the aggregate registry is generated output, not hand-maintained input | themeName↔field derivation, `@NomoThemeUtils` manual lists, `<themeName>Theme` constant matching |
+| Namespaced emission (static `.of()`, no top-level free functions) | 26 colliding `getFromContext` symbols, `hide` in every barrel |
+| Deterministic, formatted, committed output | opaque regeneration diffs |
 
-**Recommendation: A as the architecture, C as the escape hatch.**
+**Packaging — CLI first (recommended), build_runner as an optional wrapper:**
 
-- §2 deliberately reduces per-component theming to an amount of code (one small style class) where generating it costs more than writing it. *The best generator is an architecture that doesn't need one.* Dart macros — the language feature that would have made B attractive — were discontinued by the Dart team in early 2025, so betting on annotation-driven generation again means betting on build_runner indefinitely.
-- Where mechanical generation genuinely pays off — the **icon codepoint tables** (§4) and possibly a `styles.g.dart` aggregating token presets — a **small in-repo CLI** (`dart run tool/nomo_gen.dart icons`, plain `package:analyzer`-free string templating from upstream JSON metadata) is the right tool: run on demand by maintainers, output committed, freshness enforced by a CI step that reruns it and fails on diff. This matches the user-stated preference for a CLI over build_runner and keeps consumers completely codegen-free.
-- build_runner (B) is rejected: it recreates the legacy failure mode (external generator package, version lock-step, opaque builds) for a benefit §2 already eliminated.
+- **Primary: `dart run nomo_gen`** — an in-repo `tool/` CLI (or a `nomo_gen` package in this repo if we adopt a workspace layout). Run on demand while developing components (`nomo_gen watch` for iteration), output committed, freshness enforced by a CI step that reruns it and fails on diff. Consumers of the kit never install or run any codegen — they receive committed `.g.dart` files. No `build_runner`/`analyzer` version lock-step leaks into consumers' dev dependencies.
+- **Optional later: a thin `build_runner` Builder** wrapping the same core library, for contributors who prefer `build_runner watch` integration. The parsing/emission core is packaging-agnostic, so this is additive, not a fork.
+- Rationale for CLI-first: kit maintainers are the only codegen users; a CLI is faster to run, trivial to debug (plain `main()`), has no build-graph coupling, and matches how the icon tables (§4) are regenerated anyway — one tool, two subcommands (`nomo_gen themes`, `nomo_gen icons`).
+
+Dart macros — which would have made annotations expand with zero tooling — were discontinued by the Dart team in early 2025, so an explicit generator remains the right call; the CLI keeps it as small and ownable as possible.
 
 ## 6. Package & repo structure
 
@@ -150,43 +149,46 @@ The explicit goal is retiring `nomo_ui_generator`. Three options were considered
 lib/
   nomo_ui_kit.dart          # THE barrel — the only supported import
   src/
+    annotations/            # @NomoThemeable, @Themed — the decorator contract
     tokens/                 # NomoTokens, colors, sizes, typography, shadows, responsive values
-    theme/                  # NomoTheme widget, NomoStyle<S>, resolveStyle
+    theme/                  # NomoTheme widget, NomoThemeData, delegate
     primitives/             # surface, interactive, overlay engine, text core, field core
-    components/             # thin public components composed from primitives
+    components/             # public components + their committed *.g.dart theme files
     shell/                  # NomoApp, NomoScaffold, app bar, sider, bottom bar, body
 tool/
-  nomo_gen.dart             # optional CLI (icons etc.), dev-only
+  nomo_gen/                 # the generator CLI (themes + icons), dev-only, in-repo
 example/                    # gallery app — every component, no empty stubs
-test/                       # required from day one
+test/                       # required from day one (incl. generator golden tests)
 ```
 
-- **`lib/src/` + single barrel** ends the deep-import free-for-all; everything exported is deliberate API (fixes 01 §4.1.5).
-- The generator repo is archived; nothing outside this repo is needed to build.
+- **`lib/src/` + single barrel** ends the deep-import free-for-all; everything exported is deliberate API (fixes 01 §4.1.5). Generated theme classes are re-exported through the barrel deliberately.
+- Nothing outside this repo is needed to build; the old generator repo is archived.
 - Router stays decoupled: the kit takes a `RouterConfig` like legacy `NomoApp`, but `NomoBody` loses its router-coupled `copyWith` (04).
 
 ## 7. Quality gates (day-one, not retrofit)
 
 | Gate | Legacy status | Rewrite policy |
 |---|---|---|
-| Tests | zero | every primitive gets widget tests; components get golden tests; theme resolution gets unit tests |
-| CI | two dead configs | one GitHub workflow on `main` + PRs: analyze, format, test, `tool/nomo_gen.dart --check`, example build |
+| Tests | zero | every primitive gets widget tests; components get golden tests; theme resolution gets unit tests; **the generator gets golden tests** (annotated fixture in → expected .g.dart out) |
+| CI | two dead configs | one GitHub workflow on `main` + PRs: analyze, format, test, `dart run nomo_gen --check` (regenerate + fail on diff), example build |
 | Lints | very_good_analysis (kept) | kept, no ignores without justification |
 | Versioning | patch-only, no tags | semver + tags + CHANGELOG discipline; publishable structure even if `publish_to: none` initially |
 | API hygiene | typos baked in | spell-checked public API; `dart doc` builds clean |
 
 ## 8. Migration & sequencing
 
-1. **Phase 0 — validate the theory**: build `tokens/`, `NomoStyle`/`resolveStyle`, `NomoSurface`, `NomoInteractive`, and port **one** hard component (PrimaryNomoButton) + one overlay (dropdown) end-to-end. Measure: LOC per component, resolution ergonomics, theme-switch performance. Revisit §2 if targets are missed.
-2. **Phase 1 — primitives complete**: overlay engine, text core, field core; golden-test infrastructure.
+1. **Phase 0 — validate the theory**: build `tokens/`, the annotation contract, and a **minimal `nomo_gen themes`** (parse one fixture widget, emit the §2.3 artifact set); port **one** hard component (PrimaryNomoButton) + one overlay (dropdown) end-to-end on it. Measure: handwritten LOC per component, generated LOC per property (target: well under legacy's ~35), resolution ergonomics at all five levels, theme-switch performance. Revisit §2/§5 if targets are missed.
+2. **Phase 1 — primitives complete**: overlay engine, text core, field core; golden-test infrastructure; `nomo_gen` hardened (diagnostics, `--check`, watch mode).
 3. **Phase 2 — component ports** in dependency order (buttons → surfaces → menus/selection → input/form → shell), consolidating duplicates per §3. Each port closes out the corresponding legacy bugs from 01 §4.2 with a regression test.
-4. **Phase 3 — icons unbundling** + example-app rebuild (no stubs) + docs.
+4. **Phase 3 — icons unbundling** (`nomo_gen icons`) + example-app rebuild (no stubs) + docs.
 5. Nomo App migrates per component behind its own abstraction; legacy `main` stays frozen as reference (this docs branch is the map).
 
 ## 9. Open questions
 
 1. Trim the 17 semantic colors? Several exist only for single components — audit during Phase 0.
-2. Does anything real depend on `NomoText` auto-fit (deleted upstream but API still public)? If yes, `NomoFittedText`; if no, drop.
-3. One `NomoResponsive<T>` mechanism vs. per-tier token sets — decide with Phase 0 measurements.
-4. Does the Nomo App need the name→IconData lookup at runtime, or only the example gallery? Determines how aggressive §4.2 can be.
-5. Snackbar: keep ScaffoldMessenger interop, or move fully onto the overlay engine and drop the last Material service dependency?
+2. Annotation schema details: are token-expression defaults as strings (`'t.colors.primary'`) acceptable, or do we want a typed `TokenRef` API for IDE support? Decide in Phase 0 with real usage.
+3. How much `lerp` is actually needed once theme switching lerps tokens instead of component classes? Possibly only a handful of opt-in fields.
+4. Does anything real depend on `NomoText` auto-fit (deleted upstream but API still public)? If yes, `NomoFittedText`; if no, drop.
+5. Does the Nomo App need the name→IconData lookup at runtime, or only the example gallery? Determines how aggressive §4.2 can be.
+6. Snackbar: keep ScaffoldMessenger interop, or move fully onto the overlay engine and drop the last Material service dependency?
+7. Repo layout for the generator: `tool/` script vs. a proper `nomo_gen` package in a Dart workspace within this repo (workspaces are stable since Dart 3.6) — decide when Phase 0 starts.

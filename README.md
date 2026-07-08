@@ -16,7 +16,7 @@ This is an **orphan branch** containing no code — only the complete documentat
 | [06 — Components](06-components.md) | Surfaces, overlays, menus & selection, feedback/loading, layout, misc |
 | [07 — Utilities, Icons, Public API](07-utilities-icons-api.md) | Extensions, PlatformInfo, icon system, entities, export surface |
 | [08 — Example App & Tooling](08-example-app-and-tooling.md) | Example gallery, dependencies, lint/test/CI, repo hygiene |
-| [09 — Rewrite Proposal](09-rewrite-proposal.md) | **The theorized slim architecture** — tokens, generic style resolution, primitives, icon unbundling, and the generator retirement plan (CLI over build_runner) |
+| [09 — Rewrite Proposal](09-rewrite-proposal.md) | **The theorized slim architecture** — tokens, decorator-declared component themes with defaults/overrides at every level, primitives, icon unbundling, and a rebuilt in-repo generator (CLI-first, build_runner optional) |
 
 ## How this was produced
 
