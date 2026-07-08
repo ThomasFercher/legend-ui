@@ -3,3 +3,12 @@ include: package:very_good_analysis/analysis_options.yaml
 analyzer:
   exclude:
     - "**/*.g.dart"
+
+linter:
+  rules:
+    # Phase 0 velocity: class-level docs are written, per-member docs are
+    # deferred. Re-enable before anything is published (ROADMAP Phase 3).
+    public_member_api_docs: false
+    # The kit follows Flutter's `static X lerp(X a, X b, double t)` idiom
+    # (TextStyle.lerp, Color.lerp, …); a lerp constructor would be alien.
+    prefer_constructors_over_static_methods: false

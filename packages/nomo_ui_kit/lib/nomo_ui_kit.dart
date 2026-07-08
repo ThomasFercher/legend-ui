@@ -7,3 +7,11 @@
 /// Architecture reference: `docs/DESIGN.md` (accepted RFC). Legacy
 /// documentation lives on the `legacy-docs` branch.
 library;
+
+export 'src/annotations/annotations.dart';
+export 'src/theme/nomo_theme.dart';
+export 'src/tokens/nomo_colors.dart';
+export 'src/tokens/nomo_shadows.dart';
+export 'src/tokens/nomo_sizes.dart';
+export 'src/tokens/nomo_tokens.dart';
+export 'src/tokens/nomo_typography.dart';

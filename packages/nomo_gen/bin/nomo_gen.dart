@@ -1,20 +1,41 @@
 import 'dart:io';
 
-const _usage = '''
-nomo_gen — Nomo UI Kit code generation CLI (scaffold; not yet implemented)
+import 'package:args/args.dart';
+import 'package:nomo_gen/nomo_gen.dart';
 
-Planned subcommands (see docs/DESIGN.md §5):
-  themes    Generate *.theme.g.dart from @NomoThemeable widgets
-  icons     Regenerate icon codepoint tables from upstream metadata
-  create    Scaffold a new themed component
-  doctor    Validate a project's Nomo theme setup
+const _usage =
+    '''
+nomo_gen v$nomoGenVersion — Nomo UI Kit code generation CLI
 
-Planned flags:
-  --check   Verify committed generated output is fresh (CI gate)
-  --watch   Regenerate on file changes
+Usage:
+  nomo_gen themes [paths…]     Generate *.theme.g.dart from @NomoThemeable
+                               widgets (default path: lib)
+      --check                  Verify committed output is fresh; fail on
+                               stale/missing files (CI gate)
+
+Planned (see docs/DESIGN.md §5): icons, create, doctor, --watch.
 ''';
 
-void main(List<String> args) {
-  stdout.write(_usage);
-  exitCode = 64; // EX_USAGE until subcommands exist
+Future<void> main(List<String> args) async {
+  final parser = ArgParser()..addFlag('check', negatable: false);
+  final ArgResults results;
+  try {
+    results = parser.parse(args);
+  } on FormatException catch (e) {
+    stderr
+      ..writeln(e.message)
+      ..writeln(_usage);
+    exitCode = 64;
+    return;
+  }
+
+  final rest = results.rest;
+  if (rest.isEmpty || rest.first != 'themes') {
+    stdout.write(_usage);
+    exitCode = 64;
+    return;
+  }
+
+  final paths = rest.length > 1 ? rest.sublist(1) : const ['lib'];
+  exitCode = await runThemes(paths, check: results.flag('check'));
 }

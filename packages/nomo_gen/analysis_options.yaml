@@ -1,1 +1,16 @@
 include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  exclude:
+    # Test fixtures import flutter/nomo_ui_kit, which this pure-Dart
+    # package cannot resolve; they are parsed as text by the generator.
+    - test/fixtures/**
+    - test/goldens/**
+
+linter:
+  rules:
+    # Phase 0 velocity — see the matching note in nomo_ui_kit.
+    public_member_api_docs: false
+    # The emitter interleaves StringBuffer cascades with section comments;
+    # forcing one mega-cascade hurts readability of emitted-code templates.
+    cascade_invocations: false
