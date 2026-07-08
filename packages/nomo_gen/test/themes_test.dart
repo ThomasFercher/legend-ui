@@ -67,6 +67,26 @@ class Bad {
       );
     });
 
+    test('accepts adjacent string literals in defaultsTo', () {
+      const source = '''
+import 'package:nomo_ui_kit/nomo_ui_kit.dart';
+
+@NomoThemeable()
+class Wide {
+  const Wide({this.padding});
+
+  @Themed(defaultsTo: 'EdgeInsets.symmetric(horizontal: t.sizes.md, '
+      'vertical: t.sizes.sm)')
+  final EdgeInsetsGeometry? padding;
+}
+''';
+      final widgets = parseThemableWidgets('wide.dart', source);
+      expect(
+        widgets.single.fields.single.defaultsTo,
+        'EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm)',
+      );
+    });
+
     test('never copies generated-file self-imports', () {
       final widgets = parseThemableWidgets('fancy_box.dart', fixture);
       expect(

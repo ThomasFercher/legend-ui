@@ -9,6 +9,10 @@
 library;
 
 export 'src/annotations/annotations.dart';
+export 'src/components/buttons/primary_nomo_button.dart';
+export 'src/components/buttons/primary_nomo_button.theme.g.dart';
+export 'src/primitives/nomo_interactive.dart';
+export 'src/primitives/nomo_surface.dart';
 export 'src/theme/nomo_theme.dart';
 export 'src/tokens/nomo_colors.dart';
 export 'src/tokens/nomo_shadows.dart';

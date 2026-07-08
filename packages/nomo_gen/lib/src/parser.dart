@@ -163,10 +163,23 @@ _ThemedArgs _themedArguments(Annotation annotation) {
     final value = argument.expression;
     switch (argument.name.label.name) {
       case 'defaultsTo':
-        if (value is SimpleStringLiteral) defaultsTo = value.value;
+        defaultsTo = _stringLiteralValue(value);
       case 'lerp':
         if (value is BooleanLiteral) lerp = value.value;
     }
   }
   return (defaultsTo: defaultsTo, lerp: lerp);
+}
+
+/// Extracts a compile-time string, including adjacent literals
+/// (`'a' 'b'` — how long token expressions wrap across lines).
+String? _stringLiteralValue(Expression expression) {
+  if (expression is SimpleStringLiteral) return expression.value;
+  if (expression is AdjacentStrings) {
+    final parts = expression.strings;
+    if (parts.every((s) => s is SimpleStringLiteral)) {
+      return parts.cast<SimpleStringLiteral>().map((s) => s.value).join();
+    }
+  }
+  return null;
 }
