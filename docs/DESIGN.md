@@ -256,7 +256,9 @@ test/                       # per package; incl. generator golden tests
 ## 9. Open questions
 
 1. Trim the 17 semantic colors? Several exist only for single components — audit during Phase 0.
-2. Annotation schema details: are token-expression defaults as strings (`'t.colors.primary'`) acceptable, or do we want a typed `TokenRef` API for IDE support? Decide in Phase 0 with real usage.
+2. Annotation schema details: are token-expression defaults as strings (`'t.colors.primary'`) acceptable, or do we want a typed `TokenRef` API for IDE support?
+   *2026-07-09, Phase 0*: MVP ships **strings**. The expression is pasted into the generated `defaults(NomoTokens t)` factory, so the analyzer validates it in the emitted file — a typo fails `flutter analyze`, not runtime. Ergonomics were fine across three components (incl. multi-line adjacent strings). Typed `TokenRef` remains open as a possible Phase 2 refinement; it must not regress expression power (`EdgeInsets.symmetric(horizontal: t.sizes.md, …)`).
+   Also settled in Phase 0: the registry keys on the **Nullable theme class** (`components[XThemeNullable]`), matching what's stored.
 3. How much `lerp` is actually needed once theme switching lerps tokens instead of component classes? Possibly only a handful of opt-in fields.
 4. Does anything real depend on `NomoText` auto-fit (deleted upstream but API still public)? If yes, `NomoFittedText`; if no, drop.
 5. Does the Nomo App need the name→IconData lookup at runtime, or only the example gallery? Determines how aggressive §4.2 can be.

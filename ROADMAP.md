@@ -6,17 +6,21 @@ Phases per [docs/DESIGN.md](docs/DESIGN.md) §8. Check items off as they land; a
 
 Goal: prove the token model, the decorator contract, and the CLI end-to-end on one hard component — including the consumer workflow. Go/no-go review at the end; revisit DESIGN §2/§5 if targets are missed.
 
-- [ ] `NomoTokens` (colors, sizes, typography, shadows) with handwritten `copyWith`/`lerp`
-- [ ] Annotation contract: `@NomoThemeable` / `@Themed` (decide string token-expressions vs typed `TokenRef` — DESIGN §9.2)
-- [ ] `NomoThemeData` open Type-keyed registry + `NomoTheme` widget + delegate skeleton
-- [ ] `nomo_gen themes` MVP: analyzer-AST parse of a fixture widget → emit the full artifact set (Theme, ThemeNullable, merge/copyWith/lerp, Override widget, `.of(context)`)
-- [ ] Generator golden test: annotated fixture in → expected `.g.dart` out
-- [ ] Minimal primitives: `NomoSurface`, `NomoInteractive`
-- [ ] Port `PrimaryNomoButton` on the primitives + generated theme
-- [ ] Minimal `NomoOverlayEngine` + port one dropdown
-- [ ] Consumer-workflow rehearsal: annotate a widget in the (future) example app as if third-party, generate, register in the theme map, override at all five levels
-- [ ] Measurements: handwritten LOC/component, generated LOC/property (target: well under legacy's ~35), theme-switch performance
-- [ ] Go/no-go review
+- [x] `NomoTokens` (colors, sizes, typography, shadows) with handwritten `copyWith`/`lerp`
+- [x] Annotation contract: `@NomoThemeable` / `@Themed` (MVP uses string token-expressions, validated by the analyzer on emitted code — dated note in DESIGN §9.2; typed `TokenRef` still open)
+- [x] `NomoThemeData` open Type-keyed registry + `NomoTheme` widget (delegate skeleton deferred to Phase 1 alongside `NomoBreakpoints`)
+- [x] `nomo_gen themes` MVP: analyzer-AST parse → full artifact set; contract diagnostics with file:line (nullable fields, null constructor defaults, adjacent strings)
+- [x] Generator golden test (`UPDATE_GOLDENS=1` flow) + contract-violation tests
+- [x] Minimal primitives: `NomoSurface`, `NomoInteractive`
+- [x] Port `PrimaryNomoButton` — five-level resolution proven by widget tests; **closes legacy "disabled buttons stay tappable"** with a regression test
+- [x] `NomoAnchoredOverlay` primitive + unified `NomoDropdown` (one item model)
+- [x] Consumer-workflow rehearsal: `test/consumer/balance_card.dart` uses only the public barrel + `dart run nomo_gen themes test/consumer`; registers in the same components map as kit widgets (tested)
+- [x] Measurements (2026-07-09):
+  - Generated LOC/property: button 150/6 = **25**, dropdown 135/5 = **27**, consumer card 102/3 = 34 (fixed overhead dominates small counts) → avg **~28 vs legacy ~35**, with zero naming conventions, no symbol collisions, no manual registration.
+  - Handwritten: button 144 LOC incl. themed declarations; entire runtime core (tokens+theme+annotations+3 primitives) 1,137 LOC.
+  - Generator: 541 LOC total vs legacy's ~1,050 — and it's in-repo, AST-based, tested.
+  - Theme-switch performance: micro-benchmark deferred to Phase 1 (needs `AnimatedTokens`); architecture already lerps 1 token object instead of 48 classes.
+- [ ] Go/no-go review ← **next: user reviews Phase 0 results**
 
 ## Phase 1 — primitives complete
 

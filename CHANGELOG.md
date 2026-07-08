@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.0-dev.1 (unreleased) — Phase 0
+
+- `NomoTokens` (colors/sizes/typography/shadows) with single-object `lerp`.
+- `@NomoThemeable`/`@Themed` decorator contract; `NomoThemeData` with the open Type-keyed component registry; generic `NomoThemeOverride`.
+- `nomo_gen themes`: AST-based generation of the full per-component artifact set, contract diagnostics (`file:line`), `--check` freshness gate, golden-tested. Runs as a normal dev dependency (`dart run nomo_gen themes lib`).
+- Primitives: `NomoSurface`, `NomoInteractive`, `NomoAnchoredOverlay`.
+- Components: `PrimaryNomoButton` (five-level resolution verified; disabled buttons are genuinely inert — fixes a legacy bug), unified `NomoDropdown`.
+- Consumer-workflow rehearsal: an out-of-tree widget themed with the identical decorator/generator/registry workflow (tested).
+
 ## 1.0.0-dev.0 (unreleased)
 
 - Workspace scaffold for the full rewrite: `packages/nomo_ui_kit` + `packages/nomo_gen` (standalone CLI, decided over build_runner).
