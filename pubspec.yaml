@@ -1,0 +1,10 @@
+name: nomo_workspace
+description: Dart workspace for the Nomo UI Kit rewrite (kit + nomo_gen CLI).
+publish_to: none
+
+environment:
+  sdk: ^3.10.0
+
+workspace:
+  - packages/nomo_ui_kit
+  - packages/nomo_gen

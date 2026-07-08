@@ -1,0 +1,23 @@
+# Dart / Flutter
+.dart_tool/
+.packages
+build/
+pubspec.lock
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Note: pubspec.lock is ignored while nothing is published as an app;
+# revisit when example/ (an application) is added — apps should commit it.
+
+# IDE
+.idea/
+*.iml
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+
+# OS
+.DS_Store
+
+# FVM
+.fvm/

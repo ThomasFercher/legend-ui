@@ -1,0 +1,20 @@
+name: nomo_ui_kit
+description: Highly opinionated, slim and customizable UI Kit for Flutter. Full rewrite — see docs/DESIGN.md.
+version: 1.0.0-dev.0
+repository: https://github.com/nomo-app/nomo-ui-kit
+homepage: https://nomo.app
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.10.0
+  flutter: ">=3.38.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^7.0.0
