@@ -1,4 +1,5 @@
 import 'package:example/main.dart';
+import 'package:flutter/material.dart' show SelectionArea;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legend_ui/legend_ui.dart';
@@ -41,6 +42,29 @@ void main() {
     expect(
       _primaryButtonColor(tester, 'Primary'),
       LegendTokens.dark.colors.primary,
+    );
+  });
+
+  testWidgets('docs prose is web-selectable (under a SelectionArea)', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const DocsApp());
+    await tester.pumpAndSettle();
+
+    // Page prose sits inside a SelectionArea, so CanvasKit-painted text is
+    // selectable on web. SelectionArea needs MaterialLocalizations, supplied
+    // through LegendApp's localizations passthrough — if that regresses,
+    // pumping DocsApp throws here.
+    expect(
+      find.ancestor(
+        of: find.textContaining('Material-free'),
+        matching: find.byType(SelectionArea),
+      ),
+      findsOneWidget,
     );
   });
 

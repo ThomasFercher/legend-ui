@@ -11,7 +11,8 @@ import 'package:example/docs/pages/theming_page.dart';
 import 'package:example/docs/pages/typography_page.dart';
 import 'package:example/theme/theme_controller.dart';
 import 'package:example/theme/theme_panel.dart';
-import 'package:flutter/material.dart' show Icons;
+import 'package:flutter/material.dart'
+    show DefaultMaterialLocalizations, Icons, SelectionArea;
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/legend_ui.dart';
 
@@ -78,6 +79,10 @@ class _DocsAppState extends State<DocsApp> {
       builder: (context, _) => LegendApp(
         title: 'Legend UI',
         theme: _theme.data,
+        // SelectionArea (Material's selection wrapper) needs
+        // MaterialLocalizations; LegendApp is WidgetsApp-based, so a consumer
+        // supplies the delegate through the localizations passthrough.
+        localizationsDelegates: const [DefaultMaterialLocalizations.delegate],
         home: Builder(builder: _buildShell),
       ),
     );
@@ -86,12 +91,16 @@ class _DocsAppState extends State<DocsApp> {
   Widget _buildShell(BuildContext context) {
     final tokens = LegendTheme.of(context).tokens;
     final compact = LegendBreakpoints.of(context).tier == LegendTier.compact;
-    final content = SingleChildScrollView(
-      key: ValueKey(_page),
-      padding: EdgeInsets.all(tokens.sizes.lg),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 860),
-        child: _buildPage(_page),
+    // SelectionArea makes all doc prose selectable on web (CanvasKit paints
+    // text to a canvas, so nothing is selectable without it).
+    final content = SelectionArea(
+      child: SingleChildScrollView(
+        key: ValueKey(_page),
+        padding: EdgeInsets.all(tokens.sizes.lg),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 860),
+          child: _buildPage(_page),
+        ),
       ),
     );
 
