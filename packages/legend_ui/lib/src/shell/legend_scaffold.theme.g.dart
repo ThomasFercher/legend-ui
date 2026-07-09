@@ -10,7 +10,7 @@ class LegendScaffoldTheme {
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendScaffoldTheme.defaults(LegendTokens t) =>
-      LegendScaffoldTheme(background: LegendScaffold._background(t));
+      LegendScaffoldTheme(background: LegendColorsRef.background1(t));
 
   final Color background;
 

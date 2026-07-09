@@ -125,3 +125,67 @@ LegendColors _$LegendColorsLerp(LegendColors a, LegendColors b, double t) =>
       foreground2: Color.lerp(a.foreground2, b.foreground2, t)!,
       foreground3: Color.lerp(a.foreground3, b.foreground3, t)!,
     );
+
+/// Const tear-off catalog for [LegendColors] (RFC-002 R10
+/// amendment): one static per token field, usable directly
+/// inside `@Style<T>.resolve` annotations —
+/// `@Style<Color>.resolve(LegendColorsRef.primary)`.
+abstract final class LegendColorsRef {
+  /// The brand color — filled buttons, active states, focus accents.
+  static Color primary(LegendTokens t) => t.colors.primary;
+
+  /// Foreground for content sitting on [primary].
+  static Color onPrimary(LegendTokens t) => t.colors.onPrimary;
+
+  /// Soft tinted fill derived from the brand — selected navigation items,
+  /// secondary button fills.
+  static Color primaryContainer(LegendTokens t) => t.colors.primaryContainer;
+
+  /// Foreground for content sitting on [primaryContainer] (added by the
+  /// 2026-07-09 §9.1 pairs audit; matches what components historically
+  /// drew there — the primary color).
+  static Color onPrimaryContainer(LegendTokens t) =>
+      t.colors.onPrimaryContainer;
+
+  /// The supporting accent — success accents, secondary highlights.
+  static Color secondary(LegendTokens t) => t.colors.secondary;
+
+  /// Foreground for content sitting on [secondary].
+  static Color onSecondary(LegendTokens t) => t.colors.onSecondary;
+
+  /// Page background (the lowest layer).
+  static Color background1(LegendTokens t) => t.colors.background1;
+
+  /// Raised background — hover fills, subtle emphasis over [background1].
+  static Color background2(LegendTokens t) => t.colors.background2;
+
+  /// Strong background — hairlines, resting borders, dividers.
+  static Color background3(LegendTokens t) => t.colors.background3;
+
+  /// Elevated content surfaces: cards, menus, dialogs, bars.
+  static Color surface(LegendTokens t) => t.colors.surface;
+
+  /// Foreground for content sitting on [surface].
+  static Color onSurface(LegendTokens t) => t.colors.onSurface;
+
+  /// Destructive/error color — error borders, messages, accents.
+  static Color error(LegendTokens t) => t.colors.error;
+
+  /// Foreground for content sitting on [error].
+  static Color onError(LegendTokens t) => t.colors.onError;
+
+  /// Fill of disabled interactive surfaces.
+  static Color disabled(LegendTokens t) => t.colors.disabled;
+
+  /// Foreground for content sitting on [disabled].
+  static Color onDisabled(LegendTokens t) => t.colors.onDisabled;
+
+  /// Primary text color.
+  static Color foreground1(LegendTokens t) => t.colors.foreground1;
+
+  /// Muted text color — labels, supporting copy.
+  static Color foreground2(LegendTokens t) => t.colors.foreground2;
+
+  /// Faint text color — placeholders, de-emphasized items.
+  static Color foreground3(LegendTokens t) => t.colors.foreground3;
+}

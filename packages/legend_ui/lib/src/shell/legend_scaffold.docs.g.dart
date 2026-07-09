@@ -13,7 +13,7 @@ const List<LegendDocEntry> legendScaffoldDocEntries = [
     name: 'background',
     type: 'Color?',
     doc: 'Fill color behind the page body.',
-    defaultDescription: 't.colors.background1',
+    defaultDescription: 'LegendColorsRef.background1',
     group: 'component',
   ),
 ];

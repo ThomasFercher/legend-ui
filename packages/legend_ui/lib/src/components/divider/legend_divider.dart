@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_colors.dart';
+import 'package:legend_ui/src/tokens/legend_sizes.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
 part 'legend_divider.theme.g.dart';
@@ -34,19 +36,16 @@ class LegendDivider extends StatelessWidget {
   final Axis axis;
 
   /// Color of the line.
-  @Style<Color>.resolve(_color)
+  @Style<Color>.resolve(LegendColorsRef.background3)
   final Color? color;
-  static Color _color(LegendTokens t) => t.colors.background3;
 
   /// Stroke width of the line.
-  @Style<double>.resolve(_thickness)
+  @Style<double>.resolve(LegendSizesRef.borderWidth)
   final double? thickness;
-  static double _thickness(LegendTokens t) => t.sizes.borderWidth;
 
   /// Outer margin on both sides of the line.
-  @Style<double>.resolve(_spacing)
+  @Style<double>.resolve(LegendSizesRef.md)
   final double? spacing;
-  static double _spacing(LegendTokens t) => t.sizes.md;
 
   @override
   Widget build(BuildContext context) {

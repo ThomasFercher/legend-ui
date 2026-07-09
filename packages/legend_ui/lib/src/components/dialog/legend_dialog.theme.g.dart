@@ -15,9 +15,9 @@ class LegendDialogTheme {
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendDialogTheme.defaults(LegendTokens t) => LegendDialogTheme(
-    background: LegendDialog._background(t),
-    borderRadius: LegendDialog._borderRadius(t),
-    padding: LegendDialog._padding(t),
+    background: LegendColorsRef.surface(t),
+    borderRadius: _borderRadius(t),
+    padding: _padding(t),
     maxWidth: 420,
   );
 

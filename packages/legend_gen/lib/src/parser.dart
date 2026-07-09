@@ -89,11 +89,12 @@ List<ThemableWidget> parseThemableWidgets(String path, String content) {
           path: path,
           lineOf: lineOf,
           annotation: annotation,
+          unit: unit,
           declaringClass: declaration,
           className: className,
           name: name,
           type: type,
-          doc: _dartdocText(member),
+          doc: dartdocText(member),
           diagnostics: diagnostics,
         );
         if (field != null) fields.add(field);
@@ -186,6 +187,7 @@ StyledField? _parseStyleField({
   required String path,
   required int Function(SyntacticEntity) lineOf,
   required Annotation annotation,
+  required CompilationUnit unit,
   required ClassDeclaration declaringClass,
   required String className,
   required String name,
@@ -262,34 +264,46 @@ StyledField? _parseStyleField({
         report(
           annotation,
           '@Style.resolve on "$name" needs a const tear-off identifier '
-          '($resolvedType Function(LegendTokens)), e.g. a private static '
-          '"_$name" declared next to the field.',
+          '($resolvedType Function(LegendTokens)) — a token Ref catalog '
+          'member (e.g. LegendColorsRef.primary), or a private top-level '
+          'function "_$name" declared in this file.',
         );
         return null;
       }
       kind = StyleDefaultKind.resolve;
       if (target is PrefixedIdentifier) {
-        // Qualified (shared/public) symbol — emit and describe as written.
+        // Qualified symbol from another class or library (a generated
+        // `<Class>Ref` catalog member, a shared defaults class, …) —
+        // emit and describe as written.
         defaultCode = target.toSource();
         defaultDescription = defaultCode;
       } else {
-        // A plain identifier resolves against the widget class scope in
-        // the annotation, so it must be one of its statics; the generated
-        // classes qualify it explicitly.
-        final body = _staticTearOffBody(declaringClass, target.name);
-        if (body == null) {
+        // A bare identifier must be one of the two const-tear-off-able
+        // shapes: a static method of the widget class (the annotation
+        // resolves it against the class scope; the generated code
+        // qualifies it explicitly) or a top-level function of the
+        // widget's library (the generated part shares its scope).
+        final staticBody = _staticTearOffBody(declaringClass, target.name);
+        final topLevelBody = _topLevelTearOffBody(unit, target.name);
+        if (staticBody != null) {
+          defaultCode = '$className.${target.name}';
+          defaultDescription = staticBody;
+        } else if (topLevelBody != null) {
+          defaultCode = target.name;
+          defaultDescription = topLevelBody;
+        } else {
           report(
             target,
             '@Style.resolve on "$name" references "${target.name}", which '
-            'is not a static method of "$className" — declare '
-            '"static $resolvedType ${target.name}(LegendTokens t) => …;" '
-            'in the class, or qualify a shared symbol '
-            '(e.g. SharedDefaults.${target.name}).',
+            'is neither a static method of "$className" nor a top-level '
+            'function in this file — annotation arguments must be const '
+            'tear-offs (instance methods and local functions are not); '
+            'declare "$resolvedType ${target.name}(LegendTokens t) => …;" '
+            'at the top level (or as a static of the class), or use a '
+            'token Ref catalog member (e.g. LegendColorsRef.primary).',
           );
           return null;
         }
-        defaultCode = '$className.${target.name}';
-        defaultDescription = body;
       }
     default:
       report(
@@ -348,11 +362,29 @@ String? _staticTearOffBody(ClassDeclaration declaration, String name) {
   return null;
 }
 
+/// The body expression source of the top-level function [name] in [unit]
+/// (`Color _bg(LegendTokens t) => t.colors.primary;` → `t.colors.primary`),
+/// or null when the unit declares no such function. Top-level functions
+/// are the other const-tear-off-able shape besides statics; getters and
+/// setters don't tear off, so they are skipped.
+String? _topLevelTearOffBody(CompilationUnit unit, String name) {
+  for (final declaration in unit.declarations) {
+    if (declaration is! FunctionDeclaration) continue;
+    if (declaration.isGetter || declaration.isSetter) continue;
+    if (declaration.name.lexeme != name) continue;
+    final body = declaration.functionExpression.body;
+    if (body is ExpressionFunctionBody) return body.expression.toSource();
+    return body.toSource();
+  }
+  return null;
+}
+
 String _normalizeType(String source) => source.replaceAll(RegExp(r'\s'), '');
 
 /// The dartdoc of [declaration] as plain text: `///` markers stripped,
 /// lines joined with `\n`, no trailing whitespace. Empty when undocumented.
-String _dartdocText(AnnotatedNode declaration) {
+/// Shared with the tokens parser (Ref catalog members copy field docs).
+String dartdocText(AnnotatedNode declaration) {
   final comment = declaration.documentationComment;
   if (comment == null) return '';
   return comment.tokens

@@ -14,9 +14,9 @@ class LegendAppBarTheme {
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendAppBarTheme.defaults(LegendTokens t) => LegendAppBarTheme(
-    background: LegendAppBar._background(t),
+    background: LegendColorsRef.surface(t),
     height: 56,
-    padding: LegendAppBar._padding(t),
+    padding: _padding(t),
   );
 
   final Color background;

@@ -92,7 +92,7 @@ const List<LegendDocEntry> legendTextButtonDocEntries = [
     name: 'textStyle',
     type: 'TextStyle?',
     doc: 'Text style of the [text] label (its color comes from [foreground]).',
-    defaultDescription: 't.typography.b2',
+    defaultDescription: 'LegendTypographyRef.b2',
     group: 'component',
   ),
 ];

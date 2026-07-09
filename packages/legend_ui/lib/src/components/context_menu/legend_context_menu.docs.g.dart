@@ -81,7 +81,7 @@ const List<LegendDocEntry> legendContextMenuDocEntries = [
     name: 'menuShadows',
     type: 'List<BoxShadow>?',
     doc: 'Drop shadow lifting the menu off the page.',
-    defaultDescription: 't.shadows.medium',
+    defaultDescription: 'LegendShadowsRef.medium',
     group: 'component',
   ),
   LegendDocEntry(
@@ -98,7 +98,7 @@ const List<LegendDocEntry> legendContextMenuDocEntries = [
     name: 'textStyle',
     type: 'TextStyle?',
     doc: 'Text style of the entry labels.',
-    defaultDescription: 't.typography.b2',
+    defaultDescription: 'LegendTypographyRef.b2',
     group: 'component',
   ),
 ];

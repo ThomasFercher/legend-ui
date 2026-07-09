@@ -17,12 +17,12 @@ class LegendTextFieldTheme {
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendTextFieldTheme.defaults(LegendTokens t) => LegendTextFieldTheme(
-    background: LegendTextField._background(t),
-    borderRadius: LegendTextField._borderRadius(t),
-    padding: LegendTextField._padding(t),
-    textStyle: LegendTextField._textStyle(t),
-    borderColor: LegendTextField._borderColor(t),
-    focusedBorderColor: LegendTextField._focusedBorderColor(t),
+    background: LegendColorsRef.background1(t),
+    borderRadius: _borderRadius(t),
+    padding: _padding(t),
+    textStyle: LegendTypographyRef.b1(t),
+    borderColor: LegendColorsRef.background3(t),
+    focusedBorderColor: LegendColorsRef.primary(t),
   );
 
   final Color background;

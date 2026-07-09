@@ -14,9 +14,9 @@ class LegendInfoItemTheme {
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendInfoItemTheme.defaults(LegendTokens t) => LegendInfoItemTheme(
-    labelStyle: LegendInfoItem._labelStyle(t),
-    valueStyle: LegendInfoItem._valueStyle(t),
-    padding: LegendInfoItem._padding(t),
+    labelStyle: _labelStyle(t),
+    valueStyle: _valueStyle(t),
+    padding: _padding(t),
   );
 
   final TextStyle labelStyle;

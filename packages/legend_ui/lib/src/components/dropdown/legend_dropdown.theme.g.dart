@@ -17,12 +17,12 @@ class LegendDropdownTheme {
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendDropdownTheme.defaults(LegendTokens t) => LegendDropdownTheme(
-    menuBackground: LegendDropdown._menuBackground(t),
-    menuBorderRadius: LegendDropdown._menuBorderRadius(t),
-    menuShadows: LegendDropdown._menuShadows(t),
+    menuBackground: _menuBackground(t),
+    menuBorderRadius: _menuBorderRadius(t),
+    menuShadows: LegendShadowsRef.medium(t),
     menuMaxHeight: 320,
-    itemPadding: LegendDropdown._itemPadding(t),
-    textStyle: LegendDropdown._textStyle(t),
+    itemPadding: _itemPadding(t),
+    textStyle: LegendTypographyRef.b2(t),
   );
 
   final LegendStates<Color> menuBackground;

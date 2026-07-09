@@ -56,3 +56,25 @@ LegendTokens _$LegendTokensLerp(LegendTokens a, LegendTokens b, double t) =>
       shadows: LegendShadows.lerp(a.shadows, b.shadows, t),
       states: LegendStateOverlays.lerp(a.states, b.states, t),
     );
+
+/// Const tear-off catalog for [LegendTokens] (RFC-002 R10
+/// amendment): one static per token field, usable directly
+/// inside `@Style<T>.resolve` annotations —
+/// `@Style<LegendColors>.resolve(LegendTokensRef.colors)`.
+abstract final class LegendTokensRef {
+  /// The semantic color palette.
+  static LegendColors colors(LegendTokens t) => t.colors;
+
+  /// Spacing, radii, border and icon scales.
+  static LegendSizes sizes(LegendTokens t) => t.sizes;
+
+  /// The six-style type scale.
+  static LegendTypography typography(LegendTokens t) => t.typography;
+
+  /// The elevation system.
+  static LegendShadows shadows(LegendTokens t) => t.shadows;
+
+  /// Interaction-state derivation deltas (RFC-002 R6): how unset
+  /// hover/press/disabled variants derive from a base color.
+  static LegendStateOverlays states(LegendTokens t) => t.states;
+}

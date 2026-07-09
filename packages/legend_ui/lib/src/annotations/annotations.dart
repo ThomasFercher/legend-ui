@@ -21,6 +21,13 @@ class LegendThemeable {
 /// member-wise lerp function the class's one-line `static lerp` redirects
 /// to — are generated into a `<file>.tokens.g.dart` part.
 ///
+/// With [mountedAt] set, the generator additionally emits a **const
+/// tear-off catalog** `<ClassName>Ref` into the same part: one static
+/// `FieldType field(LegendTokens t) => t.<mountedAt>.<field>;` per token
+/// field, usable directly inside `@Style<T>.resolve` annotations
+/// (RFC-002 R10 amendment) — the common one-hop token default without an
+/// adjacent hand-written tear-off.
+///
 /// Explicitly NOT [LegendThemeable]: token classes are the base theme
 /// (DESIGN.md §2.1) and never get Override widgets, registry entries, or
 /// `of()` resolvers (RFC-002 R10 scope). There is no per-field opt-out:
@@ -32,10 +39,25 @@ class LegendThemeable {
 /// - the unnamed constructor accepts every field as a named parameter,
 /// - list fields are `List<BoxShadow>` (the one lerpable list),
 /// - the class applies the generated mixin (`with _$ClassName`),
-/// - the file carries `part '<file>.tokens.g.dart';`.
+/// - the file carries `part '<file>.tokens.g.dart';`,
+/// - with [mountedAt], the file imports `legend_tokens.dart` (the Ref
+///   catalog's parameter type; an in-package circular import is fine).
 @Target({TargetKind.classType})
 class LegendTokenData {
-  const LegendTokenData();
+  const LegendTokenData({this.mountedAt});
+
+  /// The [LegendTokens] getter this class sits behind — `'colors'`,
+  /// `'sizes'`, `'typography'`, `'shadows'`, or `'states'` for the kit's
+  /// own classes. An explicit declaration, never a naming convention.
+  ///
+  /// The empty string is the **root sentinel**: the class IS
+  /// [LegendTokens], and its Ref catalog reads fields directly
+  /// (`static LegendColors colors(LegendTokens t) => t.colors;`), closing
+  /// the catalog over the whole base theme.
+  ///
+  /// Null (the default) skips the Ref catalog — for nested groups a
+  /// consumer never styles against.
+  final String? mountedAt;
 }
 
 /// Marks a field of a [LegendThemeable] widget as a themed property and
@@ -51,8 +73,17 @@ class LegendTokenData {
 /// - `@Style<T>.resolve(tearOff)` — the author defines the relation to the
 ///   static theme values as a const tear-off `T Function(LegendTokens)`,
 ///   compile-checked in the widget file itself and shareable as an
-///   ordinary symbol. Tear-offs may be private statics — the generated
-///   artifact is `part of` the widget's library.
+///   ordinary symbol. Two tear-off shapes (Dart's const rules allow
+///   exactly these):
+///   - a **Ref catalog member** for the common one-hop token read —
+///     `@Style<double>.resolve(LegendSizesRef.md)`; the catalogs are
+///     generated from the token classes ([LegendTokenData.mountedAt]),
+///     so no adjacent hand-written static is needed;
+///   - a **private top-level function** (or a static method) in the
+///     widget's file for composite defaults —
+///     `EdgeInsetsGeometry _padding(LegendTokens t) =>
+///     EdgeInsets.all(t.sizes.md);` — the generated artifact is
+///     `part of` the widget's library, so private symbols resolve.
 /// - `@Style<T>(null)` — no default: the component treats the value as
 ///   genuinely optional and the resolved theme field stays nullable.
 ///

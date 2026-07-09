@@ -9,21 +9,24 @@ class FancyBoxTheme {
     required this.background,
     required this.gap,
     required this.padding,
+    required this.stripeWidth,
     required this.outline,
   });
 
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory FancyBoxTheme.defaults(LegendTokens t) => FancyBoxTheme(
-    background: FancyBox._background(t),
+    background: LegendColorsRef.surface(t),
     gap: 8.0,
     padding: FancyBox._padding(t),
+    stripeWidth: _stripeWidth(t),
     outline: null,
   );
 
   final Color background;
   final double gap;
   final EdgeInsetsGeometry padding;
+  final double stripeWidth;
   final Color? outline;
 
   /// Resolves the theme: defaults <- app registry (keyed by
@@ -48,6 +51,7 @@ class FancyBoxTheme {
       background: other.background ?? background,
       gap: other.gap ?? gap,
       padding: other.padding ?? padding,
+      stripeWidth: other.stripeWidth ?? stripeWidth,
       outline: other.outline ?? outline,
     );
   }
@@ -56,11 +60,13 @@ class FancyBoxTheme {
     Color? background,
     double? gap,
     EdgeInsetsGeometry? padding,
+    double? stripeWidth,
     Color? outline,
   }) => FancyBoxTheme(
     background: background ?? this.background,
     gap: gap ?? this.gap,
     padding: padding ?? this.padding,
+    stripeWidth: stripeWidth ?? this.stripeWidth,
     outline: outline ?? this.outline,
   );
 
@@ -69,6 +75,7 @@ class FancyBoxTheme {
         background: Color.lerp(a.background, b.background, t)!,
         gap: a.gap + (b.gap - a.gap) * t,
         padding: t < 0.5 ? a.padding : b.padding,
+        stripeWidth: t < 0.5 ? a.stripeWidth : b.stripeWidth,
         outline: Color.lerp(a.outline, b.outline, t),
       );
 }
@@ -81,12 +88,14 @@ class FancyBoxThemeNullable {
     this.background,
     this.gap,
     this.padding,
+    this.stripeWidth,
     this.outline,
   });
 
   final Color? background;
   final double? gap;
   final EdgeInsetsGeometry? padding;
+  final double? stripeWidth;
   final Color? outline;
 
   FancyBoxThemeNullable merge(FancyBoxThemeNullable? other) {
@@ -95,6 +104,7 @@ class FancyBoxThemeNullable {
       background: other.background ?? background,
       gap: other.gap ?? gap,
       padding: other.padding ?? padding,
+      stripeWidth: other.stripeWidth ?? stripeWidth,
       outline: other.outline ?? outline,
     );
   }
@@ -106,10 +116,12 @@ class FancyBoxThemeNullable {
           other.background == background &&
           other.gap == gap &&
           other.padding == padding &&
+          other.stripeWidth == stripeWidth &&
           other.outline == outline;
 
   @override
-  int get hashCode => Object.hashAll([background, gap, padding, outline]);
+  int get hashCode =>
+      Object.hashAll([background, gap, padding, stripeWidth, outline]);
 }
 
 /// Overrides [FancyBoxTheme] for a subtree (level 2).
@@ -140,6 +152,7 @@ extension _$FancyBoxThemeResolve on FancyBox {
       background: background,
       gap: gap,
       padding: padding,
+      stripeWidth: stripeWidth,
       outline: outline,
     ),
   );

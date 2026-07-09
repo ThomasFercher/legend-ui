@@ -1,5 +1,6 @@
 import 'package:flutter/painting.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
+import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
 part 'legend_typography.tokens.g.dart';
 
@@ -7,7 +8,7 @@ part 'legend_typography.tokens.g.dart';
 ///
 /// Colors are not baked in here — text color resolves from the color
 /// tokens (`LegendColors`) at the component level.
-@LegendTokenData()
+@LegendTokenData(mountedAt: 'typography')
 class LegendTypography with _$LegendTypography {
   const LegendTypography({
     this.h1 = const TextStyle(fontSize: 32, fontWeight: FontWeight.w700),

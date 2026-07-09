@@ -13,7 +13,7 @@ const List<LegendDocEntry> legendBottomBarDocEntries = [
     name: 'background',
     type: 'Color?',
     doc: 'Fill color of the bar.',
-    defaultDescription: 't.colors.surface',
+    defaultDescription: 'LegendColorsRef.surface',
     group: 'component',
   ),
   LegendDocEntry(
@@ -21,7 +21,7 @@ const List<LegendDocEntry> legendBottomBarDocEntries = [
     name: 'selectedColor',
     type: 'Color?',
     doc: 'Label/icon color of the selected item.',
-    defaultDescription: 't.colors.primary',
+    defaultDescription: 'LegendColorsRef.primary',
     group: 'component',
   ),
   LegendDocEntry(
@@ -29,7 +29,7 @@ const List<LegendDocEntry> legendBottomBarDocEntries = [
     name: 'unselectedColor',
     type: 'Color?',
     doc: 'Label/icon color of unselected items.',
-    defaultDescription: 't.colors.foreground3',
+    defaultDescription: 'LegendColorsRef.foreground3',
     group: 'component',
   ),
   LegendDocEntry(

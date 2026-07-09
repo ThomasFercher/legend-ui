@@ -52,6 +52,24 @@ LegendShadows _$LegendShadowsLerp(LegendShadows a, LegendShadows b, double t) =>
       high: BoxShadow.lerpList(a.high, b.high, t)!,
     );
 
+/// Const tear-off catalog for [LegendShadows] (RFC-002 R10
+/// amendment): one static per token field, usable directly
+/// inside `@Style<T>.resolve` annotations —
+/// `@Style<List<BoxShadow>>.resolve(LegendShadowsRef.none)`.
+abstract final class LegendShadowsRef {
+  /// Flat — no shadow at all.
+  static List<BoxShadow> none(LegendTokens t) => t.shadows.none;
+
+  /// Subtle lift for resting content (cards).
+  static List<BoxShadow> low(LegendTokens t) => t.shadows.low;
+
+  /// Clear separation for floating chrome (menus, toasts, bars).
+  static List<BoxShadow> medium(LegendTokens t) => t.shadows.medium;
+
+  /// Strong lift for modal surfaces (dialogs).
+  static List<BoxShadow> high(LegendTokens t) => t.shadows.high;
+}
+
 /// Element-wise list equality (lists compare by identity;
 /// equal token sets must compare equal).
 bool _$listEquals(List<Object?> a, List<Object?> b) {

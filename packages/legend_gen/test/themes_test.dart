@@ -60,13 +60,16 @@ void main() {
         'background',
         'gap',
         'padding',
+        'stripeWidth',
         'outline',
       ]);
 
+      // Ref-catalog member (qualified tear-off from the tokens library) —
+      // emitted and described as written (RFC-002 R10 amendment).
       final background = w.fields[0];
       expect(background.kind, StyleDefaultKind.resolve);
-      expect(background.defaultCode, 'FancyBox._background');
-      expect(background.defaultDescription, 't.colors.surface');
+      expect(background.defaultCode, 'LegendColorsRef.surface');
+      expect(background.defaultDescription, 'LegendColorsRef.surface');
       expect(background.lerp, isTrue);
 
       final gap = w.fields[1];
@@ -75,13 +78,23 @@ void main() {
       expect(gap.defaultDescription, '8.0');
       expect(gap.lerp, isTrue);
 
+      // Class-static tear-off — emitted class-qualified, described by its
+      // body expression.
       final padding = w.fields[2];
       expect(padding.kind, StyleDefaultKind.resolve);
       expect(padding.resolvedType, 'EdgeInsetsGeometry');
+      expect(padding.defaultCode, 'FancyBox._padding');
       expect(padding.defaultDescription, 'EdgeInsets.all(t.sizes.md)');
       expect(padding.lerp, isFalse);
 
-      final outline = w.fields[3];
+      // Top-level function tear-off — emitted unqualified (the generated
+      // part shares the library scope), described by its body expression.
+      final stripeWidth = w.fields[3];
+      expect(stripeWidth.kind, StyleDefaultKind.resolve);
+      expect(stripeWidth.defaultCode, '_stripeWidth');
+      expect(stripeWidth.defaultDescription, 't.sizes.borderWidth * 2');
+
+      final outline = w.fields[4];
       expect(outline.kind, StyleDefaultKind.none);
       expect(outline.themeType, 'Color?');
       expect(outline.defaultDescription, 'null');
@@ -173,7 +186,8 @@ class Bad {
       );
     });
 
-    test('rejects a .resolve target that is not a static of the class', () {
+    test('rejects a .resolve target that is neither a static of the class '
+        'nor a top-level function', () {
       _expectSingleDiagnostic(
         _widgetFile('''
 @LegendThemeable()
@@ -187,9 +201,57 @@ class Bad {
         allOf(
           contains('bad.dart:9'),
           contains('"_missing"'),
-          contains('not a static method of "Bad"'),
+          contains(
+            'neither a static method of "Bad" nor a top-level '
+            'function',
+          ),
         ),
       );
+    });
+
+    test('rejects an instance-method .resolve target (not a const '
+        'tear-off)', () {
+      _expectSingleDiagnostic(
+        _widgetFile('''
+@LegendThemeable()
+class Bad {
+  const Bad({this.background});
+
+  @Style<Color>.resolve(_background)
+  final Color? background;
+  Color _background(LegendTokens t) => t.colors.surface;
+}
+'''),
+        allOf(
+          contains('"_background"'),
+          contains(
+            'neither a static method of "Bad" nor a top-level '
+            'function',
+          ),
+          contains('must be const tear-offs'),
+        ),
+      );
+    });
+
+    test('accepts a top-level function as the .resolve target', () {
+      final widgets = parseThemableWidgets(
+        'toplevel.dart',
+        _widgetFile('''
+@LegendThemeable()
+class TopLevel {
+  const TopLevel({this.padding});
+
+  @Style<EdgeInsetsGeometry>.resolve(_padding)
+  final EdgeInsetsGeometry? padding;
+}
+
+EdgeInsetsGeometry _padding(LegendTokens t) => EdgeInsets.all(t.sizes.md);
+''').replaceFirst("part 'bad.theme.g.dart';", "part 'toplevel.theme.g.dart';"),
+      );
+      final field = widgets.single.fields.single;
+      expect(field.kind, StyleDefaultKind.resolve);
+      expect(field.defaultCode, '_padding');
+      expect(field.defaultDescription, 'EdgeInsets.all(t.sizes.md)');
     });
 
     test('accepts a qualified shared symbol as the .resolve target', () {
@@ -288,8 +350,12 @@ class Bad {
         output,
         contains('factory FancyBoxTheme.defaults(LegendTokens t)'),
       );
-      // Tear-offs are called class-qualified; consts are inlined.
-      expect(output, contains('background: FancyBox._background(t)'));
+      // Ref-catalog tear-offs are called as written, class statics
+      // class-qualified, top-level functions unqualified; consts are
+      // inlined.
+      expect(output, contains('background: LegendColorsRef.surface(t)'));
+      expect(output, contains('padding: FancyBox._padding(t)'));
+      expect(output, contains('stripeWidth: _stripeWidth(t)'));
       expect(output, contains('gap: 8.0'));
       // Both-keys level-3 lookup (R3): widget type first.
       expect(
@@ -344,7 +410,10 @@ class Bad {
       expect(output, contains('const List<LegendDocEntry> fancyBoxDocEntries'));
       expect(output, contains("name: 'background'"));
       expect(output, contains("doc: 'Fill behind the child.'"));
-      expect(output, contains("defaultDescription: 't.colors.surface'"));
+      // Ref-catalog defaults read as the catalog member itself; tear-off
+      // bodies keep reading as their expression over `t`.
+      expect(output, contains("defaultDescription: 'LegendColorsRef.surface'"));
+      expect(output, contains("defaultDescription: 't.sizes.borderWidth * 2'"));
       expect(output, contains("defaultDescription: '8.0'"));
       expect(output, contains("owner: 'FancyBox'"));
     });
@@ -411,7 +480,7 @@ class Bad {
       );
     });
 
-    test('missing tear-off static: gives the declaration to add', () {
+    test('missing tear-off: gives the declaration to add', () {
       _expectSingleDiagnostic(
         _widgetFile('''
 @LegendThemeable()
@@ -423,8 +492,12 @@ class Bad {
 }
 '''),
         allOf(
-          contains('not a static method of "Bad"'),
-          contains('declare "static Color _missing(LegendTokens t) => …;"'),
+          contains(
+            'neither a static method of "Bad" nor a top-level '
+            'function',
+          ),
+          contains('declare "Color _missing(LegendTokens t) => …;"'),
+          contains('LegendColorsRef.primary'),
         ),
       );
     });

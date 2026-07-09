@@ -3,7 +3,9 @@ import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/primitives/legend_button_core.dart';
 import 'package:legend_ui/src/theme/legend_states.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_shadows.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
+import 'package:legend_ui/src/tokens/legend_typography.dart';
 
 part 'primary_legend_button.theme.g.dart';
 
@@ -56,34 +58,11 @@ class PrimaryLegendButton extends StatelessWidget {
   /// disabled fill.
   @Style<LegendStates<Color>>.resolve(_background, lerp: true)
   final LegendStates<Color>? background;
-  static LegendStates<Color> _background(LegendTokens t) => LegendStates(
-    normal: t.colors.primary,
-    hovered: Color.alphaBlend(
-      t.colors.onPrimary.withValues(alpha: 0.08),
-      t.colors.primary,
-    ),
-    pressed: Color.alphaBlend(
-      t.colors.onPrimary.withValues(alpha: 0.16),
-      t.colors.primary,
-    ),
-    focused: Color.alphaBlend(
-      t.colors.onPrimary.withValues(alpha: 0.08),
-      t.colors.primary,
-    ),
-    disabled: t.colors.disabled,
-  );
 
   /// Color of the label and icon, per interaction state (steady except
   /// while disabled).
   @Style<LegendStates<Color>>.resolve(_foreground, lerp: true)
   final LegendStates<Color>? foreground;
-  static LegendStates<Color> _foreground(LegendTokens t) => LegendStates(
-    normal: t.colors.onPrimary,
-    hovered: t.colors.onPrimary,
-    pressed: t.colors.onPrimary,
-    focused: t.colors.onPrimary,
-    disabled: t.colors.onDisabled,
-  );
 
   /// Per-instance padding; when null the shared button surface applies
   /// ([LegendButtonCore]'s themed padding, RFC-002 R7.2).
@@ -94,14 +73,12 @@ class PrimaryLegendButton extends StatelessWidget {
   final BorderRadius? borderRadius;
 
   /// Text style of the [text] label (its color comes from [foreground]).
-  @Style<TextStyle>.resolve(_textStyle)
+  @Style<TextStyle>.resolve(LegendTypographyRef.b2)
   final TextStyle? textStyle;
-  static TextStyle _textStyle(LegendTokens t) => t.typography.b2;
 
   /// Drop shadow under the button (flat by default).
-  @Style<List<BoxShadow>>.resolve(_shadows)
+  @Style<List<BoxShadow>>.resolve(LegendShadowsRef.none)
   final List<BoxShadow>? shadows;
-  static List<BoxShadow> _shadows(LegendTokens t) => t.shadows.none;
 
   @override
   Widget build(BuildContext context) {
@@ -122,3 +99,28 @@ class PrimaryLegendButton extends StatelessWidget {
     );
   }
 }
+
+LegendStates<Color> _background(LegendTokens t) => LegendStates(
+  normal: t.colors.primary,
+  hovered: Color.alphaBlend(
+    t.colors.onPrimary.withValues(alpha: 0.08),
+    t.colors.primary,
+  ),
+  pressed: Color.alphaBlend(
+    t.colors.onPrimary.withValues(alpha: 0.16),
+    t.colors.primary,
+  ),
+  focused: Color.alphaBlend(
+    t.colors.onPrimary.withValues(alpha: 0.08),
+    t.colors.primary,
+  ),
+  disabled: t.colors.disabled,
+);
+
+LegendStates<Color> _foreground(LegendTokens t) => LegendStates(
+  normal: t.colors.onPrimary,
+  hovered: t.colors.onPrimary,
+  pressed: t.colors.onPrimary,
+  focused: t.colors.onPrimary,
+  disabled: t.colors.onDisabled,
+);

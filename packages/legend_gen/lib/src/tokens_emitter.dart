@@ -9,7 +9,11 @@ import 'package:legend_gen/src/version.dart';
 ///   `copyWith` and value `==`/`hashCode`,
 /// - a private `_$ClassNameLerp` function the class's one-line
 ///   `static lerp` redirects to (statics cannot live on a mixin usefully,
-///   and the public `ClassName.lerp` call sites must keep working).
+///   and the public `ClassName.lerp` call sites must keep working),
+/// - with `mountedAt`, the `<ClassName>Ref` const tear-off catalog
+///   (RFC-002 R10 amendment): one plain static per token field, tear-off-
+///   able inside `@Style<T>.resolve` annotations, each carrying the
+///   field's dartdoc.
 ///
 /// The output is `part of` the token library: no imports of its own — the
 /// source file's imports serve the whole library.
@@ -103,6 +107,35 @@ void _emitTokenClass(StringBuffer b, TokenClass tokenClass) {
     ..writeln('$name ${mixinName}Lerp($name a, $name b, double t) => $name(')
     ..writeln(fields.map((f) => '${f.name}: ${_lerpExpression(f)},').join())
     ..writeln(');');
+
+  final mount = tokenClass.mountedAt;
+  if (mount == null) return;
+
+  // Every instance field gets a ref, regardless of type — the catalog is
+  // closed over the whole base theme; `mountedAt: ''` is the root
+  // sentinel (fields read as `t.<field>` directly).
+  final prefix = mount.isEmpty ? 't' : 't.$mount';
+  final example =
+      '@Style<${fields.first.type}>.resolve(${name}Ref.${fields.first.name})';
+  b
+    ..writeln()
+    ..writeln('/// Const tear-off catalog for [$name] (RFC-002 R10')
+    ..writeln('/// amendment): one static per token field, usable directly')
+    ..writeln('/// inside `@Style<T>.resolve` annotations —')
+    ..writeln('/// `$example`.')
+    ..writeln('abstract final class ${name}Ref {');
+  for (final field in fields) {
+    if (field.doc.isNotEmpty) {
+      for (final line in field.doc.split('\n')) {
+        b.writeln('///${line.isEmpty ? '' : ' '}$line');
+      }
+    }
+    b.writeln(
+      'static ${field.type} ${field.name}(LegendTokens t) => '
+      '$prefix.${field.name};',
+    );
+  }
+  b.writeln('}');
 }
 
 String _equalsExpression(TokenField f) {

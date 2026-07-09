@@ -64,3 +64,27 @@ LegendTypography _$LegendTypographyLerp(
   b2: TextStyle.lerp(a.b2, b.b2, t)!,
   b3: TextStyle.lerp(a.b3, b.b3, t)!,
 );
+
+/// Const tear-off catalog for [LegendTypography] (RFC-002 R10
+/// amendment): one static per token field, usable directly
+/// inside `@Style<T>.resolve` annotations —
+/// `@Style<TextStyle>.resolve(LegendTypographyRef.h1)`.
+abstract final class LegendTypographyRef {
+  /// Page-level heading.
+  static TextStyle h1(LegendTokens t) => t.typography.h1;
+
+  /// Section heading.
+  static TextStyle h2(LegendTokens t) => t.typography.h2;
+
+  /// Subsection heading (dialog titles, card headers).
+  static TextStyle h3(LegendTokens t) => t.typography.h3;
+
+  /// Primary body text.
+  static TextStyle b1(LegendTokens t) => t.typography.b1;
+
+  /// Secondary body text — button labels, menu items, form values.
+  static TextStyle b2(LegendTokens t) => t.typography.b2;
+
+  /// Small text — captions, field titles, error messages.
+  static TextStyle b3(LegendTokens t) => t.typography.b3;
+}

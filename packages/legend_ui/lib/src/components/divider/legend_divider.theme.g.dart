@@ -14,9 +14,9 @@ class LegendDividerTheme {
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendDividerTheme.defaults(LegendTokens t) => LegendDividerTheme(
-    color: LegendDivider._color(t),
-    thickness: LegendDivider._thickness(t),
-    spacing: LegendDivider._spacing(t),
+    color: LegendColorsRef.background3(t),
+    thickness: LegendSizesRef.borderWidth(t),
+    spacing: LegendSizesRef.md(t),
   );
 
   final Color color;

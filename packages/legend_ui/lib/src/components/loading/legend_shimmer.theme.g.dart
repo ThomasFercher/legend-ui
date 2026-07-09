@@ -13,8 +13,8 @@ class LegendShimmerTheme {
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendShimmerTheme.defaults(LegendTokens t) => LegendShimmerTheme(
-    baseColor: LegendShimmer._baseColor(t),
-    highlightColor: LegendShimmer._highlightColor(t),
+    baseColor: LegendColorsRef.background2(t),
+    highlightColor: LegendColorsRef.background1(t),
   );
 
   final Color baseColor;

@@ -13,7 +13,7 @@ const List<LegendDocEntry> balanceCardDocEntries = [
     name: 'background',
     type: 'Color?',
     doc: 'Fill color of the card surface.',
-    defaultDescription: 't.colors.surface',
+    defaultDescription: 'LegendColorsRef.surface',
     group: 'component',
   ),
   LegendDocEntry(
@@ -21,7 +21,7 @@ const List<LegendDocEntry> balanceCardDocEntries = [
     name: 'accent',
     type: 'Color?',
     doc: 'Color of the amount text.',
-    defaultDescription: 't.colors.secondary',
+    defaultDescription: 'LegendColorsRef.secondary',
     group: 'component',
   ),
   LegendDocEntry(

@@ -13,7 +13,7 @@ const List<LegendDocEntry> legendTextFieldDocEntries = [
     name: 'background',
     type: 'Color?',
     doc: 'Fill color of the field surface.',
-    defaultDescription: 't.colors.background1',
+    defaultDescription: 'LegendColorsRef.background1',
     group: 'component',
   ),
   LegendDocEntry(
@@ -38,7 +38,7 @@ const List<LegendDocEntry> legendTextFieldDocEntries = [
     name: 'textStyle',
     type: 'TextStyle?',
     doc: 'Text style of the entered text (and the placeholder, recolored).',
-    defaultDescription: 't.typography.b1',
+    defaultDescription: 'LegendTypographyRef.b1',
     group: 'component',
   ),
   LegendDocEntry(
@@ -46,7 +46,7 @@ const List<LegendDocEntry> legendTextFieldDocEntries = [
     name: 'borderColor',
     type: 'Color?',
     doc: 'Border color while unfocused (error state uses the error token).',
-    defaultDescription: 't.colors.background3',
+    defaultDescription: 'LegendColorsRef.background3',
     group: 'component',
   ),
   LegendDocEntry(
@@ -54,7 +54,7 @@ const List<LegendDocEntry> legendTextFieldDocEntries = [
     name: 'focusedBorderColor',
     type: 'Color?',
     doc: 'Border color while focused — also the caret and selection color.',
-    defaultDescription: 't.colors.primary',
+    defaultDescription: 'LegendColorsRef.primary',
     group: 'component',
   ),
 ];

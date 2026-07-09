@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_colors.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
 part 'legend_loading.theme.g.dart';
@@ -14,9 +15,8 @@ class LegendLoading extends StatefulWidget {
   const LegendLoading({super.key, this.color, this.size, this.strokeWidth});
 
   /// Color of the spinning arc.
-  @Style<Color>.resolve(_color)
+  @Style<Color>.resolve(LegendColorsRef.primary)
   final Color? color;
-  static Color _color(LegendTokens t) => t.colors.primary;
 
   /// Diameter of the spinner.
   @Style<double>(24)

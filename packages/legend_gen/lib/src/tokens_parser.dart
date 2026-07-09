@@ -3,6 +3,7 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/syntactic_entity.dart';
 import 'package:legend_gen/src/model.dart';
+import 'package:legend_gen/src/parser.dart';
 import 'package:path/path.dart' as p;
 
 /// Parses one Dart file and returns its `@LegendTokenData` classes
@@ -19,6 +20,8 @@ import 'package:path/path.dart' as p;
 /// - every instance field is `final`, explicitly typed and non-nullable,
 /// - `List<…>` fields are `List<BoxShadow>` (the one list lerper),
 /// - the class applies the generated mixin (`with _$ClassName`),
+/// - `mountedAt:` (the Ref-catalog mount, RFC-002 R10 amendment) is a
+///   plain string literal when given,
 /// - the file carries `part '<file>.tokens.g.dart';`.
 List<TokenClass> parseTokenClasses(String path, String content) {
   final unit = parseString(
@@ -43,6 +46,26 @@ List<TokenClass> parseTokenClasses(String path, String content) {
     if (marker == null) continue;
 
     final className = declaration.name.lexeme;
+    String? mountedAt;
+    final mountArgument = (marker.arguments?.arguments ?? <Expression>[])
+        .whereType<NamedExpression>()
+        .where((a) => a.name.label.name == 'mountedAt')
+        .firstOrNull;
+    if (mountArgument != null) {
+      final value = mountArgument.expression;
+      if (value is SimpleStringLiteral) {
+        mountedAt = value.value;
+      } else if (value is! NullLiteral) {
+        report(
+          mountArgument,
+          'mountedAt on "$className" must be a plain string literal (the '
+          "LegendTokens getter the class sits behind, e.g. 'sizes') — the "
+          'Ref catalog is generated from it (RFC-002 R10 amendment); '
+          'write the literal directly.',
+        );
+        continue;
+      }
+    }
     if (declaration.metadata.any((a) => a.name.name == 'LegendThemeable')) {
       report(
         marker,
@@ -99,7 +122,9 @@ List<TokenClass> parseTokenClasses(String path, String content) {
           fieldsValid = false;
           continue;
         }
-        fields.add(TokenField(name: name, type: type));
+        fields.add(
+          TokenField(name: name, type: type, doc: dartdocText(member)),
+        );
       }
     }
 
@@ -134,6 +159,7 @@ List<TokenClass> parseTokenClasses(String path, String content) {
         className: className,
         fields: fields,
         sourceBasename: p.basename(path),
+        mountedAt: mountedAt,
         line: lineOf(declaration.name),
       ),
     );

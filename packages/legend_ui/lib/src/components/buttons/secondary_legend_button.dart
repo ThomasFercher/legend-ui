@@ -3,7 +3,9 @@ import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/primitives/legend_button_core.dart';
 import 'package:legend_ui/src/theme/legend_states.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_colors.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
+import 'package:legend_ui/src/tokens/legend_typography.dart';
 
 part 'secondary_legend_button.theme.g.dart';
 
@@ -56,39 +58,15 @@ class SecondaryLegendButton extends StatelessWidget {
   /// swaps to the token disabled fill.
   @Style<LegendStates<Color>>.resolve(_background, lerp: true)
   final LegendStates<Color>? background;
-  static LegendStates<Color> _background(LegendTokens t) => LegendStates(
-    normal: t.colors.primaryContainer,
-    hovered: Color.alphaBlend(
-      t.colors.primary.withValues(alpha: 0.08),
-      t.colors.primaryContainer,
-    ),
-    pressed: Color.alphaBlend(
-      t.colors.primary.withValues(alpha: 0.16),
-      t.colors.primaryContainer,
-    ),
-    focused: Color.alphaBlend(
-      t.colors.primary.withValues(alpha: 0.08),
-      t.colors.primaryContainer,
-    ),
-    disabled: t.colors.disabled,
-  );
 
   /// Color of the label and icon, per interaction state (steady except
   /// while disabled).
   @Style<LegendStates<Color>>.resolve(_foreground, lerp: true)
   final LegendStates<Color>? foreground;
-  static LegendStates<Color> _foreground(LegendTokens t) => LegendStates(
-    normal: t.colors.primary,
-    hovered: t.colors.primary,
-    pressed: t.colors.primary,
-    focused: t.colors.primary,
-    disabled: t.colors.onDisabled,
-  );
 
   /// Color of the outline (dropped entirely while disabled).
-  @Style<Color>.resolve(_borderColor)
+  @Style<Color>.resolve(LegendColorsRef.primary)
   final Color? borderColor;
-  static Color _borderColor(LegendTokens t) => t.colors.primary;
 
   /// Per-instance padding; when null the shared button surface applies
   /// ([LegendButtonCore]'s themed padding, RFC-002 R7.2).
@@ -99,9 +77,8 @@ class SecondaryLegendButton extends StatelessWidget {
   final BorderRadius? borderRadius;
 
   /// Text style of the [text] label (its color comes from [foreground]).
-  @Style<TextStyle>.resolve(_textStyle)
+  @Style<TextStyle>.resolve(LegendTypographyRef.b2)
   final TextStyle? textStyle;
-  static TextStyle _textStyle(LegendTokens t) => t.typography.b2;
 
   @override
   Widget build(BuildContext context) {
@@ -126,3 +103,28 @@ class SecondaryLegendButton extends StatelessWidget {
     );
   }
 }
+
+LegendStates<Color> _background(LegendTokens t) => LegendStates(
+  normal: t.colors.primaryContainer,
+  hovered: Color.alphaBlend(
+    t.colors.primary.withValues(alpha: 0.08),
+    t.colors.primaryContainer,
+  ),
+  pressed: Color.alphaBlend(
+    t.colors.primary.withValues(alpha: 0.16),
+    t.colors.primaryContainer,
+  ),
+  focused: Color.alphaBlend(
+    t.colors.primary.withValues(alpha: 0.08),
+    t.colors.primaryContainer,
+  ),
+  disabled: t.colors.disabled,
+);
+
+LegendStates<Color> _foreground(LegendTokens t) => LegendStates(
+  normal: t.colors.primary,
+  hovered: t.colors.primary,
+  pressed: t.colors.primary,
+  focused: t.colors.primary,
+  disabled: t.colors.onDisabled,
+);
