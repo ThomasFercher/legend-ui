@@ -1,4 +1,4 @@
-name: CI
+name: Lint
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [rewrite]
 
 jobs:
-  pipeline:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,10 +21,8 @@ jobs:
       - name: Resolve workspace
         run: flutter pub get
 
-      - name: Generated output is fresh
-        working-directory: packages/legend_ui
-        run: dart run legend_gen themes lib test/consumer --check
+      - name: Format
+        run: dart format --output=none --set-exit-if-changed .
 
-      - name: Example builds for web
-        working-directory: example
-        run: flutter build web
+      - name: Analyze
+        run: flutter analyze

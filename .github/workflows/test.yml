@@ -1,4 +1,4 @@
-name: CI
+name: Tests
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [rewrite]
 
 jobs:
-  pipeline:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,10 +21,11 @@ jobs:
       - name: Resolve workspace
         run: flutter pub get
 
-      - name: Generated output is fresh
-        working-directory: packages/legend_ui
-        run: dart run legend_gen themes lib test/consumer --check
-
-      - name: Example builds for web
-        working-directory: example
-        run: flutter build web
+      - name: Test all packages
+        run: |
+          for pkg in packages/* example; do
+            if compgen -G "$pkg/test/**/*_test.dart" > /dev/null || compgen -G "$pkg/test/*_test.dart" > /dev/null; then
+              echo "Testing $pkg"
+              (cd "$pkg" && flutter test)
+            fi
+          done
