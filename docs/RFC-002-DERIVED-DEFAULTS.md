@@ -40,6 +40,15 @@ What we take, and what is ours alone:
 5. **Ours: the sealed-state ladder (§R6)** — Dart 3 sealed classes make widget interaction state an *exhaustively-switchable, single-valued* type instead of Material's `Set<WidgetState>` guess-the-precedence model. One minimal generic container (`LegendStates<T>`) + type-bound extensions carry per-state values for any type; generic annotations (legacy's good idea, AST-parsed) type the contract; every member is a named, individually overridable variable.
 6. **Ours: the widget file is the single source of truth for behavior, theme AND documentation (§R9)** — dartdoc comments on tokens and `@Themed` fields are extracted by the generator into a docs manifest; the docs site and playground render every variable from it. Documentation cannot drift from code because it *is* the code.
 
+### Legacy inspection findings (2026-07-09, `main` generated artifacts + `NomoTheme` core)
+
+Read: `nomo_primary_button.theme_data.g.dart`, `nomo_theme.dart`, `nomo_color_theme.dart`. The legacy resolution chain was: **widget param ≻ subtree `…ThemeOverride` ≻ per-mode `components` overrides ≻ app-delegate `defaultComponentsColor` ≻ kit `predefinedComponentColors(colors)` ≻ frozen annotation consts.** Four findings feed this RFC:
+
+1. **Legacy generated the widget-param resolver** — `getFromContext(BuildContext, PrimaryNomoButton widget)` did the `widget.background ?? themeData.background` mapping *in generated code*. The rewrite regressed this into the hand-written mirror block; **R1 is a restoration** of the legacy behavior, namespaced (extension `resolveTheme`) instead of 26 colliding free functions.
+2. **Legacy already had named state-color variables** per component — `hoverColor`, `focusColor`, `highlightColor`, `splashColor` — with kit defaults derived by alpha overlays (`colors.primary.withValues(alpha: .06)`), duplicated verbatim across every interactive component in `predefinedComponentColors`. This is direct precedent for R6: named per-state variables with overlay-derived defaults — minus the copy-paste, which `LegendStates<T>` + `LegendStateOverlays` absorb.
+3. **`predefinedComponentColors(NomoColors)` was the kit's token-relation layer** — a central, closed, hand-written widget-type→defaults function. R10's `.resolve` tear-offs decentralize exactly this onto each widget's own file: same capability, no central registry to maintain, automatically open to consumer widgets.
+4. The delegate offered two app-level layers (base component defaults + per-mode overrides); Legend's single `components` map per `LegendThemeData` (one instance per mode, built by the consumer's controller) covers the same power with one concept.
+
 ## 3. Proposals
 
 All preserve the settled rules: one-file-in/one-file-out generation, open Type-keyed registry, four-level resolution, responsiveness ≠ theming.
