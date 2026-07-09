@@ -21,3 +21,4 @@ pubspec.lock
 
 # FVM
 .fvm/
+.claude/
