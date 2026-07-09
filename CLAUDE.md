@@ -38,7 +38,15 @@ dart run legend_gen themes lib test/consumer   # regenerate committed *.theme.g.
 
 ## Previewing the docs site (visual verification)
 
-`.claude/launch.json` defines the `docs-site` server: it runs `flutter analyze` first (**lint gate — the app will not start on analyzer findings**), then `flutter run -d web-server --web-port=8321` in `example/` with stdin wired to the FIFO `/tmp/legend_docs_stdin`.
+`.claude/launch.json` defines three configs, all lint-gated (`flutter analyze` runs first — **the app will not start on analyzer findings**):
+- **`docs-site`** — `flutter run -d web-server --web-port=8321`, stdin wired to the FIFO `/tmp/legend_docs_stdin`. This is the one the preview tools attach to and drive; use it for programmatic verification.
+- **`docs-chrome`** — `flutter run -d chrome` (opens a real Chrome window to click around in).
+- **`docs-macos`** — `flutter run -d macos` (native window).
+
+### Automated test tiers (what's covered where)
+- **Widget tests** (`example/test/`, `packages/*/test/`) automate all *behavior* — run in CI, cheap, deterministic. Every feature ships with them.
+- The **selectable-text guard** in `gallery_test.dart` exercises the real crash path: `SelectionArea` needs `MaterialLocalizations`, so if that wiring regresses, `pumpWidget(DocsApp())` throws.
+- **True browser interaction** (real drag-select, rendering, animation frames) is NOT reliably reproducible in the headless widget tester — it needs `integration_test` + chromedriver driven by `flutter drive -d chrome`. That tier is not yet set up (no chromedriver in this env); add it if pixel-level e2e assertions become worth a CI browser job.
 
 - **Hot reload**: after editing Dart sources, `printf 'r\n' > /tmp/legend_docs_stdin` (hot restart: `'R\n'`). No server restart needed.
 - First page load can race the debug service — if the screenshot is black and the DOM has no `flutter-view`, reload the page once.
