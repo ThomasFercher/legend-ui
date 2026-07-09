@@ -15,6 +15,7 @@ mixin _$LegendColors {
     Color? primary,
     Color? onPrimary,
     Color? primaryContainer,
+    Color? onPrimaryContainer,
     Color? secondary,
     Color? onSecondary,
     Color? background1,
@@ -33,6 +34,7 @@ mixin _$LegendColors {
     primary: primary ?? _self.primary,
     onPrimary: onPrimary ?? _self.onPrimary,
     primaryContainer: primaryContainer ?? _self.primaryContainer,
+    onPrimaryContainer: onPrimaryContainer ?? _self.onPrimaryContainer,
     secondary: secondary ?? _self.secondary,
     onSecondary: onSecondary ?? _self.onSecondary,
     background1: background1 ?? _self.background1,
@@ -56,6 +58,7 @@ mixin _$LegendColors {
           other.primary == _self.primary &&
           other.onPrimary == _self.onPrimary &&
           other.primaryContainer == _self.primaryContainer &&
+          other.onPrimaryContainer == _self.onPrimaryContainer &&
           other.secondary == _self.secondary &&
           other.onSecondary == _self.onSecondary &&
           other.background1 == _self.background1 &&
@@ -76,6 +79,7 @@ mixin _$LegendColors {
     _self.primary,
     _self.onPrimary,
     _self.primaryContainer,
+    _self.onPrimaryContainer,
     _self.secondary,
     _self.onSecondary,
     _self.background1,
@@ -101,6 +105,11 @@ LegendColors _$LegendColorsLerp(LegendColors a, LegendColors b, double t) =>
       primary: Color.lerp(a.primary, b.primary, t)!,
       onPrimary: Color.lerp(a.onPrimary, b.onPrimary, t)!,
       primaryContainer: Color.lerp(a.primaryContainer, b.primaryContainer, t)!,
+      onPrimaryContainer: Color.lerp(
+        a.onPrimaryContainer,
+        b.onPrimaryContainer,
+        t,
+      )!,
       secondary: Color.lerp(a.secondary, b.secondary, t)!,
       onSecondary: Color.lerp(a.onSecondary, b.onSecondary, t)!,
       background1: Color.lerp(a.background1, b.background1, t)!,

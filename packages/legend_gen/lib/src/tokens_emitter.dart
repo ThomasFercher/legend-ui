@@ -62,17 +62,17 @@ void _emitTokenClass(StringBuffer b, TokenClass tokenClass) {
     ..writeln()
     ..writeln('/// Generated mechanical members for [$name] (RFC-002 R5):')
     ..writeln('/// `copyWith` and value `==`/`hashCode`. Applied via')
-    ..writeln('/// `with $mixinName`; the abstract getters are implemented')
-    ..writeln("/// by the class's own final fields.")
+    ..writeln('/// `with $mixinName`; fields are read through a private cast')
+    ..writeln('/// (no abstract getters, so the class declares no overrides).')
     ..writeln('mixin $mixinName {')
-    ..writeln(fields.map((f) => '${f.type} get ${f.name};').join())
+    ..writeln('$name get _self => this as $name;')
     ..writeln()
     ..writeln('/// Copy with the given fields replaced.')
     ..writeln('$name copyWith({')
     ..writeln(fields.map((f) => '${f.type}? ${f.name},').join())
     ..writeln('}) => $name(')
     ..writeln(
-      fields.map((f) => '${f.name}: ${f.name} ?? this.${f.name},').join(),
+      fields.map((f) => '${f.name}: ${f.name} ?? _self.${f.name},').join(),
     )
     ..writeln(');')
     ..writeln()
@@ -87,7 +87,11 @@ void _emitTokenClass(StringBuffer b, TokenClass tokenClass) {
     ..writeln('int get hashCode => Object.hashAll([')
     ..writeln(
       fields
-          .map((f) => f.isList ? 'Object.hashAll(${f.name}),' : '${f.name},')
+          .map(
+            (f) => f.isList
+                ? 'Object.hashAll(_self.${f.name}),'
+                : '_self.${f.name},',
+          )
           .join(),
     )
     ..writeln(']);')
@@ -102,8 +106,8 @@ void _emitTokenClass(StringBuffer b, TokenClass tokenClass) {
 }
 
 String _equalsExpression(TokenField f) {
-  if (f.isList) return '_\$listEquals(other.${f.name}, ${f.name})';
-  return 'other.${f.name} == ${f.name}';
+  if (f.isList) return '_\$listEquals(other.${f.name}, _self.${f.name})';
+  return 'other.${f.name} == _self.${f.name}';
 }
 
 String _lerpExpression(TokenField f) {

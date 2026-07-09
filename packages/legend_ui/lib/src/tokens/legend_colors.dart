@@ -14,6 +14,7 @@ class LegendColors with _$LegendColors {
     required this.primary,
     required this.onPrimary,
     required this.primaryContainer,
+    required this.onPrimaryContainer,
     required this.secondary,
     required this.onSecondary,
     required this.background1,
@@ -33,6 +34,12 @@ class LegendColors with _$LegendColors {
   final Color primary;
   final Color onPrimary;
   final Color primaryContainer;
+
+  /// Foreground for content sitting on [primaryContainer] (added by the
+  /// 2026-07-09 §9.1 pairs audit; matches what components historically
+  /// drew there — the primary color).
+  final Color onPrimaryContainer;
+
   final Color secondary;
   final Color onSecondary;
   final Color background1;
@@ -54,6 +61,7 @@ class LegendColors with _$LegendColors {
     primary: Color(0xFF1A80F4),
     onPrimary: Color(0xFFFFFFFF),
     primaryContainer: Color(0xFFD6E8FD),
+    onPrimaryContainer: Color(0xFF1A80F4),
     secondary: Color(0xFF10B981),
     onSecondary: Color(0xFFFFFFFF),
     background1: Color(0xFFF6F7F9),
@@ -75,6 +83,7 @@ class LegendColors with _$LegendColors {
     primary: Color(0xFF3B94F6),
     onPrimary: Color(0xFF0B1220),
     primaryContainer: Color(0xFF10305B),
+    onPrimaryContainer: Color(0xFF3B94F6),
     secondary: Color(0xFF34D399),
     onSecondary: Color(0xFF07130D),
     background1: Color(0xFF0F1115),

@@ -5,14 +5,10 @@ part of 'mini_tokens.dart';
 
 /// Generated mechanical members for [MiniTokens] (RFC-002 R5):
 /// `copyWith` and value `==`/`hashCode`. Applied via
-/// `with _$MiniTokens`; the abstract getters are implemented
-/// by the class's own final fields.
+/// `with _$MiniTokens`; fields are read through a private cast
+/// (no abstract getters, so the class declares no overrides).
 mixin _$MiniTokens {
-  Color get accent;
-  double get gap;
-  TextStyle get label;
-  List<BoxShadow> get glow;
-  MiniNested get nested;
+  MiniTokens get _self => this as MiniTokens;
 
   /// Copy with the given fields replaced.
   MiniTokens copyWith({
@@ -22,26 +18,31 @@ mixin _$MiniTokens {
     List<BoxShadow>? glow,
     MiniNested? nested,
   }) => MiniTokens(
-    accent: accent ?? this.accent,
-    gap: gap ?? this.gap,
-    label: label ?? this.label,
-    glow: glow ?? this.glow,
-    nested: nested ?? this.nested,
+    accent: accent ?? _self.accent,
+    gap: gap ?? _self.gap,
+    label: label ?? _self.label,
+    glow: glow ?? _self.glow,
+    nested: nested ?? _self.nested,
   );
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is MiniTokens &&
-          other.accent == accent &&
-          other.gap == gap &&
-          other.label == label &&
-          _$listEquals(other.glow, glow) &&
-          other.nested == nested;
+          other.accent == _self.accent &&
+          other.gap == _self.gap &&
+          other.label == _self.label &&
+          _$listEquals(other.glow, _self.glow) &&
+          other.nested == _self.nested;
 
   @override
-  int get hashCode =>
-      Object.hashAll([accent, gap, label, Object.hashAll(glow), nested]);
+  int get hashCode => Object.hashAll([
+    _self.accent,
+    _self.gap,
+    _self.label,
+    Object.hashAll(_self.glow),
+    _self.nested,
+  ]);
 }
 
 /// Member-wise lerp for [MiniTokens]; the public [MiniTokens.lerp]
@@ -57,21 +58,22 @@ MiniTokens _$MiniTokensLerp(MiniTokens a, MiniTokens b, double t) => MiniTokens(
 
 /// Generated mechanical members for [MiniNested] (RFC-002 R5):
 /// `copyWith` and value `==`/`hashCode`. Applied via
-/// `with _$MiniNested`; the abstract getters are implemented
-/// by the class's own final fields.
+/// `with _$MiniNested`; fields are read through a private cast
+/// (no abstract getters, so the class declares no overrides).
 mixin _$MiniNested {
-  double get amount;
+  MiniNested get _self => this as MiniNested;
 
   /// Copy with the given fields replaced.
   MiniNested copyWith({double? amount}) =>
-      MiniNested(amount: amount ?? this.amount);
+      MiniNested(amount: amount ?? _self.amount);
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is MiniNested && other.amount == amount;
+      identical(this, other) ||
+      other is MiniNested && other.amount == _self.amount;
 
   @override
-  int get hashCode => Object.hashAll([amount]);
+  int get hashCode => Object.hashAll([_self.amount]);
 }
 
 /// Member-wise lerp for [MiniNested]; the public [MiniNested.lerp]

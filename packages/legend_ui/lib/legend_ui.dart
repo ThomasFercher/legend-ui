@@ -47,6 +47,9 @@ export 'src/theme/legend_states.dart';
 export 'src/theme/legend_theme.dart';
 export 'src/theme/legend_widget_state.dart';
 export 'src/tokens/legend_colors.dart';
+// legend_ramp.dart is deliberately NOT exported (RFC-002 R4, Fluent's
+// rule): the ramp stays internal; the public surface is semantic pairs.
+export 'src/tokens/legend_seed.dart';
 export 'src/tokens/legend_shadows.dart';
 export 'src/tokens/legend_sizes.dart';
 export 'src/tokens/legend_state_overlays.dart';

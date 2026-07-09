@@ -23,6 +23,7 @@ dart format . && flutter analyze           # from repo root
 cd packages/legend_ui && flutter test      # kit tests
 cd packages/legend_gen && dart test        # generator tests
 dart run legend_gen themes lib test/consumer   # regenerate committed *.theme.g.dart (from packages/legend_ui)
+dart run legend_gen tokens lib test/consumer   # regenerate committed *.tokens.g.dart (from packages/legend_ui)
 ```
 
 ## Settled architecture rules (from DESIGN.md — do not relitigate casually)

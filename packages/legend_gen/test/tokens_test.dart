@@ -78,13 +78,13 @@ void main() {
     test('skips statics and unannotated classes', () {
       final classes = parseTokenClasses(
         'plain.dart',
-        _tokenFile('''
+        _tokenFile(r'''
 @LegendTokenData()
-class Plain with _\$Plain {
+class Plain with _$Plain {
   const Plain({this.amount = 1});
   final double amount;
   static const preset = Plain();
-  static Plain lerp(Plain a, Plain b, double t) => _\$PlainLerp(a, b, t);
+  static Plain lerp(Plain a, Plain b, double t) => _$PlainLerp(a, b, t);
 }
 
 class NotTokens {
@@ -98,10 +98,10 @@ class NotTokens {
 
     test('rejects a class that is also @LegendThemeable', () {
       _expectSingleDiagnostic(
-        _tokenFile('''
+        _tokenFile(r'''
 @LegendTokenData()
 @LegendThemeable()
-class Bad with _\$Bad {
+class Bad with _$Bad {
   const Bad({this.amount = 1});
   final double amount;
 }
@@ -115,9 +115,9 @@ class Bad with _\$Bad {
 
     test('rejects nullable token fields', () {
       _expectSingleDiagnostic(
-        _tokenFile('''
+        _tokenFile(r'''
 @LegendTokenData()
-class Bad with _\$Bad {
+class Bad with _$Bad {
   const Bad({this.amount});
   final double? amount;
 }
@@ -128,9 +128,9 @@ class Bad with _\$Bad {
 
     test('rejects non-final token fields', () {
       _expectSingleDiagnostic(
-        _tokenFile('''
+        _tokenFile(r'''
 @LegendTokenData()
-class Bad with _\$Bad {
+class Bad with _$Bad {
   Bad({this.amount = 1});
   double amount;
 }
@@ -141,9 +141,9 @@ class Bad with _\$Bad {
 
     test('rejects list fields other than List<BoxShadow>', () {
       _expectSingleDiagnostic(
-        _tokenFile('''
+        _tokenFile(r'''
 @LegendTokenData()
-class Bad with _\$Bad {
+class Bad with _$Bad {
   const Bad({this.stops = const <double>[]});
   final List<double> stops;
 }
@@ -167,9 +167,9 @@ class Bad {
 
     test('rejects a class with no instance fields', () {
       _expectSingleDiagnostic(
-        _tokenFile('''
+        _tokenFile(r'''
 @LegendTokenData()
-class Bad with _\$Bad {
+class Bad with _$Bad {
   const Bad();
   static const preset = 1;
 }
@@ -179,11 +179,11 @@ class Bad with _\$Bad {
     });
 
     test('rejects a token file without the part directive', () {
-      const source = '''
+      const source = r'''
 import 'package:legend_ui/legend_ui.dart';
 
 @LegendTokenData()
-class Bad with _\$Bad {
+class Bad with _$Bad {
   const Bad({this.amount = 1});
   final double amount;
 }
@@ -222,9 +222,10 @@ class Bad with _\$Bad {
         output,
         contains(r'MiniTokens _$MiniTokensLerp(MiniTokens a, MiniTokens b'),
       );
-      // copyWith over abstract getters.
-      expect(output, contains('Color get accent;'));
-      expect(output, contains('accent: accent ?? this.accent'));
+      // copyWith over the private self-cast (no abstract getters, so the
+      // class declares no overrides and annotate_overrides stays quiet).
+      expect(output, contains('MiniTokens get _self => this as MiniTokens;'));
+      expect(output, contains('accent: accent ?? _self.accent'));
       // Type-appropriate lerpers.
       expect(output, contains('Color.lerp(a.accent, b.accent, t)!'));
       expect(
@@ -237,8 +238,8 @@ class Bad with _\$Bad {
       expect(output, isNot(contains('lerpDouble')));
       // Value equality: lists compare element-wise and hash by elements.
       expect(output, contains('bool operator ==(Object other)'));
-      expect(output, contains(r'_$listEquals(other.glow, glow)'));
-      expect(output, contains('Object.hashAll(glow),'));
+      expect(output, contains(r'_$listEquals(other.glow, _self.glow)'));
+      expect(output, contains('Object.hashAll(_self.glow),'));
       expect(output, contains(r'bool _$listEquals('));
     });
 
@@ -246,16 +247,13 @@ class Bad with _\$Bad {
       final output = emitTokensFile(
         parseTokenClasses(
           'plain.dart',
-          _tokenFile('''
+          _tokenFile(r'''
 @LegendTokenData()
-class Plain with _\$Plain {
+class Plain with _$Plain {
   const Plain({this.amount = 1});
   final double amount;
 }
-''').replaceFirst(
-            "part 'bad.tokens.g.dart';",
-            "part 'plain.tokens.g.dart';",
-          ),
+''').replaceFirst("part 'bad.tokens.g.dart';", "part 'plain.tokens.g.dart';"),
         ),
       );
       expect(output, isNot(contains(r'_$listEquals')));
@@ -288,22 +286,16 @@ class Plain with _\$Plain {
 
     test('contract violations exit 2 without writing output', () async {
       File('${tmp.path}/broken.dart').writeAsStringSync(
-        _tokenFile('''
+        _tokenFile(r'''
 @LegendTokenData()
-class Broken with _\$Broken {
+class Broken with _$Broken {
   const Broken({this.amount});
   final double? amount;
 }
-''').replaceFirst(
-          "part 'bad.tokens.g.dart';",
-          "part 'broken.tokens.g.dart';",
-        ),
+''').replaceFirst("part 'bad.tokens.g.dart';", "part 'broken.tokens.g.dart';"),
       );
       expect(await runTokens([tmp.path]), 2);
-      expect(
-        File('${tmp.path}/broken.tokens.g.dart').existsSync(),
-        isFalse,
-      );
+      expect(File('${tmp.path}/broken.tokens.g.dart').existsSync(), isFalse);
     });
 
     test('generation is deterministic', () async {
