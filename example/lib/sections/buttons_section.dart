@@ -1,7 +1,7 @@
 import 'package:example/main.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
-import 'package:nomo_ui_kit/nomo_ui_kit.dart';
+import 'package:legend_ui/legend_ui.dart';
 
 class ButtonsSection extends StatelessWidget {
   const ButtonsSection({super.key});
@@ -20,9 +20,9 @@ class ButtonsSection extends StatelessWidget {
               spacing: 12,
               runSpacing: 12,
               children: [
-                PrimaryNomoButton(text: 'Primary', onPressed: noop),
-                SecondaryNomoButton(text: 'Secondary', onPressed: noop),
-                NomoTextButton(text: 'Text button', onPressed: noop),
+                PrimaryLegendButton(text: 'Primary', onPressed: noop),
+                SecondaryLegendButton(text: 'Secondary', onPressed: noop),
+                LegendTextButton(text: 'Text button', onPressed: noop),
               ],
             ),
           ],
@@ -34,13 +34,13 @@ class ButtonsSection extends StatelessWidget {
               spacing: 12,
               runSpacing: 12,
               children: [
-                PrimaryNomoButton(
+                PrimaryLegendButton(
                   text: 'Save',
                   icon: Icons.save_outlined,
                   textFirst: false,
                   onPressed: noop,
                 ),
-                SecondaryNomoButton(
+                SecondaryLegendButton(
                   text: 'Share',
                   icon: Icons.ios_share,
                   onPressed: noop,
@@ -56,13 +56,13 @@ class ButtonsSection extends StatelessWidget {
               spacing: 12,
               runSpacing: 12,
               children: [
-                PrimaryNomoButton(
+                PrimaryLegendButton(
                   text: 'Disabled',
                   enabled: false,
                   onPressed: noop,
                 ),
                 // Level-1 override: constructor params beat every theme level.
-                PrimaryNomoButton(
+                PrimaryLegendButton(
                   text: 'Custom',
                   background: const Color(0xFF8B5CF6),
                   borderRadius: BorderRadius.circular(24),
@@ -75,15 +75,15 @@ class ButtonsSection extends StatelessWidget {
         DemoGroup(
           title: 'Subtree override (level 2)',
           children: [
-            PrimaryNomoButtonThemeOverride(
-              data: const PrimaryNomoButtonThemeNullable(
+            PrimaryLegendButtonThemeOverride(
+              data: const PrimaryLegendButtonThemeNullable(
                 background: Color(0xFF0D9488),
               ),
               child: Wrap(
                 spacing: 12,
                 children: [
-                  PrimaryNomoButton(text: 'Overridden', onPressed: noop),
-                  PrimaryNomoButton(text: 'Also overridden', onPressed: noop),
+                  PrimaryLegendButton(text: 'Overridden', onPressed: noop),
+                  PrimaryLegendButton(text: 'Also overridden', onPressed: noop),
                 ],
               ),
             ),

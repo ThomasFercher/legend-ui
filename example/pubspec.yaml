@@ -1,5 +1,5 @@
 name: example
-description: Nomo UI Kit gallery — living documentation of every component.
+description: Legend UI Kit gallery — living documentation of every component.
 version: 0.1.0
 publish_to: none
 resolution: workspace
@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  nomo_ui_kit: any # resolved from the workspace
+  legend_ui: any # resolved from the workspace
 
 dev_dependencies:
   flutter_test:

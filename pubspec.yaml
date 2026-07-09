@@ -1,11 +1,11 @@
-name: nomo_workspace
-description: Dart workspace for the Nomo UI Kit rewrite (kit + nomo_gen CLI).
+name: legend_workspace
+description: Dart workspace for the Legend UI Kit rewrite (kit + legend_gen CLI).
 publish_to: none
 
 environment:
   sdk: ^3.10.0
 
 workspace:
-  - packages/nomo_ui_kit
-  - packages/nomo_gen
+  - packages/legend_ui
+  - packages/legend_gen
   - example

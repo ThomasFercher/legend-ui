@@ -1,0 +1,24 @@
+name: legend_ui
+description: Highly opinionated, slim and customizable UI Kit for Flutter. Full rewrite — see docs/DESIGN.md.
+version: 1.0.0-dev.4
+repository: https://github.com/legend-app/legend-ui-kit
+homepage: https://legend.app
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.10.0
+  flutter: ">=3.38.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  meta: ^1.15.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  # The consumer pattern: legend_gen as a dev dependency, run via
+  # `dart run legend_gen themes lib` (DESIGN.md §5.3).
+  legend_gen: ^0.1.0-dev.0
+  very_good_analysis: ^7.0.0

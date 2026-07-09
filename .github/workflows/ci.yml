@@ -37,8 +37,8 @@ jobs:
           done
 
       - name: Generated output is fresh
-        working-directory: packages/nomo_ui_kit
-        run: dart run nomo_gen themes lib test/consumer --check
+        working-directory: packages/legend_ui
+        run: dart run legend_gen themes lib test/consumer --check
 
       - name: Example builds for web
         working-directory: example

@@ -1,13 +1,13 @@
 import 'package:example/main.dart';
 import 'package:flutter/widgets.dart';
-import 'package:nomo_ui_kit/nomo_ui_kit.dart';
+import 'package:legend_ui/legend_ui.dart';
 
 class TypographySection extends StatelessWidget {
   const TypographySection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final tokens = NomoTheme.of(context).tokens;
+    final tokens = LegendTheme.of(context).tokens;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 16,
@@ -15,17 +15,17 @@ class TypographySection extends StatelessWidget {
         const DemoGroup(
           title: 'Scale',
           children: [
-            NomoText('Heading 1', variant: NomoTextVariant.h1),
-            NomoText('Heading 2', variant: NomoTextVariant.h2),
-            NomoText('Heading 3', variant: NomoTextVariant.h3),
-            NomoText('Body 1 — the default reading size.'),
-            NomoText(
+            LegendText('Heading 1', variant: LegendTextVariant.h1),
+            LegendText('Heading 2', variant: LegendTextVariant.h2),
+            LegendText('Heading 3', variant: LegendTextVariant.h3),
+            LegendText('Body 1 — the default reading size.'),
+            LegendText(
               'Body 2 — secondary content.',
-              variant: NomoTextVariant.b2,
+              variant: LegendTextVariant.b2,
             ),
-            NomoText(
+            LegendText(
               'Body 3 — captions and labels.',
-              variant: NomoTextVariant.b3,
+              variant: LegendTextVariant.b3,
             ),
           ],
         ),
@@ -49,13 +49,13 @@ class TypographySection extends StatelessWidget {
                   Column(
                     spacing: 4,
                     children: [
-                      NomoSurface(
+                      LegendSurface(
                         color: color,
                         borderRadius: tokens.sizes.borderRadiusSm,
                         border: Border.all(color: tokens.colors.background3),
                         child: const SizedBox.square(dimension: 48),
                       ),
-                      NomoText(name, variant: NomoTextVariant.b3),
+                      LegendText(name, variant: LegendTextVariant.b3),
                     ],
                   ),
               ],

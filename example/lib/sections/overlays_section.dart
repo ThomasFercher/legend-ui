@@ -1,6 +1,6 @@
 import 'package:example/main.dart';
 import 'package:flutter/widgets.dart';
-import 'package:nomo_ui_kit/nomo_ui_kit.dart';
+import 'package:legend_ui/legend_ui.dart';
 
 class OverlaysSection extends StatefulWidget {
   const OverlaysSection({super.key});
@@ -21,24 +21,24 @@ class _OverlaysSectionState extends State<OverlaysSection> {
         DemoGroup(
           title: 'Dialog',
           children: [
-            NomoText('Last result: $_lastResult'),
-            PrimaryNomoButton(
+            LegendText('Last result: $_lastResult'),
+            PrimaryLegendButton(
               text: 'Open dialog',
               onPressed: () async {
-                final result = await showNomoDialog<String>(
+                final result = await showLegendDialog<String>(
                   context: context,
-                  builder: (context) => NomoDialog(
+                  builder: (context) => LegendDialog(
                     title: 'Delete file?',
-                    content: const NomoText(
+                    content: const LegendText(
                       'This action cannot be undone.',
-                      variant: NomoTextVariant.b2,
+                      variant: LegendTextVariant.b2,
                     ),
                     actions: [
-                      NomoTextButton(
+                      LegendTextButton(
                         text: 'Cancel',
                         onPressed: () => Navigator.pop(context, 'cancelled'),
                       ),
-                      PrimaryNomoButton(
+                      PrimaryLegendButton(
                         text: 'Delete',
                         onPressed: () => Navigator.pop(context, 'deleted'),
                       ),
@@ -53,21 +53,21 @@ class _OverlaysSectionState extends State<OverlaysSection> {
         DemoGroup(
           title: 'Sheet (edge-aligned modal)',
           children: [
-            SecondaryNomoButton(
+            SecondaryLegendButton(
               text: 'Open bottom sheet',
-              onPressed: () => showNomoModal<void>(
+              onPressed: () => showLegendModal<void>(
                 context: context,
                 alignment: Alignment.bottomCenter,
-                builder: (context) => NomoDialog(
+                builder: (context) => LegendDialog(
                   title: 'Bottom sheet',
                   maxWidth: double.infinity,
-                  content: const NomoText(
+                  content: const LegendText(
                     'The same modal engine, aligned to an edge — it slides '
                     'instead of scaling.',
-                    variant: NomoTextVariant.b2,
+                    variant: LegendTextVariant.b2,
                   ),
                   actions: [
-                    PrimaryNomoButton(
+                    PrimaryLegendButton(
                       text: 'Close',
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -80,9 +80,9 @@ class _OverlaysSectionState extends State<OverlaysSection> {
         DemoGroup(
           title: 'Cards',
           children: [
-            NomoCard(
+            LegendCard(
               onTap: () {},
-              child: const NomoText('A tappable card on NomoSurface.'),
+              child: const LegendText('A tappable card on LegendSurface.'),
             ),
           ],
         ),

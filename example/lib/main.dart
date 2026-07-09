@@ -5,7 +5,7 @@ import 'package:example/sections/selection_section.dart';
 import 'package:example/sections/typography_section.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
-import 'package:nomo_ui_kit/nomo_ui_kit.dart';
+import 'package:legend_ui/legend_ui.dart';
 
 void main() => runApp(const GalleryApp());
 
@@ -21,15 +21,18 @@ class _GalleryAppState extends State<GalleryApp> {
   var _section = 0;
 
   static const _sections = [
-    (NomoNavItem(label: 'Buttons', icon: Icons.smart_button), ButtonsSection()),
-    (NomoNavItem(label: 'Inputs', icon: Icons.edit), InputsSection()),
     (
-      NomoNavItem(label: 'Selection', icon: Icons.check_circle_outline),
+      LegendNavItem(label: 'Buttons', icon: Icons.smart_button),
+      ButtonsSection(),
+    ),
+    (LegendNavItem(label: 'Inputs', icon: Icons.edit), InputsSection()),
+    (
+      LegendNavItem(label: 'Selection', icon: Icons.check_circle_outline),
       SelectionSection(),
     ),
-    (NomoNavItem(label: 'Overlays', icon: Icons.layers), OverlaysSection()),
+    (LegendNavItem(label: 'Overlays', icon: Icons.layers), OverlaysSection()),
     (
-      NomoNavItem(label: 'Typography', icon: Icons.text_fields),
+      LegendNavItem(label: 'Typography', icon: Icons.text_fields),
       TypographySection(),
     ),
   ];
@@ -37,27 +40,29 @@ class _GalleryAppState extends State<GalleryApp> {
   @override
   Widget build(BuildContext context) {
     final items = [for (final (item, _) in _sections) item];
-    return NomoApp(
-      title: 'Nomo UI Kit Gallery',
-      theme: NomoThemeData(tokens: _dark ? NomoTokens.dark : NomoTokens.light),
+    return LegendApp(
+      title: 'Legend UI Kit Gallery',
+      theme: LegendThemeData(
+        tokens: _dark ? LegendTokens.dark : LegendTokens.light,
+      ),
       home: Builder(
-        builder: (context) => NomoScaffold(
-          appBar: NomoAppBar(
-            title: 'Nomo UI Kit — ${items[_section].label}',
+        builder: (context) => LegendScaffold(
+          appBar: LegendAppBar(
+            title: 'Legend UI Kit — ${items[_section].label}',
             actions: [
-              const NomoText('Dark', variant: NomoTextVariant.b3),
-              NomoSwitch(
+              const LegendText('Dark', variant: LegendTextVariant.b3),
+              LegendSwitch(
                 value: _dark,
                 onChanged: (v) => setState(() => _dark = v),
               ),
             ],
           ),
-          sider: NomoSider(
+          sider: LegendSider(
             items: items,
             selectedIndex: _section,
             onSelected: (i) => setState(() => _section = i),
           ),
-          bottomBar: NomoBottomBar(
+          bottomBar: LegendBottomBar(
             items: items,
             selectedIndex: _section,
             onSelected: (i) => setState(() => _section = i),
@@ -81,13 +86,13 @@ class DemoGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = NomoTheme.of(context).tokens;
-    return NomoCard(
+    final tokens = LegendTheme.of(context).tokens;
+    return LegendCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: tokens.sizes.md,
         children: [
-          NomoText(title, variant: NomoTextVariant.h3),
+          LegendText(title, variant: LegendTextVariant.h3),
           ...children,
         ],
       ),

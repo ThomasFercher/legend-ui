@@ -1,7 +1,7 @@
 import 'package:example/main.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:nomo_ui_kit/nomo_ui_kit.dart';
+import 'package:legend_ui/legend_ui.dart';
 
 void main() {
   testWidgets('gallery renders, navigates sections, toggles theme', (
@@ -19,9 +19,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Heading 1'), findsOneWidget);
 
-    await tester.tap(find.byType(NomoSwitch));
+    await tester.tap(find.byType(LegendSwitch));
     await tester.pumpAndSettle();
     final text = tester.widget<Text>(find.text('Heading 1'));
-    expect(text.style?.color, NomoTokens.dark.colors.foreground1);
+    expect(text.style?.color, LegendTokens.dark.colors.foreground1);
   });
 }

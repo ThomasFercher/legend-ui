@@ -1,6 +1,6 @@
 import 'package:example/main.dart';
 import 'package:flutter/widgets.dart';
-import 'package:nomo_ui_kit/nomo_ui_kit.dart';
+import 'package:legend_ui/legend_ui.dart';
 
 class InputsSection extends StatefulWidget {
   const InputsSection({super.key});
@@ -21,8 +21,8 @@ class _InputsSectionState extends State<InputsSection> {
         DemoGroup(
           title: 'Text fields',
           children: [
-            const NomoTextField(title: 'Name', placeholder: 'Jane Doe'),
-            NomoTextField(
+            const LegendTextField(title: 'Name', placeholder: 'Jane Doe'),
+            LegendTextField(
               title: 'Email',
               placeholder: 'jane@example.com',
               errorText: _emailError,
@@ -32,17 +32,17 @@ class _InputsSectionState extends State<InputsSection> {
                     : 'Not a valid email address',
               ),
             ),
-            const NomoTextField(
+            const LegendTextField(
               title: 'Password',
               placeholder: '••••••••',
               obscureText: true,
             ),
-            const NomoTextField(
+            const LegendTextField(
               title: 'Disabled',
               placeholder: 'Read only',
               enabled: false,
             ),
-            const NomoTextField(
+            const LegendTextField(
               title: 'Notes (multiline)',
               placeholder: 'Write something…',
               maxLines: 4,

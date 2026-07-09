@@ -1,6 +1,6 @@
 import 'package:example/main.dart';
 import 'package:flutter/widgets.dart';
-import 'package:nomo_ui_kit/nomo_ui_kit.dart';
+import 'package:legend_ui/legend_ui.dart';
 
 class SelectionSection extends StatefulWidget {
   const SelectionSection({super.key});
@@ -23,13 +23,13 @@ class _SelectionSectionState extends State<SelectionSection> {
         DemoGroup(
           title: 'Dropdown',
           children: [
-            NomoDropdown<String>(
+            LegendDropdown<String>(
               placeholder: 'Pick a fruit',
               value: _fruit,
               items: const [
-                NomoDropdownItem(value: 'apple', label: 'Apple'),
-                NomoDropdownItem(value: 'banana', label: 'Banana'),
-                NomoDropdownItem(value: 'cherry', label: 'Cherry'),
+                LegendDropdownItem(value: 'apple', label: 'Apple'),
+                LegendDropdownItem(value: 'banana', label: 'Banana'),
+                LegendDropdownItem(value: 'cherry', label: 'Cherry'),
               ],
               onChanged: (value) => setState(() => _fruit = value),
             ),
@@ -41,8 +41,8 @@ class _SelectionSectionState extends State<SelectionSection> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const NomoText('Notifications'),
-                NomoSwitch(
+                const LegendText('Notifications'),
+                LegendSwitch(
                   value: _notifications,
                   onChanged: (v) => setState(() => _notifications = v),
                 ),
@@ -51,8 +51,8 @@ class _SelectionSectionState extends State<SelectionSection> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const NomoText('Newsletter'),
-                NomoSwitch(
+                const LegendText('Newsletter'),
+                LegendSwitch(
                   value: _newsletter,
                   onChanged: (v) => setState(() => _newsletter = v),
                 ),
@@ -61,8 +61,8 @@ class _SelectionSectionState extends State<SelectionSection> {
             const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                NomoText('Disabled'),
-                NomoSwitch(value: true, onChanged: null),
+                LegendText('Disabled'),
+                LegendSwitch(value: true, onChanged: null),
               ],
             ),
           ],
