@@ -37,7 +37,7 @@ What we take, and what is ours alone:
 2. **From MUI/shadcn**: deltas-over-defaults and legibility pairs — expressed as typed Dart, not string paths.
 3. **From the headless school**: state-as-data flowing into the styling layer — but typed and **sealed**, not stringly `data-state` attributes.
 4. **From Fluent/Airbnb**: themes stay declarative and inspectable; recomposition from primitives is the last rung of the ladder.
-5. **Ours: the sealed-state ladder (§R6)** — Dart 3 sealed classes make widget interaction state an *exhaustively-switchable, single-valued* type instead of Material's `Set<WidgetState>` guess-the-precedence model. Styling functions over that sealed type are total, compiler-checked, and safe to put in a theme.
+5. **Ours: the sealed-state ladder (§R6)** — Dart 3 sealed classes make widget interaction state an *exhaustively-switchable, single-valued* type instead of Material's `Set<WidgetState>` guess-the-precedence model. Token-derived overlays are the default; styling functions over the sealed type are the offered opt-in — total, compiler-checked, and safe to put in a theme.
 6. **Ours: the widget file is the single source of truth for behavior, theme AND documentation (§R9)** — dartdoc comments on tokens and `@Themed` fields are extracted by the generator into a docs manifest; the docs site and playground render every variable from it. Documentation cannot drift from code because it *is* the code.
 
 ## 3. Proposals
@@ -89,7 +89,7 @@ final dark   = LegendTokens.fromSeed(LegendSeed(brand: ..., brightness: Brightne
 
 `tokens/` data classes get their `copyWith`/`lerp`/ctors generated into `*.tokens.g.dart` (annotate with the existing contract). Removes ~230 hand LOC, makes "add a token" a one-line diff, and dogfoods the generator on the kit's own core.
 
-### R6 — Sealed widget states + styling functions *(revised 2026-07-09: functions over sealed states, directed)*
+### R6 — Sealed widget states; styling functions as an opt-in, not the default *(revised 2026-07-09 ×2: offered as an option, directed)*
 
 Interaction state becomes a **sealed type** with a single effective value, resolved by a fixed priority ladder (disabled ≻ pressed ≻ hovered ≻ focused ≻ normal):
 
@@ -102,22 +102,26 @@ final class LegendStateFocused  extends LegendWidgetState { const ... }
 final class LegendStateDisabled extends LegendWidgetState { const ... }
 ```
 
-Themed fields may then be **styling functions over that sealed type**, wrapped in `LegendStateStyle<T>`:
+**The default stays data.** Themed fields remain plain values (`Color?` etc.); tokens gain `LegendStateOverlays` (hover/press deltas, disabled opacity), and components derive their state colors from the base value through those overlays (`t.states.hovered(background)`), so every interactive component gets consistent state styling from one color with zero extra declaration — brand restyles automatically restyle hover/press everywhere; components stop inventing hover math.
+
+**The function is the offered option.** Where a consumer wants full per-state control, a themed field can *additionally* accept a **`LegendStateStyle<T>`** — a styling function over the sealed type — which, when set, wins over the derived overlays:
 
 ```dart
-@Themed(defaultsTo: 'LegendStateStyle.derive(t.colors.primary, t.states)')
-final LegendStateStyle<Color>? background;
+// default path — nothing extra to write:
+PrimaryLegendButton(background: brand)          // hover/press derived from overlays
 
-// consumer, exhaustive by the compiler:
-background: LegendStateStyle((state) => switch (state) {
+// opt-in path — exhaustive by the compiler:
+PrimaryLegendButton(backgroundStyle: LegendStateStyle((state) => switch (state) {
   LegendStatePressed()  => brand.shade700,
   LegendStateHovered()  => brand.shade600,
   LegendStateDisabled() => grey,
   _                     => brand,
-}),
+}))
 ```
 
-Why this does **not** repeat Fluent v8's mistake (the reason the first draft was data-only): v8's failure was *arbitrary style-merge callbacks* composed per render with unpredictable output. A `LegendStateStyle` function is **total over a sealed 5-value domain** — exhaustively checked by the compiler, pure, and *materializable*: the kit samples it once into a per-state record for `lerp` (per-state value lerp) and equality (sampled comparison), so `AnimatedLegendTheme` and `updateShouldNotify` treat it as data. `LegendStateStyle.derive(base, t.states)` supplies the good default: tokens gain `LegendStateOverlays` (hover/press deltas, disabled opacity) so every interactive component gets consistent state styling from one base color — brand restyles automatically restyle hover/press everywhere; components stop inventing hover math. `LegendInteractive` maps its `LegendInteractionStates` snapshot onto the ladder via `states.effective`.
+Precedence within a field: explicit `LegendStateStyle` (any resolution level) ≻ base value + derived overlays (same four-level resolution as today). The generator supports `LegendStateStyle<Color>` as a field category so kit and consumer widgets can expose the option uniformly; components are not required to expose it.
+
+Why the option does **not** repeat Fluent v8's mistake (the reason the first draft was data-only): v8's failure was *arbitrary style-merge callbacks* composed per render with unpredictable output. A `LegendStateStyle` function is **total over a sealed 5-value domain** — exhaustively checked by the compiler, pure, and *materializable*: the kit samples it once into a per-state record for `lerp` (per-state value lerp) and equality (sampled comparison), so `AnimatedLegendTheme` and `updateShouldNotify` treat it as data. `LegendInteractive` maps its `LegendInteractionStates` snapshot onto the ladder via `states.effective`.
 
 ### R7 — Shared default expressions + variant consolidation
 
@@ -142,7 +146,7 @@ Every token field and every `@Themed` field already carries (or per CLAUDE.md mu
 
 ## 4. What is deliberately NOT adopted
 
-- **No arbitrary style callbacks in themes** — `LegendStateStyle` is the *only* function-valued theme type, and only because its sealed domain makes it total, pure, and materializable (§R6). Nothing receives a BuildContext or arbitrary widget state.
+- **No arbitrary style callbacks in themes** — `LegendStateStyle` is the *only* function-valued theme type, it is opt-in rather than the default declaration style, and it is admitted only because its sealed domain makes it total, pure, and materializable (§R6). Nothing receives a BuildContext or arbitrary widget state.
 - **No headless/unstyled pivot** — annotation defaults remain the styled layer; primitives remain the recomposition hatch.
 - **No closed variant registry, no naming conventions, no cross-file generation** — RFC-001 rules hold.
 - **No `sx`-style ad-hoc instance styling** — typed constructor params are the instance hatch.
