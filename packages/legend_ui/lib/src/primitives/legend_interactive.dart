@@ -88,6 +88,9 @@ class _LegendInteractiveState extends State<LegendInteractive> {
       toggled: widget.toggled,
       enabled: _enabled,
       label: widget.semanticLabel,
+      // The labeled node must carry the tap action itself — assistive tech
+      // (and semantics-driven tooling) activates the node it announces.
+      onTap: _enabled ? _activate : null,
       child: FocusableActionDetector(
         enabled: _enabled,
         focusNode: widget.focusNode,

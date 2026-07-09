@@ -6,7 +6,7 @@
       "runtimeExecutable": "sh",
       "runtimeArgs": [
         "-c",
-        "cd example && tail -f /dev/null | flutter run -d web-server --web-port=8321"
+        "flutter analyze || exit 1; cd example; PIPE=/tmp/legend_docs_stdin; rm -f \"$PIPE\"; mkfifo \"$PIPE\"; (exec 3>\"$PIPE\"; while :; do sleep 3600; done) & KEEPER=$!; trap 'kill $KEEPER 2>/dev/null; rm -f \"$PIPE\"' EXIT; flutter run -d web-server --web-port=8321 < \"$PIPE\""
       ],
       "port": 8321
     }

@@ -44,6 +44,57 @@ void main() {
     );
   });
 
+  testWidgets('resolution ladder: nearest enabled level wins', (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const DocsApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Theming'));
+    await tester.pumpAndSettle();
+
+    Future<void> toggle(String key) async {
+      await tester.scrollUntilVisible(
+        find.byKey(ValueKey(key)),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.byKey(ValueKey(key)));
+      await tester.pumpAndSettle();
+    }
+
+    await tester.scrollUntilVisible(
+      find.text('Resolved'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    // All levels off: token default.
+    expect(
+      _primaryButtonColor(tester, 'Resolved'),
+      LegendTokens.light.colors.primary,
+    );
+
+    // Mid-tree LegendTheme (level 3) beats tokens.
+    await toggle('ladder-midtree');
+    expect(_primaryButtonColor(tester, 'Resolved'), const Color(0xFF0D9488));
+
+    // Subtree override (level 2) beats the mid-tree theme.
+    await toggle('ladder-subtree');
+    expect(_primaryButtonColor(tester, 'Resolved'), const Color(0xFFD97706));
+
+    // Constructor param (level 1) beats everything.
+    await toggle('ladder-constructor');
+    expect(_primaryButtonColor(tester, 'Resolved'), const Color(0xFF8B5CF6));
+
+    // Dropping the nearer levels falls back down the ladder.
+    await toggle('ladder-constructor');
+    await toggle('ladder-subtree');
+    expect(_primaryButtonColor(tester, 'Resolved'), const Color(0xFF0D9488));
+  });
+
   testWidgets(
     'playground: preset, brand color, and component override restyle live',
     (tester) async {

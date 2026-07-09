@@ -1,4 +1,4 @@
-import 'dart:ui' show Tristate;
+import 'dart:ui' show SemanticsAction, Tristate;
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -117,6 +117,22 @@ void main() {
           .flagsCollection;
       expect(flags.isButton, isTrue);
       expect(flags.isToggled, Tristate.none);
+      handle.dispose();
+    });
+
+    testWidgets('the labeled semantics node carries the tap action', (
+      tester,
+    ) async {
+      var taps = 0;
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(_wrap(_probe(onTap: () => taps++)));
+      final node = tester.getSemantics(find.byType(LegendInteractive));
+      // Assistive tech (and semantics-driven tooling) activates the node it
+      // announces — the action must live on the labeled node itself.
+      expect(node.getSemanticsData().hasAction(SemanticsAction.tap), isTrue);
+      node.owner!.performAction(node.id, SemanticsAction.tap);
+      await tester.pump();
+      expect(taps, 1);
       handle.dispose();
     });
   });

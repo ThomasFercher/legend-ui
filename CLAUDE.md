@@ -38,11 +38,41 @@ dart run legend_gen themes lib test/consumer   # regenerate committed *.theme.g.
 
 ## Previewing the docs site (visual verification)
 
-`.claude/launch.json` defines the `docs-site` server (`flutter run -d web-server --web-port=8321` in `example/`). Start it with the preview tools, then verify visually:
+`.claude/launch.json` defines the `docs-site` server: it runs `flutter analyze` first (**lint gate — the app will not start on analyzer findings**), then `flutter run -d web-server --web-port=8321` in `example/` with stdin wired to the FIFO `/tmp/legend_docs_stdin`.
 
+- **Hot reload**: after editing Dart sources, `printf 'r\n' > /tmp/legend_docs_stdin` (hot restart: `'R\n'`). No server restart needed.
 - First page load can race the debug service — if the screenshot is black and the DOM has no `flutter-view`, reload the page once.
-- The app calls `SemanticsBinding.instance.ensureSemantics()` in `main`, so the full semantics tree is in the DOM: use the accessibility snapshot to read the UI and click nodes via their `aria-label`/role instead of guessing canvas coordinates.
+- The app enables the semantics tree in `main`, so every widget is in the DOM as `flt-semantics` nodes.
 - Screenshots may render scaled relative to `window.innerWidth` — don't derive click coordinates from screenshot pixels; use semantics nodes.
+
+### Token-friendly testing (prefer this order)
+
+1. **Widget tests** (`example/test/`) — cheapest, deterministic; cover behavior here first.
+2. **Semantics text dump** — read the live UI as text instead of screenshots. In the preview page evaluate:
+   ```js
+   [...document.querySelectorAll('flt-semantics')].map(n => {
+     const r = n.getBoundingClientRect();
+     return `${n.getAttribute('role') || 'node'} "${n.getAttribute('aria-label') || n.textContent.trim().slice(0, 60)}" @${r.x | 0},${r.y | 0}`;
+   }).filter(s => !s.includes('""')).join('\n')
+   ```
+   **Reliable interaction recipe** (do NOT use `click` events on semantics nodes — they don't drive Flutter's gesture layer): take the target node's `getBoundingClientRect()` center, multiply by `devicePixelRatio`, and dispatch `pointerdown`+`pointerup` PointerEvents on the `flutter-view` element:
+   ```js
+   const dpr = devicePixelRatio, v = document.querySelector('flutter-view');
+   const r = node.getBoundingClientRect(), x = (r.x+r.width/2)*dpr, y = (r.y+r.height/2)*dpr;
+   const o = {bubbles:true,composed:true,clientX:x,clientY:y,pointerId:1,pointerType:'mouse',isPrimary:true};
+   v.dispatchEvent(new PointerEvent('pointerdown',{...o,button:0,buttons:1}));
+   v.dispatchEvent(new PointerEvent('pointerup',{...o,button:0,buttons:0}));
+   ```
+   When several nodes share a label, prefer one whose `role` is `button`/`switch`/`checkbox`, else the smallest by area. **The nav sider only exists at ≥600px wide** — call `preview_resize` to 1400×900 first, or the sider items won't be in the DOM (compact tier shows a "Navigation" hamburger instead).
+3. **Dart MCP server** (registered in `.mcp.json`, needs a session restart to load) — text-based runtime introspection: widget tree, runtime errors, hot reload, expression evaluation against the running VM service.
+4. **Screenshots** — only for genuinely visual questions (colors, layout, animation states); they are the token-expensive tool.
+
+## Component & docs conventions (do not skip when adding/porting a component)
+
+1. **Every shipped component must appear in the playground configure screen** (`example/lib/docs/pages/playground_page.dart` + `theme_panel.dart`): a live instance in the preview column AND at least one editable knob wired through `ThemeController` (its most characteristic themed property). A component that ships without a playground rung is incomplete.
+2. **Standardized doc comments on every public/base widget.** Order: (1) one-sentence summary of what it is; (2) which primitive(s) it composes; (3) the legacy bug or fork it replaces, if any; (4) `@Themed` fields get a one-line intent comment. Dartdoc `///`, reference related types with `[Brackets]`. Base primitives (`LegendSurface`, `LegendInteractive`, `LegendButtonCore`, `LegendAnchoredOverlay`, `LegendModalRoute`, `LegendCaret`) are the reference style.
+3. **Text is selectable on web.** Body content sits under a `SelectionArea`; `LegendText` must participate in selection (it wraps `Text`/`RichText`, which already do). Don't break this with `IgnorePointer`/custom paint over text.
+4. **Rich text** goes through `LegendText.rich` (inline `TextSpan`s over token styles) — never a Material `RichText` import in component code.
 
 ## Process
 
