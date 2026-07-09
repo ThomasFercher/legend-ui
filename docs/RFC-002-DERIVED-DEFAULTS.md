@@ -37,7 +37,7 @@ What we take, and what is ours alone:
 2. **From MUI/shadcn**: deltas-over-defaults and legibility pairs — expressed as typed Dart, not string paths.
 3. **From the headless school**: state-as-data flowing into the styling layer — but typed and **sealed**, not stringly `data-state` attributes.
 4. **From Fluent/Airbnb**: themes stay declarative and inspectable; recomposition from primitives is the last rung of the ladder.
-5. **Ours: the sealed-state ladder (§R6)** — Dart 3 sealed classes make widget interaction state an *exhaustively-switchable, single-valued* type instead of Material's `Set<WidgetState>` guess-the-precedence model. Token-derived overlays are the default; record-style `LegendStateColor` shapes name every state variant individually — pure data, no functions in the theme at all.
+5. **Ours: the sealed-state ladder (§R6)** — Dart 3 sealed classes make widget interaction state an *exhaustively-switchable, single-valued* type instead of Material's `Set<WidgetState>` guess-the-precedence model. `@Themed(states: true)` expands one declaration into flat named variants of the raw type; a generic `pick<T>` selects per state — no wrapper objects, no functions in the theme, every variant a named variable.
 6. **Ours: the widget file is the single source of truth for behavior, theme AND documentation (§R9)** — dartdoc comments on tokens and `@Themed` fields are extracted by the generator into a docs manifest; the docs site and playground render every variable from it. Documentation cannot drift from code because it *is* the code.
 
 ## 3. Proposals
@@ -89,7 +89,7 @@ final dark   = LegendTokens.fromSeed(LegendSeed(brand: ..., brightness: Brightne
 
 `tokens/` data classes get their `copyWith`/`lerp`/ctors generated into `*.tokens.g.dart` (annotate with the existing contract). Removes ~230 hand LOC, makes "add a token" a one-line diff, and dogfoods the generator on the kit's own core.
 
-### R6 — Sealed widget states; record-style named state variables, no functions *(revised 2026-07-09 ×4, directed: dropped the function form — sparse named members cover every shape)*
+### R6 — Sealed widget states; flat named state variants, generically resolved — no wrapper types *(revised 2026-07-09 ×5, directed: raw values + generics replace the LegendStateColor envelope)*
 
 Interaction state becomes a **sealed type** with a single effective value, resolved by a fixed priority ladder (disabled ≻ pressed ≻ hovered ≻ focused ≻ normal):
 
@@ -102,22 +102,36 @@ final class LegendStateFocused  extends LegendWidgetState { const ... }
 final class LegendStateDisabled extends LegendWidgetState { const ... }
 ```
 
-**Every state variant is a named, overridable variable** *(amended 2026-07-09 ×3, directed)*. State-bearing fields use **`LegendStateColor`** — a data class whose members are individually named and individually overridable at every resolution level: `normal`, `hovered`, `pressed`, `focused`, `disabled`. Merging across the four levels is **member-wise sparse**, so overriding one named member at any level leaves the others resolving normally. No value is reachable only through derivation — everything the playground/manifest lists by name can be set by name.
+**No wrapper values** *(amended 2026-07-09 ×5, directed)*. Theme values stay raw — `Color`, `double`, `TextStyle` — never enveloped in state-carrier objects (`LegendStateColor` is dead). Per-state flexibility comes from **generation** and **generics** instead:
 
-**Derivation fills what you didn't name.** Tokens gain `LegendStateOverlays` (hover/press deltas, disabled opacity). An unset member resolves by applying the overlays to the *resolved* `normal` at resolve time — so `PrimaryLegendButton(background: LegendStateColor(normal: brand))` (or the plain-color sugar `background: brand`) gets brand-consistent hover/press for free, and they re-derive from whatever `normal` resolves to at any level. Consistent state styling from one color, zero extra declaration; hand-naming a member always wins over derivation.
-
-**Record-style, no functions.** `LegendStateColor` is a const class whose all-optional named members give it record literal ergonomics in "any shape" — one state, three states, or all five — while staying a single static type. (True Dart records can't play this role: a named-field record type requires every field at construction, so sparse shapes are distinct incompatible types, and Dart has no union for `Color | record`. The const class with optional named members *is* the record with any shape.) With that flexibility, a styling-function form adds nothing and is **dropped** — the theme system is pure data all the way down, which is an even stronger version of Fluent's no-callbacks lesson:
+**The generator expands states into flat named variables.** A state-bearing field is declared once, on its raw type:
 
 ```dart
-// plain color — states derived from overlays:
-PrimaryLegendButton(background: brand.state)                 // Color → LegendStateColor sugar
-// any shape, like a record literal:
-PrimaryLegendButton(background: LegendStateColor(normal: brand, pressed: navy))
-// named override of exactly one state variant, at any level:
-PrimaryLegendButtonThemeNullable(background: LegendStateColor(pressed: navy))
+@Themed(defaultsTo: 't.colors.primary', states: true)
+final Color? background;
 ```
 
-Per-member precedence: named member (nearest resolution level) ≻ overlays applied to resolved `normal`. The generator supports `LegendStateColor` as a field category (member-wise sparse merge, member-wise `Color.lerp`, member-wise `==`); the manifest (R9) lists each member as its own named variable. A consumer who wants computed states writes the computation *at theme-build time* and passes the resulting members — data in the theme, logic outside it. `LegendInteractive` maps its `LegendInteractionStates` snapshot onto the ladder via `states.effective`.
+The generated theme classes then carry **flat, individually named plain-`Color` variables** — `background`, `backgroundHovered`, `backgroundPressed`, `backgroundFocused`, `backgroundDisabled` — each a first-class themed variable: individually overridable at every resolution level, individually merged, lerped, and listed by name in the manifest (R9):
+
+```dart
+// override exactly one variant, any level — it's just a named field:
+PrimaryLegendButtonThemeNullable(backgroundPressed: navy)
+```
+
+**Derivation fills what you didn't set.** Tokens gain `LegendStateOverlays` (hover/press deltas, disabled opacity); the generated *defaults* for `Color` variants apply the overlays to the base default expression, and an unset variant falls back to overlays-over-the-*resolved*-base at `of()` time — so one brand color still yields consistent hover/press everywhere, while any explicitly set variant wins. Non-`Color` `states:` fields default their variants to the base expression (no color math).
+
+**Generics do the selection, not wrappers.** The sealed type gets a generic picker, and each expanded field gets a generated typed accessor:
+
+```dart
+// generated on XTheme — exhaustive switch over the sealed states:
+Color backgroundFor(LegendWidgetState state);
+
+// generic, works for any type, fallback-to-normal built in — no envelope object:
+final elevation = states.effective.pick(normal: 1.0, pressed: 3.0);
+T pick<T>({required T normal, T? hovered, T? pressed, T? focused, T? disabled});
+```
+
+The widget constructor keeps the base param (`background`) for level 1; an author who wants a variant constructor-settable declares it as its own `@Themed` field, and the generator diagnoses collisions with expanded names. Themes remain pure data (no functions, no wrappers); computed state values are produced at theme-build time and stored in the flat variables. `LegendInteractive` maps its `LegendInteractionStates` snapshot onto the ladder via `states.effective`.
 
 ### R7 — Shared default expressions + variant consolidation
 
@@ -142,7 +156,7 @@ Every token field and every `@Themed` field already carries (or per CLAUDE.md mu
 
 ## 4. What is deliberately NOT adopted
 
-- **No function-valued theme content at all** *(amendment 4)* — the earlier `resolveWith` opt-in was dropped once record-style sparse members covered every shape; themes are pure data, computed values are produced at theme-build time and stored as members. Nothing in a theme receives a BuildContext or a callback.
+- **No function-valued theme content, no wrapper value types** *(amendments 4–5)* — the `resolveWith` opt-in and then the `LegendStateColor` envelope itself were both dropped; theme values are raw `Color`/`double`/`TextStyle` in flat named variables, state selection is generic (`pick<T>`), and computed values are produced at theme-build time. Nothing in a theme receives a BuildContext or a callback.
 - **No headless/unstyled pivot** — annotation defaults remain the styled layer; primitives remain the recomposition hatch.
 - **No closed variant registry, no naming conventions, no cross-file generation** — RFC-001 rules hold.
 - **No `sx`-style ad-hoc instance styling** — typed constructor params are the instance hatch.
@@ -152,7 +166,7 @@ Every token field and every `@Themed` field already carries (or per CLAUDE.md mu
 
 | Step | Contents | Status |
 |---|---|---|
-| **A — generator sprint** | R1 + R2 + R3 + `LegendStateColor` field category + `legend_gen docs`; regenerate all + goldens | in progress (2026-07-09) |
+| **A — generator sprint** | R1 + R2 + R3 + `states:` flat expansion + `legend_gen docs`; regenerate all + goldens | in progress (2026-07-09) |
 | **B — token sprint** | R5 then R4 (`LegendRamp`, `LegendSeed`, pairs restructure, `LegendStateOverlays`); goldens pin light/dark | in progress (2026-07-09) |
 | **C — component adoption** | resolveTheme() everywhere; interactive components move to `LegendStateStyle`; R7 | in progress (2026-07-09) |
 | **D — playground & docs CMS** | manifest-driven configurator over every variable; Theme reference page; `LegendThemeController` in kit | in progress (2026-07-09) |
