@@ -225,7 +225,7 @@ Skipped deliberately: a `dev`-style VM-service server (the consumer's `flutter r
 
 | Step | Contents | Status |
 |---|---|---|
-| **A — generator sprint** | R1 + R2 + R3 + R10 `@Style<T>` typed contract + `LegendStates<T>` category + `legend_gen docs`; migrate all 72 fields; regenerate all + goldens | pending relaunch (2026-07-09) |
+| **A — generator sprint** | R1 + R2 + R3 + R10 `@Style<T>` typed contract + `LegendStates<T>` category + `legend_gen docs`; migrate all 72 fields; regenerate all + goldens | **landed** (2026-07-09): typed `@Style<T>` (value/resolve/null), part-of emission with the private `_theme(context)` resolver extension, `XThemeNullable` value `==`, both-keys registry lookup (widget type wins), sealed `LegendWidgetState` + `LegendStates<T>` + `LegendStateOverlays` on the tokens, `legend_gen docs` manifests (`LegendDocEntry`). Migrated 82 fields across 19 widgets + the consumer fixture (73 `.resolve` tear-offs, 9 const values); all 20 mirror blocks deleted (−317 hand LOC, +257 for the typed tear-off statics); 20 theme parts + 20 docs manifests regenerated and committed; generator goldens ×3 (theme ×2, docs ×1) |
 | **B — token sprint** | R5 then R4 (`LegendRamp`, `LegendSeed`, pairs restructure, `LegendStateOverlays`); goldens pin light/dark | in progress (2026-07-09) |
 | **C — component adoption** | resolveTheme() everywhere; interactive components move to `LegendStateStyle`; R7 | in progress (2026-07-09) |
 | **D — playground & docs CMS** | manifest-driven configurator over every variable; Theme reference page; `LegendThemeController` in kit | in progress (2026-07-09) |

@@ -1,6 +1,6 @@
 name: legend_gen
 description: Standalone CLI for Legend UI Kit — generates component theme plumbing from @LegendThemeable decorators; also icon tables, scaffolding, and setup diagnostics.
-version: 0.1.0-dev.0
+version: 0.2.0-dev.0
 repository: https://github.com/legend-app/legend-ui-kit
 publish_to: none # published to pub.dev once Phase 0 validates the annotation contract
 resolution: workspace

@@ -1,8 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
-import 'package:legend_ui/src/shell/legend_app_bar.theme.g.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_tokens.dart';
+
+part 'legend_app_bar.theme.g.dart';
 
 /// Top bar: leading / title / actions in a plain Row — no custom
 /// RenderBox (legacy's slotted app-bar render object had broken
@@ -28,25 +30,21 @@ class LegendAppBar extends StatelessWidget {
 
   final List<Widget> actions;
 
-  @Themed(defaultsTo: 't.colors.surface')
+  @Style<Color>.resolve(_background)
   final Color? background;
+  static Color _background(LegendTokens t) => t.colors.surface;
 
-  @Themed(defaultsTo: '56.0')
+  @Style<double>(56)
   final double? height;
 
-  @Themed(defaultsTo: 'EdgeInsets.symmetric(horizontal: t.sizes.md)')
+  @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
+  static EdgeInsetsGeometry _padding(LegendTokens t) =>
+      EdgeInsets.symmetric(horizontal: t.sizes.md);
 
   @override
   Widget build(BuildContext context) {
-    final theme = LegendAppBarTheme.of(
-      context,
-      LegendAppBarThemeNullable(
-        background: background,
-        height: height,
-        padding: padding,
-      ),
-    );
+    final theme = _theme(context);
     final tokens = LegendTheme.of(context).tokens;
     final titleChild =
         titleWidget ??

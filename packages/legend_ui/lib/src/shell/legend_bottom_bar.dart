@@ -2,9 +2,11 @@ import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/primitives/legend_interactive.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
-import 'package:legend_ui/src/shell/legend_bottom_bar.theme.g.dart';
 import 'package:legend_ui/src/shell/legend_nav_item.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_tokens.dart';
+
+part 'legend_bottom_bar.theme.g.dart';
 
 /// Compact-tier navigation bar; `LegendScaffold` shows it below the
 /// compact breakpoint.
@@ -25,29 +27,24 @@ class LegendBottomBar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onSelected;
 
-  @Themed(defaultsTo: 't.colors.surface')
+  @Style<Color>.resolve(_background)
   final Color? background;
+  static Color _background(LegendTokens t) => t.colors.surface;
 
-  @Themed(defaultsTo: 't.colors.primary', lerp: true)
+  @Style<Color>.resolve(_selectedColor, lerp: true)
   final Color? selectedColor;
+  static Color _selectedColor(LegendTokens t) => t.colors.primary;
 
-  @Themed(defaultsTo: 't.colors.foreground3', lerp: true)
+  @Style<Color>.resolve(_unselectedColor, lerp: true)
   final Color? unselectedColor;
+  static Color _unselectedColor(LegendTokens t) => t.colors.foreground3;
 
-  @Themed(defaultsTo: '64.0')
+  @Style<double>(64)
   final double? height;
 
   @override
   Widget build(BuildContext context) {
-    final theme = LegendBottomBarTheme.of(
-      context,
-      LegendBottomBarThemeNullable(
-        background: background,
-        selectedColor: selectedColor,
-        unselectedColor: unselectedColor,
-        height: height,
-      ),
-    );
+    final theme = _theme(context);
     final tokens = LegendTheme.of(context).tokens;
 
     return LegendSurface(

@@ -1,7 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
-import 'package:legend_ui/src/components/info_item/legend_info_item.theme.g.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_tokens.dart';
+
+part 'legend_info_item.theme.g.dart';
 
 /// A label/value row for detail lists — label on the left, value on the
 /// right, with optional [leading] and [trailing] widgets on the outside.
@@ -30,25 +32,24 @@ class LegendInfoItem extends StatelessWidget {
   /// Shown after the value.
   final Widget? trailing;
 
-  @Themed(defaultsTo: 't.typography.b3.copyWith(color: t.colors.foreground2)')
+  @Style<TextStyle>.resolve(_labelStyle)
   final TextStyle? labelStyle;
+  static TextStyle _labelStyle(LegendTokens t) =>
+      t.typography.b3.copyWith(color: t.colors.foreground2);
 
-  @Themed(defaultsTo: 't.typography.b2.copyWith(color: t.colors.foreground1)')
+  @Style<TextStyle>.resolve(_valueStyle)
   final TextStyle? valueStyle;
+  static TextStyle _valueStyle(LegendTokens t) =>
+      t.typography.b2.copyWith(color: t.colors.foreground1);
 
-  @Themed(defaultsTo: 'EdgeInsets.symmetric(vertical: t.sizes.xs)')
+  @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
+  static EdgeInsetsGeometry _padding(LegendTokens t) =>
+      EdgeInsets.symmetric(vertical: t.sizes.xs);
 
   @override
   Widget build(BuildContext context) {
-    final theme = LegendInfoItemTheme.of(
-      context,
-      LegendInfoItemThemeNullable(
-        labelStyle: labelStyle,
-        valueStyle: valueStyle,
-        padding: padding,
-      ),
-    );
+    final theme = _theme(context);
     final tokens = LegendTheme.of(context).tokens;
     return Padding(
       padding: theme.padding,

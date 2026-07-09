@@ -20,6 +20,21 @@ class LegendThemeData {
   /// didn't register one.
   T? component<T>() => components[T] as T?;
 
+  /// Level-3 lookup used by generated `XTheme.of` (RFC-002 R3): tries the
+  /// **widget type** [widget] first — the key consumers naturally reach
+  /// for — then falls back to `T` (the sparse theme type, the pre-RFC-002
+  /// key) so existing registrations keep working. When both keys are
+  /// registered, the widget-type entry wins.
+  T? componentOf<T>(Type widget) {
+    final value = components[widget] ?? components[T];
+    assert(
+      value is T?,
+      'LegendThemeData.components[$widget] holds ${value.runtimeType}, '
+      'expected $T — register the generated sparse theme type as the value.',
+    );
+    return value is T ? value : null;
+  }
+
   LegendThemeData copyWith({
     LegendTokens? tokens,
     Map<Type, Object>? components,

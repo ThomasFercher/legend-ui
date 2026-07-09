@@ -3,8 +3,10 @@ import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/primitives/legend_interactive.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
 import 'package:legend_ui/src/shell/legend_nav_item.dart';
-import 'package:legend_ui/src/shell/legend_sider.theme.g.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_tokens.dart';
+
+part 'legend_sider.theme.g.dart';
 
 /// Wide-tier side navigation; `LegendScaffold` shows it at medium/expanded
 /// tiers.
@@ -30,37 +32,29 @@ class LegendSider extends StatelessWidget {
   final Widget? header;
   final Widget? footer;
 
-  @Themed(defaultsTo: 't.colors.surface')
+  @Style<Color>.resolve(_background)
   final Color? background;
+  static Color _background(LegendTokens t) => t.colors.surface;
 
-  @Themed(defaultsTo: '240.0')
+  @Style<double>(240)
   final double? width;
 
-  @Themed(defaultsTo: 't.colors.primary', lerp: true)
+  @Style<Color>.resolve(_selectedColor, lerp: true)
   final Color? selectedColor;
+  static Color _selectedColor(LegendTokens t) => t.colors.primary;
 
-  @Themed(defaultsTo: 't.colors.foreground2', lerp: true)
+  @Style<Color>.resolve(_unselectedColor, lerp: true)
   final Color? unselectedColor;
+  static Color _unselectedColor(LegendTokens t) => t.colors.foreground2;
 
-  @Themed(
-    defaultsTo:
-        'EdgeInsets.symmetric(horizontal: t.sizes.md, '
-        'vertical: t.sizes.sm)',
-  )
+  @Style<EdgeInsetsGeometry>.resolve(_itemPadding)
   final EdgeInsetsGeometry? itemPadding;
+  static EdgeInsetsGeometry _itemPadding(LegendTokens t) =>
+      EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm);
 
   @override
   Widget build(BuildContext context) {
-    final theme = LegendSiderTheme.of(
-      context,
-      LegendSiderThemeNullable(
-        background: background,
-        width: width,
-        selectedColor: selectedColor,
-        unselectedColor: unselectedColor,
-        itemPadding: itemPadding,
-      ),
-    );
+    final theme = _theme(context);
     final tokens = LegendTheme.of(context).tokens;
 
     return LegendSurface(

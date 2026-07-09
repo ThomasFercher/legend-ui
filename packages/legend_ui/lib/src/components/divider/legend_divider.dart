@@ -1,7 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
-import 'package:legend_ui/src/components/divider/legend_divider.theme.g.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
+import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_tokens.dart';
+
+part 'legend_divider.theme.g.dart';
 
 /// A thin rule separating content, horizontal ([Axis.horizontal], the
 /// default) or vertical.
@@ -28,25 +31,21 @@ class LegendDivider extends StatelessWidget {
   /// The direction the line runs in.
   final Axis axis;
 
-  @Themed(defaultsTo: 't.colors.background3')
+  @Style<Color>.resolve(_color)
   final Color? color;
+  static Color _color(LegendTokens t) => t.colors.background3;
 
-  @Themed(defaultsTo: 't.sizes.borderWidth')
+  @Style<double>.resolve(_thickness)
   final double? thickness;
+  static double _thickness(LegendTokens t) => t.sizes.borderWidth;
 
-  @Themed(defaultsTo: 't.sizes.md')
+  @Style<double>.resolve(_spacing)
   final double? spacing;
+  static double _spacing(LegendTokens t) => t.sizes.md;
 
   @override
   Widget build(BuildContext context) {
-    final theme = LegendDividerTheme.of(
-      context,
-      LegendDividerThemeNullable(
-        color: color,
-        thickness: thickness,
-        spacing: spacing,
-      ),
-    );
+    final theme = _theme(context);
     final horizontal = axis == Axis.horizontal;
     return Padding(
       padding: horizontal

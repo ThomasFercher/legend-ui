@@ -1,10 +1,12 @@
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
-import 'package:legend_ui/src/components/expandable/legend_expandable.theme.g.dart';
 import 'package:legend_ui/src/primitives/legend_caret.dart';
 import 'package:legend_ui/src/primitives/legend_interactive.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_tokens.dart';
+
+part 'legend_expandable.theme.g.dart';
 
 /// A header that expands and collapses its [child] with an animated size
 /// change and a rotating [LegendCaret].
@@ -58,14 +60,18 @@ class LegendExpandable extends StatefulWidget {
   /// How long the expand/collapse (and caret) animation takes.
   final Duration duration;
 
-  @Themed(defaultsTo: 'EdgeInsets.all(t.sizes.md)')
+  @Style<EdgeInsetsGeometry>.resolve(_headerPadding)
   final EdgeInsetsGeometry? headerPadding;
+  static EdgeInsetsGeometry _headerPadding(LegendTokens t) =>
+      EdgeInsets.all(t.sizes.md);
 
-  @Themed(defaultsTo: 't.colors.surface')
+  @Style<Color>.resolve(_backgroundColor)
   final Color? backgroundColor;
+  static Color _backgroundColor(LegendTokens t) => t.colors.surface;
 
-  @Themed(defaultsTo: 't.sizes.borderRadiusMd')
+  @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
+  static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusMd;
 
   @override
   State<LegendExpandable> createState() => _LegendExpandableState();
@@ -84,14 +90,7 @@ class _LegendExpandableState extends State<LegendExpandable> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = LegendExpandableTheme.of(
-      context,
-      LegendExpandableThemeNullable(
-        headerPadding: widget.headerPadding,
-        backgroundColor: widget.backgroundColor,
-        borderRadius: widget.borderRadius,
-      ),
-    );
+    final theme = widget._theme(context);
     final tokens = LegendTheme.of(context).tokens;
     final expanded = _isExpanded;
 

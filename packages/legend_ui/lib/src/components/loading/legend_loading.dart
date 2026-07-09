@@ -1,8 +1,10 @@
 import 'dart:math' as math;
-
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
-import 'package:legend_ui/src/components/loading/legend_loading.theme.g.dart';
+import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_tokens.dart';
+
+part 'legend_loading.theme.g.dart';
 
 /// An indeterminate arc spinner — a rotating [CustomPainter] arc, no
 /// Material `CircularProgressIndicator` (DESIGN.md §3: no Material
@@ -11,13 +13,14 @@ import 'package:legend_ui/src/components/loading/legend_loading.theme.g.dart';
 class LegendLoading extends StatefulWidget {
   const LegendLoading({super.key, this.color, this.size, this.strokeWidth});
 
-  @Themed(defaultsTo: 't.colors.primary')
+  @Style<Color>.resolve(_color)
   final Color? color;
+  static Color _color(LegendTokens t) => t.colors.primary;
 
-  @Themed(defaultsTo: '24.0')
+  @Style<double>(24)
   final double? size;
 
-  @Themed(defaultsTo: '3.0')
+  @Style<double>(3)
   final double? strokeWidth;
 
   @override
@@ -39,14 +42,7 @@ class _LegendLoadingState extends State<LegendLoading>
 
   @override
   Widget build(BuildContext context) {
-    final theme = LegendLoadingTheme.of(
-      context,
-      LegendLoadingThemeNullable(
-        color: widget.color,
-        size: widget.size,
-        strokeWidth: widget.strokeWidth,
-      ),
-    );
+    final theme = widget._theme(context);
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) => CustomPaint(

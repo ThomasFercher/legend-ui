@@ -98,7 +98,7 @@ class CodeBlock extends StatelessWidget {
 /// One themed property of a component, for [PropsTable].
 typedef PropRow = ({String name, String type, String defaultsTo});
 
-/// The component's `@Themed` surface: property, type, token default.
+/// The component's `@Style` surface: property, type, token default.
 /// Every row is overridable at all four resolution levels.
 class PropsTable extends StatelessWidget {
   const PropsTable({required this.rows, super.key});

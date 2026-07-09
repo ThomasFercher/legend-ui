@@ -1,9 +1,11 @@
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
-import 'package:legend_ui/src/components/dialog/legend_dialog.theme.g.dart';
 import 'package:legend_ui/src/primitives/legend_modal.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_tokens.dart';
+
+part 'legend_dialog.theme.g.dart';
 
 /// A modal dialog surface. Show it with [showLegendDialog] — the kit's own
 /// modal engine, no Material `showDialog` (legacy-docs 06).
@@ -24,29 +26,25 @@ class LegendDialog extends StatelessWidget {
   final Widget? content;
   final List<Widget> actions;
 
-  @Themed(defaultsTo: 't.colors.surface')
+  @Style<Color>.resolve(_background)
   final Color? background;
+  static Color _background(LegendTokens t) => t.colors.surface;
 
-  @Themed(defaultsTo: 't.sizes.borderRadiusLg')
+  @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
+  static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusLg;
 
-  @Themed(defaultsTo: 'EdgeInsets.all(t.sizes.lg)')
+  @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
+  static EdgeInsetsGeometry _padding(LegendTokens t) =>
+      EdgeInsets.all(t.sizes.lg);
 
-  @Themed(defaultsTo: '420.0')
+  @Style<double>(420)
   final double? maxWidth;
 
   @override
   Widget build(BuildContext context) {
-    final theme = LegendDialogTheme.of(
-      context,
-      LegendDialogThemeNullable(
-        background: background,
-        borderRadius: borderRadius,
-        padding: padding,
-        maxWidth: maxWidth,
-      ),
-    );
+    final theme = _theme(context);
     final tokens = LegendTheme.of(context).tokens;
 
     return ConstrainedBox(

@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:legend_ui/src/theme/legend_widget_state.dart';
 
 /// Snapshot of an interactive widget's input state, passed to
 /// [LegendInteractive.builder].
@@ -15,6 +16,17 @@ class LegendInteractionStates {
   final bool pressed;
   final bool focused;
   final bool disabled;
+
+  /// The single effective [LegendWidgetState] this snapshot maps to, by
+  /// the fixed priority ladder disabled ≻ pressed ≻ hovered ≻ focused ≻
+  /// normal (RFC-002 R6) — feed it to `LegendStates.pick`/`resolve`.
+  LegendWidgetState get effective {
+    if (disabled) return const LegendStateDisabled();
+    if (pressed) return const LegendStatePressed();
+    if (hovered) return const LegendStateHovered();
+    if (focused) return const LegendStateFocused();
+    return const LegendStateNormal();
+  }
 }
 
 /// The one tap/hover/focus/disabled primitive (DESIGN.md §3) — every

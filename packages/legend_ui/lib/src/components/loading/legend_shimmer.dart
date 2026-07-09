@@ -1,7 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
-import 'package:legend_ui/src/components/loading/legend_shimmer.theme.g.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
+import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_tokens.dart';
+
+part 'legend_shimmer.theme.g.dart';
 
 /// A looping gradient sweep over [child] — a `ShaderMask` sliding a
 /// `LinearGradient` across the subtree (skeleton-loading effect).
@@ -42,11 +45,13 @@ class LegendShimmer extends StatefulWidget {
   /// Placeholder box corner radius (only for [LegendShimmer.box]).
   final BorderRadius? boxBorderRadius;
 
-  @Themed(defaultsTo: 't.colors.background2')
+  @Style<Color>.resolve(_baseColor)
   final Color? baseColor;
+  static Color _baseColor(LegendTokens t) => t.colors.background2;
 
-  @Themed(defaultsTo: 't.colors.background1')
+  @Style<Color>.resolve(_highlightColor)
   final Color? highlightColor;
+  static Color _highlightColor(LegendTokens t) => t.colors.background1;
 
   @override
   State<LegendShimmer> createState() => _LegendShimmerState();
@@ -67,13 +72,7 @@ class _LegendShimmerState extends State<LegendShimmer>
 
   @override
   Widget build(BuildContext context) {
-    final theme = LegendShimmerTheme.of(
-      context,
-      LegendShimmerThemeNullable(
-        baseColor: widget.baseColor,
-        highlightColor: widget.highlightColor,
-      ),
-    );
+    final theme = widget._theme(context);
     final content =
         widget.child ??
         LegendSurface(

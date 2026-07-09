@@ -87,6 +87,39 @@ void main() {
       expect(_backgroundOf(tester), _param);
     });
 
+    testWidgets('level 3 accepts the widget type as the key (RFC-002 R3)', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _app(
+          components: {
+            PrimaryLegendButton: const PrimaryLegendButtonThemeNullable(
+              background: _appTheme,
+            ),
+          },
+        ),
+      );
+      expect(_backgroundOf(tester), _appTheme);
+    });
+
+    testWidgets('when both key styles are registered the widget type wins', (
+      tester,
+    ) async {
+      const byNullable = Color(0xFF444444);
+      await tester.pumpWidget(
+        _app(
+          components: {
+            PrimaryLegendButton: const PrimaryLegendButtonThemeNullable(
+              background: _appTheme,
+            ),
+            PrimaryLegendButtonThemeNullable:
+                const PrimaryLegendButtonThemeNullable(background: byNullable),
+          },
+        ),
+      );
+      expect(_backgroundOf(tester), _appTheme);
+    });
+
     testWidgets('unset properties still inherit lower levels', (tester) async {
       await tester.pumpWidget(_app(subtreeOverride: _subtree));
       final text = tester.widget<Text>(find.text('Save'));

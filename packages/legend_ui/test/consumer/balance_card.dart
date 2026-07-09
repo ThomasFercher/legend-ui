@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/legend_ui.dart';
 
-import 'balance_card.theme.g.dart';
+part 'balance_card.theme.g.dart';
 
 /// Consumer-workflow rehearsal (ROADMAP Phase 0): this widget stands in
 /// for one written by a *dependent* of the kit — it uses only the public
@@ -20,25 +20,22 @@ class BalanceCard extends StatelessWidget {
 
   final String amount;
 
-  @Themed(defaultsTo: 't.colors.surface', lerp: true)
+  @Style<Color>.resolve(_background, lerp: true)
   final Color? background;
+  static Color _background(LegendTokens t) => t.colors.surface;
 
-  @Themed(defaultsTo: 't.colors.secondary')
+  @Style<Color>.resolve(_accent)
   final Color? accent;
+  static Color _accent(LegendTokens t) => t.colors.secondary;
 
-  @Themed(defaultsTo: 'EdgeInsets.all(t.sizes.lg)')
+  @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
+  static EdgeInsetsGeometry _padding(LegendTokens t) =>
+      EdgeInsets.all(t.sizes.lg);
 
   @override
   Widget build(BuildContext context) {
-    final theme = BalanceCardTheme.of(
-      context,
-      BalanceCardThemeNullable(
-        background: background,
-        accent: accent,
-        padding: padding,
-      ),
-    );
+    final theme = _theme(context);
     final tokens = LegendTheme.of(context).tokens;
     return LegendSurface(
       color: theme.background,
