@@ -89,9 +89,11 @@ class ThemePanel extends StatelessWidget {
           const LegendDivider(),
           const LegendText('Component override', variant: LegendTextVariant.h3),
           const LegendText(
-            'Registers a sparse PrimaryLegendButtonThemeNullable in the '
-            'components map (level 3) — exactly how an app reskins one '
-            'component without touching the others.',
+            'Registers sparse overrides in the components map (level 3): '
+            'a PrimaryLegendButtonThemeNullable for the background and a '
+            'LegendButtonCoreThemeNullable for the shared button surface '
+            '(RFC-002 R7.2) — exactly how an app reskins components '
+            'without touching the others.',
             variant: LegendTextVariant.b3,
           ),
           ColorField(
@@ -100,7 +102,7 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setButtonBackground,
           ),
           const LegendText(
-            'Primary button radius',
+            'Button radius (shared LegendButtonCore surface)',
             variant: LegendTextVariant.b3,
           ),
           LegendDropdown<double>(

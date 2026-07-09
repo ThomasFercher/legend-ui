@@ -90,16 +90,13 @@ class SecondaryLegendButton extends StatelessWidget {
   final Color? borderColor;
   static Color _borderColor(LegendTokens t) => t.colors.primary;
 
-  /// Inner padding around the button content.
-  @Style<EdgeInsetsGeometry>.resolve(_padding)
+  /// Per-instance padding; when null the shared button surface applies
+  /// ([LegendButtonCore]'s themed padding, RFC-002 R7.2).
   final EdgeInsetsGeometry? padding;
-  static EdgeInsetsGeometry _padding(LegendTokens t) =>
-      EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm);
 
-  /// Corner rounding of the button surface.
-  @Style<BorderRadius>.resolve(_borderRadius)
+  /// Per-instance corner rounding; when null the shared button surface
+  /// applies ([LegendButtonCore]'s themed radius, RFC-002 R7.2).
   final BorderRadius? borderRadius;
-  static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusMd;
 
   /// Text style of the [text] label (its color comes from [foreground]).
   @Style<TextStyle>.resolve(_textStyle)
@@ -122,8 +119,8 @@ class SecondaryLegendButton extends StatelessWidget {
         color: theme.borderColor,
         width: tokens.sizes.borderWidth,
       ),
-      padding: theme.padding,
-      borderRadius: theme.borderRadius,
+      padding: padding,
+      borderRadius: borderRadius,
       textStyle: theme.textStyle,
       child: child,
     );

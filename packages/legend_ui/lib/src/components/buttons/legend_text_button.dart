@@ -57,14 +57,18 @@ class LegendTextButton extends StatelessWidget {
     disabled: t.colors.onDisabled,
   );
 
-  /// Inner padding around the button content (tighter than the filled
-  /// variants).
+  /// Inner padding around the button content — tighter than the filled
+  /// variants, so this variant keeps its own themed value instead of the
+  /// shared [LegendButtonCore] surface (variant wins, RFC-002 R7.2).
   @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
   static EdgeInsetsGeometry _padding(LegendTokens t) =>
       EdgeInsets.symmetric(horizontal: t.sizes.sm, vertical: t.sizes.xs);
 
-  /// Corner rounding of the hover/press tint area.
+  /// Corner rounding of the hover/press tint area — smaller than the
+  /// filled variants, so this variant keeps its own themed value instead
+  /// of the shared [LegendButtonCore] surface (variant wins, RFC-002
+  /// R7.2).
   @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
   static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusSm;

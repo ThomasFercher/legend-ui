@@ -9,8 +9,6 @@ class SecondaryLegendButtonTheme {
     required this.background,
     required this.foreground,
     required this.borderColor,
-    required this.padding,
-    required this.borderRadius,
     required this.textStyle,
   });
 
@@ -21,16 +19,12 @@ class SecondaryLegendButtonTheme {
         background: SecondaryLegendButton._background(t),
         foreground: SecondaryLegendButton._foreground(t),
         borderColor: SecondaryLegendButton._borderColor(t),
-        padding: SecondaryLegendButton._padding(t),
-        borderRadius: SecondaryLegendButton._borderRadius(t),
         textStyle: SecondaryLegendButton._textStyle(t),
       );
 
   final LegendStates<Color> background;
   final LegendStates<Color> foreground;
   final Color borderColor;
-  final EdgeInsetsGeometry padding;
-  final BorderRadius borderRadius;
   final TextStyle textStyle;
 
   /// Resolves the theme: defaults <- app registry (keyed by
@@ -72,8 +66,6 @@ class SecondaryLegendButtonTheme {
       foreground:
           LegendStates.merge(foreground, other.foreground) ?? foreground,
       borderColor: other.borderColor ?? borderColor,
-      padding: other.padding ?? padding,
-      borderRadius: other.borderRadius ?? borderRadius,
       textStyle: other.textStyle ?? textStyle,
     );
   }
@@ -82,15 +74,11 @@ class SecondaryLegendButtonTheme {
     LegendStates<Color>? background,
     LegendStates<Color>? foreground,
     Color? borderColor,
-    EdgeInsetsGeometry? padding,
-    BorderRadius? borderRadius,
     TextStyle? textStyle,
   }) => SecondaryLegendButtonTheme(
     background: background ?? this.background,
     foreground: foreground ?? this.foreground,
     borderColor: borderColor ?? this.borderColor,
-    padding: padding ?? this.padding,
-    borderRadius: borderRadius ?? this.borderRadius,
     textStyle: textStyle ?? this.textStyle,
   );
 
@@ -112,8 +100,6 @@ class SecondaryLegendButtonTheme {
       Color.lerp,
     ),
     borderColor: t < 0.5 ? a.borderColor : b.borderColor,
-    padding: t < 0.5 ? a.padding : b.padding,
-    borderRadius: t < 0.5 ? a.borderRadius : b.borderRadius,
     textStyle: t < 0.5 ? a.textStyle : b.textStyle,
   );
 }
@@ -126,16 +112,12 @@ class SecondaryLegendButtonThemeNullable {
     this.background,
     this.foreground,
     this.borderColor,
-    this.padding,
-    this.borderRadius,
     this.textStyle,
   });
 
   final LegendStates<Color>? background;
   final LegendStates<Color>? foreground;
   final Color? borderColor;
-  final EdgeInsetsGeometry? padding;
-  final BorderRadius? borderRadius;
   final TextStyle? textStyle;
 
   SecondaryLegendButtonThemeNullable merge(
@@ -146,8 +128,6 @@ class SecondaryLegendButtonThemeNullable {
       background: LegendStates.merge(background, other.background),
       foreground: LegendStates.merge(foreground, other.foreground),
       borderColor: other.borderColor ?? borderColor,
-      padding: other.padding ?? padding,
-      borderRadius: other.borderRadius ?? borderRadius,
       textStyle: other.textStyle ?? textStyle,
     );
   }
@@ -159,19 +139,11 @@ class SecondaryLegendButtonThemeNullable {
           other.background == background &&
           other.foreground == foreground &&
           other.borderColor == borderColor &&
-          other.padding == padding &&
-          other.borderRadius == borderRadius &&
           other.textStyle == textStyle;
 
   @override
-  int get hashCode => Object.hashAll([
-    background,
-    foreground,
-    borderColor,
-    padding,
-    borderRadius,
-    textStyle,
-  ]);
+  int get hashCode =>
+      Object.hashAll([background, foreground, borderColor, textStyle]);
 }
 
 /// Overrides [SecondaryLegendButtonTheme] for a subtree (level 2).
@@ -206,8 +178,6 @@ extension _$SecondaryLegendButtonThemeResolve on SecondaryLegendButton {
           background: background,
           foreground: foreground,
           borderColor: borderColor,
-          padding: padding,
-          borderRadius: borderRadius,
           textStyle: textStyle,
         ),
       );

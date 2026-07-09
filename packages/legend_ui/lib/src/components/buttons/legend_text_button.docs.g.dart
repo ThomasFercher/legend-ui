@@ -73,7 +73,7 @@ const List<LegendDocEntry> legendTextButtonDocEntries = [
     name: 'padding',
     type: 'EdgeInsetsGeometry?',
     doc:
-        'Inner padding around the button content (tighter than the filled\nvariants).',
+        'Inner padding around the button content — tighter than the filled\nvariants, so this variant keeps its own themed value instead of the\nshared [LegendButtonCore] surface (variant wins, RFC-002 R7.2).',
     defaultDescription:
         'EdgeInsets.symmetric(horizontal: t.sizes.sm, vertical: t.sizes.xs)',
     group: 'component',
@@ -82,7 +82,8 @@ const List<LegendDocEntry> legendTextButtonDocEntries = [
     owner: 'LegendTextButton',
     name: 'borderRadius',
     type: 'BorderRadius?',
-    doc: 'Corner rounding of the hover/press tint area.',
+    doc:
+        'Corner rounding of the hover/press tint area — smaller than the\nfilled variants, so this variant keeps its own themed value instead\nof the shared [LegendButtonCore] surface (variant wins, RFC-002\nR7.2).',
     defaultDescription: 't.sizes.borderRadiusSm',
     group: 'component',
   ),

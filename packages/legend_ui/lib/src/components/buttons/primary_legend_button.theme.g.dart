@@ -8,8 +8,6 @@ class PrimaryLegendButtonTheme {
   const PrimaryLegendButtonTheme({
     required this.background,
     required this.foreground,
-    required this.padding,
-    required this.borderRadius,
     required this.textStyle,
     required this.shadows,
   });
@@ -20,16 +18,12 @@ class PrimaryLegendButtonTheme {
       PrimaryLegendButtonTheme(
         background: PrimaryLegendButton._background(t),
         foreground: PrimaryLegendButton._foreground(t),
-        padding: PrimaryLegendButton._padding(t),
-        borderRadius: PrimaryLegendButton._borderRadius(t),
         textStyle: PrimaryLegendButton._textStyle(t),
         shadows: PrimaryLegendButton._shadows(t),
       );
 
   final LegendStates<Color> background;
   final LegendStates<Color> foreground;
-  final EdgeInsetsGeometry padding;
-  final BorderRadius borderRadius;
   final TextStyle textStyle;
   final List<BoxShadow> shadows;
 
@@ -71,8 +65,6 @@ class PrimaryLegendButtonTheme {
           LegendStates.merge(background, other.background) ?? background,
       foreground:
           LegendStates.merge(foreground, other.foreground) ?? foreground,
-      padding: other.padding ?? padding,
-      borderRadius: other.borderRadius ?? borderRadius,
       textStyle: other.textStyle ?? textStyle,
       shadows: other.shadows ?? shadows,
     );
@@ -81,15 +73,11 @@ class PrimaryLegendButtonTheme {
   PrimaryLegendButtonTheme copyWith({
     LegendStates<Color>? background,
     LegendStates<Color>? foreground,
-    EdgeInsetsGeometry? padding,
-    BorderRadius? borderRadius,
     TextStyle? textStyle,
     List<BoxShadow>? shadows,
   }) => PrimaryLegendButtonTheme(
     background: background ?? this.background,
     foreground: foreground ?? this.foreground,
-    padding: padding ?? this.padding,
-    borderRadius: borderRadius ?? this.borderRadius,
     textStyle: textStyle ?? this.textStyle,
     shadows: shadows ?? this.shadows,
   );
@@ -111,8 +99,6 @@ class PrimaryLegendButtonTheme {
       t,
       Color.lerp,
     ),
-    padding: t < 0.5 ? a.padding : b.padding,
-    borderRadius: t < 0.5 ? a.borderRadius : b.borderRadius,
     textStyle: t < 0.5 ? a.textStyle : b.textStyle,
     shadows: t < 0.5 ? a.shadows : b.shadows,
   );
@@ -125,16 +111,12 @@ class PrimaryLegendButtonThemeNullable {
   const PrimaryLegendButtonThemeNullable({
     this.background,
     this.foreground,
-    this.padding,
-    this.borderRadius,
     this.textStyle,
     this.shadows,
   });
 
   final LegendStates<Color>? background;
   final LegendStates<Color>? foreground;
-  final EdgeInsetsGeometry? padding;
-  final BorderRadius? borderRadius;
   final TextStyle? textStyle;
   final List<BoxShadow>? shadows;
 
@@ -145,8 +127,6 @@ class PrimaryLegendButtonThemeNullable {
     return PrimaryLegendButtonThemeNullable(
       background: LegendStates.merge(background, other.background),
       foreground: LegendStates.merge(foreground, other.foreground),
-      padding: other.padding ?? padding,
-      borderRadius: other.borderRadius ?? borderRadius,
       textStyle: other.textStyle ?? textStyle,
       shadows: other.shadows ?? shadows,
     );
@@ -158,20 +138,12 @@ class PrimaryLegendButtonThemeNullable {
       other is PrimaryLegendButtonThemeNullable &&
           other.background == background &&
           other.foreground == foreground &&
-          other.padding == padding &&
-          other.borderRadius == borderRadius &&
           other.textStyle == textStyle &&
           other.shadows == shadows;
 
   @override
-  int get hashCode => Object.hashAll([
-    background,
-    foreground,
-    padding,
-    borderRadius,
-    textStyle,
-    shadows,
-  ]);
+  int get hashCode =>
+      Object.hashAll([background, foreground, textStyle, shadows]);
 }
 
 /// Overrides [PrimaryLegendButtonTheme] for a subtree (level 2).
@@ -205,8 +177,6 @@ extension _$PrimaryLegendButtonThemeResolve on PrimaryLegendButton {
         PrimaryLegendButtonThemeNullable(
           background: background,
           foreground: foreground,
-          padding: padding,
-          borderRadius: borderRadius,
           textStyle: textStyle,
           shadows: shadows,
         ),

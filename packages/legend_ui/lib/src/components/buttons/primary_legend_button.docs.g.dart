@@ -130,23 +130,6 @@ const List<LegendDocEntry> primaryLegendButtonDocEntries = [
   ),
   LegendDocEntry(
     owner: 'PrimaryLegendButton',
-    name: 'padding',
-    type: 'EdgeInsetsGeometry?',
-    doc: 'Inner padding around the button content.',
-    defaultDescription:
-        'EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm)',
-    group: 'component',
-  ),
-  LegendDocEntry(
-    owner: 'PrimaryLegendButton',
-    name: 'borderRadius',
-    type: 'BorderRadius?',
-    doc: 'Corner rounding of the button surface.',
-    defaultDescription: 't.sizes.borderRadiusMd',
-    group: 'component',
-  ),
-  LegendDocEntry(
-    owner: 'PrimaryLegendButton',
     name: 'textStyle',
     type: 'TextStyle?',
     doc: 'Text style of the [text] label (its color comes from [foreground]).',
