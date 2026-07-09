@@ -1,16 +1,23 @@
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/primitives/legend_button_core.dart';
+import 'package:legend_ui/src/theme/legend_states.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
 part 'primary_legend_button.theme.g.dart';
 
-/// The primary action button — first component ported in the rewrite
-/// (ROADMAP Phase 0), composed on [LegendButtonCore].
+/// The primary (filled) action button — the first component ported in the
+/// rewrite (ROADMAP Phase 0).
+///
+/// Composes [LegendButtonCore] (which stacks `LegendInteractive` +
+/// `LegendSurface`).
 @LegendThemeable()
 class PrimaryLegendButton extends StatelessWidget {
-  const PrimaryLegendButton({
+  /// The [background]/[foreground] colors lift into the `normal` member of
+  /// the per-state theme fields (RFC-002 R6) — pass a sparse
+  /// [LegendStates] via the theme levels to restyle individual states.
+  PrimaryLegendButton({
     required this.onPressed,
     super.key,
     this.text,
@@ -18,13 +25,15 @@ class PrimaryLegendButton extends StatelessWidget {
     this.child,
     this.textFirst = true,
     this.enabled = true,
-    this.background,
-    this.foreground,
+    Color? background,
+    Color? foreground,
     this.padding,
     this.borderRadius,
     this.textStyle,
     this.shadows,
-  }) : assert(
+  }) : background = background?.states,
+       foreground = foreground?.states,
+       assert(
          text != null || icon != null || child != null,
          'Provide text, an icon, or a child.',
        );
@@ -42,27 +51,57 @@ class PrimaryLegendButton extends StatelessWidget {
 
   final bool enabled;
 
-  @Style<Color>.resolve(_background, lerp: true)
-  final Color? background;
-  static Color _background(LegendTokens t) => t.colors.primary;
+  /// Fill behind the label, per interaction state — hover/press blend the
+  /// foreground over the fill (8%/16%), disabled swaps to the token
+  /// disabled fill.
+  @Style<LegendStates<Color>>.resolve(_background, lerp: true)
+  final LegendStates<Color>? background;
+  static LegendStates<Color> _background(LegendTokens t) => LegendStates(
+    normal: t.colors.primary,
+    hovered: Color.alphaBlend(
+      t.colors.onPrimary.withValues(alpha: 0.08),
+      t.colors.primary,
+    ),
+    pressed: Color.alphaBlend(
+      t.colors.onPrimary.withValues(alpha: 0.16),
+      t.colors.primary,
+    ),
+    focused: Color.alphaBlend(
+      t.colors.onPrimary.withValues(alpha: 0.08),
+      t.colors.primary,
+    ),
+    disabled: t.colors.disabled,
+  );
 
-  @Style<Color>.resolve(_foreground, lerp: true)
-  final Color? foreground;
-  static Color _foreground(LegendTokens t) => t.colors.onPrimary;
+  /// Color of the label and icon, per interaction state (steady except
+  /// while disabled).
+  @Style<LegendStates<Color>>.resolve(_foreground, lerp: true)
+  final LegendStates<Color>? foreground;
+  static LegendStates<Color> _foreground(LegendTokens t) => LegendStates(
+    normal: t.colors.onPrimary,
+    hovered: t.colors.onPrimary,
+    pressed: t.colors.onPrimary,
+    focused: t.colors.onPrimary,
+    disabled: t.colors.onDisabled,
+  );
 
+  /// Inner padding around the button content.
   @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
   static EdgeInsetsGeometry _padding(LegendTokens t) =>
       EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm);
 
+  /// Corner rounding of the button surface.
   @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
   static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusMd;
 
+  /// Text style of the [text] label (its color comes from [foreground]).
   @Style<TextStyle>.resolve(_textStyle)
   final TextStyle? textStyle;
   static TextStyle _textStyle(LegendTokens t) => t.typography.b2;
 
+  /// Drop shadow under the button (flat by default).
   @Style<List<BoxShadow>>.resolve(_shadows)
   final List<BoxShadow>? shadows;
   static List<BoxShadow> _shadows(LegendTokens t) => t.shadows.none;

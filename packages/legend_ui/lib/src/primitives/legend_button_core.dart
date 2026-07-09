@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/primitives/legend_interactive.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
+import 'package:legend_ui/src/theme/legend_states.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
@@ -8,6 +9,14 @@ import 'package:legend_ui/src/tokens/legend_tokens.dart';
 /// row. Every button variant is this plus a resolved theme — no
 /// copy-pasted layout arms (legacy had 4× per variant), and consumers can
 /// build their own variants on it.
+///
+/// Composes [LegendInteractive] (input handling) + [LegendSurface]
+/// (decoration).
+///
+/// [background] and [foreground] are per-state [LegendStates] containers
+/// (RFC-002 R6): the core selects the single effective value via
+/// `states.effective` — no color math happens here. Both must carry at
+/// least a `normal` value.
 class LegendButtonCore extends StatelessWidget {
   const LegendButtonCore({
     required this.onPressed,
@@ -36,12 +45,20 @@ class LegendButtonCore extends StatelessWidget {
   final bool textFirst;
   final bool enabled;
 
-  final Color background;
-  final Color foreground;
+  /// Surface fill per interaction state (`normal` is required).
+  final LegendStates<Color> background;
+
+  /// Label/icon color per interaction state (`normal` is required).
+  final LegendStates<Color> foreground;
+
   final EdgeInsetsGeometry padding;
   final BorderRadius borderRadius;
   final TextStyle textStyle;
+
+  /// Outline around the surface; hidden while disabled.
   final BoxBorder? border;
+
+  /// Drop shadow under the surface; hidden while disabled.
   final List<BoxShadow>? shadows;
 
   @override
@@ -52,24 +69,9 @@ class LegendButtonCore extends StatelessWidget {
       enabled: enabled,
       semanticLabel: text,
       builder: (context, states) {
-        final effectiveBackground = switch (states) {
-          // A transparent variant (text button) must stay transparent when
-          // disabled — a grey slab would invent a shape it never had.
-          LegendInteractionStates(disabled: true) =>
-            background.a == 0 ? background : tokens.colors.disabled,
-          LegendInteractionStates(pressed: true) => Color.alphaBlend(
-            foreground.withValues(alpha: 0.16),
-            background,
-          ),
-          LegendInteractionStates(hovered: true) ||
-          LegendInteractionStates(
-            focused: true,
-          ) => Color.alphaBlend(foreground.withValues(alpha: 0.08), background),
-          _ => background,
-        };
-        final effectiveForeground = states.disabled
-            ? tokens.colors.onDisabled
-            : foreground;
+        final state = states.effective;
+        final effectiveBackground = background.pick(state)!;
+        final effectiveForeground = foreground.pick(state)!;
 
         return LegendSurface(
           color: effectiveBackground,

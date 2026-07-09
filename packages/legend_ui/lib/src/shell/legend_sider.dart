@@ -3,6 +3,7 @@ import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/primitives/legend_interactive.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
 import 'package:legend_ui/src/shell/legend_nav_item.dart';
+import 'package:legend_ui/src/theme/legend_states.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
@@ -10,21 +11,26 @@ part 'legend_sider.theme.g.dart';
 
 /// Wide-tier side navigation; `LegendScaffold` shows it at medium/expanded
 /// tiers.
+///
+/// Composes [LegendInteractive] (item activation) + [LegendSurface];
+/// destinations come from the shared [LegendNavItem] model.
 @LegendThemeable()
 class LegendSider extends StatelessWidget {
-  const LegendSider({
+  /// The [background] color lifts into the `normal` member of the
+  /// per-state theme field (RFC-002 R6).
+  LegendSider({
     required this.items,
     required this.selectedIndex,
     required this.onSelected,
     super.key,
     this.header,
     this.footer,
-    this.background,
+    Color? background,
     this.width,
     this.selectedColor,
     this.unselectedColor,
     this.itemPadding,
-  });
+  }) : background = background?.states;
 
   final List<LegendNavItem> items;
   final int selectedIndex;
@@ -32,21 +38,34 @@ class LegendSider extends StatelessWidget {
   final Widget? header;
   final Widget? footer;
 
-  @Style<Color>.resolve(_background)
-  final Color? background;
-  static Color _background(LegendTokens t) => t.colors.surface;
+  /// Fill of the sider surface and its items, per interaction state —
+  /// `normal` paints the whole rail, `hovered`/`pressed`/`focused`
+  /// highlight the item under the pointer (a selected item uses the
+  /// `primaryContainer` token instead).
+  @Style<LegendStates<Color>>.resolve(_background)
+  final LegendStates<Color>? background;
+  static LegendStates<Color> _background(LegendTokens t) => LegendStates(
+    normal: t.colors.surface,
+    hovered: t.colors.background2,
+    pressed: t.colors.background2,
+    focused: t.colors.background2,
+  );
 
+  /// Width of the rail.
   @Style<double>(240)
   final double? width;
 
+  /// Label/icon color of the selected item.
   @Style<Color>.resolve(_selectedColor, lerp: true)
   final Color? selectedColor;
   static Color _selectedColor(LegendTokens t) => t.colors.primary;
 
+  /// Label/icon color of unselected items.
   @Style<Color>.resolve(_unselectedColor, lerp: true)
   final Color? unselectedColor;
   static Color _unselectedColor(LegendTokens t) => t.colors.foreground2;
 
+  /// Inner padding of each item row.
   @Style<EdgeInsetsGeometry>.resolve(_itemPadding)
   final EdgeInsetsGeometry? itemPadding;
   static EdgeInsetsGeometry _itemPadding(LegendTokens t) =>
@@ -58,7 +77,7 @@ class LegendSider extends StatelessWidget {
     final tokens = LegendTheme.of(context).tokens;
 
     return LegendSurface(
-      color: theme.background,
+      color: theme.background.normal,
       duration: const Duration(milliseconds: 120),
       child: SafeArea(
         right: false,
@@ -86,9 +105,7 @@ class LegendSider extends StatelessWidget {
                             return LegendSurface(
                               color: selected
                                   ? tokens.colors.primaryContainer
-                                  : states.hovered || states.focused
-                                  ? tokens.colors.background2
-                                  : theme.background,
+                                  : theme.background.pick(states.effective),
                               borderRadius: tokens.sizes.borderRadiusMd,
                               padding: theme.itemPadding,
                               duration: const Duration(milliseconds: 120),

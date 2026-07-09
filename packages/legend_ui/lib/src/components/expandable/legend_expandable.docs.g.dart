@@ -12,23 +12,75 @@ const List<LegendDocEntry> legendExpandableDocEntries = [
     owner: 'LegendExpandable',
     name: 'headerPadding',
     type: 'EdgeInsetsGeometry?',
-    doc: '',
+    doc: 'Inner padding of the header row.',
     defaultDescription: 'EdgeInsets.all(t.sizes.md)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'LegendExpandable',
     name: 'backgroundColor',
+    type: 'LegendStates<Color>?',
+    doc:
+        'Fill of the container and its header, per interaction state —\n`normal` paints the whole surface, `hovered`/`pressed`/`focused`\ntint the header while the pointer is on it.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendExpandable',
+    name: 'backgroundColor.normal',
     type: 'Color?',
-    doc: '',
-    defaultDescription: 't.colors.surface',
+    doc:
+        'Fill of the container and its header, per interaction state —\n`normal` paints the whole surface, `hovered`/`pressed`/`focused`\ntint the header while the pointer is on it.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendExpandable',
+    name: 'backgroundColor.hovered',
+    type: 'Color?',
+    doc:
+        'Fill of the container and its header, per interaction state —\n`normal` paints the whole surface, `hovered`/`pressed`/`focused`\ntint the header while the pointer is on it.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendExpandable',
+    name: 'backgroundColor.pressed',
+    type: 'Color?',
+    doc:
+        'Fill of the container and its header, per interaction state —\n`normal` paints the whole surface, `hovered`/`pressed`/`focused`\ntint the header while the pointer is on it.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendExpandable',
+    name: 'backgroundColor.focused',
+    type: 'Color?',
+    doc:
+        'Fill of the container and its header, per interaction state —\n`normal` paints the whole surface, `hovered`/`pressed`/`focused`\ntint the header while the pointer is on it.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendExpandable',
+    name: 'backgroundColor.disabled',
+    type: 'Color?',
+    doc:
+        'Fill of the container and its header, per interaction state —\n`normal` paints the whole surface, `hovered`/`pressed`/`focused`\ntint the header while the pointer is on it.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'LegendExpandable',
     name: 'borderRadius',
     type: 'BorderRadius?',
-    doc: '',
+    doc: 'Corner rounding of the container surface.',
     defaultDescription: 't.sizes.borderRadiusMd',
     group: 'component',
   ),

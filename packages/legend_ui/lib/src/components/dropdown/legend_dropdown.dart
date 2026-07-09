@@ -4,6 +4,7 @@ import 'package:legend_ui/src/primitives/legend_anchored_overlay.dart';
 import 'package:legend_ui/src/primitives/legend_caret.dart';
 import 'package:legend_ui/src/primitives/legend_interactive.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
+import 'package:legend_ui/src/theme/legend_states.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
@@ -18,24 +19,32 @@ class LegendDropdownItem<T> {
   final String label;
 }
 
-/// The one dropdown: an anchored menu over a field-like trigger,
-/// built on [LegendAnchoredOverlay] + [LegendInteractive] + [LegendSurface].
+/// The one dropdown: an anchored menu over a field-like trigger.
+///
+/// Composes [LegendAnchoredOverlay] (menu positioning + dismissal) +
+/// [LegendInteractive] (trigger and item input) + [LegendSurface] +
+/// [LegendCaret].
+///
+/// Replaces legacy's two parallel dropdown implementations and their raw
+/// `OverlayEntry` management (legacy-docs 06).
 @LegendThemeable()
 class LegendDropdown<T> extends StatefulWidget {
-  const LegendDropdown({
+  /// The [menuBackground] color lifts into the `normal` member of the
+  /// per-state theme field (RFC-002 R6).
+  LegendDropdown({
     required this.items,
     required this.onChanged,
     super.key,
     this.value,
     this.placeholder,
     this.enabled = true,
-    this.menuBackground,
+    Color? menuBackground,
     this.menuBorderRadius,
     this.menuShadows,
     this.menuMaxHeight,
     this.itemPadding,
     this.textStyle,
-  });
+  }) : menuBackground = menuBackground?.states;
 
   final List<LegendDropdownItem<T>> items;
   final ValueChanged<T> onChanged;
@@ -43,15 +52,25 @@ class LegendDropdown<T> extends StatefulWidget {
   final String? placeholder;
   final bool enabled;
 
-  @Style<Color>.resolve(_menuBackground)
-  final Color? menuBackground;
-  static Color _menuBackground(LegendTokens t) => t.colors.surface;
+  /// Fill of the menu surface and its items, per interaction state —
+  /// `normal` paints the whole menu, `hovered`/`pressed`/`focused`
+  /// highlight the item under the pointer.
+  @Style<LegendStates<Color>>.resolve(_menuBackground)
+  final LegendStates<Color>? menuBackground;
+  static LegendStates<Color> _menuBackground(LegendTokens t) => LegendStates(
+    normal: t.colors.surface,
+    hovered: t.colors.background2,
+    pressed: t.colors.background2,
+    focused: t.colors.background2,
+  );
 
+  /// Corner rounding of the menu and the trigger field.
   @Style<BorderRadius>.resolve(_menuBorderRadius)
   final BorderRadius? menuBorderRadius;
   static BorderRadius _menuBorderRadius(LegendTokens t) =>
       t.sizes.borderRadiusMd;
 
+  /// Drop shadow lifting the menu off the page.
   @Style<List<BoxShadow>>.resolve(_menuShadows)
   final List<BoxShadow>? menuShadows;
   static List<BoxShadow> _menuShadows(LegendTokens t) => t.shadows.medium;
@@ -61,11 +80,13 @@ class LegendDropdown<T> extends StatefulWidget {
   @Style<double>(320)
   final double? menuMaxHeight;
 
+  /// Inner padding of each menu item (and the trigger field).
   @Style<EdgeInsetsGeometry>.resolve(_itemPadding)
   final EdgeInsetsGeometry? itemPadding;
   static EdgeInsetsGeometry _itemPadding(LegendTokens t) =>
       EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm);
 
+  /// Text style of the item labels and the selected value.
   @Style<TextStyle>.resolve(_textStyle)
   final TextStyle? textStyle;
   static TextStyle _textStyle(LegendTokens t) => t.typography.b2;
@@ -148,7 +169,7 @@ class _LegendDropdownState<T> extends State<LegendDropdown<T>> {
 
   Widget _menu(LegendDropdownTheme theme, LegendTokens tokens) {
     return LegendSurface(
-      color: theme.menuBackground,
+      color: theme.menuBackground.normal,
       borderRadius: theme.menuBorderRadius,
       shadows: theme.menuShadows,
       clip: true,
@@ -165,9 +186,7 @@ class _LegendDropdownState<T> extends State<LegendDropdown<T>> {
                   onTap: () => _select(item.value),
                   builder: (context, states) {
                     return LegendSurface(
-                      color: states.hovered || states.focused
-                          ? tokens.colors.background2
-                          : theme.menuBackground,
+                      color: theme.menuBackground.pick(states.effective),
                       padding: theme.itemPadding,
                       child: Text(
                         item.label,

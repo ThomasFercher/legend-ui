@@ -21,13 +21,17 @@ class LegendExpandableTheme {
       );
 
   final EdgeInsetsGeometry headerPadding;
-  final Color backgroundColor;
+  final LegendStates<Color> backgroundColor;
   final BorderRadius borderRadius;
 
   /// Resolves the theme: defaults <- app registry (keyed by
   /// [LegendExpandable] first, [LegendExpandableThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Post-merge, unset `LegendStates<Color>` members fill
+  /// from the resolved `normal` via `tokens.states`
+  /// (RFC-002 R6) — named members at any level always win.
   static LegendExpandableTheme of(
     BuildContext context, [
     LegendExpandableThemeNullable? local,
@@ -41,21 +45,25 @@ class LegendExpandableTheme {
           LegendThemeOverride.maybeOf<LegendExpandableThemeNullable>(context),
         )
         .merge(local);
-    return resolved;
+    return resolved.copyWith(
+      backgroundColor: resolved.backgroundColor.withDerived(data.tokens.states),
+    );
   }
 
   LegendExpandableTheme merge(LegendExpandableThemeNullable? other) {
     if (other == null) return this;
     return LegendExpandableTheme(
       headerPadding: other.headerPadding ?? headerPadding,
-      backgroundColor: other.backgroundColor ?? backgroundColor,
+      backgroundColor:
+          LegendStates.merge(backgroundColor, other.backgroundColor) ??
+          backgroundColor,
       borderRadius: other.borderRadius ?? borderRadius,
     );
   }
 
   LegendExpandableTheme copyWith({
     EdgeInsetsGeometry? headerPadding,
-    Color? backgroundColor,
+    LegendStates<Color>? backgroundColor,
     BorderRadius? borderRadius,
   }) => LegendExpandableTheme(
     headerPadding: headerPadding ?? this.headerPadding,
@@ -85,14 +93,17 @@ class LegendExpandableThemeNullable {
   });
 
   final EdgeInsetsGeometry? headerPadding;
-  final Color? backgroundColor;
+  final LegendStates<Color>? backgroundColor;
   final BorderRadius? borderRadius;
 
   LegendExpandableThemeNullable merge(LegendExpandableThemeNullable? other) {
     if (other == null) return this;
     return LegendExpandableThemeNullable(
       headerPadding: other.headerPadding ?? headerPadding,
-      backgroundColor: other.backgroundColor ?? backgroundColor,
+      backgroundColor: LegendStates.merge(
+        backgroundColor,
+        other.backgroundColor,
+      ),
       borderRadius: other.borderRadius ?? borderRadius,
     );
   }

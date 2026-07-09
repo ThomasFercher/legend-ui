@@ -11,16 +11,69 @@ const List<LegendDocEntry> legendTextButtonDocEntries = [
   LegendDocEntry(
     owner: 'LegendTextButton',
     name: 'foreground',
+    type: 'LegendStates<Color>?',
+    doc:
+        'Color of the label and icon, per interaction state — also the source\nof the hover/press tint (steady except while disabled).',
+    defaultDescription:
+        'LegendStates(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendTextButton',
+    name: 'foreground.normal',
     type: 'Color?',
-    doc: '',
-    defaultDescription: 't.colors.primary',
+    doc:
+        'Color of the label and icon, per interaction state — also the source\nof the hover/press tint (steady except while disabled).',
+    defaultDescription:
+        'LegendStates(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendTextButton',
+    name: 'foreground.hovered',
+    type: 'Color?',
+    doc:
+        'Color of the label and icon, per interaction state — also the source\nof the hover/press tint (steady except while disabled).',
+    defaultDescription:
+        'LegendStates(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendTextButton',
+    name: 'foreground.pressed',
+    type: 'Color?',
+    doc:
+        'Color of the label and icon, per interaction state — also the source\nof the hover/press tint (steady except while disabled).',
+    defaultDescription:
+        'LegendStates(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendTextButton',
+    name: 'foreground.focused',
+    type: 'Color?',
+    doc:
+        'Color of the label and icon, per interaction state — also the source\nof the hover/press tint (steady except while disabled).',
+    defaultDescription:
+        'LegendStates(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendTextButton',
+    name: 'foreground.disabled',
+    type: 'Color?',
+    doc:
+        'Color of the label and icon, per interaction state — also the source\nof the hover/press tint (steady except while disabled).',
+    defaultDescription:
+        'LegendStates(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'LegendTextButton',
     name: 'padding',
     type: 'EdgeInsetsGeometry?',
-    doc: '',
+    doc:
+        'Inner padding around the button content (tighter than the filled\nvariants).',
     defaultDescription:
         'EdgeInsets.symmetric(horizontal: t.sizes.sm, vertical: t.sizes.xs)',
     group: 'component',
@@ -29,7 +82,7 @@ const List<LegendDocEntry> legendTextButtonDocEntries = [
     owner: 'LegendTextButton',
     name: 'borderRadius',
     type: 'BorderRadius?',
-    doc: '',
+    doc: 'Corner rounding of the hover/press tint area.',
     defaultDescription: 't.sizes.borderRadiusSm',
     group: 'component',
   ),
@@ -37,7 +90,7 @@ const List<LegendDocEntry> legendTextButtonDocEntries = [
     owner: 'LegendTextButton',
     name: 'textStyle',
     type: 'TextStyle?',
-    doc: '',
+    doc: 'Text style of the [text] label (its color comes from [foreground]).',
     defaultDescription: 't.typography.b2',
     group: 'component',
   ),

@@ -141,7 +141,7 @@ class ThemeController extends ChangeNotifier {
         // unset properties keep resolving through the lower levels.
         if (buttonBackground != null || buttonRadius != null)
           PrimaryLegendButtonThemeNullable: PrimaryLegendButtonThemeNullable(
-            background: buttonBackground,
+            background: buttonBackground?.states,
             borderRadius: buttonRadius == null
                 ? null
                 : BorderRadius.circular(buttonRadius!),

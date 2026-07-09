@@ -18,7 +18,9 @@ Widget _app({
   );
   if (subtreeOverride != null) {
     button = PrimaryLegendButtonThemeOverride(
-      data: PrimaryLegendButtonThemeNullable(background: subtreeOverride),
+      data: PrimaryLegendButtonThemeNullable(
+        background: LegendStates(normal: subtreeOverride),
+      ),
       child: button,
     );
   }
@@ -53,7 +55,9 @@ void main() {
         _app(
           components: {
             PrimaryLegendButtonThemeNullable:
-                const PrimaryLegendButtonThemeNullable(background: _appTheme),
+                const PrimaryLegendButtonThemeNullable(
+                  background: LegendStates(normal: _appTheme),
+                ),
           },
         ),
       );
@@ -65,7 +69,9 @@ void main() {
         _app(
           components: {
             PrimaryLegendButtonThemeNullable:
-                const PrimaryLegendButtonThemeNullable(background: _appTheme),
+                const PrimaryLegendButtonThemeNullable(
+                  background: LegendStates(normal: _appTheme),
+                ),
           },
           subtreeOverride: _subtree,
         ),
@@ -78,7 +84,9 @@ void main() {
         _app(
           components: {
             PrimaryLegendButtonThemeNullable:
-                const PrimaryLegendButtonThemeNullable(background: _appTheme),
+                const PrimaryLegendButtonThemeNullable(
+                  background: LegendStates(normal: _appTheme),
+                ),
           },
           subtreeOverride: _subtree,
           param: _param,
@@ -94,7 +102,7 @@ void main() {
         _app(
           components: {
             PrimaryLegendButton: const PrimaryLegendButtonThemeNullable(
-              background: _appTheme,
+              background: LegendStates(normal: _appTheme),
             ),
           },
         ),
@@ -110,10 +118,12 @@ void main() {
         _app(
           components: {
             PrimaryLegendButton: const PrimaryLegendButtonThemeNullable(
-              background: _appTheme,
+              background: LegendStates(normal: _appTheme),
             ),
             PrimaryLegendButtonThemeNullable:
-                const PrimaryLegendButtonThemeNullable(background: byNullable),
+                const PrimaryLegendButtonThemeNullable(
+                  background: LegendStates(normal: byNullable),
+                ),
           },
         ),
       );

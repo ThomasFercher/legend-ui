@@ -26,8 +26,8 @@ class SecondaryLegendButtonTheme {
         textStyle: SecondaryLegendButton._textStyle(t),
       );
 
-  final Color background;
-  final Color foreground;
+  final LegendStates<Color> background;
+  final LegendStates<Color> foreground;
   final Color borderColor;
   final EdgeInsetsGeometry padding;
   final BorderRadius borderRadius;
@@ -37,6 +37,10 @@ class SecondaryLegendButtonTheme {
   /// [SecondaryLegendButton] first, [SecondaryLegendButtonThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Post-merge, unset `LegendStates<Color>` members fill
+  /// from the resolved `normal` via `tokens.states`
+  /// (RFC-002 R6) — named members at any level always win.
   static SecondaryLegendButtonTheme of(
     BuildContext context, [
     SecondaryLegendButtonThemeNullable? local,
@@ -54,14 +58,19 @@ class SecondaryLegendButtonTheme {
           ),
         )
         .merge(local);
-    return resolved;
+    return resolved.copyWith(
+      background: resolved.background.withDerived(data.tokens.states),
+      foreground: resolved.foreground.withDerived(data.tokens.states),
+    );
   }
 
   SecondaryLegendButtonTheme merge(SecondaryLegendButtonThemeNullable? other) {
     if (other == null) return this;
     return SecondaryLegendButtonTheme(
-      background: other.background ?? background,
-      foreground: other.foreground ?? foreground,
+      background:
+          LegendStates.merge(background, other.background) ?? background,
+      foreground:
+          LegendStates.merge(foreground, other.foreground) ?? foreground,
       borderColor: other.borderColor ?? borderColor,
       padding: other.padding ?? padding,
       borderRadius: other.borderRadius ?? borderRadius,
@@ -70,8 +79,8 @@ class SecondaryLegendButtonTheme {
   }
 
   SecondaryLegendButtonTheme copyWith({
-    Color? background,
-    Color? foreground,
+    LegendStates<Color>? background,
+    LegendStates<Color>? foreground,
     Color? borderColor,
     EdgeInsetsGeometry? padding,
     BorderRadius? borderRadius,
@@ -90,8 +99,18 @@ class SecondaryLegendButtonTheme {
     SecondaryLegendButtonTheme b,
     double t,
   ) => SecondaryLegendButtonTheme(
-    background: Color.lerp(a.background, b.background, t)!,
-    foreground: Color.lerp(a.foreground, b.foreground, t)!,
+    background: LegendStates.lerpWith(
+      a.background,
+      b.background,
+      t,
+      Color.lerp,
+    ),
+    foreground: LegendStates.lerpWith(
+      a.foreground,
+      b.foreground,
+      t,
+      Color.lerp,
+    ),
     borderColor: t < 0.5 ? a.borderColor : b.borderColor,
     padding: t < 0.5 ? a.padding : b.padding,
     borderRadius: t < 0.5 ? a.borderRadius : b.borderRadius,
@@ -112,8 +131,8 @@ class SecondaryLegendButtonThemeNullable {
     this.textStyle,
   });
 
-  final Color? background;
-  final Color? foreground;
+  final LegendStates<Color>? background;
+  final LegendStates<Color>? foreground;
   final Color? borderColor;
   final EdgeInsetsGeometry? padding;
   final BorderRadius? borderRadius;
@@ -124,8 +143,8 @@ class SecondaryLegendButtonThemeNullable {
   ) {
     if (other == null) return this;
     return SecondaryLegendButtonThemeNullable(
-      background: other.background ?? background,
-      foreground: other.foreground ?? foreground,
+      background: LegendStates.merge(background, other.background),
+      foreground: LegendStates.merge(foreground, other.foreground),
       borderColor: other.borderColor ?? borderColor,
       padding: other.padding ?? padding,
       borderRadius: other.borderRadius ?? borderRadius,

@@ -81,7 +81,7 @@ LegendThemeData(
   tokens: tokens,
   components: {
     PrimaryLegendButtonThemeNullable: PrimaryLegendButtonThemeNullable(
-      background: ${_hex(controller.buttonBackground)},
+      background: ${controller.buttonBackground == null ? '/* unset */' : 'LegendStates(normal: ${_hex(controller.buttonBackground)})'},
       borderRadius: ${controller.buttonRadius == null ? '/* unset */' : 'BorderRadius.circular(${controller.buttonRadius})'},
     ),
   },

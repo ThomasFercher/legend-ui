@@ -11,16 +11,68 @@ const List<LegendDocEntry> legendContextMenuDocEntries = [
   LegendDocEntry(
     owner: 'LegendContextMenu',
     name: 'menuBackground',
+    type: 'LegendStates<Color>?',
+    doc:
+        'Fill of the menu surface and its entries, per interaction state —\n`normal` paints the whole menu, `hovered`/`pressed`/`focused`\nhighlight the entry under the pointer.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendContextMenu',
+    name: 'menuBackground.normal',
     type: 'Color?',
-    doc: '',
-    defaultDescription: 't.colors.surface',
+    doc:
+        'Fill of the menu surface and its entries, per interaction state —\n`normal` paints the whole menu, `hovered`/`pressed`/`focused`\nhighlight the entry under the pointer.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendContextMenu',
+    name: 'menuBackground.hovered',
+    type: 'Color?',
+    doc:
+        'Fill of the menu surface and its entries, per interaction state —\n`normal` paints the whole menu, `hovered`/`pressed`/`focused`\nhighlight the entry under the pointer.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendContextMenu',
+    name: 'menuBackground.pressed',
+    type: 'Color?',
+    doc:
+        'Fill of the menu surface and its entries, per interaction state —\n`normal` paints the whole menu, `hovered`/`pressed`/`focused`\nhighlight the entry under the pointer.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendContextMenu',
+    name: 'menuBackground.focused',
+    type: 'Color?',
+    doc:
+        'Fill of the menu surface and its entries, per interaction state —\n`normal` paints the whole menu, `hovered`/`pressed`/`focused`\nhighlight the entry under the pointer.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendContextMenu',
+    name: 'menuBackground.disabled',
+    type: 'Color?',
+    doc:
+        'Fill of the menu surface and its entries, per interaction state —\n`normal` paints the whole menu, `hovered`/`pressed`/`focused`\nhighlight the entry under the pointer.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'LegendContextMenu',
     name: 'menuBorderRadius',
     type: 'BorderRadius?',
-    doc: '',
+    doc: 'Corner rounding of the menu surface.',
     defaultDescription: 't.sizes.borderRadiusMd',
     group: 'component',
   ),
@@ -28,7 +80,7 @@ const List<LegendDocEntry> legendContextMenuDocEntries = [
     owner: 'LegendContextMenu',
     name: 'menuShadows',
     type: 'List<BoxShadow>?',
-    doc: '',
+    doc: 'Drop shadow lifting the menu off the page.',
     defaultDescription: 't.shadows.medium',
     group: 'component',
   ),
@@ -36,7 +88,7 @@ const List<LegendDocEntry> legendContextMenuDocEntries = [
     owner: 'LegendContextMenu',
     name: 'itemPadding',
     type: 'EdgeInsetsGeometry?',
-    doc: '',
+    doc: 'Inner padding of each menu entry row.',
     defaultDescription:
         'EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm)',
     group: 'component',
@@ -45,7 +97,7 @@ const List<LegendDocEntry> legendContextMenuDocEntries = [
     owner: 'LegendContextMenu',
     name: 'textStyle',
     type: 'TextStyle?',
-    doc: '',
+    doc: 'Text style of the entry labels.',
     defaultDescription: 't.typography.b2',
     group: 'component',
   ),

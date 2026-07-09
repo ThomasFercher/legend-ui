@@ -364,9 +364,9 @@ void main() {
 
   group('LegendExpandable header per-state colors', () {
     Widget expandable() => _wrap(
-      const SizedBox(
+      SizedBox(
         width: 300,
-        child: LegendExpandable(title: 'Details', child: Text('Body')),
+        child: LegendExpandable(title: 'Details', child: const Text('Body')),
       ),
     );
 
@@ -413,6 +413,76 @@ void main() {
     testWidgets('disabled: disabled track regardless of value', (tester) async {
       await tester.pumpWidget(switchAt(value: true, enabled: false));
       expect(trackColor(tester), _colors.disabled);
+    });
+  });
+
+  group('sparse per-state overrides (RFC-002 R6)', () {
+    const navy = Color(0xFF001F54);
+    final finder = find.byType(PrimaryLegendButton);
+
+    Widget app({LegendStates<Color>? background, Color? param}) {
+      return LegendTheme(
+        data: LegendThemeData(
+          tokens: _tokens,
+          components: {
+            if (background != null)
+              PrimaryLegendButton: PrimaryLegendButtonThemeNullable(
+                background: background,
+              ),
+          },
+        ),
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: Center(
+            child: PrimaryLegendButton(
+              onPressed: () {},
+              text: 'Go',
+              background: param,
+            ),
+          ),
+        ),
+      );
+    }
+
+    testWidgets('naming only `pressed` restyles the pressed state and '
+        'inherits every other member', (tester) async {
+      await tester.pumpWidget(
+        app(background: const LegendStates(pressed: navy)),
+      );
+      expect(_buttonDecoration(tester, finder).color, _colors.primary);
+
+      final gesture = await tester.startGesture(tester.getCenter(finder));
+      await tester.pump();
+      expect(_buttonDecoration(tester, finder).color, navy);
+      await gesture.up();
+    });
+
+    testWidgets('a constructor Color lifts into `normal` only — the other '
+        'members keep resolving through the theme levels', (tester) async {
+      await tester.pumpWidget(app(param: navy));
+      expect(_buttonDecoration(tester, finder).color, navy);
+
+      // Hover keeps the kit default (named member wins over derivation).
+      await _hoverOver(tester, finder);
+      expect(
+        _buttonDecoration(tester, finder).color,
+        _hoverBlend(_colors.onPrimary, _colors.primary),
+      );
+    });
+
+    testWidgets('an unnamed member derives from the resolved normal via the '
+        'token overlays (withDerived)', (tester) async {
+      // Override that names ONLY normal-like members: replace the whole
+      // container so hovered is genuinely unset at every level. That is
+      // only possible for a consumer widget default; for the kit button the
+      // override merges over the fully-named default, so instead pin the
+      // container-level behavior directly.
+      const sparse = LegendStates<Color>(normal: navy);
+      final derived = sparse.withDerived(_tokens.states);
+      expect(derived.hovered, _tokens.states.hovered(navy));
+      expect(derived.pressed, _tokens.states.pressed(navy));
+      expect(derived.disabled, _tokens.states.disabled(navy));
+      expect(derived.focused, navy);
     });
   });
 }

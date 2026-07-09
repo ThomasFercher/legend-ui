@@ -57,14 +57,14 @@ LegendCard(
           ),
           code: 'const LegendDivider()  //  or axis: Axis.vertical',
         ),
-        const DocSection(
+        DocSection(
           title: 'Expandable',
           description:
               'Uncontrolled by default; pass expanded/onToggle to control '
               'it yourself.',
           demo: LegendExpandable(
             title: 'What is Legend UI?',
-            child: LegendText(
+            child: const LegendText(
               'A Material-free component kit where design tokens are the '
               'only global theme and every component theme is generated '
               'from decorators on the widget.',
