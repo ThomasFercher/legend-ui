@@ -107,3 +107,48 @@ LegendSizes _$LegendSizesLerp(
   iconMd: a.iconMd == b.iconMd ? a.iconMd : a.iconMd * (1.0 - t) + b.iconMd * t,
   iconLg: a.iconLg == b.iconLg ? a.iconLg : a.iconLg * (1.0 - t) + b.iconLg * t,
 );
+
+/// Const tear-off catalog for [LegendSizes] (RFC-002 R10
+/// amendment): one static per token field, usable directly
+/// inside `@Style<T>.resolve` annotations —
+/// `@Style<double>.resolve(LegendSizesRef.xs)`.
+abstract final class LegendSizesRef {
+  /// Extra-small spacing step (tight gaps, chip padding).
+  static double xs(LegendTokens t) => t.sizes.xs;
+
+  /// Small spacing step (row gaps, compact padding).
+  static double sm(LegendTokens t) => t.sizes.sm;
+
+  /// Medium spacing step — the default content padding.
+  static double md(LegendTokens t) => t.sizes.md;
+
+  /// Large spacing step (section padding).
+  static double lg(LegendTokens t) => t.sizes.lg;
+
+  /// Extra-large spacing step (page gutters).
+  static double xl(LegendTokens t) => t.sizes.xl;
+
+  /// Largest spacing step (hero spacing).
+  static double xxl(LegendTokens t) => t.sizes.xxl;
+
+  /// Small corner radius (text buttons, chips).
+  static double radiusSm(LegendTokens t) => t.sizes.radiusSm;
+
+  /// Medium corner radius — the default component rounding.
+  static double radiusMd(LegendTokens t) => t.sizes.radiusMd;
+
+  /// Large corner radius (cards, dialogs).
+  static double radiusLg(LegendTokens t) => t.sizes.radiusLg;
+
+  /// Hairline width for borders and dividers.
+  static double borderWidth(LegendTokens t) => t.sizes.borderWidth;
+
+  /// Small icon size.
+  static double iconSm(LegendTokens t) => t.sizes.iconSm;
+
+  /// Medium icon size — the default inline icon.
+  static double iconMd(LegendTokens t) => t.sizes.iconMd;
+
+  /// Large icon size.
+  static double iconLg(LegendTokens t) => t.sizes.iconLg;
+}

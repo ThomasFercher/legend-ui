@@ -55,3 +55,18 @@ LegendStateOverlays _$LegendStateOverlaysLerp(
       ? a.disabledOpacity
       : a.disabledOpacity * (1.0 - t) + b.disabledOpacity * t,
 );
+
+/// Const tear-off catalog for [LegendStateOverlays] (RFC-002 R10
+/// amendment): one static per token field, usable directly
+/// inside `@Style<T>.resolve` annotations —
+/// `@Style<double>.resolve(LegendStateOverlaysRef.hoverAmount)`.
+abstract final class LegendStateOverlaysRef {
+  /// How far [hovered] shifts the base toward black/white (0–1).
+  static double hoverAmount(LegendTokens t) => t.states.hoverAmount;
+
+  /// How far [pressed] shifts the base toward black/white (0–1).
+  static double pressAmount(LegendTokens t) => t.states.pressAmount;
+
+  /// Opacity multiplier [disabled] applies to the base color (0–1).
+  static double disabledOpacity(LegendTokens t) => t.states.disabledOpacity;
+}

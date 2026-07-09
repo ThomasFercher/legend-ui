@@ -1,10 +1,11 @@
 import 'package:flutter/painting.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
+import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
 part 'legend_shadows.tokens.g.dart';
 
 /// The single elevation system (replaces legacy ElevatedBox + LegendElevation).
-@LegendTokenData()
+@LegendTokenData(mountedAt: 'shadows')
 class LegendShadows with _$LegendShadows {
   const LegendShadows({
     this.none = const [],

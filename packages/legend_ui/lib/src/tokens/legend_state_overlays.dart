@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:legend_ui/src/annotations/annotations.dart';
+import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
 part 'legend_state_overlays.tokens.g.dart';
 
@@ -13,7 +14,7 @@ part 'legend_state_overlays.tokens.g.dart';
 /// overlays, so a brand restyle automatically restyles hover/press
 /// everywhere and components stop inventing their own hover math.
 /// Hand-naming a state variant always wins over this derivation.
-@LegendTokenData()
+@LegendTokenData(mountedAt: 'states')
 class LegendStateOverlays with _$LegendStateOverlays {
   /// Sensible defaults: hover shifts ~6% toward the contrast pole, pressed
   /// ~12%, disabled keeps the color at half opacity.

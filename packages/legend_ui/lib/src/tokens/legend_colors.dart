@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:legend_ui/src/annotations/annotations.dart';
+import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
 part 'legend_colors.tokens.g.dart';
 
@@ -8,7 +9,7 @@ part 'legend_colors.tokens.g.dart';
 ///
 /// Component defaults reference these via `@Style<T>.resolve` tear-offs
 /// (`(t) => t.colors.…`).
-@LegendTokenData()
+@LegendTokenData(mountedAt: 'colors')
 class LegendColors with _$LegendColors {
   const LegendColors({
     required this.primary,
