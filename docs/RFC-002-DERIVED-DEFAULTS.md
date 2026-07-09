@@ -1,6 +1,6 @@
-# RFC-002 — Derived defaults, generated ceremony: the boilerplate refactor
+# RFC-002 — Derived defaults, generated ceremony, sealed-state styling
 
-> Status: **proposed** (2026-07-09). Companion to [DESIGN.md](DESIGN.md) (RFC-001, accepted) — this RFC does **not** relitigate its settled decisions; every proposal below strengthens them. Grounded in a comparative study of Ant Design v5, MUI v5–v7/Base UI, the headless school (TanStack, Radix, Zag/Ark, shadcn/ui), Fluent 2 / Fluent UI React v9, and Airbnb's DLS, plus a line-level audit of this repo.
+> Status: **accepted** (2026-07-09, directed by maintainer) — implementation in progress; each landed step gets a dated note in §5. Companion to [DESIGN.md](DESIGN.md) (RFC-001) — this RFC does **not** relitigate its settled decisions; every proposal below strengthens them. Grounded in a comparative study of Ant Design v5, MUI v5–v7/Base UI, the headless school (TanStack, Radix, Zag/Ark, shadcn/ui), Fluent 2 / Fluent UI React v9, and Airbnb's DLS, plus a line-level audit of this repo.
 
 ## 1. Motivation
 
@@ -15,25 +15,34 @@ Legend UI's raw ideas are right and stay: **layered configurability** (four-leve
 | Interaction states are outside the theme system | hover/pressed/disabled colors ad-hoc in every `LegendInteractive.builder` |
 | Variant duplication | 3 button theme classes; `defaultsTo` strings duplicated verbatim (strings can't share constants) |
 | Registry-key footgun | keying `components` by widget type instead of `XThemeNullable` is a **silent no-op** |
-| Generated `XThemeNullable` has no `==` | any rebuild reconstructing a non-const override invalidates every dependent (`LegendThemeData` implements equality precisely to avoid this — the generated classes don't) |
-| Field core missing | `LegendTextField` (286 LOC, largest component) is both primitive and component; a second field has nothing to reuse |
-| Conventions without tooling | playground rung + doc-comment rules are manual process; `legend_gen create` scaffolds neither |
+| Generated `XThemeNullable` has no `==` | any rebuild reconstructing a non-const override invalidates every dependent |
+| Field core missing | `LegendTextField` (286 LOC, largest component) is both primitive and component |
+| Conventions without tooling | playground rung + doc-comment rules are manual process; docs drift from code |
 
-## 2. What the field study established
+## 2. What the field study established — and Legend's synthesis
 
 One-line verdicts; full reports in the session research (2026-07-09).
 
-- **AntD v5** — ~27 *seed* tokens expand into ~180 map/alias tokens via **pure, composable derivation algorithms** (dark and compact are algorithms, not hand-authored forks). One seed change stays self-consistent system-wide. Component tokens default to alias tokens; per-component overrides are sparse. Their v4 (1000+ hand-maintained variables) is the cautionary tale — hand-authoring derived values grows unboundedly.
-- **MUI** — consumers write **deltas over a complete default theme** (partial deep-merge); a coherent brand theme is 10–20 lines because `light`/`dark`/`contrastText` derive from one `main` color. The `defaultProps` / `styleOverrides` / `variants` triad names three distinct customization intents. Anti-lesson: precedence via CSS injection order, and type-augmentation ceremony as the extension mechanism.
-- **Headless (TanStack/Radix/Zag/shadcn)** — behavior is the expensive reusable part; state exposed *as data* to the styling layer (`data-state` ≈ our builder `states`); controlled+uncontrolled on every stateful prop. Every headless ecosystem had to bolt a styled layer back on (Radix→Themes, Ark→Park UI) — shipping good defaults first-class was the right call. shadcn's token vocabulary: **surface/foreground pairs** (ink guaranteed legible on its surface) and **one radius from which a scale derives**.
-- **Fluent v9** — brand ramp in, `createLightTheme`/`createDarkTheme` out. Deliberately **removed per-component style callbacks from the theme** (v8's model): runtime merges were slow and unpredictable. Component themes must stay **data**. Escape hatches form an explicit cost ladder ending in recomposition from the behavior hooks (≈ our five primitives). Raw ramps are hidden from the public theme so nobody hardcodes a theme-invariant value.
-- **Airbnb DLS** — zero technical escape hatch ("petition for a prop") caused a 30-prop, 33 KB Button and mass bypass; the rebuild landed on **unstyled base + styled variants**. Constraint must live in the architecture, not in an approval queue.
+- **AntD v5** — ~27 *seed* tokens expand into ~180 map/alias tokens via **pure, composable derivation algorithms**; one brand color expands to a 10-stop ramp (`@ant-design/colors`' `generate()`) whose stops become bg/hover/border/active variants; dark mode re-runs generation blended against a dark background. Hand-authoring derived values (their v4, 1000+ variables) grows unboundedly.
+- **MUI** — consumers write **deltas over a complete default theme**; `light`/`dark`/`contrastText` derive from one `main` color; `ownerState` makes theme overrides prop-aware. Anti-lesson: precedence via CSS injection order, type-augmentation ceremony.
+- **Headless (TanStack/Radix/Zag/shadcn)** — behavior is the expensive reusable part; state exposed *as data* to the styling layer (`data-state`); every headless ecosystem re-grew a styled defaults layer. shadcn: **surface/foreground pairs**, one radius derives a scale.
+- **Fluent v9** — brand ramp in, full light+dark themes out; raw ramps hidden from the public theme; removed v8's per-component style callbacks (slow, unpredictable); escape hatches form an explicit cost ladder ending in recomposition.
+- **Airbnb DLS** — zero technical escape hatch caused a 30-prop Button and mass bypass; the rebuild landed on **unstyled base + styled variants**.
 
-Convergent conclusion: **the systems that minimize boilerplate all do it the same way — a small seed surface plus pure derivation for defaults, sparse diffs for customization, and generated/uniform plumbing per component.** Legend UI already has the resolution model and the generator; what's missing is derivation (tokens) and absorption of the remaining ceremony (generator).
+### Legend's opinionated synthesis
+
+What we take, and what is ours alone:
+
+1. **From AntD**: the ramp algorithm and seed→derived split — but *behind* the theme surface (Fluent's rule), never as a 180-token public namespace.
+2. **From MUI/shadcn**: deltas-over-defaults and legibility pairs — expressed as typed Dart, not string paths.
+3. **From the headless school**: state-as-data flowing into the styling layer — but typed and **sealed**, not stringly `data-state` attributes.
+4. **From Fluent/Airbnb**: themes stay declarative and inspectable; recomposition from primitives is the last rung of the ladder.
+5. **Ours: the sealed-state ladder (§R6)** — Dart 3 sealed classes make widget interaction state an *exhaustively-switchable, single-valued* type instead of Material's `Set<WidgetState>` guess-the-precedence model. Styling functions over that sealed type are total, compiler-checked, and safe to put in a theme.
+6. **Ours: the widget file is the single source of truth for behavior, theme AND documentation (§R9)** — dartdoc comments on tokens and `@Themed` fields are extracted by the generator into a docs manifest; the docs site and playground render every variable from it. Documentation cannot drift from code because it *is* the code.
 
 ## 3. Proposals
 
-Ordered by leverage ÷ risk. R1–R3 are mechanical generator work; R4–R6 are design work; R7–R8 are quality-of-life. All preserve the settled rules: one-file-in/one-file-out generation, open Type-keyed registry, themes as data, four-level resolution, responsiveness ≠ theming.
+All preserve the settled rules: one-file-in/one-file-out generation, open Type-keyed registry, four-level resolution, responsiveness ≠ theming.
 
 ### R1 — Generate the mirror block away *(biggest per-component win)*
 
@@ -50,83 +59,104 @@ extension LegendSwitchThemeResolve on LegendSwitch {
 }
 ```
 
-Component build method drops from a 5–10 line hand-maintained block (that silently drifts when a field is added) to:
-
-```dart
-final theme = resolveTheme(context);          // StatelessWidget
-final theme = widget.resolveTheme(context);   // State<...>
-```
-
-Effect: themed fields are written **2× instead of 3×**; adding a field can no longer be forgotten in the resolve path (the generator regenerates it). ~15–40 hand lines removed per component across 19 widgets. Stays strictly one-file-in/one-file-out.
+Component build methods drop to `final theme = resolveTheme(context);` (`widget.resolveTheme(context)` in a `State`). Themed fields are written **2× instead of 3×**; a new field can no longer be forgotten in the resolve path. ~15–40 hand lines removed per component across 19 widgets.
 
 ### R2 — Generate `==`/`hashCode` (+ `debugFillProperties`) on `XThemeNullable`
 
-Fixes the `updateShouldNotify` churn the audit found: identity-compared override data means any ancestor rebuild invalidates all dependents unless consumers remember `const`. Value equality makes the generated classes as honest as the hand-written `LegendThemeData` already is. Pure generator change + regen.
+Identity-compared override data means any ancestor rebuild reconstructing a non-const override invalidates all dependents. Value equality makes generated classes as honest as the hand-written `LegendThemeData` already is.
 
 ### R3 — Key the registry by the **widget type**
 
-`components: {LegendSwitch: LegendSwitchThemeNullable(...)}` instead of keying by `LegendSwitchThemeNullable`. The widget type is what consumers naturally reach for (the current mistake mode is a *silent no-op*), reads better, and the generator knows the widget type when emitting `.of`. Value type stays the Nullable class; `legend_gen doctor` gains a check for value-type/key mismatches (debug assert in `LegendThemeData` too — value's runtime type must be a `LegendComponentTheme`). Mechanical migration; updates the §9.2 Phase-0 note with a dated amendment.
+`components: {LegendSwitch: LegendSwitchThemeNullable(...)}` instead of keying by the Nullable class. The widget type is what consumers naturally reach for (the current mistake mode is a *silent no-op*). Value type stays the Nullable class; `legend_gen doctor` checks key/value mismatches, plus a debug assert in `LegendThemeData`. Amends the §9.2 Phase-0 note.
 
-### R4 — Seed-derived tokens: `LegendTokens.fromSeed` *(biggest consumer-defaults win)*
+### R4 — Seed-derived tokens: `LegendTokens.fromSeed` with an AntD-adapted ramp
 
-Adopt the AntD/Fluent/MUI convergence: a small **`LegendSeed`** — brand color, optional neutral tint, radius, density/size unit, font family, brightness — and a **pure derivation function** producing the full `LegendTokens`:
+A small **`LegendSeed`** — brand color, optional neutral tint, radius, density/size unit, font family, brightness — and a pure derivation producing full `LegendTokens`:
 
 ```dart
 final tokens = LegendTokens.fromSeed(LegendSeed(brand: Color(0xFF0059FF)));
-final dark  = LegendTokens.fromSeed(LegendSeed(brand: ..., brightness: Brightness.dark));
+final dark   = LegendTokens.fromSeed(LegendSeed(brand: ..., brightness: Brightness.dark));
 ```
 
-- Derivation lives in one audited function (HSL ramp for containers/hover surfaces, contrast-checked foregrounds à la MUI's `contrastThreshold`, size scale from one unit, radius scale from one radius — shadcn's "one knob derives the scale").
-- **Dark is the same seed through a dark algorithm**, not a second hand-authored palette. `LegendTokens.light`/`.dark` remain as the kit's canonical seeds run through the derivation (golden-tested so the defaults can't drift silently).
-- Hand-authoring stays possible — `fromSeed` returns a normal `LegendTokens`; `copyWith` still applies on top. Derivation is a *constructor*, not a new layer, so rule 6 (lerp tokens once) is untouched.
-- Resolves DESIGN §9.1 (the 17-color audit) by restructuring `LegendColors` into **surface/foreground pairs** (`primary`/`onPrimary`, `surface`/`onSurface`…) — the shadcn/Fluent lesson that legibility pairing belongs in the token vocabulary, plus Fluent's "never expose raw ramps" rule: the ramp is internal to derivation.
-- Consumer cost of a coherent custom theme: **17 colors → 1–4 seed values.** The playground's preset/brand-color panel becomes a thin UI over `LegendSeed`.
+- **`LegendRamp`** adapts AntD's `generate()`: from one color, a 10-stop ramp via HSV rotation/saturation/value stepping (stops 1–4 light surfaces, 5 hover, 6 base, 7 active, 8–10 dark accents). **Dark mode is the same seed re-generated blended against the dark background** — one algorithm, not a second hand-authored palette.
+- The ramp is **internal** (Fluent's rule): public `LegendColors` exposes semantic **surface/foreground pairs** (`primary`/`onPrimary`, `primaryContainer`/`onPrimaryContainer`, `surface`/`onSurface`, …) mapped from ramp stops, with contrast-checked `on*` colors (MUI's `contrastThreshold` idea). Resolves DESIGN §9.1: the 17 flat colors restructure into pairs.
+- Size scale from one unit, radius scale from one radius, type scale from one base size (shadcn's one-knob-derives-the-scale).
+- `LegendTokens.light`/`.dark` become the kit seeds run through the derivation, golden-tested so defaults can't drift.
+- Hand-authoring stays possible: `fromSeed` returns a normal `LegendTokens`; `copyWith` applies on top. Derivation is a *constructor*, not a new resolution level — rule 6 (lerp tokens once) untouched.
+- Consumer cost of a coherent theme: **17 colors → 1–4 seed values.**
 
 ### R5 — Generate the token classes
 
-`tokens/` is 4 data classes whose `copyWith`/`lerp`/ctors are exactly what `legend_gen` exists to write. Annotate them (`@LegendTokenClass` or reuse `@LegendThemeable` with a mode flag) and generate the mechanical members into `*.tokens.g.dart`. Removes ~230 hand LOC, makes "add a token" a one-line diff, and dogfoods the generator on the kit's own core. (Also where R4's `lerp` for any new state-overlay tokens comes from for free.)
+`tokens/` data classes get their `copyWith`/`lerp`/ctors generated into `*.tokens.g.dart` (annotate with the existing contract). Removes ~230 hand LOC, makes "add a token" a one-line diff, and dogfoods the generator on the kit's own core.
 
-### R6 — Interaction states enter the theme system as **data**
+### R6 — Sealed widget states + styling functions *(revised 2026-07-09: functions over sealed states, directed)*
 
-Today every component hand-rolls `states.disabled ? tokens.colors.disabled : theme.activeTrack`. Two coordinated pieces, honoring Fluent's "no callbacks in the theme" rule:
+Interaction state becomes a **sealed type** with a single effective value, resolved by a fixed priority ladder (disabled ≻ pressed ≻ hovered ≻ focused ≻ normal):
 
-1. **`LegendStateColor`** — a lerpable value type `{normal, hovered, pressed, disabled}` usable as a `@Themed` field type. The generator already infers categories from types; this adds one.
-2. **Token-level state derivation**: tokens gain a small `LegendStateOverlays` (hover/press deltas, disabled opacity) so `defaultsTo: 't.states.of(t.colors.primary)'` yields a complete, consistent state set — good defaults again; components stop inventing their own hover math, and a brand restyle automatically restyles hover/press everywhere.
+```dart
+sealed class LegendWidgetState { const LegendWidgetState(); }
+final class LegendStateNormal   extends LegendWidgetState { const ... }
+final class LegendStateHovered  extends LegendWidgetState { const ... }
+final class LegendStatePressed  extends LegendWidgetState { const ... }
+final class LegendStateFocused  extends LegendWidgetState { const ... }
+final class LegendStateDisabled extends LegendWidgetState { const ... }
+```
 
-`LegendInteractive`'s builder contract is unchanged; components map `states → theme.background.resolve(states)` in one line. This is MUI's `ownerState`-awareness and Radix's `data-state`, expressed as typed data.
+Themed fields may then be **styling functions over that sealed type**, wrapped in `LegendStateStyle<T>`:
+
+```dart
+@Themed(defaultsTo: 'LegendStateStyle.derive(t.colors.primary, t.states)')
+final LegendStateStyle<Color>? background;
+
+// consumer, exhaustive by the compiler:
+background: LegendStateStyle((state) => switch (state) {
+  LegendStatePressed()  => brand.shade700,
+  LegendStateHovered()  => brand.shade600,
+  LegendStateDisabled() => grey,
+  _                     => brand,
+}),
+```
+
+Why this does **not** repeat Fluent v8's mistake (the reason the first draft was data-only): v8's failure was *arbitrary style-merge callbacks* composed per render with unpredictable output. A `LegendStateStyle` function is **total over a sealed 5-value domain** — exhaustively checked by the compiler, pure, and *materializable*: the kit samples it once into a per-state record for `lerp` (per-state value lerp) and equality (sampled comparison), so `AnimatedLegendTheme` and `updateShouldNotify` treat it as data. `LegendStateStyle.derive(base, t.states)` supplies the good default: tokens gain `LegendStateOverlays` (hover/press deltas, disabled opacity) so every interactive component gets consistent state styling from one base color — brand restyles automatically restyle hover/press everywhere; components stop inventing hover math. `LegendInteractive` maps its `LegendInteractionStates` snapshot onto the ladder via `states.effective`.
 
 ### R7 — Shared default expressions + variant consolidation
 
-Two fixes for the duplicated-`defaultsTo`-string problem (partially reopens §9.2, as its Phase-0 note anticipated):
-
-1. `defaultsTo` may reference **static consts/functions on the widget's own file** (still one-file-in/one-file-out) — e.g. `defaultsTo: '_buttonPadding(t)'`. Trivial parser change; kills the verbatim triplication across the three buttons.
-2. The three button *theme* classes stay (registry is Type-keyed — settled) but their shared surface moves into `LegendButtonCore`'s own themed declaration where truly common (padding, radius, minHeight), with the variant classes declaring only what genuinely differs (colors). Airbnb's base+variant, applied to theme declarations. §9.8 (named variant registration) stays **deferred** — MUI's `variants` evidence is noted, but no consumer demand yet; the constructor + subtree levels cover today's cases.
+1. `defaultsTo` may reference static consts/functions in the widget's own file (still one-file-in/one-file-out) — kills the verbatim triplication across the three buttons.
+2. Shared button surface (padding, radius, minHeight) moves into `LegendButtonCore`'s own themed declaration; variant classes declare only what differs (colors). Airbnb's base+variant, applied to theme declarations. §9.8 (named variant registration) stays deferred.
 
 ### R8 — Consumer & process ergonomics
 
-- **`LegendThemeController`** ships in the kit (mode + seed + per-component overrides + `notifyListeners`); every consumer currently rewrites the example's. The docs app becomes its reference consumer.
-- **Flat restyle helpers** where nesting hurts most: `tokens.withColors(primary: …)` sugar over the nested `copyWith` chain (generated with R5).
-- **`legend_gen create`** scaffolds the full component contract: widget + annotations + test stub + **playground rung + docs-page section stub**, making CLAUDE.md's conventions tool-enforced instead of process-enforced. **`legend_gen doctor`** checks registry keys (R3), missing playground rungs, and stale `.g.dart`.
-- **Extract `LegendFieldCore`** from `LegendTextField` (the RFC-001 §3 primitive that never materialized) and widen `LegendInteractive`'s vocabulary (secondary-tap, focus-tap) so the two audited `GestureDetector` bypasses become compositions again.
-- Document the **escape-hatch ladder** (Fluent's cost gradient) on the Theming page: tokens → app map → subtree override → constructor → recomposition from primitives. All five rungs exist today; naming the ladder is what makes people use the cheap rungs first.
+- **`LegendThemeController`** ships in the kit (mode + seed + component overrides); the docs app becomes its reference consumer.
+- Flat restyle helpers (`tokens.withColors(primary: …)`) generated with R5.
+- **`legend_gen create`** scaffolds widget + test + playground rung + docs stub; **`legend_gen doctor`** checks registry keys, missing rungs, stale `.g.dart`.
+- Extract **`LegendFieldCore`** from `LegendTextField`; widen `LegendInteractive`'s vocabulary (secondary-tap, focus-tap) so the two audited `GestureDetector` bypasses become compositions again.
+- Document the **escape-hatch ladder** on the Theming page: tokens → app map → subtree override → constructor → recomposition from primitives.
 
-## 4. What is deliberately NOT proposed
+### R9 — The theme docs CMS: doc comments are the content *(added 2026-07-09)*
 
-- **No style callbacks in themes** (Fluent v8's mistake) — `LegendStateColor` is data; derivation runs at theme-build time.
-- **No headless/unstyled pivot** — every headless ecosystem re-grew a styled layer; our annotation defaults already are that layer. The primitives remain the recomposition escape hatch.
-- **No closed variant registry, no naming conventions, no cross-file generation** — RFC-001 rules 4/5 hold everywhere above.
-- **No `sx`-style ad-hoc instance styling** — typed constructor params are the instance hatch; MUI shows how an over-ergonomic escape hatch metastasizes.
-- **No token count explosion** — Fluent measured the cost of ~1,200 CSS vars; R4 *restructures* the 17 colors into pairs, it does not multiply them.
+Every token field and every `@Themed` field already carries (or per CLAUDE.md must carry) a dartdoc intent comment. The generator turns those comments into the documentation system:
+
+- **`legend_gen docs`** — for each annotated file (token class or themed widget), emit a `*.docs.g.dart` manifest next to the theme artifacts: a const list of `LegendDocEntry {owner, name, type, dartdoc, defaultExpression, group}` records extracted from the AST. Strictly one-file-in/one-file-out; the docs app aggregates by importing the manifests it cares about (open, like the components registry — consumers' own widgets get manifests too).
+- **The playground becomes manifest-driven**: instead of hand-built knob rungs, the configurator renders **every variable** — all token fields grouped (colors/sizes/typography/shadows/state overlays) and every component's themed fields — each with its name, extracted doc comment, default expression, current resolved value, and an editor appropriate to its type (color swatch/hex, number stepper, state-style editor). Hand-curated presets stay; exhaustive coverage comes from the manifest, so a new `@Themed` field appears in the playground on regeneration with **zero playground code**.
+- The docs site gains a **Theme reference** page rendered from the same manifests — the "CMS" is the source tree; editing content means editing the doc comment where the variable is declared, and `legend_gen --check` keeps it fresh in CI.
+
+## 4. What is deliberately NOT adopted
+
+- **No arbitrary style callbacks in themes** — `LegendStateStyle` is the *only* function-valued theme type, and only because its sealed domain makes it total, pure, and materializable (§R6). Nothing receives a BuildContext or arbitrary widget state.
+- **No headless/unstyled pivot** — annotation defaults remain the styled layer; primitives remain the recomposition hatch.
+- **No closed variant registry, no naming conventions, no cross-file generation** — RFC-001 rules hold.
+- **No `sx`-style ad-hoc instance styling** — typed constructor params are the instance hatch.
+- **No public token namespace explosion** — the ramp is internal; the public surface is semantic pairs.
 
 ## 5. Sequencing & measurements
 
-| Step | Contents | Risk |
+| Step | Contents | Status |
 |---|---|---|
-| **R-a** (generator sprint) | R1 + R2 + R3, regenerate all 19 + consumer fixture, goldens updated | Low — mechanical, fully test-covered |
-| **R-b** (token sprint) | R5 then R4 (generated lerp/copyWith make derivation cheap), goldens pin `light`/`dark` == today's palettes | Medium — visual diffs must be zero by construction |
-| **R-c** (state sprint) | R6 across the interactive components, closing per-component hover math | Medium |
-| **R-d** (ergonomics) | R7 + R8 alongside the two remaining Phase-2 ports | Low, incremental |
+| **A — generator sprint** | R1 + R2 + R3 + `LegendStateStyle` field category + `legend_gen docs`; regenerate all + goldens | in progress (2026-07-09) |
+| **B — token sprint** | R5 then R4 (`LegendRamp`, `LegendSeed`, pairs restructure, `LegendStateOverlays`); goldens pin light/dark | in progress (2026-07-09) |
+| **C — component adoption** | resolveTheme() everywhere; interactive components move to `LegendStateStyle`; R7 | in progress (2026-07-09) |
+| **D — playground & docs CMS** | manifest-driven configurator over every variable; Theme reference page; `LegendThemeController` in kit | in progress (2026-07-09) |
 
-Measurements to record (extending the Phase-0 table): hand LOC per component before/after R1 (target: ceremony share < 15%), seed-values-to-coherent-theme (target ≤ 4), generated-vs-hand ratio in `tokens/`, and the playground's preset panel rewritten over `LegendSeed` as the consumer-workflow proof.
+Measurements to record (extending the Phase-0 table): hand LOC per component before/after R1 (target: ceremony share < 15%), seed-values-to-coherent-theme (target ≤ 4), generated-vs-hand ratio in `tokens/`, playground variables covered / total manifest entries (target: 100%).
 
-Open questions resolved on acceptance (dated notes go into DESIGN §9): §9.1 (colors → derived pairs, R4), §9.2 amendment (shared default expressions, R7), §9.8 (variants stay deferred, dated re-affirmation), plus a new §9 entry for the registry-key change (R3).
+Open questions resolved (dated notes to DESIGN §9): §9.1 (colors → derived pairs, R4), §9.2 amendment (shared default expressions, R7), §9.8 (variants stay deferred), new entries for the registry-key change (R3) and sealed-state styling (R6).
