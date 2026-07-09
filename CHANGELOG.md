@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.0-dev.2 (unreleased) — Phases 1–2 core
+
+- Theme animation (`AnimatedNomoTheme`: one token lerp per switch), `NomoBreakpoints` responsive tiers, `NomoApp` root (WidgetsApp-based, optional `RouterConfig`).
+- Modal engine (`NomoModalRoute`/`showNomoModal`) + `NomoDialog`/`showNomoDialog` — no Material dialogs.
+- `NomoText` (token typography) and `NomoTextField` on `EditableText` — the CupertinoTextField fork is gone.
+- `NomoButtonCore` chassis; `SecondaryNomoButton`, `NomoTextButton`; `NomoCard`; `NomoSwitch`.
+- Responsive shell: `NomoScaffold`, `NomoAppBar`, `NomoSider`, `NomoBottomBar`, one `NomoNavItem` model — chrome flips by breakpoint tier, not theme swaps.
+- `nomo_gen themes --watch`; CI runs the `--check` freshness gate.
+- Example gallery app (workspace member, web-buildable, no stubs) doubling as the consumer reference.
+
 ## 1.0.0-dev.1 (unreleased) — Phase 0
 
 - `NomoTokens` (colors/sizes/typography/shadows) with single-object `lerp`.

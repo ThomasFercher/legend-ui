@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:nomo_gen/src/emitter.dart';
@@ -61,6 +62,35 @@ Future<int> runThemes(List<String> paths, {bool check = false}) async {
     return 0;
   }
   stdout.writeln('$generated file(s) generated');
+  return 0;
+}
+
+/// Runs `nomo_gen themes --watch`: initial full pass, then regenerates a
+/// source file whenever it changes. Blocks until SIGINT.
+Future<int> runThemesWatch(List<String> paths) async {
+  await runThemes(paths);
+  final directories = paths.where(
+    (p) => FileSystemEntity.typeSync(p) == FileSystemEntityType.directory,
+  );
+  final subscriptions = <StreamSubscription<FileSystemEvent>>[];
+  for (final path in directories) {
+    subscriptions.add(
+      Directory(path).watch(recursive: true).listen((event) {
+        final changed = event.path;
+        if (!changed.endsWith('.dart') ||
+            changed.endsWith('.g.dart') ||
+            event is FileSystemDeleteEvent) {
+          return;
+        }
+        runThemes([changed]);
+      }),
+    );
+  }
+  stdout.writeln('watching ${directories.join(', ')} — Ctrl-C to stop');
+  await ProcessSignal.sigint.watch().first;
+  for (final subscription in subscriptions) {
+    await subscription.cancel();
+  }
   return 0;
 }
 

@@ -12,12 +12,15 @@ Usage:
                                widgets (default path: lib)
       --check                  Verify committed output is fresh; fail on
                                stale/missing files (CI gate)
+      --watch                  Regenerate on source changes (Ctrl-C to stop)
 
-Planned (see docs/DESIGN.md §5): icons, create, doctor, --watch.
+Planned (see docs/DESIGN.md §5): icons, create, doctor.
 ''';
 
 Future<void> main(List<String> args) async {
-  final parser = ArgParser()..addFlag('check', negatable: false);
+  final parser = ArgParser()
+    ..addFlag('check', negatable: false)
+    ..addFlag('watch', negatable: false);
   final ArgResults results;
   try {
     results = parser.parse(args);
@@ -37,5 +40,12 @@ Future<void> main(List<String> args) async {
   }
 
   final paths = rest.length > 1 ? rest.sublist(1) : const ['lib'];
-  exitCode = await runThemes(paths, check: results.flag('check'));
+  if (results.flag('watch') && results.flag('check')) {
+    stderr.writeln('--watch and --check are mutually exclusive.');
+    exitCode = 64;
+    return;
+  }
+  exitCode = results.flag('watch')
+      ? await runThemesWatch(paths)
+      : await runThemes(paths, check: results.flag('check'));
 }

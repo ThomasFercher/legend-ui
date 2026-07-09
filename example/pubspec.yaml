@@ -1,0 +1,23 @@
+name: example
+description: Nomo UI Kit gallery — living documentation of every component.
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  nomo_ui_kit: any # resolved from the workspace
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^7.0.0
+
+flutter:
+  # Only for the Icons glyph font — the kit itself is icon-agnostic and
+  # the gallery never uses Material widgets.
+  uses-material-design: true

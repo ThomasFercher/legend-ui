@@ -8,3 +8,4 @@ environment:
 workspace:
   - packages/nomo_ui_kit
   - packages/nomo_gen
+  - example

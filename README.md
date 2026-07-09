@@ -20,17 +20,27 @@ Design tokens (`NomoTokens`) are the only global theme. Component themes are **d
 packages/
   nomo_ui_kit/     # the kit (Flutter package)
   nomo_gen/        # the CLI (pure Dart, published for consumers)
+example/           # gallery app — living docs + consumer-workflow reference
 docs/DESIGN.md     # the accepted RFC (canonical copy also on legacy-docs as 09-rewrite-proposal.md)
-ROADMAP.md         # phased plan; Phase 0 is the current focus
+ROADMAP.md         # phased plan with current status
 ```
 
-Planned additions (not yet scaffolded): `packages/nomo_gen_builder` (optional thin build_runner wrapper), `packages/nomo_icons` (optional FontAwesome package), `example/` (gallery app, doubles as the consumer-workflow fixture).
+Planned additions: `packages/nomo_gen_builder` (optional thin build_runner wrapper), `packages/nomo_icons` (optional FontAwesome package).
+
+## What exists today
+
+- **Tokens & theming**: `NomoTokens` (colors/sizes/typography/shadows), `NomoThemeData` open registry, `AnimatedNomoTheme` (one token lerp per theme switch), `NomoBreakpoints`.
+- **Primitives**: `NomoSurface`, `NomoInteractive`, `NomoButtonCore`, `NomoAnchoredOverlay`, `NomoModalRoute`/`showNomoModal`.
+- **Components**: Primary/Secondary/Text buttons, `NomoText`, `NomoTextField`, `NomoDropdown`, `NomoSwitch`, `NomoCard`, `NomoDialog`/`showNomoDialog`.
+- **Shell**: `NomoApp`, `NomoScaffold`, `NomoAppBar`, `NomoSider`, `NomoBottomBar` — chrome flips by breakpoint tier.
+- **Codegen**: `nomo_gen themes` (generate/`--check`/`--watch`), golden-tested; consumers annotate their own widgets and register them in the same theme map as kit components.
 
 ## Getting started
 
 ```bash
-flutter pub get            # resolves the whole workspace from the root
-dart run nomo_gen          # CLI stub — prints planned subcommands
+flutter pub get                          # resolves the whole workspace from the root
+cd example && flutter run -d chrome      # component gallery
+cd packages/nomo_ui_kit && dart run nomo_gen themes lib   # regenerate themes
 ```
 
-Quality gates from day one: `dart format`, `flutter analyze` (very_good_analysis), tests per package, and CI on this branch — see `.github/workflows/ci.yml`.
+Quality gates: `dart format`, `flutter analyze` (very_good_analysis), tests per package, and the `nomo_gen --check` freshness gate — all wired into `.github/workflows/ci.yml`.

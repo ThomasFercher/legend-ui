@@ -29,7 +29,7 @@ jobs:
 
       - name: Test
         run: |
-          for pkg in packages/*; do
+          for pkg in packages/* example; do
             if compgen -G "$pkg/test/**/*_test.dart" > /dev/null || compgen -G "$pkg/test/*_test.dart" > /dev/null; then
               echo "Testing $pkg"
               (cd "$pkg" && flutter test)
@@ -39,3 +39,7 @@ jobs:
       - name: Generated output is fresh
         working-directory: packages/nomo_ui_kit
         run: dart run nomo_gen themes lib test/consumer --check
+
+      - name: Example builds for web
+        working-directory: example
+        run: flutter build web

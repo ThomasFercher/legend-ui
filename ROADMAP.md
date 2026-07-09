@@ -24,23 +24,32 @@ Goal: prove the token model, the decorator contract, and the CLI end-to-end on o
 
 ## Phase 1 — primitives complete
 
-- [ ] Overlay engine (anchored + modal, dismiss, animation, safe-area)
-- [ ] Text core (+ decide fate of auto-fit — DESIGN §9.4)
-- [ ] Field core (thin `EditableText` wrapper — no more CupertinoTextField fork)
-- [ ] Golden-test infrastructure for components
-- [ ] `nomo_gen` hardened: diagnostics with file:line, `--check`, `--watch`, version stamping
-- [ ] Decide `nomo_gen` consumer distribution default (DESIGN §9.7)
+- [x] Overlay engine: anchored (`NomoAnchoredOverlay`) + modal (`NomoModalRoute`/`showNomoModal` — fade/scale centered, slide for edges, barrier dismiss, safe-area)
+- [x] Text core: `NomoText` on token typography — legacy's dead `fit:` API intentionally not ported (DESIGN §9.4 stays open for an explicit `NomoFittedText` if a real need appears)
+- [x] Field core: `NomoTextField` on `EditableText` (placeholder/title/error/focus border/disabled) — replaces the 1,535-line CupertinoTextField fork; selection toolbar/handles still TODO
+- [x] Theme animation: `AnimatedNomoTheme` lerps the token object once per switch (tested mid-animation); `NomoBreakpoints`/`NomoBreakpointScope` for responsive tiers; `NomoApp` root (WidgetsApp, optional RouterConfig)
+- [ ] Golden-test infrastructure for components (behavior-level widget tests exist; screenshot goldens TODO)
+- [x] `nomo_gen` hardened: file:line diagnostics, `--check` (in CI), `--watch`, version stamping
+- [ ] Decide `nomo_gen` consumer distribution default (DESIGN §9.7) — needs a real external consumer
 
 ## Phase 2 — component ports
 
-Dependency order: buttons → surfaces → menus/selection → input/form → shell. Consolidations per DESIGN §3 (one dropdown, one switch, one elevation system, `NomoBody` single-mode, real form lifecycle). Every port closes its legacy bugs with a regression test.
+Consolidations per DESIGN §3; every port closes its legacy bugs.
+
+- [x] Buttons: Primary / Secondary / Text on the shared `NomoButtonCore` chassis (no duplicated layout arms; themed padding actually applies — legacy bug; disabled = inert — legacy bug, regression-tested)
+- [x] Surfaces: `NomoCard` on `NomoSurface` (one shadow system; reachable theme defaults)
+- [x] Menus/selection: one `NomoDropdown` (one item model), `NomoSwitch` (no Cupertino fork)
+- [x] Shell: `NomoScaffold` + `NomoAppBar` (plain Row, no custom RenderBox) + `NomoSider` + `NomoBottomBar`, chrome driven by breakpoint tier not theme swaps; one `NomoNavItem` model
+- [x] Dialog: `NomoDialog` + `showNomoDialog` on the kit's own modal engine (no Material `showDialog`)
+- [ ] Form system (registration/unregistration lifecycle, working validity model, `NomoValidator` set)
+- [ ] Remaining legacy inventory: snackbar/toast, context menu, expandable, vertical menu, divider, info item, shimmer/loading, `NomoBody` (single-mode route body)
 
 ## Phase 3 — icons & polish
 
 - [ ] `packages/nomo_icons` (optional, tree-shakeable, no reflection map) + `nomo_gen icons`
-- [ ] Example/gallery app rebuilt — every component, no empty stubs
+- [x] Example/gallery app — every shipped component, no empty stubs; web build verified (icon tree-shaking works: Material glyph font 1.6 MB → 8 KB, validating the icon-agnostic core)
 - [ ] `packages/nomo_gen_builder` (optional thin build_runner wrapper) if demand exists
-- [ ] Publishing decision (pub.dev vs submodule)
+- [ ] Publishing decision (pub.dev vs submodule); re-enable `public_member_api_docs` and write member docs before publishing
 
 ## Open questions
 
