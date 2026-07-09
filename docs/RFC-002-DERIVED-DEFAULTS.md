@@ -105,8 +105,9 @@ final class LegendStateDisabled extends LegendWidgetState { const ... }
 **One minimal generic object, not per-type wrappers.** State-bearing values use **`LegendStates<T>`** — the single, tiny, pure-data generic container (five `T?` members: `normal`, `hovered`, `pressed`, `focused`, `disabled`). One class serves every value type — `LegendStates<Color>`, `LegendStates<double>`, `LegendStates<TextStyle>` — Dart's generics carry the type safety; no per-type wrapper zoo, no functions:
 
 ```dart
-@Themed<LegendStates<Color>>(defaultsTo: 'LegendStates(normal: t.colors.primary)')
+@Style<LegendStates<Color>>.resolve(_background)   // typed contract — see R10
 final LegendStates<Color>? background;
+static LegendStates<Color> _background(LegendTokens t) => LegendStates(normal: t.colors.primary);
 ```
 
 Every member is a named variable at every resolution level (member-wise sparse merge, member-wise lerp with the type-appropriate lerper, member-wise `==`; the manifest lists `background.hovered` etc.):
@@ -116,7 +117,7 @@ Every member is a named variable at every resolution level (member-wise sparse m
 PrimaryLegendButtonThemeNullable(background: LegendStates(pressed: navy))
 ```
 
-**Generic annotations (the legacy pattern, done right).** `@Themed<T>` takes a type argument like legacy's `@NomoColorField<T>` — parsed from the AST (never `toSource()` slicing), validated against the field's declared type, and used by the generator to pick the merge/lerp strategy for `T` (including through `LegendStates<T>`). The type argument is optional where inference from the field suffices.
+**Generic annotations (the legacy pattern, done right).** The field annotation takes a type argument like legacy's `@NomoColorField<T>` — parsed from the AST (never `toSource()` slicing), validated against the field's declared type, and used by the generator to pick the merge/lerp strategy for `T` (including through `LegendStates<T>`). The full typed contract is R10.
 
 **Extensions carry the type-specific behavior and the ergonomics.** The generic container stays dumb; capabilities attach by extension exactly where they type-check:
 
@@ -135,9 +136,9 @@ extension LegendStatesColorResolve on LegendStates<Color> {
 
 **Flat named variables remain the fallback**: an author who wants a variant as its own constructor param (or a nonstandard state axis like `selected`) declares it as an ordinary separate `@Themed` field — plain types, no container, full four-level resolution. Nothing forces the container. `LegendInteractive` maps its `LegendInteractionStates` snapshot onto the ladder via `states.effective`.
 
-### R7 — Shared default expressions + variant consolidation
+### R7 — Shared defaults + variant consolidation
 
-1. `defaultsTo` may reference static consts/functions in the widget's own file (still one-file-in/one-file-out) — kills the verbatim triplication across the three buttons.
+1. ~~`defaultsTo` may reference static consts/functions~~ — superseded by R10: typed defaults are ordinary Dart symbols (consts and tear-offs), so sharing them across the three buttons is plain code reuse; the string-duplication problem ceases to exist.
 2. Shared button surface (padding, radius, minHeight) moves into `LegendButtonCore`'s own themed declaration; variant classes declare only what differs (colors). Airbnb's base+variant, applied to theme declarations. §9.8 (named variant registration) stays deferred.
 
 ### R8 — Consumer & process ergonomics
@@ -156,6 +157,27 @@ Every token field and every `@Themed` field already carries (or per CLAUDE.md mu
 - **The playground becomes manifest-driven**: instead of hand-built knob rungs, the configurator renders **every variable** — all token fields grouped (colors/sizes/typography/shadows/state overlays) and every component's themed fields — each with its name, extracted doc comment, default expression, current resolved value, and an editor appropriate to its type (color swatch/hex, number stepper, state-style editor). Hand-curated presets stay; exhaustive coverage comes from the manifest, so a new `@Themed` field appears in the playground on regeneration with **zero playground code**.
 - The docs site gains a **Theme reference** page rendered from the same manifests — the "CMS" is the source tree; editing content means editing the doc comment where the variable is declared, and `legend_gen --check` keeps it fresh in CI.
 
+### R10 — Typed annotation contract: `@Style<T>` *(added 2026-07-09, directed)*
+
+**The annotation exists for exactly one thing: generating the theme boilerplate** (the legacy model, with the CLI in place of build_runner). The field stays a plain declaration; the annotation is generic and its default is **typed Dart, not a string**:
+
+```dart
+/// Fill behind the label.
+@Style<Color>(Color(0xFF2563EB))          // const default — the value "without theme"
+final Color? background;
+
+/// Text color, related to the static theme values by the author:
+@Style<Color>.resolve(_foreground)         // typed tear-off: Color Function(LegendTokens)
+final Color? foreground;
+static Color _foreground(LegendTokens t) => t.colors.onPrimary;
+```
+
+- **`@Style<T>(value)`** — the positional const value is the default used when no theme provides anything (level 4). It is overridden by any theme override at any level: constructor ≻ subtree override ≻ components map ≻ this default. Untouched four-level semantics.
+- **`@Style<T>.resolve(tearOff)`** — the value is optional; omitting it means the developer defines the relation to the static theme values instead, as a **const tear-off** `T Function(LegendTokens)`. This replaces the `defaultsTo` string expressions wholesale and closes DESIGN §9.2 with the *typed* answer it hoped for: the default is compile-checked in the widget file itself, IDE-navigable, rename-safe, and shareable across widgets as an ordinary symbol — no analyzer-after-generation gap, no duplicated strings.
+- **Neither given** → the default is null (legacy's `@NomoColorField<Color?>(null)` case): the component treats the value as genuinely optional.
+- `lerp:` stays as the opt-in flag. The generator reads value/tear-off from the AST (structured expression spans, never index math), validates `T` against the field type, and emits `XTheme.defaults(LegendTokens t)` calling the tear-offs / inlining the consts.
+- `@LegendThemeable()` remains the class marker; `@Style<T>` replaces `@Themed`. Migration of the 72 existing fields is mechanical (each `defaultsTo` string becomes either a const value or a private static tear-off in the same file).
+
 ## 4. What is deliberately NOT adopted
 
 - **No function-valued theme content; exactly one generic container** *(amendments 4–6)* — the `resolveWith` function form was dropped, and per-type wrappers (`LegendStateColor`) were replaced by the single generic `LegendStates<T>` with type-bound extensions. Themes are pure data; computed values are produced at theme-build time. Nothing in a theme receives a BuildContext or a callback.
@@ -168,7 +190,7 @@ Every token field and every `@Themed` field already carries (or per CLAUDE.md mu
 
 | Step | Contents | Status |
 |---|---|---|
-| **A — generator sprint** | R1 + R2 + R3 + `LegendStates<T>` category + generic `@Themed<T>` + `legend_gen docs`; regenerate all + goldens | in progress (2026-07-09) |
+| **A — generator sprint** | R1 + R2 + R3 + R10 `@Style<T>` typed contract + `LegendStates<T>` category + `legend_gen docs`; migrate all 72 fields; regenerate all + goldens | pending relaunch (2026-07-09) |
 | **B — token sprint** | R5 then R4 (`LegendRamp`, `LegendSeed`, pairs restructure, `LegendStateOverlays`); goldens pin light/dark | in progress (2026-07-09) |
 | **C — component adoption** | resolveTheme() everywhere; interactive components move to `LegendStateStyle`; R7 | in progress (2026-07-09) |
 | **D — playground & docs CMS** | manifest-driven configurator over every variable; Theme reference page; `LegendThemeController` in kit | in progress (2026-07-09) |
