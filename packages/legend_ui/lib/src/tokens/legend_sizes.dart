@@ -1,9 +1,11 @@
-import 'dart:ui';
-
 import 'package:flutter/painting.dart';
+import 'package:legend_ui/src/annotations/annotations.dart';
+
+part 'legend_sizes.tokens.g.dart';
 
 /// Spacing, radii, border and icon scales.
-class LegendSizes {
+@LegendTokenData()
+class LegendSizes with _$LegendSizes {
   const LegendSizes({
     this.xs = 4,
     this.sm = 8,
@@ -38,53 +40,7 @@ class LegendSizes {
   BorderRadius get borderRadiusMd => BorderRadius.circular(radiusMd);
   BorderRadius get borderRadiusLg => BorderRadius.circular(radiusLg);
 
-  LegendSizes copyWith({
-    double? xs,
-    double? sm,
-    double? md,
-    double? lg,
-    double? xl,
-    double? xxl,
-    double? radiusSm,
-    double? radiusMd,
-    double? radiusLg,
-    double? borderWidth,
-    double? iconSm,
-    double? iconMd,
-    double? iconLg,
-  }) {
-    return LegendSizes(
-      xs: xs ?? this.xs,
-      sm: sm ?? this.sm,
-      md: md ?? this.md,
-      lg: lg ?? this.lg,
-      xl: xl ?? this.xl,
-      xxl: xxl ?? this.xxl,
-      radiusSm: radiusSm ?? this.radiusSm,
-      radiusMd: radiusMd ?? this.radiusMd,
-      radiusLg: radiusLg ?? this.radiusLg,
-      borderWidth: borderWidth ?? this.borderWidth,
-      iconSm: iconSm ?? this.iconSm,
-      iconMd: iconMd ?? this.iconMd,
-      iconLg: iconLg ?? this.iconLg,
-    );
-  }
-
-  static LegendSizes lerp(LegendSizes a, LegendSizes b, double t) {
-    return LegendSizes(
-      xs: lerpDouble(a.xs, b.xs, t)!,
-      sm: lerpDouble(a.sm, b.sm, t)!,
-      md: lerpDouble(a.md, b.md, t)!,
-      lg: lerpDouble(a.lg, b.lg, t)!,
-      xl: lerpDouble(a.xl, b.xl, t)!,
-      xxl: lerpDouble(a.xxl, b.xxl, t)!,
-      radiusSm: lerpDouble(a.radiusSm, b.radiusSm, t)!,
-      radiusMd: lerpDouble(a.radiusMd, b.radiusMd, t)!,
-      radiusLg: lerpDouble(a.radiusLg, b.radiusLg, t)!,
-      borderWidth: lerpDouble(a.borderWidth, b.borderWidth, t)!,
-      iconSm: lerpDouble(a.iconSm, b.iconSm, t)!,
-      iconMd: lerpDouble(a.iconMd, b.iconMd, t)!,
-      iconLg: lerpDouble(a.iconLg, b.iconLg, t)!,
-    );
-  }
+  /// Member-wise lerp (generated, RFC-002 R5).
+  static LegendSizes lerp(LegendSizes a, LegendSizes b, double t) =>
+      _$LegendSizesLerp(a, b, t);
 }

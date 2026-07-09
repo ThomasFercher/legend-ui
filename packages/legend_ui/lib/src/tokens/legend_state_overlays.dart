@@ -1,5 +1,9 @@
 import 'dart:ui';
 
+import 'package:legend_ui/src/annotations/annotations.dart';
+
+part 'legend_state_overlays.tokens.g.dart';
+
 /// Token-level interaction-state derivation (RFC-002 R6): how a base color
 /// turns into its hovered/pressed/disabled variants when a state variant
 /// was not named explicitly.
@@ -9,7 +13,8 @@ import 'dart:ui';
 /// overlays, so a brand restyle automatically restyles hover/press
 /// everywhere and components stop inventing their own hover math.
 /// Hand-naming a state variant always wins over this derivation.
-class LegendStateOverlays {
+@LegendTokenData()
+class LegendStateOverlays with _$LegendStateOverlays {
   /// Sensible defaults: hover shifts ~6% toward the contrast pole, pressed
   /// ~12%, disabled keeps the color at half opacity.
   const LegendStateOverlays({
@@ -47,30 +52,10 @@ class LegendStateOverlays {
     return Color.lerp(base, target, amount)!;
   }
 
-  /// Copy with the given deltas replaced.
-  LegendStateOverlays copyWith({
-    double? hoverAmount,
-    double? pressAmount,
-    double? disabledOpacity,
-  }) {
-    return LegendStateOverlays(
-      hoverAmount: hoverAmount ?? this.hoverAmount,
-      pressAmount: pressAmount ?? this.pressAmount,
-      disabledOpacity: disabledOpacity ?? this.disabledOpacity,
-    );
-  }
-
-  /// Linearly interpolate the deltas (part of the one token lerp a theme
-  /// switch pays, DESIGN.md §2.4).
+  /// Member-wise lerp (generated, RFC-002 R5).
   static LegendStateOverlays lerp(
     LegendStateOverlays a,
     LegendStateOverlays b,
     double t,
-  ) {
-    return LegendStateOverlays(
-      hoverAmount: lerpDouble(a.hoverAmount, b.hoverAmount, t)!,
-      pressAmount: lerpDouble(a.pressAmount, b.pressAmount, t)!,
-      disabledOpacity: lerpDouble(a.disabledOpacity, b.disabledOpacity, t)!,
-    );
-  }
+  ) => _$LegendStateOverlaysLerp(a, b, t);
 }

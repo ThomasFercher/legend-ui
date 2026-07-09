@@ -1,9 +1,15 @@
 import 'dart:ui';
 
+import 'package:legend_ui/src/annotations/annotations.dart';
+
+part 'legend_colors.tokens.g.dart';
+
 /// The semantic color palette — the only place colors live.
 ///
-/// Component defaults reference these via `@Themed(defaultsTo: 't.colors.…')`.
-class LegendColors {
+/// Component defaults reference these via `@Style<T>.resolve` tear-offs
+/// (`(t) => t.colors.…`).
+@LegendTokenData()
+class LegendColors with _$LegendColors {
   const LegendColors({
     required this.primary,
     required this.onPrimary,
@@ -85,65 +91,7 @@ class LegendColors {
     foreground3: Color(0xFF7A8290),
   );
 
-  LegendColors copyWith({
-    Color? primary,
-    Color? onPrimary,
-    Color? primaryContainer,
-    Color? secondary,
-    Color? onSecondary,
-    Color? background1,
-    Color? background2,
-    Color? background3,
-    Color? surface,
-    Color? onSurface,
-    Color? error,
-    Color? onError,
-    Color? disabled,
-    Color? onDisabled,
-    Color? foreground1,
-    Color? foreground2,
-    Color? foreground3,
-  }) {
-    return LegendColors(
-      primary: primary ?? this.primary,
-      onPrimary: onPrimary ?? this.onPrimary,
-      primaryContainer: primaryContainer ?? this.primaryContainer,
-      secondary: secondary ?? this.secondary,
-      onSecondary: onSecondary ?? this.onSecondary,
-      background1: background1 ?? this.background1,
-      background2: background2 ?? this.background2,
-      background3: background3 ?? this.background3,
-      surface: surface ?? this.surface,
-      onSurface: onSurface ?? this.onSurface,
-      error: error ?? this.error,
-      onError: onError ?? this.onError,
-      disabled: disabled ?? this.disabled,
-      onDisabled: onDisabled ?? this.onDisabled,
-      foreground1: foreground1 ?? this.foreground1,
-      foreground2: foreground2 ?? this.foreground2,
-      foreground3: foreground3 ?? this.foreground3,
-    );
-  }
-
-  static LegendColors lerp(LegendColors a, LegendColors b, double t) {
-    return LegendColors(
-      primary: Color.lerp(a.primary, b.primary, t)!,
-      onPrimary: Color.lerp(a.onPrimary, b.onPrimary, t)!,
-      primaryContainer: Color.lerp(a.primaryContainer, b.primaryContainer, t)!,
-      secondary: Color.lerp(a.secondary, b.secondary, t)!,
-      onSecondary: Color.lerp(a.onSecondary, b.onSecondary, t)!,
-      background1: Color.lerp(a.background1, b.background1, t)!,
-      background2: Color.lerp(a.background2, b.background2, t)!,
-      background3: Color.lerp(a.background3, b.background3, t)!,
-      surface: Color.lerp(a.surface, b.surface, t)!,
-      onSurface: Color.lerp(a.onSurface, b.onSurface, t)!,
-      error: Color.lerp(a.error, b.error, t)!,
-      onError: Color.lerp(a.onError, b.onError, t)!,
-      disabled: Color.lerp(a.disabled, b.disabled, t)!,
-      onDisabled: Color.lerp(a.onDisabled, b.onDisabled, t)!,
-      foreground1: Color.lerp(a.foreground1, b.foreground1, t)!,
-      foreground2: Color.lerp(a.foreground2, b.foreground2, t)!,
-      foreground3: Color.lerp(a.foreground3, b.foreground3, t)!,
-    );
-  }
+  /// Member-wise lerp (generated, RFC-002 R5).
+  static LegendColors lerp(LegendColors a, LegendColors b, double t) =>
+      _$LegendColorsLerp(a, b, t);
 }

@@ -1,7 +1,11 @@
 import 'package:flutter/painting.dart';
+import 'package:legend_ui/src/annotations/annotations.dart';
+
+part 'legend_shadows.tokens.g.dart';
 
 /// The single elevation system (replaces legacy ElevatedBox + LegendElevation).
-class LegendShadows {
+@LegendTokenData()
+class LegendShadows with _$LegendShadows {
   const LegendShadows({
     this.none = const [],
     this.low = const [
@@ -20,26 +24,7 @@ class LegendShadows {
   final List<BoxShadow> medium;
   final List<BoxShadow> high;
 
-  LegendShadows copyWith({
-    List<BoxShadow>? none,
-    List<BoxShadow>? low,
-    List<BoxShadow>? medium,
-    List<BoxShadow>? high,
-  }) {
-    return LegendShadows(
-      none: none ?? this.none,
-      low: low ?? this.low,
-      medium: medium ?? this.medium,
-      high: high ?? this.high,
-    );
-  }
-
-  static LegendShadows lerp(LegendShadows a, LegendShadows b, double t) {
-    return LegendShadows(
-      none: BoxShadow.lerpList(a.none, b.none, t)!,
-      low: BoxShadow.lerpList(a.low, b.low, t)!,
-      medium: BoxShadow.lerpList(a.medium, b.medium, t)!,
-      high: BoxShadow.lerpList(a.high, b.high, t)!,
-    );
-  }
+  /// Member-wise lerp (generated, RFC-002 R5).
+  static LegendShadows lerp(LegendShadows a, LegendShadows b, double t) =>
+      _$LegendShadowsLerp(a, b, t);
 }

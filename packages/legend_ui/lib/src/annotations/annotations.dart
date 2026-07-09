@@ -15,6 +15,29 @@ class LegendThemeable {
   const LegendThemeable();
 }
 
+/// Marks a token data class for `legend_gen tokens` (RFC-002 R5): the
+/// mechanical members — `copyWith` and value `==`/`hashCode` as a
+/// `_$ClassName` mixin the class applies via `with`, plus the private
+/// member-wise lerp function the class's one-line `static lerp` redirects
+/// to — are generated into a `<file>.tokens.g.dart` part.
+///
+/// Explicitly NOT [LegendThemeable]: token classes are the base theme
+/// (DESIGN.md §2.1) and never get Override widgets, registry entries, or
+/// `of()` resolvers (RFC-002 R10 scope). There is no per-field opt-out:
+/// every field lerps with its type-appropriate lerper (none of the kit's
+/// token fields needs to step).
+///
+/// Contract (enforced by the generator):
+/// - every instance field is `final`, explicitly typed and non-nullable,
+/// - the unnamed constructor accepts every field as a named parameter,
+/// - list fields are `List<BoxShadow>` (the one lerpable list),
+/// - the class applies the generated mixin (`with _$ClassName`),
+/// - the file carries `part '<file>.tokens.g.dart';`.
+@Target({TargetKind.classType})
+class LegendTokenData {
+  const LegendTokenData();
+}
+
 /// Marks a field of a [LegendThemeable] widget as a themed property and
 /// carries its **typed** default (RFC-002 R10) — the annotation exists for
 /// exactly one thing: generating the theme boilerplate. Applies to
