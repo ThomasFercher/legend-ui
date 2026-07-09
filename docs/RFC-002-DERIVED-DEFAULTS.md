@@ -85,9 +85,9 @@ final dark   = LegendTokens.fromSeed(LegendSeed(brand: ..., brightness: Brightne
 - Hand-authoring stays possible: `fromSeed` returns a normal `LegendTokens`; `copyWith` applies on top. Derivation is a *constructor*, not a new resolution level — rule 6 (lerp tokens once) untouched.
 - Consumer cost of a coherent theme: **17 colors → 1–4 seed values.**
 
-### R5 — Generate the token classes
+### R5 — Generate the token classes *(mechanical members only — see R10 scope)*
 
-`tokens/` data classes get their `copyWith`/`lerp`/ctors generated into `*.tokens.g.dart` (annotate with the existing contract). Removes ~230 hand LOC, makes "add a token" a one-line diff, and dogfoods the generator on the kit's own core.
+`tokens/` data classes get their `copyWith`/`lerp`/`==` generated into `*.tokens.g.dart` via a separate lightweight marker (NOT `@LegendThemeable` — tokens are the base theme, not component themes, and never get Override widgets or registry entries). Removes ~230 hand LOC, makes "add a token" a one-line diff, and dogfoods the generator on the kit's own core.
 
 ### R6 — Sealed widget states; ONE minimal generic container + extensions *(settled 2026-07-09 ×6, directed: `LegendStates<T>` compromise, generic annotations per the legacy pattern, flat vars as fallback)*
 
@@ -177,6 +177,13 @@ static Color _foreground(LegendTokens t) => t.colors.onPrimary;
 - **Neither given** → the default is null (legacy's `@NomoColorField<Color?>(null)` case): the component treats the value as genuinely optional.
 - `lerp:` stays as the opt-in flag. The generator reads value/tear-off from the AST (structured expression spans, never index math), validates `T` against the field type, and emits `XTheme.defaults(LegendTokens t)` calling the tear-offs / inlining the consts.
 - `@LegendThemeable()` remains the class marker; `@Style<T>` replaces `@Themed`. Migration of the 72 existing fields is mechanical (each `defaultsTo` string becomes either a const value or a private static tear-off in the same file).
+
+**Scope: component themes only** *(clarified 2026-07-09, directed)*. `@Style`/`@LegendThemeable` and the generated artifact set apply to **components** — never to the base theme. `LegendTokens` (the base colors/sizes/typography/shadows) is its own layer, exactly as in the legacy split:
+
+- The **kit defines the base defaults** (`LegendTokens.light`/`.dark`, and `fromSeed` once R4 lands); consumers override them **wholesale at their levels** — app-wide via `LegendThemeData(tokens: …)`, per-subtree via a nested `LegendTheme` — without any codegen involvement.
+- Component defaults *relate* to the base through `.resolve` tear-offs (`(t) => t.colors.primary`), so a base-color override cascades into every component default that references it, while any component-level override (constructor / subtree / components map) still wins for that component.
+- **Consumer symmetry is CLI-delivered** (DESIGN goal 4, unchanged): a package user runs `legend_gen` on their own annotated widget and gets the identical feature set — generated theme classes, four-level resolution, registry entry, docs manifest — with zero kit changes.
+- R5 (generated token classes) is accordingly *mechanical only*: a separate lightweight marker generates `copyWith`/`lerp`/`==` for the token data classes — it must never grow Override widgets, registry entries, or any of the component-theme machinery.
 
 ## 4. What is deliberately NOT adopted
 
