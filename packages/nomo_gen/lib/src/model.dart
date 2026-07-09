@@ -31,10 +31,14 @@ class ThemableWidget {
     required this.fields,
     required this.sourceImports,
     required this.sourceBasename,
+    this.line = 1,
   });
 
   final String className;
   final List<ThemedField> fields;
+
+  /// 1-based line of the class name in the source file (for diagnostics).
+  final int line;
 
   /// Import directives copied verbatim from the source file (minus
   /// generated-file self-imports).

@@ -5,6 +5,8 @@
 /// later (DESIGN.md §5.3).
 library;
 
+export 'src/create_command.dart';
+export 'src/doctor_command.dart';
 export 'src/emitter.dart';
 export 'src/model.dart';
 export 'src/parser.dart';

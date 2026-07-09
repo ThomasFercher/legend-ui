@@ -145,6 +145,7 @@ List<ThemableWidget> parseThemableWidgets(String path, String content) {
         fields: fields,
         sourceImports: imports,
         sourceBasename: p.basename(path),
+        line: lineOf(declaration.name),
       ),
     );
   }
