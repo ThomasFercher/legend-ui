@@ -9,6 +9,8 @@ part 'legend_divider.theme.g.dart';
 /// A thin rule separating content, horizontal ([Axis.horizontal], the
 /// default) or vertical.
 ///
+/// Composes [LegendSurface] for the line itself.
+///
 /// [spacing] is the outer margin on both sides of the line — vertical
 /// margin for a horizontal divider, horizontal margin for a vertical one.
 ///
@@ -31,14 +33,17 @@ class LegendDivider extends StatelessWidget {
   /// The direction the line runs in.
   final Axis axis;
 
+  /// Color of the line.
   @Style<Color>.resolve(_color)
   final Color? color;
   static Color _color(LegendTokens t) => t.colors.background3;
 
+  /// Stroke width of the line.
   @Style<double>.resolve(_thickness)
   final double? thickness;
   static double _thickness(LegendTokens t) => t.sizes.borderWidth;
 
+  /// Outer margin on both sides of the line.
   @Style<double>.resolve(_spacing)
   final double? spacing;
   static double _spacing(LegendTokens t) => t.sizes.md;

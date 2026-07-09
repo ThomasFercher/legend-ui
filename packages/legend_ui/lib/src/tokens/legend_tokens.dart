@@ -66,16 +66,26 @@ class LegendTokens with _$LegendTokens {
     );
   }
 
+  /// The semantic color palette.
   final LegendColors colors;
+
+  /// Spacing, radii, border and icon scales.
   final LegendSizes sizes;
+
+  /// The six-style type scale.
   final LegendTypography typography;
+
+  /// The elevation system.
   final LegendShadows shadows;
 
   /// Interaction-state derivation deltas (RFC-002 R6): how unset
   /// hover/press/disabled variants derive from a base color.
   final LegendStateOverlays states;
 
+  /// The kit's hand-authored light theme.
   static const light = LegendTokens(colors: LegendColors.light);
+
+  /// The kit's hand-authored dark theme.
   static const dark = LegendTokens(colors: LegendColors.dark);
 
   /// Lerp the whole token set — the one lerp a theme switch pays

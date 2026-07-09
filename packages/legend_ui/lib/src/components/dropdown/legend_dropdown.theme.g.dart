@@ -25,7 +25,7 @@ class LegendDropdownTheme {
     textStyle: LegendDropdown._textStyle(t),
   );
 
-  final Color menuBackground;
+  final LegendStates<Color> menuBackground;
   final BorderRadius menuBorderRadius;
   final List<BoxShadow> menuShadows;
   final double menuMaxHeight;
@@ -36,6 +36,10 @@ class LegendDropdownTheme {
   /// [LegendDropdown] first, [LegendDropdownThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Post-merge, unset `LegendStates<Color>` members fill
+  /// from the resolved `normal` via `tokens.states`
+  /// (RFC-002 R6) — named members at any level always win.
   static LegendDropdownTheme of(
     BuildContext context, [
     LegendDropdownThemeNullable? local,
@@ -47,13 +51,17 @@ class LegendDropdownTheme {
           LegendThemeOverride.maybeOf<LegendDropdownThemeNullable>(context),
         )
         .merge(local);
-    return resolved;
+    return resolved.copyWith(
+      menuBackground: resolved.menuBackground.withDerived(data.tokens.states),
+    );
   }
 
   LegendDropdownTheme merge(LegendDropdownThemeNullable? other) {
     if (other == null) return this;
     return LegendDropdownTheme(
-      menuBackground: other.menuBackground ?? menuBackground,
+      menuBackground:
+          LegendStates.merge(menuBackground, other.menuBackground) ??
+          menuBackground,
       menuBorderRadius: other.menuBorderRadius ?? menuBorderRadius,
       menuShadows: other.menuShadows ?? menuShadows,
       menuMaxHeight: other.menuMaxHeight ?? menuMaxHeight,
@@ -63,7 +71,7 @@ class LegendDropdownTheme {
   }
 
   LegendDropdownTheme copyWith({
-    Color? menuBackground,
+    LegendStates<Color>? menuBackground,
     BorderRadius? menuBorderRadius,
     List<BoxShadow>? menuShadows,
     double? menuMaxHeight,
@@ -105,7 +113,7 @@ class LegendDropdownThemeNullable {
     this.textStyle,
   });
 
-  final Color? menuBackground;
+  final LegendStates<Color>? menuBackground;
   final BorderRadius? menuBorderRadius;
   final List<BoxShadow>? menuShadows;
   final double? menuMaxHeight;
@@ -115,7 +123,7 @@ class LegendDropdownThemeNullable {
   LegendDropdownThemeNullable merge(LegendDropdownThemeNullable? other) {
     if (other == null) return this;
     return LegendDropdownThemeNullable(
-      menuBackground: other.menuBackground ?? menuBackground,
+      menuBackground: LegendStates.merge(menuBackground, other.menuBackground),
       menuBorderRadius: other.menuBorderRadius ?? menuBorderRadius,
       menuShadows: other.menuShadows ?? menuShadows,
       menuMaxHeight: other.menuMaxHeight ?? menuMaxHeight,

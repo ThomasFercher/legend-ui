@@ -10,6 +10,13 @@ part 'legend_bottom_bar.theme.g.dart';
 
 /// Compact-tier navigation bar; `LegendScaffold` shows it below the
 /// compact breakpoint.
+///
+/// Composes [LegendInteractive] (item activation) + [LegendSurface];
+/// destinations come from the shared [LegendNavItem] model.
+///
+/// Items carry no hover/press tint (selection is the state that matters
+/// on touch tiers), so the colors are plain fields (RFC-002 R6 audit
+/// note).
 @LegendThemeable()
 class LegendBottomBar extends StatelessWidget {
   const LegendBottomBar({
@@ -27,18 +34,22 @@ class LegendBottomBar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onSelected;
 
+  /// Fill color of the bar.
   @Style<Color>.resolve(_background)
   final Color? background;
   static Color _background(LegendTokens t) => t.colors.surface;
 
+  /// Label/icon color of the selected item.
   @Style<Color>.resolve(_selectedColor, lerp: true)
   final Color? selectedColor;
   static Color _selectedColor(LegendTokens t) => t.colors.primary;
 
+  /// Label/icon color of unselected items.
   @Style<Color>.resolve(_unselectedColor, lerp: true)
   final Color? unselectedColor;
   static Color _unselectedColor(LegendTokens t) => t.colors.foreground3;
 
+  /// Height of the bar content (excluding any safe-area inset).
   @Style<double>(64)
   final double? height;
 

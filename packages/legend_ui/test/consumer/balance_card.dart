@@ -20,14 +20,17 @@ class BalanceCard extends StatelessWidget {
 
   final String amount;
 
+  /// Fill color of the card surface.
   @Style<Color>.resolve(_background, lerp: true)
   final Color? background;
   static Color _background(LegendTokens t) => t.colors.surface;
 
+  /// Color of the amount text.
   @Style<Color>.resolve(_accent)
   final Color? accent;
   static Color _accent(LegendTokens t) => t.colors.secondary;
 
+  /// Inner padding around the amount.
   @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
   static EdgeInsetsGeometry _padding(LegendTokens t) =>

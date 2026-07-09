@@ -11,16 +11,68 @@ const List<LegendDocEntry> legendSiderDocEntries = [
   LegendDocEntry(
     owner: 'LegendSider',
     name: 'background',
+    type: 'LegendStates<Color>?',
+    doc:
+        'Fill of the sider surface and its items, per interaction state —\n`normal` paints the whole rail, `hovered`/`pressed`/`focused`\nhighlight the item under the pointer (a selected item uses the\n`primaryContainer` token instead).',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendSider',
+    name: 'background.normal',
     type: 'Color?',
-    doc: '',
-    defaultDescription: 't.colors.surface',
+    doc:
+        'Fill of the sider surface and its items, per interaction state —\n`normal` paints the whole rail, `hovered`/`pressed`/`focused`\nhighlight the item under the pointer (a selected item uses the\n`primaryContainer` token instead).',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendSider',
+    name: 'background.hovered',
+    type: 'Color?',
+    doc:
+        'Fill of the sider surface and its items, per interaction state —\n`normal` paints the whole rail, `hovered`/`pressed`/`focused`\nhighlight the item under the pointer (a selected item uses the\n`primaryContainer` token instead).',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendSider',
+    name: 'background.pressed',
+    type: 'Color?',
+    doc:
+        'Fill of the sider surface and its items, per interaction state —\n`normal` paints the whole rail, `hovered`/`pressed`/`focused`\nhighlight the item under the pointer (a selected item uses the\n`primaryContainer` token instead).',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendSider',
+    name: 'background.focused',
+    type: 'Color?',
+    doc:
+        'Fill of the sider surface and its items, per interaction state —\n`normal` paints the whole rail, `hovered`/`pressed`/`focused`\nhighlight the item under the pointer (a selected item uses the\n`primaryContainer` token instead).',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendSider',
+    name: 'background.disabled',
+    type: 'Color?',
+    doc:
+        'Fill of the sider surface and its items, per interaction state —\n`normal` paints the whole rail, `hovered`/`pressed`/`focused`\nhighlight the item under the pointer (a selected item uses the\n`primaryContainer` token instead).',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'LegendSider',
     name: 'width',
     type: 'double?',
-    doc: '',
+    doc: 'Width of the rail.',
     defaultDescription: '240',
     group: 'component',
   ),
@@ -28,7 +80,7 @@ const List<LegendDocEntry> legendSiderDocEntries = [
     owner: 'LegendSider',
     name: 'selectedColor',
     type: 'Color?',
-    doc: '',
+    doc: 'Label/icon color of the selected item.',
     defaultDescription: 't.colors.primary',
     group: 'component',
   ),
@@ -36,7 +88,7 @@ const List<LegendDocEntry> legendSiderDocEntries = [
     owner: 'LegendSider',
     name: 'unselectedColor',
     type: 'Color?',
-    doc: '',
+    doc: 'Label/icon color of unselected items.',
     defaultDescription: 't.colors.foreground2',
     group: 'component',
   ),
@@ -44,7 +96,7 @@ const List<LegendDocEntry> legendSiderDocEntries = [
     owner: 'LegendSider',
     name: 'itemPadding',
     type: 'EdgeInsetsGeometry?',
-    doc: '',
+    doc: 'Inner padding of each item row.',
     defaultDescription:
         'EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm)',
     group: 'component',

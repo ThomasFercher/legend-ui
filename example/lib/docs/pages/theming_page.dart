@@ -35,7 +35,9 @@ class _ResolutionLadderState extends State<_ResolutionLadder> {
     );
     if (_subtree) {
       target = PrimaryLegendButtonThemeOverride(
-        data: const PrimaryLegendButtonThemeNullable(background: _subtreeColor),
+        data: const PrimaryLegendButtonThemeNullable(
+          background: LegendStates(normal: _subtreeColor),
+        ),
         child: target,
       );
     }
@@ -47,7 +49,7 @@ class _ResolutionLadderState extends State<_ResolutionLadder> {
             // RFC-002 R3: keyed by the widget type (wins over a legacy
             // Nullable-type entry when both are present).
             PrimaryLegendButton: const PrimaryLegendButtonThemeNullable(
-              background: _midTreeColor,
+              background: LegendStates(normal: _midTreeColor),
             ),
           },
         ),
@@ -171,7 +173,7 @@ class ThemingPage extends StatelessWidget {
               PrimaryLegendButton(text: 'Token default', onPressed: noop),
               PrimaryLegendButtonThemeOverride(
                 data: const PrimaryLegendButtonThemeNullable(
-                  background: Color(0xFF0D9488),
+                  background: LegendStates(normal: Color(0xFF0D9488)),
                 ),
                 child: PrimaryLegendButton(
                   text: 'Subtree override',
@@ -183,7 +185,8 @@ class ThemingPage extends StatelessWidget {
           code: '''
 PrimaryLegendButtonThemeOverride(
   data: const PrimaryLegendButtonThemeNullable(
-    background: Color(0xFF0D9488),
+    // per-state container: name only what you restyle (RFC-002 R6)
+    background: LegendStates(normal: Color(0xFF0D9488)),
   ),
   child: PrimaryLegendButton(text: 'Subtree override', ...),
 )''',
@@ -234,8 +237,9 @@ LegendThemeData(
   components: {
     // reskin a kit component, keyed by the widget type
     // (sparse — only what you set)
-    PrimaryLegendButton:
-        const PrimaryLegendButtonThemeNullable(background: brand),
+    PrimaryLegendButton: const PrimaryLegendButtonThemeNullable(
+      background: LegendStates(normal: brand),
+    ),
     // and your own component, exactly the same way
     BalanceCard: const BalanceCardThemeNullable(padding: EdgeInsets.all(24)),
   },

@@ -7,8 +7,13 @@ import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
 part 'legend_dialog.theme.g.dart';
 
-/// A modal dialog surface. Show it with [showLegendDialog] — the kit's own
-/// modal engine, no Material `showDialog` (legacy-docs 06).
+/// A modal dialog surface with an optional title, content and action row.
+///
+/// Composes [LegendSurface]; [showLegendDialog] presents it through
+/// [LegendModalRoute], the kit's own modal engine.
+///
+/// Replaces the legacy dialog's dependency on Material `showDialog`
+/// (legacy-docs 06).
 @LegendThemeable()
 class LegendDialog extends StatelessWidget {
   const LegendDialog({
@@ -26,19 +31,23 @@ class LegendDialog extends StatelessWidget {
   final Widget? content;
   final List<Widget> actions;
 
+  /// Fill color of the dialog surface.
   @Style<Color>.resolve(_background)
   final Color? background;
   static Color _background(LegendTokens t) => t.colors.surface;
 
+  /// Corner rounding of the dialog surface.
   @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
   static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusLg;
 
+  /// Inner padding around title, content and actions.
   @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
   static EdgeInsetsGeometry _padding(LegendTokens t) =>
       EdgeInsets.all(t.sizes.lg);
 
+  /// Widest the dialog grows before its content wraps.
   @Style<double>(420)
   final double? maxWidth;
 

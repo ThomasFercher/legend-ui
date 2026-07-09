@@ -13,13 +13,16 @@ part 'legend_loading.theme.g.dart';
 class LegendLoading extends StatefulWidget {
   const LegendLoading({super.key, this.color, this.size, this.strokeWidth});
 
+  /// Color of the spinning arc.
   @Style<Color>.resolve(_color)
   final Color? color;
   static Color _color(LegendTokens t) => t.colors.primary;
 
+  /// Diameter of the spinner.
   @Style<double>(24)
   final double? size;
 
+  /// Stroke width of the arc.
   @Style<double>(3)
   final double? strokeWidth;
 

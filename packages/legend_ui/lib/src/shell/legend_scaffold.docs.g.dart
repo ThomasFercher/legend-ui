@@ -12,7 +12,7 @@ const List<LegendDocEntry> legendScaffoldDocEntries = [
     owner: 'LegendScaffold',
     name: 'background',
     type: 'Color?',
-    doc: '',
+    doc: 'Fill color behind the page body.',
     defaultDescription: 't.colors.background1',
     group: 'component',
   ),

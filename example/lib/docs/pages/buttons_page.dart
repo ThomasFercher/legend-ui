@@ -102,30 +102,23 @@ PrimaryLegendButton(
           title: 'PrimaryLegendButton theme surface',
           description:
               'Overridable per constructor, subtree, or the app components '
-              'map. Secondary and text buttons expose the same set (plus '
+              'map. Colors are per-state LegendStates containers (RFC-002 '
+              'R6): name only the state you restyle. The shared surface '
+              '(padding, borderRadius) is themed once on LegendButtonCore '
+              '(RFC-002 R7.2) — variant-level values win over core-level '
+              'ones. Secondary and text buttons expose the same set (plus '
               'border for secondary).',
           demo: PropsTable(
             rows: [
               (
                 name: 'background',
-                type: 'Color',
-                defaultsTo: 't.colors.primary',
+                type: 'LegendStates<Color>',
+                defaultsTo: 'per-state: primary; hover/press blend onPrimary',
               ),
               (
                 name: 'foreground',
-                type: 'Color',
-                defaultsTo: 't.colors.onPrimary',
-              ),
-              (
-                name: 'padding',
-                type: 'EdgeInsetsGeometry',
-                defaultsTo:
-                    'EdgeInsets.symmetric(h: t.sizes.md, v: t.sizes.sm)',
-              ),
-              (
-                name: 'borderRadius',
-                type: 'BorderRadius',
-                defaultsTo: 't.sizes.borderRadiusMd',
+                type: 'LegendStates<Color>',
+                defaultsTo: 'per-state: onPrimary; onDisabled when disabled',
               ),
               (
                 name: 'textStyle',
@@ -136,6 +129,17 @@ PrimaryLegendButton(
                 name: 'shadows',
                 type: 'List<BoxShadow>',
                 defaultsTo: 't.shadows.none',
+              ),
+              (
+                name: 'padding  (LegendButtonCore)',
+                type: 'EdgeInsetsGeometry',
+                defaultsTo:
+                    'EdgeInsets.symmetric(h: t.sizes.md, v: t.sizes.sm)',
+              ),
+              (
+                name: 'borderRadius  (LegendButtonCore)',
+                type: 'BorderRadius',
+                defaultsTo: 't.sizes.borderRadiusMd',
               ),
             ],
           ),
@@ -149,11 +153,11 @@ PrimaryLegendButton(
           code: '''
 LegendButtonCore(
   onPressed: onPressed,
-  background: myTheme.background,
-  foreground: myTheme.foreground,
-  padding: myTheme.padding,
-  borderRadius: myTheme.borderRadius,
+  // per-state containers: unset members derive from `normal`
+  background: myTheme.background,   // LegendStates<Color>
+  foreground: dangerText.states,    // lift a single Color
   textStyle: myTheme.textStyle,
+  // padding/borderRadius omitted: the shared core surface applies
   text: 'Danger',
 )''',
         ),

@@ -3,13 +3,18 @@ import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/primitives/legend_caret.dart';
 import 'package:legend_ui/src/primitives/legend_interactive.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
+import 'package:legend_ui/src/theme/legend_states.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
 part 'legend_expandable.theme.g.dart';
 
 /// A header that expands and collapses its [child] with an animated size
-/// change and a rotating [LegendCaret].
+/// change.
+///
+/// Composes [LegendInteractive] (header activation) + [LegendSurface]
+/// (container and hover tint) + [LegendCaret] (rotating disclosure
+/// indicator).
 ///
 /// Works in two modes:
 /// - **Uncontrolled** (default): leave [expanded] null; the widget owns the
@@ -22,7 +27,9 @@ part 'legend_expandable.theme.g.dart';
 /// custom [header] widget.
 @LegendThemeable()
 class LegendExpandable extends StatefulWidget {
-  const LegendExpandable({
+  /// The [backgroundColor] lifts into the `normal` member of the
+  /// per-state theme field (RFC-002 R6).
+  LegendExpandable({
     required this.child,
     super.key,
     this.title,
@@ -32,9 +39,10 @@ class LegendExpandable extends StatefulWidget {
     this.initiallyExpanded = false,
     this.duration = const Duration(milliseconds: 200),
     this.headerPadding,
-    this.backgroundColor,
+    Color? backgroundColor,
     this.borderRadius,
-  }) : assert(
+  }) : backgroundColor = backgroundColor?.states,
+       assert(
          title != null || header != null,
          'Provide a title or a custom header.',
        );
@@ -60,15 +68,25 @@ class LegendExpandable extends StatefulWidget {
   /// How long the expand/collapse (and caret) animation takes.
   final Duration duration;
 
+  /// Inner padding of the header row.
   @Style<EdgeInsetsGeometry>.resolve(_headerPadding)
   final EdgeInsetsGeometry? headerPadding;
   static EdgeInsetsGeometry _headerPadding(LegendTokens t) =>
       EdgeInsets.all(t.sizes.md);
 
-  @Style<Color>.resolve(_backgroundColor)
-  final Color? backgroundColor;
-  static Color _backgroundColor(LegendTokens t) => t.colors.surface;
+  /// Fill of the container and its header, per interaction state —
+  /// `normal` paints the whole surface, `hovered`/`pressed`/`focused`
+  /// tint the header while the pointer is on it.
+  @Style<LegendStates<Color>>.resolve(_backgroundColor)
+  final LegendStates<Color>? backgroundColor;
+  static LegendStates<Color> _backgroundColor(LegendTokens t) => LegendStates(
+    normal: t.colors.surface,
+    hovered: t.colors.background2,
+    pressed: t.colors.background2,
+    focused: t.colors.background2,
+  );
 
+  /// Corner rounding of the container surface.
   @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
   static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusMd;
@@ -95,7 +113,7 @@ class _LegendExpandableState extends State<LegendExpandable> {
     final expanded = _isExpanded;
 
     return LegendSurface(
-      color: theme.backgroundColor,
+      color: theme.backgroundColor.normal,
       borderRadius: theme.borderRadius,
       clip: true,
       child: Column(
@@ -107,9 +125,7 @@ class _LegendExpandableState extends State<LegendExpandable> {
             onTap: _toggle,
             builder: (context, states) {
               return LegendSurface(
-                color: states.hovered || states.focused
-                    ? tokens.colors.background2
-                    : theme.backgroundColor,
+                color: theme.backgroundColor.pick(states.effective),
                 padding: theme.headerPadding,
                 duration: widget.duration,
                 child: Row(

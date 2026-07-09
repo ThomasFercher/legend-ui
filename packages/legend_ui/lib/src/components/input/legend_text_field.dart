@@ -9,7 +9,9 @@ import 'package:legend_ui/src/tokens/legend_tokens.dart';
 part 'legend_text_field.theme.g.dart';
 
 /// The field core (DESIGN.md §3): a thin composition over Flutter's
-/// `EditableText` — replacing legacy's 1,535-line CupertinoTextField fork.
+/// `EditableText`, wrapped in a [LegendSurface] for the field chrome.
+///
+/// Replaces legacy's 1,535-line CupertinoTextField fork.
 ///
 /// MVP scope: single/multi-line text, placeholder, title, error state,
 /// focus border. Selection toolbar/handles land in a later phase.
@@ -73,27 +75,33 @@ class LegendTextField extends StatefulWidget {
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
 
+  /// Fill color of the field surface.
   @Style<Color>.resolve(_background)
   final Color? background;
   static Color _background(LegendTokens t) => t.colors.background1;
 
+  /// Corner rounding of the field surface.
   @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
   static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusMd;
 
+  /// Inner padding between the border and the text.
   @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
   static EdgeInsetsGeometry _padding(LegendTokens t) =>
       EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm);
 
+  /// Text style of the entered text (and the placeholder, recolored).
   @Style<TextStyle>.resolve(_textStyle)
   final TextStyle? textStyle;
   static TextStyle _textStyle(LegendTokens t) => t.typography.b1;
 
+  /// Border color while unfocused (error state uses the error token).
   @Style<Color>.resolve(_borderColor)
   final Color? borderColor;
   static Color _borderColor(LegendTokens t) => t.colors.background3;
 
+  /// Border color while focused — also the caret and selection color.
   @Style<Color>.resolve(_focusedBorderColor)
   final Color? focusedBorderColor;
   static Color _focusedBorderColor(LegendTokens t) => t.colors.primary;

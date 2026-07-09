@@ -22,7 +22,7 @@ class LegendTextButtonTheme {
         textStyle: LegendTextButton._textStyle(t),
       );
 
-  final Color foreground;
+  final LegendStates<Color> foreground;
   final EdgeInsetsGeometry padding;
   final BorderRadius borderRadius;
   final TextStyle textStyle;
@@ -31,6 +31,10 @@ class LegendTextButtonTheme {
   /// [LegendTextButton] first, [LegendTextButtonThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Post-merge, unset `LegendStates<Color>` members fill
+  /// from the resolved `normal` via `tokens.states`
+  /// (RFC-002 R6) — named members at any level always win.
   static LegendTextButtonTheme of(
     BuildContext context, [
     LegendTextButtonThemeNullable? local,
@@ -44,13 +48,16 @@ class LegendTextButtonTheme {
           LegendThemeOverride.maybeOf<LegendTextButtonThemeNullable>(context),
         )
         .merge(local);
-    return resolved;
+    return resolved.copyWith(
+      foreground: resolved.foreground.withDerived(data.tokens.states),
+    );
   }
 
   LegendTextButtonTheme merge(LegendTextButtonThemeNullable? other) {
     if (other == null) return this;
     return LegendTextButtonTheme(
-      foreground: other.foreground ?? foreground,
+      foreground:
+          LegendStates.merge(foreground, other.foreground) ?? foreground,
       padding: other.padding ?? padding,
       borderRadius: other.borderRadius ?? borderRadius,
       textStyle: other.textStyle ?? textStyle,
@@ -58,7 +65,7 @@ class LegendTextButtonTheme {
   }
 
   LegendTextButtonTheme copyWith({
-    Color? foreground,
+    LegendStates<Color>? foreground,
     EdgeInsetsGeometry? padding,
     BorderRadius? borderRadius,
     TextStyle? textStyle,
@@ -74,7 +81,12 @@ class LegendTextButtonTheme {
     LegendTextButtonTheme b,
     double t,
   ) => LegendTextButtonTheme(
-    foreground: Color.lerp(a.foreground, b.foreground, t)!,
+    foreground: LegendStates.lerpWith(
+      a.foreground,
+      b.foreground,
+      t,
+      Color.lerp,
+    ),
     padding: t < 0.5 ? a.padding : b.padding,
     borderRadius: t < 0.5 ? a.borderRadius : b.borderRadius,
     textStyle: t < 0.5 ? a.textStyle : b.textStyle,
@@ -92,7 +104,7 @@ class LegendTextButtonThemeNullable {
     this.textStyle,
   });
 
-  final Color? foreground;
+  final LegendStates<Color>? foreground;
   final EdgeInsetsGeometry? padding;
   final BorderRadius? borderRadius;
   final TextStyle? textStyle;
@@ -100,7 +112,7 @@ class LegendTextButtonThemeNullable {
   LegendTextButtonThemeNullable merge(LegendTextButtonThemeNullable? other) {
     if (other == null) return this;
     return LegendTextButtonThemeNullable(
-      foreground: other.foreground ?? foreground,
+      foreground: LegendStates.merge(foreground, other.foreground),
       padding: other.padding ?? padding,
       borderRadius: other.borderRadius ?? borderRadius,
       textStyle: other.textStyle ?? textStyle,

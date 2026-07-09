@@ -23,7 +23,7 @@ class LegendSiderTheme {
     itemPadding: LegendSider._itemPadding(t),
   );
 
-  final Color background;
+  final LegendStates<Color> background;
   final double width;
   final Color selectedColor;
   final Color unselectedColor;
@@ -33,6 +33,10 @@ class LegendSiderTheme {
   /// [LegendSider] first, [LegendSiderThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Post-merge, unset `LegendStates<Color>` members fill
+  /// from the resolved `normal` via `tokens.states`
+  /// (RFC-002 R6) — named members at any level always win.
   static LegendSiderTheme of(
     BuildContext context, [
     LegendSiderThemeNullable? local,
@@ -42,13 +46,16 @@ class LegendSiderTheme {
         .merge(data.componentOf<LegendSiderThemeNullable>(LegendSider))
         .merge(LegendThemeOverride.maybeOf<LegendSiderThemeNullable>(context))
         .merge(local);
-    return resolved;
+    return resolved.copyWith(
+      background: resolved.background.withDerived(data.tokens.states),
+    );
   }
 
   LegendSiderTheme merge(LegendSiderThemeNullable? other) {
     if (other == null) return this;
     return LegendSiderTheme(
-      background: other.background ?? background,
+      background:
+          LegendStates.merge(background, other.background) ?? background,
       width: other.width ?? width,
       selectedColor: other.selectedColor ?? selectedColor,
       unselectedColor: other.unselectedColor ?? unselectedColor,
@@ -57,7 +64,7 @@ class LegendSiderTheme {
   }
 
   LegendSiderTheme copyWith({
-    Color? background,
+    LegendStates<Color>? background,
     double? width,
     Color? selectedColor,
     Color? unselectedColor,
@@ -95,7 +102,7 @@ class LegendSiderThemeNullable {
     this.itemPadding,
   });
 
-  final Color? background;
+  final LegendStates<Color>? background;
   final double? width;
   final Color? selectedColor;
   final Color? unselectedColor;
@@ -104,7 +111,7 @@ class LegendSiderThemeNullable {
   LegendSiderThemeNullable merge(LegendSiderThemeNullable? other) {
     if (other == null) return this;
     return LegendSiderThemeNullable(
-      background: other.background ?? background,
+      background: LegendStates.merge(background, other.background),
       width: other.width ?? width,
       selectedColor: other.selectedColor ?? selectedColor,
       unselectedColor: other.unselectedColor ?? unselectedColor,

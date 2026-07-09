@@ -6,9 +6,17 @@ import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
 part 'legend_switch.theme.g.dart';
 
-/// A toggle switch built on [LegendInteractive] — no CupertinoSwitch fork
-/// (legacy vendored one just to change its size, complete with an
-/// `Opacity(opacity: 42)` crash).
+/// A toggle switch.
+///
+/// Composes [LegendInteractive] (tap/keyboard activation, toggle
+/// semantics).
+///
+/// Replaces legacy's vendored CupertinoSwitch fork (vendored just to
+/// change its size, complete with an `Opacity(opacity: 42)` crash).
+///
+/// The track and thumb colors are plain (not per-state) fields: the
+/// switch communicates its state through [value], not hover/press tints
+/// (RFC-002 R6 audit note — do not invent new visuals).
 @LegendThemeable()
 class LegendSwitch extends StatelessWidget {
   const LegendSwitch({
@@ -32,21 +40,26 @@ class LegendSwitch extends StatelessWidget {
   /// is announced via toggle semantics, never as a hard-coded English label.
   final String? semanticLabel;
 
+  /// Track color while the switch is on.
   @Style<Color>.resolve(_activeTrack, lerp: true)
   final Color? activeTrack;
   static Color _activeTrack(LegendTokens t) => t.colors.primary;
 
+  /// Track color while the switch is off.
   @Style<Color>.resolve(_inactiveTrack, lerp: true)
   final Color? inactiveTrack;
   static Color _inactiveTrack(LegendTokens t) => t.colors.background3;
 
+  /// Color of the sliding thumb.
   @Style<Color>.resolve(_thumb)
   final Color? thumb;
   static Color _thumb(LegendTokens t) => t.colors.surface;
 
+  /// Overall width of the track.
   @Style<double>(44)
   final double? width;
 
+  /// Overall height of the track (the thumb diameter follows it).
   @Style<double>(24)
   final double? height;
 

@@ -31,6 +31,7 @@ class LegendScaffold extends StatelessWidget {
   /// Shown at [LegendTier.compact].
   final Widget? bottomBar;
 
+  /// Fill color behind the page body.
   @Style<Color>.resolve(_background, lerp: true)
   final Color? background;
   static Color _background(LegendTokens t) => t.colors.background1;

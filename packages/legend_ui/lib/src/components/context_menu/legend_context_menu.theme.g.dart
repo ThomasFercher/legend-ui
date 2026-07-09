@@ -24,7 +24,7 @@ class LegendContextMenuTheme {
         textStyle: LegendContextMenu._textStyle(t),
       );
 
-  final Color menuBackground;
+  final LegendStates<Color> menuBackground;
   final BorderRadius menuBorderRadius;
   final List<BoxShadow> menuShadows;
   final EdgeInsetsGeometry itemPadding;
@@ -34,6 +34,10 @@ class LegendContextMenuTheme {
   /// [LegendContextMenu] first, [LegendContextMenuThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Post-merge, unset `LegendStates<Color>` members fill
+  /// from the resolved `normal` via `tokens.states`
+  /// (RFC-002 R6) — named members at any level always win.
   static LegendContextMenuTheme of(
     BuildContext context, [
     LegendContextMenuThemeNullable? local,
@@ -47,13 +51,17 @@ class LegendContextMenuTheme {
           LegendThemeOverride.maybeOf<LegendContextMenuThemeNullable>(context),
         )
         .merge(local);
-    return resolved;
+    return resolved.copyWith(
+      menuBackground: resolved.menuBackground.withDerived(data.tokens.states),
+    );
   }
 
   LegendContextMenuTheme merge(LegendContextMenuThemeNullable? other) {
     if (other == null) return this;
     return LegendContextMenuTheme(
-      menuBackground: other.menuBackground ?? menuBackground,
+      menuBackground:
+          LegendStates.merge(menuBackground, other.menuBackground) ??
+          menuBackground,
       menuBorderRadius: other.menuBorderRadius ?? menuBorderRadius,
       menuShadows: other.menuShadows ?? menuShadows,
       itemPadding: other.itemPadding ?? itemPadding,
@@ -62,7 +70,7 @@ class LegendContextMenuTheme {
   }
 
   LegendContextMenuTheme copyWith({
-    Color? menuBackground,
+    LegendStates<Color>? menuBackground,
     BorderRadius? menuBorderRadius,
     List<BoxShadow>? menuShadows,
     EdgeInsetsGeometry? itemPadding,
@@ -100,7 +108,7 @@ class LegendContextMenuThemeNullable {
     this.textStyle,
   });
 
-  final Color? menuBackground;
+  final LegendStates<Color>? menuBackground;
   final BorderRadius? menuBorderRadius;
   final List<BoxShadow>? menuShadows;
   final EdgeInsetsGeometry? itemPadding;
@@ -109,7 +117,7 @@ class LegendContextMenuThemeNullable {
   LegendContextMenuThemeNullable merge(LegendContextMenuThemeNullable? other) {
     if (other == null) return this;
     return LegendContextMenuThemeNullable(
-      menuBackground: other.menuBackground ?? menuBackground,
+      menuBackground: LegendStates.merge(menuBackground, other.menuBackground),
       menuBorderRadius: other.menuBorderRadius ?? menuBorderRadius,
       menuShadows: other.menuShadows ?? menuShadows,
       itemPadding: other.itemPadding ?? itemPadding,

@@ -23,6 +23,8 @@ class ThemeController extends ChangeNotifier {
 
   /// Level-3 override for [PrimaryLegendButton], edited in the playground.
   Color? buttonBackground;
+
+  /// Level-3 override for the shared [LegendButtonCore] surface.
   double? buttonRadius;
 
   bool get dark => preset == ThemePreset.dark;
@@ -139,12 +141,15 @@ class ThemeController extends ChangeNotifier {
       components: {
         // The open Type-keyed registry (level 3): sparse overrides only —
         // unset properties keep resolving through the lower levels.
-        if (buttonBackground != null || buttonRadius != null)
+        if (buttonBackground != null)
           PrimaryLegendButtonThemeNullable: PrimaryLegendButtonThemeNullable(
-            background: buttonBackground,
-            borderRadius: buttonRadius == null
-                ? null
-                : BorderRadius.circular(buttonRadius!),
+            background: buttonBackground?.states,
+          ),
+        // The shared button surface (RFC-002 R7.2): one core-level entry
+        // restyles the radius of every variant that doesn't opt out.
+        if (buttonRadius != null)
+          LegendButtonCore: LegendButtonCoreThemeNullable(
+            borderRadius: BorderRadius.circular(buttonRadius!),
           ),
       },
     );

@@ -1,22 +1,45 @@
 import 'package:flutter/widgets.dart';
+import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/primitives/legend_interactive.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
+import 'package:legend_ui/src/theme/legend_states.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
+
+part 'legend_button_core.theme.g.dart';
 
 /// Shared button chassis: interaction states → surface styling → content
 /// row. Every button variant is this plus a resolved theme — no
 /// copy-pasted layout arms (legacy had 4× per variant), and consumers can
 /// build their own variants on it.
+///
+/// Composes [LegendInteractive] (input handling) + [LegendSurface]
+/// (decoration).
+///
+/// The genuinely shared button surface — [padding] and [borderRadius] —
+/// is themed HERE (RFC-002 R7.2): override `LegendButtonCore` in the
+/// components map (or with [LegendButtonCoreThemeOverride]) and every
+/// variant that doesn't opt out follows. **Variant-level values win over
+/// core-level ones**: a variant passes its own resolved value as a
+/// constructor param (level 1 of the core's resolution), so
+/// `LegendTextButton`'s tighter padding/radius and any per-variant
+/// override always beat a core-level theme entry. Colors and text style
+/// stay variant-level — the variants ARE the color decisions.
+///
+/// [background] and [foreground] are per-state [LegendStates] containers
+/// (RFC-002 R6): the core selects the single effective value via
+/// `states.effective` — no color math happens here. Both must carry at
+/// least a `normal` value.
+@LegendThemeable()
 class LegendButtonCore extends StatelessWidget {
   const LegendButtonCore({
     required this.onPressed,
     required this.background,
     required this.foreground,
-    required this.padding,
-    required this.borderRadius,
     required this.textStyle,
     super.key,
+    this.padding,
+    this.borderRadius,
     this.text,
     this.icon,
     this.child,
@@ -36,47 +59,53 @@ class LegendButtonCore extends StatelessWidget {
   final bool textFirst;
   final bool enabled;
 
-  final Color background;
-  final Color foreground;
-  final EdgeInsetsGeometry padding;
-  final BorderRadius borderRadius;
+  /// Surface fill per interaction state (`normal` is required).
+  final LegendStates<Color> background;
+
+  /// Label/icon color per interaction state (`normal` is required).
+  final LegendStates<Color> foreground;
+
+  /// Inner padding around the button content, shared by every variant
+  /// that doesn't set its own.
+  @Style<EdgeInsetsGeometry>.resolve(_padding)
+  final EdgeInsetsGeometry? padding;
+  static EdgeInsetsGeometry _padding(LegendTokens t) =>
+      EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm);
+
+  /// Corner rounding of the button surface, shared by every variant that
+  /// doesn't set its own.
+  @Style<BorderRadius>.resolve(_borderRadius)
+  final BorderRadius? borderRadius;
+  static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusMd;
+
+  /// Text style of the [text] label (its color comes from [foreground]).
   final TextStyle textStyle;
+
+  /// Outline around the surface; hidden while disabled.
   final BoxBorder? border;
+
+  /// Drop shadow under the surface; hidden while disabled.
   final List<BoxShadow>? shadows;
 
   @override
   Widget build(BuildContext context) {
+    final theme = _theme(context);
     final tokens = LegendTheme.of(context).tokens;
     return LegendInteractive(
       onTap: onPressed,
       enabled: enabled,
       semanticLabel: text,
       builder: (context, states) {
-        final effectiveBackground = switch (states) {
-          // A transparent variant (text button) must stay transparent when
-          // disabled — a grey slab would invent a shape it never had.
-          LegendInteractionStates(disabled: true) =>
-            background.a == 0 ? background : tokens.colors.disabled,
-          LegendInteractionStates(pressed: true) => Color.alphaBlend(
-            foreground.withValues(alpha: 0.16),
-            background,
-          ),
-          LegendInteractionStates(hovered: true) ||
-          LegendInteractionStates(
-            focused: true,
-          ) => Color.alphaBlend(foreground.withValues(alpha: 0.08), background),
-          _ => background,
-        };
-        final effectiveForeground = states.disabled
-            ? tokens.colors.onDisabled
-            : foreground;
+        final state = states.effective;
+        final effectiveBackground = background.pick(state)!;
+        final effectiveForeground = foreground.pick(state)!;
 
         return LegendSurface(
           color: effectiveBackground,
-          borderRadius: borderRadius,
+          borderRadius: theme.borderRadius,
           border: states.disabled ? null : border,
           shadows: states.disabled ? null : shadows,
-          padding: padding,
+          padding: theme.padding,
           duration: const Duration(milliseconds: 120),
           child: _content(effectiveForeground, tokens),
         );

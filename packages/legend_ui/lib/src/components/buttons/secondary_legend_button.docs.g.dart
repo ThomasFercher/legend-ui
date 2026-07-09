@@ -11,49 +11,136 @@ const List<LegendDocEntry> secondaryLegendButtonDocEntries = [
   LegendDocEntry(
     owner: 'SecondaryLegendButton',
     name: 'background',
+    type: 'LegendStates<Color>?',
+    doc:
+        'Tinted fill behind the label, per interaction state — hover/press\nblend the foreground over the container tint (8%/16%), disabled\nswaps to the token disabled fill.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.primaryContainer, hovered: Color.alphaBlend(t.colors.primary.withValues(alpha: 0.08), t.colors.primaryContainer), pressed: Color.alphaBlend(t.colors.primary.withValues(alpha: 0.16), t.colors.primaryContainer), focused: Color.alphaBlend(t.colors.primary.withValues(alpha: 0.08), t.colors.primaryContainer), disabled: t.colors.disabled)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'SecondaryLegendButton',
+    name: 'background.normal',
     type: 'Color?',
-    doc: '',
-    defaultDescription: 't.colors.primaryContainer',
+    doc:
+        'Tinted fill behind the label, per interaction state — hover/press\nblend the foreground over the container tint (8%/16%), disabled\nswaps to the token disabled fill.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.primaryContainer, hovered: Color.alphaBlend(t.colors.primary.withValues(alpha: 0.08), t.colors.primaryContainer), pressed: Color.alphaBlend(t.colors.primary.withValues(alpha: 0.16), t.colors.primaryContainer), focused: Color.alphaBlend(t.colors.primary.withValues(alpha: 0.08), t.colors.primaryContainer), disabled: t.colors.disabled)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'SecondaryLegendButton',
+    name: 'background.hovered',
+    type: 'Color?',
+    doc:
+        'Tinted fill behind the label, per interaction state — hover/press\nblend the foreground over the container tint (8%/16%), disabled\nswaps to the token disabled fill.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.primaryContainer, hovered: Color.alphaBlend(t.colors.primary.withValues(alpha: 0.08), t.colors.primaryContainer), pressed: Color.alphaBlend(t.colors.primary.withValues(alpha: 0.16), t.colors.primaryContainer), focused: Color.alphaBlend(t.colors.primary.withValues(alpha: 0.08), t.colors.primaryContainer), disabled: t.colors.disabled)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'SecondaryLegendButton',
+    name: 'background.pressed',
+    type: 'Color?',
+    doc:
+        'Tinted fill behind the label, per interaction state — hover/press\nblend the foreground over the container tint (8%/16%), disabled\nswaps to the token disabled fill.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.primaryContainer, hovered: Color.alphaBlend(t.colors.primary.withValues(alpha: 0.08), t.colors.primaryContainer), pressed: Color.alphaBlend(t.colors.primary.withValues(alpha: 0.16), t.colors.primaryContainer), focused: Color.alphaBlend(t.colors.primary.withValues(alpha: 0.08), t.colors.primaryContainer), disabled: t.colors.disabled)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'SecondaryLegendButton',
+    name: 'background.focused',
+    type: 'Color?',
+    doc:
+        'Tinted fill behind the label, per interaction state — hover/press\nblend the foreground over the container tint (8%/16%), disabled\nswaps to the token disabled fill.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.primaryContainer, hovered: Color.alphaBlend(t.colors.primary.withValues(alpha: 0.08), t.colors.primaryContainer), pressed: Color.alphaBlend(t.colors.primary.withValues(alpha: 0.16), t.colors.primaryContainer), focused: Color.alphaBlend(t.colors.primary.withValues(alpha: 0.08), t.colors.primaryContainer), disabled: t.colors.disabled)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'SecondaryLegendButton',
+    name: 'background.disabled',
+    type: 'Color?',
+    doc:
+        'Tinted fill behind the label, per interaction state — hover/press\nblend the foreground over the container tint (8%/16%), disabled\nswaps to the token disabled fill.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.primaryContainer, hovered: Color.alphaBlend(t.colors.primary.withValues(alpha: 0.08), t.colors.primaryContainer), pressed: Color.alphaBlend(t.colors.primary.withValues(alpha: 0.16), t.colors.primaryContainer), focused: Color.alphaBlend(t.colors.primary.withValues(alpha: 0.08), t.colors.primaryContainer), disabled: t.colors.disabled)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'SecondaryLegendButton',
     name: 'foreground',
+    type: 'LegendStates<Color>?',
+    doc:
+        'Color of the label and icon, per interaction state (steady except\nwhile disabled).',
+    defaultDescription:
+        'LegendStates(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'SecondaryLegendButton',
+    name: 'foreground.normal',
     type: 'Color?',
-    doc: '',
-    defaultDescription: 't.colors.primary',
+    doc:
+        'Color of the label and icon, per interaction state (steady except\nwhile disabled).',
+    defaultDescription:
+        'LegendStates(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'SecondaryLegendButton',
+    name: 'foreground.hovered',
+    type: 'Color?',
+    doc:
+        'Color of the label and icon, per interaction state (steady except\nwhile disabled).',
+    defaultDescription:
+        'LegendStates(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'SecondaryLegendButton',
+    name: 'foreground.pressed',
+    type: 'Color?',
+    doc:
+        'Color of the label and icon, per interaction state (steady except\nwhile disabled).',
+    defaultDescription:
+        'LegendStates(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'SecondaryLegendButton',
+    name: 'foreground.focused',
+    type: 'Color?',
+    doc:
+        'Color of the label and icon, per interaction state (steady except\nwhile disabled).',
+    defaultDescription:
+        'LegendStates(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'SecondaryLegendButton',
+    name: 'foreground.disabled',
+    type: 'Color?',
+    doc:
+        'Color of the label and icon, per interaction state (steady except\nwhile disabled).',
+    defaultDescription:
+        'LegendStates(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'SecondaryLegendButton',
     name: 'borderColor',
     type: 'Color?',
-    doc: '',
+    doc: 'Color of the outline (dropped entirely while disabled).',
     defaultDescription: 't.colors.primary',
-    group: 'component',
-  ),
-  LegendDocEntry(
-    owner: 'SecondaryLegendButton',
-    name: 'padding',
-    type: 'EdgeInsetsGeometry?',
-    doc: '',
-    defaultDescription:
-        'EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm)',
-    group: 'component',
-  ),
-  LegendDocEntry(
-    owner: 'SecondaryLegendButton',
-    name: 'borderRadius',
-    type: 'BorderRadius?',
-    doc: '',
-    defaultDescription: 't.sizes.borderRadiusMd',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'SecondaryLegendButton',
     name: 'textStyle',
     type: 'TextStyle?',
-    doc: '',
+    doc: 'Text style of the [text] label (its color comes from [foreground]).',
     defaultDescription: 't.typography.b2',
     group: 'component',
   ),

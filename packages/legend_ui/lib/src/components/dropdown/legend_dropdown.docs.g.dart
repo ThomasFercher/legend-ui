@@ -11,16 +11,68 @@ const List<LegendDocEntry> legendDropdownDocEntries = [
   LegendDocEntry(
     owner: 'LegendDropdown',
     name: 'menuBackground',
+    type: 'LegendStates<Color>?',
+    doc:
+        'Fill of the menu surface and its items, per interaction state —\n`normal` paints the whole menu, `hovered`/`pressed`/`focused`\nhighlight the item under the pointer.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendDropdown',
+    name: 'menuBackground.normal',
     type: 'Color?',
-    doc: '',
-    defaultDescription: 't.colors.surface',
+    doc:
+        'Fill of the menu surface and its items, per interaction state —\n`normal` paints the whole menu, `hovered`/`pressed`/`focused`\nhighlight the item under the pointer.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendDropdown',
+    name: 'menuBackground.hovered',
+    type: 'Color?',
+    doc:
+        'Fill of the menu surface and its items, per interaction state —\n`normal` paints the whole menu, `hovered`/`pressed`/`focused`\nhighlight the item under the pointer.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendDropdown',
+    name: 'menuBackground.pressed',
+    type: 'Color?',
+    doc:
+        'Fill of the menu surface and its items, per interaction state —\n`normal` paints the whole menu, `hovered`/`pressed`/`focused`\nhighlight the item under the pointer.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendDropdown',
+    name: 'menuBackground.focused',
+    type: 'Color?',
+    doc:
+        'Fill of the menu surface and its items, per interaction state —\n`normal` paints the whole menu, `hovered`/`pressed`/`focused`\nhighlight the item under the pointer.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendDropdown',
+    name: 'menuBackground.disabled',
+    type: 'Color?',
+    doc:
+        'Fill of the menu surface and its items, per interaction state —\n`normal` paints the whole menu, `hovered`/`pressed`/`focused`\nhighlight the item under the pointer.',
+    defaultDescription:
+        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'LegendDropdown',
     name: 'menuBorderRadius',
     type: 'BorderRadius?',
-    doc: '',
+    doc: 'Corner rounding of the menu and the trigger field.',
     defaultDescription: 't.sizes.borderRadiusMd',
     group: 'component',
   ),
@@ -28,7 +80,7 @@ const List<LegendDocEntry> legendDropdownDocEntries = [
     owner: 'LegendDropdown',
     name: 'menuShadows',
     type: 'List<BoxShadow>?',
-    doc: '',
+    doc: 'Drop shadow lifting the menu off the page.',
     defaultDescription: 't.shadows.medium',
     group: 'component',
   ),
@@ -45,7 +97,7 @@ const List<LegendDocEntry> legendDropdownDocEntries = [
     owner: 'LegendDropdown',
     name: 'itemPadding',
     type: 'EdgeInsetsGeometry?',
-    doc: '',
+    doc: 'Inner padding of each menu item (and the trigger field).',
     defaultDescription:
         'EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm)',
     group: 'component',
@@ -54,7 +106,7 @@ const List<LegendDocEntry> legendDropdownDocEntries = [
     owner: 'LegendDropdown',
     name: 'textStyle',
     type: 'TextStyle?',
-    doc: '',
+    doc: 'Text style of the item labels and the selected value.',
     defaultDescription: 't.typography.b2',
     group: 'component',
   ),

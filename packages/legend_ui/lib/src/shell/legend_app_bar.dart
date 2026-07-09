@@ -6,9 +6,12 @@ import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
 part 'legend_app_bar.theme.g.dart';
 
-/// Top bar: leading / title / actions in a plain Row — no custom
-/// RenderBox (legacy's slotted app-bar render object had broken
-/// intrinsics and no RTL support).
+/// Top bar: leading / title / actions in a plain Row.
+///
+/// Composes [LegendSurface].
+///
+/// Replaces legacy's slotted app-bar render object, which had broken
+/// intrinsics and no RTL support — there is no custom RenderBox here.
 @LegendThemeable()
 class LegendAppBar extends StatelessWidget {
   const LegendAppBar({
@@ -30,13 +33,16 @@ class LegendAppBar extends StatelessWidget {
 
   final List<Widget> actions;
 
+  /// Fill color of the bar.
   @Style<Color>.resolve(_background)
   final Color? background;
   static Color _background(LegendTokens t) => t.colors.surface;
 
+  /// Height of the bar content (excluding any safe-area inset).
   @Style<double>(56)
   final double? height;
 
+  /// Horizontal padding around the bar content.
   @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
   static EdgeInsetsGeometry _padding(LegendTokens t) =>
