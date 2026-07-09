@@ -115,13 +115,14 @@ void _emitTokenClass(StringBuffer b, TokenClass tokenClass) {
   // closed over the whole base theme; `mountedAt: ''` is the root
   // sentinel (fields read as `t.<field>` directly).
   final prefix = mount.isEmpty ? 't' : 't.$mount';
+  final example =
+      '@Style<${fields.first.type}>.resolve(${name}Ref.${fields.first.name})';
   b
     ..writeln()
     ..writeln('/// Const tear-off catalog for [$name] (RFC-002 R10')
     ..writeln('/// amendment): one static per token field, usable directly')
     ..writeln('/// inside `@Style<T>.resolve` annotations —')
-    ..writeln('/// `@Style<${fields.first.type}>.resolve'
-        '(${name}Ref.${fields.first.name})`.')
+    ..writeln('/// `$example`.')
     ..writeln('abstract final class ${name}Ref {');
   for (final field in fields) {
     if (field.doc.isNotEmpty) {

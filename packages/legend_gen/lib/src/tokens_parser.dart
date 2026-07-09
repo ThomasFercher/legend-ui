@@ -122,7 +122,9 @@ List<TokenClass> parseTokenClasses(String path, String content) {
           fieldsValid = false;
           continue;
         }
-        fields.add(TokenField(name: name, type: type, doc: dartdocText(member)));
+        fields.add(
+          TokenField(name: name, type: type, doc: dartdocText(member)),
+        );
       }
     }
 

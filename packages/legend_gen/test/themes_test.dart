@@ -201,8 +201,10 @@ class Bad {
         allOf(
           contains('bad.dart:9'),
           contains('"_missing"'),
-          contains('neither a static method of "Bad" nor a top-level '
-              'function'),
+          contains(
+            'neither a static method of "Bad" nor a top-level '
+            'function',
+          ),
         ),
       );
     });
@@ -222,8 +224,10 @@ class Bad {
 '''),
         allOf(
           contains('"_background"'),
-          contains('neither a static method of "Bad" nor a top-level '
-              'function'),
+          contains(
+            'neither a static method of "Bad" nor a top-level '
+            'function',
+          ),
           contains('must be const tear-offs'),
         ),
       );
@@ -242,10 +246,7 @@ class TopLevel {
 }
 
 EdgeInsetsGeometry _padding(LegendTokens t) => EdgeInsets.all(t.sizes.md);
-''').replaceFirst(
-          "part 'bad.theme.g.dart';",
-          "part 'toplevel.theme.g.dart';",
-        ),
+''').replaceFirst("part 'bad.theme.g.dart';", "part 'toplevel.theme.g.dart';"),
       );
       final field = widgets.single.fields.single;
       expect(field.kind, StyleDefaultKind.resolve);
@@ -412,10 +413,7 @@ class Bad {
       // Ref-catalog defaults read as the catalog member itself; tear-off
       // bodies keep reading as their expression over `t`.
       expect(output, contains("defaultDescription: 'LegendColorsRef.surface'"));
-      expect(
-        output,
-        contains(r"defaultDescription: 't.sizes.borderWidth * 2'"),
-      );
+      expect(output, contains("defaultDescription: 't.sizes.borderWidth * 2'"));
       expect(output, contains("defaultDescription: '8.0'"));
       expect(output, contains("owner: 'FancyBox'"));
     });
@@ -494,8 +492,10 @@ class Bad {
 }
 '''),
         allOf(
-          contains('neither a static method of "Bad" nor a top-level '
-              'function'),
+          contains(
+            'neither a static method of "Bad" nor a top-level '
+            'function',
+          ),
           contains('declare "Color _missing(LegendTokens t) => …;"'),
           contains('LegendColorsRef.primary'),
         ),
