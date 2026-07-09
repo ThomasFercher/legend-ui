@@ -56,6 +56,27 @@ MiniTokens _$MiniTokensLerp(MiniTokens a, MiniTokens b, double t) => MiniTokens(
   nested: MiniNested.lerp(a.nested, b.nested, t),
 );
 
+/// Const tear-off catalog for [MiniTokens] (RFC-002 R10
+/// amendment): one static per token field, usable directly
+/// inside `@Style<T>.resolve` annotations —
+/// `@Style<Color>.resolve(MiniTokensRef.accent)`.
+abstract final class MiniTokensRef {
+  /// Accent color drawn behind everything.
+  static Color accent(LegendTokens t) => t.accent;
+
+  /// Gap between items.
+  static double gap(LegendTokens t) => t.gap;
+
+  /// Label style.
+  static TextStyle label(LegendTokens t) => t.label;
+
+  /// Glow shadow stack.
+  static List<BoxShadow> glow(LegendTokens t) => t.glow;
+
+  /// Nested token group.
+  static MiniNested nested(LegendTokens t) => t.nested;
+}
+
 /// Generated mechanical members for [MiniNested] (RFC-002 R5):
 /// `copyWith` and value `==`/`hashCode`. Applied via
 /// `with _$MiniNested`; fields are read through a private cast
@@ -82,6 +103,15 @@ mixin _$MiniNested {
 MiniNested _$MiniNestedLerp(MiniNested a, MiniNested b, double t) => MiniNested(
   amount: a.amount == b.amount ? a.amount : a.amount * (1.0 - t) + b.amount * t,
 );
+
+/// Const tear-off catalog for [MiniNested] (RFC-002 R10
+/// amendment): one static per token field, usable directly
+/// inside `@Style<T>.resolve` annotations —
+/// `@Style<double>.resolve(MiniNestedRef.amount)`.
+abstract final class MiniNestedRef {
+  /// Some derivation amount.
+  static double amount(LegendTokens t) => t.nested.amount;
+}
 
 /// Element-wise list equality (lists compare by identity;
 /// equal token sets must compare equal).

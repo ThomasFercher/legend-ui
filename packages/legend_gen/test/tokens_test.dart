@@ -75,6 +75,55 @@ void main() {
       expect(nested.fields.single.name, 'amount');
     });
 
+    test('extracts mountedAt (Ref catalog mount, incl. the root '
+        'sentinel)', () {
+      final classes = parseTokenClasses('mini_tokens.dart', miniTokens);
+      // '' is the root sentinel: the class IS the LegendTokens root.
+      expect(classes.first.mountedAt, '');
+      expect(classes.last.mountedAt, 'nested');
+    });
+
+    test('mountedAt defaults to null (no Ref catalog)', () {
+      final classes = parseTokenClasses(
+        'plain.dart',
+        _tokenFile(r'''
+@LegendTokenData()
+class Plain with _$Plain {
+  const Plain({this.amount = 1});
+  final double amount;
+}
+''').replaceFirst("part 'bad.tokens.g.dart';", "part 'plain.tokens.g.dart';"),
+      );
+      expect(classes.single.mountedAt, isNull);
+    });
+
+    test('extracts field dartdoc for the Ref catalog members', () {
+      final classes = parseTokenClasses('mini_tokens.dart', miniTokens);
+      expect(
+        classes.first.fields.first.doc,
+        'Accent color drawn behind everything.',
+      );
+    });
+
+    test('rejects a non-literal mountedAt with the fix named', () {
+      _expectSingleDiagnostic(
+        _tokenFile(r'''
+const _mount = 'sizes';
+
+@LegendTokenData(mountedAt: _mount)
+class Bad with _$Bad {
+  const Bad({this.amount = 1});
+  final double amount;
+}
+'''),
+        allOf(
+          contains('mountedAt on "Bad"'),
+          contains('plain string literal'),
+          contains('write the literal directly'),
+        ),
+      );
+    });
+
     test('skips statics and unannotated classes', () {
       final classes = parseTokenClasses(
         'plain.dart',
@@ -241,6 +290,58 @@ class Bad with _$Bad {
       expect(output, contains(r'_$listEquals(other.glow, _self.glow)'));
       expect(output, contains('Object.hashAll(_self.glow),'));
       expect(output, contains(r'bool _$listEquals('));
+    });
+
+    test('mountedAt emits the Ref const tear-off catalog (RFC-002 R10 '
+        'amendment)', () {
+      final output = emitTokensFile(
+        parseTokenClasses('mini_tokens.dart', miniTokens),
+      );
+      // The root sentinel ('') reads fields directly off `t` and covers
+      // every field type — no filtering.
+      expect(output, contains('abstract final class MiniTokensRef {'));
+      expect(
+        output,
+        contains('static Color accent(LegendTokens t) => t.accent;'),
+      );
+      expect(output, contains('static double gap(LegendTokens t) => t.gap;'));
+      expect(
+        output,
+        contains('static TextStyle label(LegendTokens t) => t.label;'),
+      );
+      expect(
+        output,
+        contains('static List<BoxShadow> glow(LegendTokens t) => t.glow;'),
+      );
+      expect(
+        output,
+        contains('static MiniNested nested(LegendTokens t) => t.nested;'),
+      );
+      // A non-root mount reads through its LegendTokens getter.
+      expect(output, contains('abstract final class MiniNestedRef {'));
+      expect(
+        output,
+        contains('static double amount(LegendTokens t) => t.nested.amount;'),
+      );
+      // Members carry the field's dartdoc (the docs-CMS content, R9).
+      expect(output, contains('/// Accent color drawn behind everything.'));
+      expect(output, contains('/// Some derivation amount.'));
+    });
+
+    test('no Ref catalog without mountedAt', () {
+      final output = emitTokensFile(
+        parseTokenClasses(
+          'plain.dart',
+          _tokenFile(r'''
+@LegendTokenData()
+class Plain with _$Plain {
+  const Plain({this.amount = 1});
+  final double amount;
+}
+''').replaceFirst("part 'bad.tokens.g.dart';", "part 'plain.tokens.g.dart';"),
+        ),
+      );
+      expect(output, isNot(contains('PlainRef')));
     });
 
     test('the list-equality helper is only emitted when needed', () {

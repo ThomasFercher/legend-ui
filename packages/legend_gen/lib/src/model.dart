@@ -109,13 +109,18 @@ class ThemableWidget {
 
 /// A final instance field of a `@LegendTokenData` class (RFC-002 R5).
 class TokenField {
-  const TokenField({required this.name, required this.type});
+  const TokenField({required this.name, required this.type, this.doc = ''});
 
   /// Field name, e.g. `primary`.
   final String name;
 
   /// Declared (non-nullable) type source, e.g. `Color`, `List<BoxShadow>`.
   final String type;
+
+  /// The field's dartdoc text with `///` markers stripped (empty when
+  /// undocumented) — copied onto the matching Ref catalog member
+  /// (RFC-002 R10 amendment).
+  final String doc;
 
   /// Whether the field is a `List<…>` — value `==` compares element-wise
   /// and `hashCode` hashes the elements (list identity would make equal
@@ -133,11 +138,18 @@ class TokenClass {
     required this.className,
     required this.fields,
     required this.sourceBasename,
+    this.mountedAt,
     this.line = 1,
   });
 
   final String className;
   final List<TokenField> fields;
+
+  /// The `LegendTokens` getter this class sits behind (e.g. `'colors'`),
+  /// from `@LegendTokenData(mountedAt: …)`. Non-null makes the emitter
+  /// additionally generate the `<ClassName>Ref` const tear-off catalog
+  /// (RFC-002 R10 amendment); null emits no catalog.
+  final String? mountedAt;
 
   /// 1-based line of the class name in the source file (for diagnostics).
   final int line;

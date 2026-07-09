@@ -7,7 +7,11 @@ part 'mini_tokens.tokens.g.dart';
 /// Color, double (guarded arithmetic), TextStyle, List&lt;BoxShadow&gt;
 /// (element-wise `==`/hash), and a nested token class (static-lerp
 /// convention) — plus multi-class emission into one part file.
-@LegendTokenData()
+/// `mountedAt: ''` is the root sentinel (RFC-002 R10 amendment): the
+/// MiniTokensRef catalog reads fields directly off `t`, covering refs of
+/// every field type (Color, double, TextStyle, List&lt;BoxShadow&gt;,
+/// nested class).
+@LegendTokenData(mountedAt: '')
 class MiniTokens with _$MiniTokens {
   const MiniTokens({
     this.accent = const Color(0xFF123456),
@@ -37,8 +41,10 @@ class MiniTokens with _$MiniTokens {
       _$MiniTokensLerp(a, b, t);
 }
 
-/// Nested token group of [MiniTokens].
-@LegendTokenData()
+/// Nested token group of [MiniTokens]. `mountedAt` makes the generator
+/// also emit the `MiniNestedRef` const tear-off catalog (RFC-002 R10
+/// amendment) reading through `t.nested`.
+@LegendTokenData(mountedAt: 'nested')
 class MiniNested with _$MiniNested {
   const MiniNested({this.amount = 0.5});
 

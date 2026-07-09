@@ -13,7 +13,7 @@ const List<LegendDocEntry> fancyBoxDocEntries = [
     name: 'background',
     type: 'Color?',
     doc: 'Fill behind the child.',
-    defaultDescription: 't.colors.surface',
+    defaultDescription: 'LegendColorsRef.surface',
     group: 'component',
   ),
   LegendDocEntry(
@@ -30,6 +30,14 @@ const List<LegendDocEntry> fancyBoxDocEntries = [
     type: 'EdgeInsetsGeometry?',
     doc: 'Inner padding.',
     defaultDescription: 'EdgeInsets.all(t.sizes.md)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'FancyBox',
+    name: 'stripeWidth',
+    type: 'double?',
+    doc: 'Width of the decorative stripe.',
+    defaultDescription: 't.sizes.borderWidth * 2',
     group: 'component',
   ),
   LegendDocEntry(
