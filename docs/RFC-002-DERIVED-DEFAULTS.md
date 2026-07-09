@@ -246,20 +246,25 @@ Today `_theme(context)` depends on `LegendTheme` as a whole — any theme change
 
 Themes remain pure data; this changes only *who gets notified*, never how values resolve.
 
-### R13 — The themed build signature: `build(context, theme)` *(added 2026-07-10, directed)*
+### R13 — Theme wiring: extensions only, no base classes *(revised ×2, 2026-07-10, directed)*
 
-The resolution step disappears from author code entirely: the theme arrives **alongside the context**, riverpod-`ConsumerWidget`-style. Dart forbids overloading, so a plain `StatelessWidget` can't add a two-arg `build` — the kit owns a tiny custom-element hierarchy once (`LegendStatelessWidget<T>` / `LegendStatefulWidget` + `LegendState<T>`; the element calls `widget.build(context, widget.resolveThemeOf(context))`), and the generated part emits a per-widget base that hides every trace of it:
+> **Revision 2 (final):** the custom widget hierarchy and generated per-widget base classes from the first draft are **dropped** — the only thing they bought was a two-arg stateless `build(context, theme)` signature, at the price of a riverpod-style custom-element layer, `extends _$XBase` in every declaration, and a freezed-style bootstrap. The settled wiring is **generated extensions only**, on plain Flutter widgets:
+>
+> ```dart
+> // Stateful — plain State, zero visible wiring: a generated extension on the
+> // State class (detected in the same file) provides the getter.
+> class _LegendSwitchState extends State<LegendSwitch> {
+>   Widget build(BuildContext context) => LegendSurface(color: theme.activeTrack, ...);
+> }
+>
+> // Stateless — plain StatelessWidget, one line (the irreducible minimum
+> // without macros: a StatelessWidget has no context outside build):
+> final theme = _theme(context);
+> ```
+>
+> R12 aspects register inside the hook/getter resolution; per-field `_<field>(context)` accessors unchanged. If no State class is found in the widget's file, the getter extension is simply not emitted — the hook covers everything. **Additionally a mixin form is emitted** (`mixin _$XThemeState on State<X> { XTheme get theme => widget._theme(context); }`): the explicit opt-in — needs no State detection, reads as a real inherited member, overridable; the auto-extension and the mixin coexist (instance members win over extensions). No custom elements, no base classes, no bootstrap edge, full interop with default Flutter widgets by construction.
 
-```dart
-class LegendDivider extends _$LegendDividerBase {          // generated base in the part file
-  @override
-  Widget build(BuildContext context, LegendDividerTheme theme) { ... }
-}
-```
-
-`_$LegendDividerBase` extends `LegendStatelessWidget<LegendDividerTheme>`, declares abstract getters for the themed fields (satisfied by the widget's finals), and implements `resolveThemeOf` — which is also where R12's per-field aspects register, so granular rebuilds and `listen: false` compose unchanged. These are ordinary `Widget`s, fully interoperable with default Flutter widgets. The freezed-style bootstrap (base doesn't exist before the first CLI run) is covered by `legend_gen create` and `--watch`.
-
-*Amended 2026-07-10 (directed):* the wire-in is **optional** — the base form and the `_theme(context)` hook are equal first-class authoring styles, both always emitted; a plain `StatelessWidget` with the hook stays fully supported. Stateful widgets get `LegendState`, which keeps the ordinary single-arg `build(context)` and offers only a **`theme` getter** (a `State` has `context`, so no parameter is needed — no two-arg stateful variant exists, one shape only; amended 2026-07-10). Ref catalogs are renamed for annotation ubiquity — `ColorRef`/`SizeRef`/`TextRef`/`ShadowRef`/`StateRef`/`TokenRef` via an explicit `refName:` on `@LegendTokenData` (documented exception to the Legend-prefix rule; getter-nesting like `Ref.colors.primary` is impossible since getters aren't const).
+Ref catalogs are renamed for annotation ubiquity — `ColorRef`/`SizeRef`/`TextRef`/`ShadowRef`/`StateRef`/`TokenRef` via an explicit `refName:` on `@LegendTokenData` (documented exception to the Legend-prefix rule; getter-nesting like `Ref.colors.primary` is impossible since getters aren't const).
 
 *Context-free resolution — investigated and rejected (2026-07-10):* writing resolved values into the annotated fields themselves would require mutating widgets post-construction, which Flutter's immutability contract forbids (const instances are canonicalized — one object can serve subtrees with different overrides); Dart macros (the mechanism that could have generated a resolved view) were discontinued; a Zone-ambient theme would break subtree overrides, whose resolution is positional by nature. Context is irreducible — but fully hideable, which the three supported forms do.
 
