@@ -16,9 +16,9 @@ class LegendSwitchTheme {
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendSwitchTheme.defaults(LegendTokens t) => LegendSwitchTheme(
-    activeTrack: LegendSwitch._activeTrack(t),
-    inactiveTrack: LegendSwitch._inactiveTrack(t),
-    thumb: LegendSwitch._thumb(t),
+    activeTrack: LegendColorsRef.primary(t),
+    inactiveTrack: LegendColorsRef.background3(t),
+    thumb: LegendColorsRef.surface(t),
     width: 44,
     height: 24,
   );

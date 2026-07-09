@@ -4,6 +4,7 @@ import 'package:legend_ui/src/primitives/legend_button_core.dart';
 import 'package:legend_ui/src/theme/legend_states.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
+import 'package:legend_ui/src/tokens/legend_typography.dart';
 
 part 'legend_text_button.theme.g.dart';
 
@@ -49,21 +50,12 @@ class LegendTextButton extends StatelessWidget {
   /// of the hover/press tint (steady except while disabled).
   @Style<LegendStates<Color>>.resolve(_foreground, lerp: true)
   final LegendStates<Color>? foreground;
-  static LegendStates<Color> _foreground(LegendTokens t) => LegendStates(
-    normal: t.colors.primary,
-    hovered: t.colors.primary,
-    pressed: t.colors.primary,
-    focused: t.colors.primary,
-    disabled: t.colors.onDisabled,
-  );
 
   /// Inner padding around the button content — tighter than the filled
   /// variants, so this variant keeps its own themed value instead of the
   /// shared [LegendButtonCore] surface (variant wins, RFC-002 R7.2).
   @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
-  static EdgeInsetsGeometry _padding(LegendTokens t) =>
-      EdgeInsets.symmetric(horizontal: t.sizes.sm, vertical: t.sizes.xs);
 
   /// Corner rounding of the hover/press tint area — smaller than the
   /// filled variants, so this variant keeps its own themed value instead
@@ -71,12 +63,10 @@ class LegendTextButton extends StatelessWidget {
   /// R7.2).
   @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
-  static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusSm;
 
   /// Text style of the [text] label (its color comes from [foreground]).
-  @Style<TextStyle>.resolve(_textStyle)
+  @Style<TextStyle>.resolve(LegendTypographyRef.b2)
   final TextStyle? textStyle;
-  static TextStyle _textStyle(LegendTokens t) => t.typography.b2;
 
   @override
   Widget build(BuildContext context) {
@@ -109,3 +99,16 @@ class LegendTextButton extends StatelessWidget {
     );
   }
 }
+
+LegendStates<Color> _foreground(LegendTokens t) => LegendStates(
+  normal: t.colors.primary,
+  hovered: t.colors.primary,
+  pressed: t.colors.primary,
+  focused: t.colors.primary,
+  disabled: t.colors.onDisabled,
+);
+
+EdgeInsetsGeometry _padding(LegendTokens t) =>
+    EdgeInsets.symmetric(horizontal: t.sizes.sm, vertical: t.sizes.xs);
+
+BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusSm;

@@ -16,10 +16,10 @@ class LegendTextButtonTheme {
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendTextButtonTheme.defaults(LegendTokens t) =>
       LegendTextButtonTheme(
-        foreground: LegendTextButton._foreground(t),
-        padding: LegendTextButton._padding(t),
-        borderRadius: LegendTextButton._borderRadius(t),
-        textStyle: LegendTextButton._textStyle(t),
+        foreground: _foreground(t),
+        padding: _padding(t),
+        borderRadius: _borderRadius(t),
+        textStyle: LegendTypographyRef.b2(t),
       );
 
   final LegendStates<Color> foreground;

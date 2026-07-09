@@ -14,8 +14,8 @@ class LegendButtonCoreTheme {
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendButtonCoreTheme.defaults(LegendTokens t) =>
       LegendButtonCoreTheme(
-        padding: LegendButtonCore._padding(t),
-        borderRadius: LegendButtonCore._borderRadius(t),
+        padding: _padding(t),
+        borderRadius: _borderRadius(t),
       );
 
   final EdgeInsetsGeometry padding;

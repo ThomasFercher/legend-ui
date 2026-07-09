@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/primitives/legend_interactive.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_colors.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
 part 'legend_switch.theme.g.dart';
@@ -41,19 +42,16 @@ class LegendSwitch extends StatelessWidget {
   final String? semanticLabel;
 
   /// Track color while the switch is on.
-  @Style<Color>.resolve(_activeTrack, lerp: true)
+  @Style<Color>.resolve(LegendColorsRef.primary, lerp: true)
   final Color? activeTrack;
-  static Color _activeTrack(LegendTokens t) => t.colors.primary;
 
   /// Track color while the switch is off.
-  @Style<Color>.resolve(_inactiveTrack, lerp: true)
+  @Style<Color>.resolve(LegendColorsRef.background3, lerp: true)
   final Color? inactiveTrack;
-  static Color _inactiveTrack(LegendTokens t) => t.colors.background3;
 
   /// Color of the sliding thumb.
-  @Style<Color>.resolve(_thumb)
+  @Style<Color>.resolve(LegendColorsRef.surface)
   final Color? thumb;
-  static Color _thumb(LegendTokens t) => t.colors.surface;
 
   /// Overall width of the track.
   @Style<double>(44)

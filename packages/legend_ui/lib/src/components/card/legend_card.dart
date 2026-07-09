@@ -3,6 +3,8 @@ import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/primitives/legend_interactive.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_colors.dart';
+import 'package:legend_ui/src/tokens/legend_shadows.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
 part 'legend_card.theme.g.dart';
@@ -32,25 +34,20 @@ class LegendCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   /// Fill color of the card surface.
-  @Style<Color>.resolve(_background, lerp: true)
+  @Style<Color>.resolve(LegendColorsRef.surface, lerp: true)
   final Color? background;
-  static Color _background(LegendTokens t) => t.colors.surface;
 
   /// Corner rounding of the card surface.
   @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
-  static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusLg;
 
   /// Inner padding around [child].
   @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
-  static EdgeInsetsGeometry _padding(LegendTokens t) =>
-      EdgeInsets.all(t.sizes.md);
 
   /// Drop shadow lifting the card off the background.
-  @Style<List<BoxShadow>>.resolve(_shadows)
+  @Style<List<BoxShadow>>.resolve(LegendShadowsRef.low)
   final List<BoxShadow>? shadows;
-  static List<BoxShadow> _shadows(LegendTokens t) => t.shadows.low;
 
   @override
   Widget build(BuildContext context) {
@@ -70,3 +67,7 @@ class LegendCard extends StatelessWidget {
     );
   }
 }
+
+BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusLg;
+
+EdgeInsetsGeometry _padding(LegendTokens t) => EdgeInsets.all(t.sizes.md);

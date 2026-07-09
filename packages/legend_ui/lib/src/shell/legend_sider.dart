@@ -5,6 +5,7 @@ import 'package:legend_ui/src/primitives/legend_surface.dart';
 import 'package:legend_ui/src/shell/legend_nav_item.dart';
 import 'package:legend_ui/src/theme/legend_states.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_colors.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
 part 'legend_sider.theme.g.dart';
@@ -44,32 +45,22 @@ class LegendSider extends StatelessWidget {
   /// `primaryContainer` token instead).
   @Style<LegendStates<Color>>.resolve(_background)
   final LegendStates<Color>? background;
-  static LegendStates<Color> _background(LegendTokens t) => LegendStates(
-    normal: t.colors.surface,
-    hovered: t.colors.background2,
-    pressed: t.colors.background2,
-    focused: t.colors.background2,
-  );
 
   /// Width of the rail.
   @Style<double>(240)
   final double? width;
 
   /// Label/icon color of the selected item.
-  @Style<Color>.resolve(_selectedColor, lerp: true)
+  @Style<Color>.resolve(LegendColorsRef.primary, lerp: true)
   final Color? selectedColor;
-  static Color _selectedColor(LegendTokens t) => t.colors.primary;
 
   /// Label/icon color of unselected items.
-  @Style<Color>.resolve(_unselectedColor, lerp: true)
+  @Style<Color>.resolve(LegendColorsRef.foreground2, lerp: true)
   final Color? unselectedColor;
-  static Color _unselectedColor(LegendTokens t) => t.colors.foreground2;
 
   /// Inner padding of each item row.
   @Style<EdgeInsetsGeometry>.resolve(_itemPadding)
   final EdgeInsetsGeometry? itemPadding;
-  static EdgeInsetsGeometry _itemPadding(LegendTokens t) =>
-      EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm);
 
   @override
   Widget build(BuildContext context) {
@@ -139,3 +130,13 @@ class LegendSider extends StatelessWidget {
     );
   }
 }
+
+LegendStates<Color> _background(LegendTokens t) => LegendStates(
+  normal: t.colors.surface,
+  hovered: t.colors.background2,
+  pressed: t.colors.background2,
+  focused: t.colors.background2,
+);
+
+EdgeInsetsGeometry _itemPadding(LegendTokens t) =>
+    EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm);

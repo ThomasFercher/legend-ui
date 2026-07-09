@@ -13,7 +13,7 @@ const List<LegendDocEntry> legendToastDocEntries = [
     name: 'background',
     type: 'Color?',
     doc: 'Fill color of the toast surface.',
-    defaultDescription: 't.colors.surface',
+    defaultDescription: 'LegendColorsRef.surface',
     group: 'component',
   ),
   LegendDocEntry(
@@ -38,7 +38,7 @@ const List<LegendDocEntry> legendToastDocEntries = [
     name: 'infoAccent',
     type: 'Color?',
     doc: 'Leading accent color for [LegendToastSeverity.info].',
-    defaultDescription: 't.colors.primary',
+    defaultDescription: 'LegendColorsRef.primary',
     group: 'component',
   ),
   LegendDocEntry(
@@ -46,7 +46,7 @@ const List<LegendDocEntry> legendToastDocEntries = [
     name: 'successAccent',
     type: 'Color?',
     doc: 'Leading accent color for [LegendToastSeverity.success].',
-    defaultDescription: 't.colors.secondary',
+    defaultDescription: 'LegendColorsRef.secondary',
     group: 'component',
   ),
   LegendDocEntry(
@@ -54,7 +54,7 @@ const List<LegendDocEntry> legendToastDocEntries = [
     name: 'errorAccent',
     type: 'Color?',
     doc: 'Leading accent color for [LegendToastSeverity.error].',
-    defaultDescription: 't.colors.error',
+    defaultDescription: 'LegendColorsRef.error',
     group: 'component',
   ),
 ];

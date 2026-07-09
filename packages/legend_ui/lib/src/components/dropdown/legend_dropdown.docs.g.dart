@@ -81,7 +81,7 @@ const List<LegendDocEntry> legendDropdownDocEntries = [
     name: 'menuShadows',
     type: 'List<BoxShadow>?',
     doc: 'Drop shadow lifting the menu off the page.',
-    defaultDescription: 't.shadows.medium',
+    defaultDescription: 'LegendShadowsRef.medium',
     group: 'component',
   ),
   LegendDocEntry(
@@ -107,7 +107,7 @@ const List<LegendDocEntry> legendDropdownDocEntries = [
     name: 'textStyle',
     type: 'TextStyle?',
     doc: 'Text style of the item labels and the selected value.',
-    defaultDescription: 't.typography.b2',
+    defaultDescription: 'LegendTypographyRef.b2',
     group: 'component',
   ),
 ];

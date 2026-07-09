@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_colors.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
 part 'legend_shimmer.theme.g.dart';
@@ -47,14 +48,12 @@ class LegendShimmer extends StatefulWidget {
   final BorderRadius? boxBorderRadius;
 
   /// Resting color of the sweep (and the fill of [LegendShimmer.box]).
-  @Style<Color>.resolve(_baseColor)
+  @Style<Color>.resolve(LegendColorsRef.background2)
   final Color? baseColor;
-  static Color _baseColor(LegendTokens t) => t.colors.background2;
 
   /// Color of the moving highlight band.
-  @Style<Color>.resolve(_highlightColor)
+  @Style<Color>.resolve(LegendColorsRef.background1)
   final Color? highlightColor;
-  static Color _highlightColor(LegendTokens t) => t.colors.background1;
 
   @override
   State<LegendShimmer> createState() => _LegendShimmerState();

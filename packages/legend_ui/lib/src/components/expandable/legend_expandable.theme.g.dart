@@ -15,9 +15,9 @@ class LegendExpandableTheme {
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendExpandableTheme.defaults(LegendTokens t) =>
       LegendExpandableTheme(
-        headerPadding: LegendExpandable._headerPadding(t),
-        backgroundColor: LegendExpandable._backgroundColor(t),
-        borderRadius: LegendExpandable._borderRadius(t),
+        headerPadding: _headerPadding(t),
+        backgroundColor: _backgroundColor(t),
+        borderRadius: _borderRadius(t),
       );
 
   final EdgeInsetsGeometry headerPadding;

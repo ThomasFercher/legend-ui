@@ -16,10 +16,10 @@ class PrimaryLegendButtonTheme {
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory PrimaryLegendButtonTheme.defaults(LegendTokens t) =>
       PrimaryLegendButtonTheme(
-        background: PrimaryLegendButton._background(t),
-        foreground: PrimaryLegendButton._foreground(t),
-        textStyle: PrimaryLegendButton._textStyle(t),
-        shadows: PrimaryLegendButton._shadows(t),
+        background: _background(t),
+        foreground: _foreground(t),
+        textStyle: LegendTypographyRef.b2(t),
+        shadows: LegendShadowsRef.none(t),
       );
 
   final LegendStates<Color> background;

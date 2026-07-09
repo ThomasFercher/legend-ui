@@ -17,11 +17,11 @@ class LegendContextMenuTheme {
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendContextMenuTheme.defaults(LegendTokens t) =>
       LegendContextMenuTheme(
-        menuBackground: LegendContextMenu._menuBackground(t),
-        menuBorderRadius: LegendContextMenu._menuBorderRadius(t),
-        menuShadows: LegendContextMenu._menuShadows(t),
-        itemPadding: LegendContextMenu._itemPadding(t),
-        textStyle: LegendContextMenu._textStyle(t),
+        menuBackground: _menuBackground(t),
+        menuBorderRadius: _menuBorderRadius(t),
+        menuShadows: LegendShadowsRef.medium(t),
+        itemPadding: _itemPadding(t),
+        textStyle: LegendTypographyRef.b2(t),
       );
 
   final LegendStates<Color> menuBackground;

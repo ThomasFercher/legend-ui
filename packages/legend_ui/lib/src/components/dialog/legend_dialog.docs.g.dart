@@ -13,7 +13,7 @@ const List<LegendDocEntry> legendDialogDocEntries = [
     name: 'background',
     type: 'Color?',
     doc: 'Fill color of the dialog surface.',
-    defaultDescription: 't.colors.surface',
+    defaultDescription: 'LegendColorsRef.surface',
     group: 'component',
   ),
   LegendDocEntry(

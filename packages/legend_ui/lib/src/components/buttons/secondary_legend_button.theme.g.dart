@@ -16,10 +16,10 @@ class SecondaryLegendButtonTheme {
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory SecondaryLegendButtonTheme.defaults(LegendTokens t) =>
       SecondaryLegendButtonTheme(
-        background: SecondaryLegendButton._background(t),
-        foreground: SecondaryLegendButton._foreground(t),
-        borderColor: SecondaryLegendButton._borderColor(t),
-        textStyle: SecondaryLegendButton._textStyle(t),
+        background: _background(t),
+        foreground: _foreground(t),
+        borderColor: LegendColorsRef.primary(t),
+        textStyle: LegendTypographyRef.b2(t),
       );
 
   final LegendStates<Color> background;

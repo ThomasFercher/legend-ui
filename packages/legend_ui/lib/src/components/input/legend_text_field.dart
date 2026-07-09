@@ -4,7 +4,9 @@ import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/components/form/legend_form.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_colors.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
+import 'package:legend_ui/src/tokens/legend_typography.dart';
 
 part 'legend_text_field.theme.g.dart';
 
@@ -76,35 +78,28 @@ class LegendTextField extends StatefulWidget {
   final ValueChanged<String>? onSubmitted;
 
   /// Fill color of the field surface.
-  @Style<Color>.resolve(_background)
+  @Style<Color>.resolve(LegendColorsRef.background1)
   final Color? background;
-  static Color _background(LegendTokens t) => t.colors.background1;
 
   /// Corner rounding of the field surface.
   @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
-  static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusMd;
 
   /// Inner padding between the border and the text.
   @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
-  static EdgeInsetsGeometry _padding(LegendTokens t) =>
-      EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm);
 
   /// Text style of the entered text (and the placeholder, recolored).
-  @Style<TextStyle>.resolve(_textStyle)
+  @Style<TextStyle>.resolve(LegendTypographyRef.b1)
   final TextStyle? textStyle;
-  static TextStyle _textStyle(LegendTokens t) => t.typography.b1;
 
   /// Border color while unfocused (error state uses the error token).
-  @Style<Color>.resolve(_borderColor)
+  @Style<Color>.resolve(LegendColorsRef.background3)
   final Color? borderColor;
-  static Color _borderColor(LegendTokens t) => t.colors.background3;
 
   /// Border color while focused — also the caret and selection color.
-  @Style<Color>.resolve(_focusedBorderColor)
+  @Style<Color>.resolve(LegendColorsRef.primary)
   final Color? focusedBorderColor;
-  static Color _focusedBorderColor(LegendTokens t) => t.colors.primary;
 
   @override
   State<LegendTextField> createState() => _LegendTextFieldState();
@@ -287,3 +282,8 @@ class _LegendTextFieldState extends State<LegendTextField>
     );
   }
 }
+
+BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusMd;
+
+EdgeInsetsGeometry _padding(LegendTokens t) =>
+    EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm);

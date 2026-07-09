@@ -4,6 +4,7 @@ import 'package:legend_ui/src/primitives/legend_interactive.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
 import 'package:legend_ui/src/shell/legend_nav_item.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_colors.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
 part 'legend_bottom_bar.theme.g.dart';
@@ -35,19 +36,16 @@ class LegendBottomBar extends StatelessWidget {
   final ValueChanged<int> onSelected;
 
   /// Fill color of the bar.
-  @Style<Color>.resolve(_background)
+  @Style<Color>.resolve(LegendColorsRef.surface)
   final Color? background;
-  static Color _background(LegendTokens t) => t.colors.surface;
 
   /// Label/icon color of the selected item.
-  @Style<Color>.resolve(_selectedColor, lerp: true)
+  @Style<Color>.resolve(LegendColorsRef.primary, lerp: true)
   final Color? selectedColor;
-  static Color _selectedColor(LegendTokens t) => t.colors.primary;
 
   /// Label/icon color of unselected items.
-  @Style<Color>.resolve(_unselectedColor, lerp: true)
+  @Style<Color>.resolve(LegendColorsRef.foreground3, lerp: true)
   final Color? unselectedColor;
-  static Color _unselectedColor(LegendTokens t) => t.colors.foreground3;
 
   /// Height of the bar content (excluding any safe-area inset).
   @Style<double>(64)

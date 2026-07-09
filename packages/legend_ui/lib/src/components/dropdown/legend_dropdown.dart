@@ -6,7 +6,9 @@ import 'package:legend_ui/src/primitives/legend_interactive.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
 import 'package:legend_ui/src/theme/legend_states.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_shadows.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
+import 'package:legend_ui/src/tokens/legend_typography.dart';
 
 part 'legend_dropdown.theme.g.dart';
 
@@ -57,23 +59,14 @@ class LegendDropdown<T> extends StatefulWidget {
   /// highlight the item under the pointer.
   @Style<LegendStates<Color>>.resolve(_menuBackground)
   final LegendStates<Color>? menuBackground;
-  static LegendStates<Color> _menuBackground(LegendTokens t) => LegendStates(
-    normal: t.colors.surface,
-    hovered: t.colors.background2,
-    pressed: t.colors.background2,
-    focused: t.colors.background2,
-  );
 
   /// Corner rounding of the menu and the trigger field.
   @Style<BorderRadius>.resolve(_menuBorderRadius)
   final BorderRadius? menuBorderRadius;
-  static BorderRadius _menuBorderRadius(LegendTokens t) =>
-      t.sizes.borderRadiusMd;
 
   /// Drop shadow lifting the menu off the page.
-  @Style<List<BoxShadow>>.resolve(_menuShadows)
+  @Style<List<BoxShadow>>.resolve(LegendShadowsRef.medium)
   final List<BoxShadow>? menuShadows;
-  static List<BoxShadow> _menuShadows(LegendTokens t) => t.shadows.medium;
 
   /// The menu scrolls past this height instead of overflowing the screen
   /// on long item lists.
@@ -83,13 +76,10 @@ class LegendDropdown<T> extends StatefulWidget {
   /// Inner padding of each menu item (and the trigger field).
   @Style<EdgeInsetsGeometry>.resolve(_itemPadding)
   final EdgeInsetsGeometry? itemPadding;
-  static EdgeInsetsGeometry _itemPadding(LegendTokens t) =>
-      EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm);
 
   /// Text style of the item labels and the selected value.
-  @Style<TextStyle>.resolve(_textStyle)
+  @Style<TextStyle>.resolve(LegendTypographyRef.b2)
   final TextStyle? textStyle;
-  static TextStyle _textStyle(LegendTokens t) => t.typography.b2;
 
   @override
   State<LegendDropdown<T>> createState() => _LegendDropdownState<T>();
@@ -206,3 +196,15 @@ class _LegendDropdownState<T> extends State<LegendDropdown<T>> {
     );
   }
 }
+
+LegendStates<Color> _menuBackground(LegendTokens t) => LegendStates(
+  normal: t.colors.surface,
+  hovered: t.colors.background2,
+  pressed: t.colors.background2,
+  focused: t.colors.background2,
+);
+
+BorderRadius _menuBorderRadius(LegendTokens t) => t.sizes.borderRadiusMd;
+
+EdgeInsetsGeometry _itemPadding(LegendTokens t) =>
+    EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm);

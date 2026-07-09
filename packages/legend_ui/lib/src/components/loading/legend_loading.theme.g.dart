@@ -14,7 +14,7 @@ class LegendLoadingTheme {
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendLoadingTheme.defaults(LegendTokens t) => LegendLoadingTheme(
-    color: LegendLoading._color(t),
+    color: LegendColorsRef.primary(t),
     size: 24,
     strokeWidth: 3,
   );

@@ -37,20 +37,14 @@ class LegendInfoItem extends StatelessWidget {
   /// Text style of the [label] (muted, smaller than the value).
   @Style<TextStyle>.resolve(_labelStyle)
   final TextStyle? labelStyle;
-  static TextStyle _labelStyle(LegendTokens t) =>
-      t.typography.b3.copyWith(color: t.colors.foreground2);
 
   /// Text style of the [value].
   @Style<TextStyle>.resolve(_valueStyle)
   final TextStyle? valueStyle;
-  static TextStyle _valueStyle(LegendTokens t) =>
-      t.typography.b2.copyWith(color: t.colors.foreground1);
 
   /// Outer padding around the row.
   @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
-  static EdgeInsetsGeometry _padding(LegendTokens t) =>
-      EdgeInsets.symmetric(vertical: t.sizes.xs);
 
   @override
   Widget build(BuildContext context) {
@@ -76,3 +70,12 @@ class LegendInfoItem extends StatelessWidget {
     );
   }
 }
+
+TextStyle _labelStyle(LegendTokens t) =>
+    t.typography.b3.copyWith(color: t.colors.foreground2);
+
+TextStyle _valueStyle(LegendTokens t) =>
+    t.typography.b2.copyWith(color: t.colors.foreground1);
+
+EdgeInsetsGeometry _padding(LegendTokens t) =>
+    EdgeInsets.symmetric(vertical: t.sizes.xs);

@@ -69,14 +69,11 @@ class LegendButtonCore extends StatelessWidget {
   /// that doesn't set its own.
   @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
-  static EdgeInsetsGeometry _padding(LegendTokens t) =>
-      EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm);
 
   /// Corner rounding of the button surface, shared by every variant that
   /// doesn't set its own.
   @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
-  static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusMd;
 
   /// Text style of the [text] label (its color comes from [foreground]).
   final TextStyle textStyle;
@@ -130,3 +127,8 @@ class LegendButtonCore extends StatelessWidget {
     );
   }
 }
+
+EdgeInsetsGeometry _padding(LegendTokens t) =>
+    EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm);
+
+BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusMd;

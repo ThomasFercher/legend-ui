@@ -15,10 +15,10 @@ class LegendCardTheme {
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendCardTheme.defaults(LegendTokens t) => LegendCardTheme(
-    background: LegendCard._background(t),
-    borderRadius: LegendCard._borderRadius(t),
-    padding: LegendCard._padding(t),
-    shadows: LegendCard._shadows(t),
+    background: LegendColorsRef.surface(t),
+    borderRadius: _borderRadius(t),
+    padding: _padding(t),
+    shadows: LegendShadowsRef.low(t),
   );
 
   final Color background;

@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_colors.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
 part 'legend_toast.theme.g.dart';
@@ -41,35 +42,28 @@ class LegendToast extends StatelessWidget {
   final Widget? action;
 
   /// Fill color of the toast surface.
-  @Style<Color>.resolve(_background)
+  @Style<Color>.resolve(LegendColorsRef.surface)
   final Color? background;
-  static Color _background(LegendTokens t) => t.colors.surface;
 
   /// Corner rounding of the toast surface.
   @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
-  static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusMd;
 
   /// Inner padding around the accent bar, message and action.
   @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
-  static EdgeInsetsGeometry _padding(LegendTokens t) =>
-      EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm);
 
   /// Leading accent color for [LegendToastSeverity.info].
-  @Style<Color>.resolve(_infoAccent)
+  @Style<Color>.resolve(LegendColorsRef.primary)
   final Color? infoAccent;
-  static Color _infoAccent(LegendTokens t) => t.colors.primary;
 
   /// Leading accent color for [LegendToastSeverity.success].
-  @Style<Color>.resolve(_successAccent)
+  @Style<Color>.resolve(LegendColorsRef.secondary)
   final Color? successAccent;
-  static Color _successAccent(LegendTokens t) => t.colors.secondary;
 
   /// Leading accent color for [LegendToastSeverity.error].
-  @Style<Color>.resolve(_errorAccent)
+  @Style<Color>.resolve(LegendColorsRef.error)
   final Color? errorAccent;
-  static Color _errorAccent(LegendTokens t) => t.colors.error;
 
   @override
   Widget build(BuildContext context) {
@@ -270,3 +264,8 @@ class _LegendToastHostState extends State<_LegendToastHost>
     );
   }
 }
+
+BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusMd;
+
+EdgeInsetsGeometry _padding(LegendTokens t) =>
+    EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm);

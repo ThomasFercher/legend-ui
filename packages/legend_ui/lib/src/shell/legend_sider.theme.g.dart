@@ -16,11 +16,11 @@ class LegendSiderTheme {
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendSiderTheme.defaults(LegendTokens t) => LegendSiderTheme(
-    background: LegendSider._background(t),
+    background: _background(t),
     width: 240,
-    selectedColor: LegendSider._selectedColor(t),
-    unselectedColor: LegendSider._unselectedColor(t),
-    itemPadding: LegendSider._itemPadding(t),
+    selectedColor: LegendColorsRef.primary(t),
+    unselectedColor: LegendColorsRef.foreground2(t),
+    itemPadding: _itemPadding(t),
   );
 
   final LegendStates<Color> background;

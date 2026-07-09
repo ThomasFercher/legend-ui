@@ -3,6 +3,7 @@ import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/primitives/legend_modal.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_colors.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
 part 'legend_dialog.theme.g.dart';
@@ -32,20 +33,16 @@ class LegendDialog extends StatelessWidget {
   final List<Widget> actions;
 
   /// Fill color of the dialog surface.
-  @Style<Color>.resolve(_background)
+  @Style<Color>.resolve(LegendColorsRef.surface)
   final Color? background;
-  static Color _background(LegendTokens t) => t.colors.surface;
 
   /// Corner rounding of the dialog surface.
   @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
-  static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusLg;
 
   /// Inner padding around title, content and actions.
   @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
-  static EdgeInsetsGeometry _padding(LegendTokens t) =>
-      EdgeInsets.all(t.sizes.lg);
 
   /// Widest the dialog grows before its content wraps.
   @Style<double>(420)
@@ -107,3 +104,7 @@ Future<T?> showLegendDialog<T>({
     dismissible: dismissible,
   );
 }
+
+BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusLg;
+
+EdgeInsetsGeometry _padding(LegendTokens t) => EdgeInsets.all(t.sizes.lg);

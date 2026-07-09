@@ -71,25 +71,16 @@ class LegendExpandable extends StatefulWidget {
   /// Inner padding of the header row.
   @Style<EdgeInsetsGeometry>.resolve(_headerPadding)
   final EdgeInsetsGeometry? headerPadding;
-  static EdgeInsetsGeometry _headerPadding(LegendTokens t) =>
-      EdgeInsets.all(t.sizes.md);
 
   /// Fill of the container and its header, per interaction state —
   /// `normal` paints the whole surface, `hovered`/`pressed`/`focused`
   /// tint the header while the pointer is on it.
   @Style<LegendStates<Color>>.resolve(_backgroundColor)
   final LegendStates<Color>? backgroundColor;
-  static LegendStates<Color> _backgroundColor(LegendTokens t) => LegendStates(
-    normal: t.colors.surface,
-    hovered: t.colors.background2,
-    pressed: t.colors.background2,
-    focused: t.colors.background2,
-  );
 
   /// Corner rounding of the container surface.
   @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
-  static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusMd;
 
   @override
   State<LegendExpandable> createState() => _LegendExpandableState();
@@ -164,3 +155,14 @@ class _LegendExpandableState extends State<LegendExpandable> {
     );
   }
 }
+
+EdgeInsetsGeometry _headerPadding(LegendTokens t) => EdgeInsets.all(t.sizes.md);
+
+LegendStates<Color> _backgroundColor(LegendTokens t) => LegendStates(
+  normal: t.colors.surface,
+  hovered: t.colors.background2,
+  pressed: t.colors.background2,
+  focused: t.colors.background2,
+);
+
+BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusMd;
