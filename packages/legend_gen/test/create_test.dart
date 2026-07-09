@@ -72,19 +72,22 @@ void main() {
     },
   );
 
-  test('refuses to overwrite an existing file with exit 65', () async {
-    final existing = File(p.join(tmp.path, 'legend_badge.dart'))
-      ..writeAsStringSync('// hands off\n');
+  test(
+    'refuses to overwrite an existing file with exit cantCreate (73)',
+    () async {
+      final existing = File(p.join(tmp.path, 'legend_badge.dart'))
+        ..writeAsStringSync('// hands off\n');
 
-    final code = await runCreate('LegendBadge', dir: tmp.path);
-    expect(code, 65);
-    expect(existing.readAsStringSync(), '// hands off\n');
-    expect(
-      File(p.join(tmp.path, 'legend_badge.theme.g.dart')).existsSync(),
-      isFalse,
-      reason: 'a refused create must not generate anything',
-    );
-  });
+      final code = await runCreate('LegendBadge', dir: tmp.path);
+      expect(code, LegendGenExit.cantCreate);
+      expect(existing.readAsStringSync(), '// hands off\n');
+      expect(
+        File(p.join(tmp.path, 'legend_badge.theme.g.dart')).existsSync(),
+        isFalse,
+        reason: 'a refused create must not generate anything',
+      );
+    },
+  );
 
   test('rejects a non-UpperCamelCase class name with exit 64', () async {
     expect(await runCreate('legendBadge', dir: tmp.path), 64);

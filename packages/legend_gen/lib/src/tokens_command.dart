@@ -1,8 +1,7 @@
-import 'dart:async';
-
 import 'package:legend_gen/src/generate_runner.dart';
 import 'package:legend_gen/src/tokens_emitter.dart';
 import 'package:legend_gen/src/tokens_parser.dart';
+import 'package:mason_logger/mason_logger.dart';
 
 /// Runs `legend_gen tokens` (RFC-002 R5): scans [paths] for
 /// `@LegendTokenData` classes and writes `<source>.tokens.g.dart` — a
@@ -19,8 +18,12 @@ import 'package:legend_gen/src/tokens_parser.dart';
 /// With [check], nothing is written; stale or missing output makes the run
 /// fail — the CI freshness gate.
 ///
-/// Returns the process exit code.
-Future<int> runTokens(List<String> paths, {bool check = false}) {
+/// Returns a `LegendGenExit` process exit code (see `runGeneration`).
+Future<int> runTokens(
+  List<String> paths, {
+  bool check = false,
+  Logger? logger,
+}) {
   return runGeneration(
     paths,
     suffix: '.tokens.g.dart',
@@ -29,5 +32,6 @@ Future<int> runTokens(List<String> paths, {bool check = false}) {
     parse: parseTokenClasses,
     emit: emitTokensFile,
     check: check,
+    logger: logger,
   );
 }

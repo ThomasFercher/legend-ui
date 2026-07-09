@@ -270,21 +270,23 @@ class Plain with _$Plain {
 
     tearDown(() => tmp.deleteSync(recursive: true));
 
-    test('generates, then --check passes; stale output fails', () async {
+    test('generates, then --check passes; stale output exits dirty '
+        '(65)', () async {
       expect(await runTokens([tmp.path]), 0);
       final generated = File('${tmp.path}/mini_tokens.tokens.g.dart');
       expect(generated.existsSync(), isTrue);
       expect(await runTokens([tmp.path], check: true), 0);
 
       generated.writeAsStringSync('// stale');
-      expect(await runTokens([tmp.path], check: true), 1);
+      expect(await runTokens([tmp.path], check: true), LegendGenExit.dirty);
     });
 
-    test('--check fails on missing output', () async {
-      expect(await runTokens([tmp.path], check: true), 1);
+    test('--check fails on missing output with the dirty code', () async {
+      expect(await runTokens([tmp.path], check: true), LegendGenExit.dirty);
     });
 
-    test('contract violations exit 2 without writing output', () async {
+    test('contract violations exit sourceError (66) without writing '
+        'output', () async {
       File('${tmp.path}/broken.dart').writeAsStringSync(
         _tokenFile(r'''
 @LegendTokenData()
@@ -294,7 +296,7 @@ class Broken with _$Broken {
 }
 ''').replaceFirst("part 'bad.tokens.g.dart';", "part 'broken.tokens.g.dart';"),
       );
-      expect(await runTokens([tmp.path]), 2);
+      expect(await runTokens([tmp.path]), LegendGenExit.sourceError);
       expect(File('${tmp.path}/broken.tokens.g.dart').existsSync(), isFalse);
     });
 

@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:legend_gen/src/exit_codes.dart';
 import 'package:legend_gen/src/model.dart';
+import 'package:mason_logger/mason_logger.dart';
 import 'package:path/path.dart' as p;
 
 /// Shared one-file-in/one-file-out driver behind `legend_gen themes`,
@@ -11,10 +13,21 @@ import 'package:path/path.dart' as p;
 /// when the file declares none) and throws [LegendGenException] on
 /// contract violations.
 ///
+/// Guarantees relied on by watch mode (RFC-002 R11.2):
+///
+/// - **No write on error.** Output is written only after a clean parse and
+///   emit — a source file that fails the contract never truncates, deletes,
+///   or corrupts its last good generated output.
+/// - **No write when unchanged.** Identical output is left untouched, so
+///   downstream watchers (IDEs, `flutter run`) see no spurious changes.
+///
 /// With [check], nothing is written; stale or missing output makes the run
 /// fail — the CI freshness gate (DESIGN.md §5.3).
 ///
-/// Returns the process exit code.
+/// Returns a [LegendGenExit] process exit code: [LegendGenExit.sourceError]
+/// on contract diagnostics, [LegendGenExit.dirty] on a dirty `--check`,
+/// else [LegendGenExit.success]. Progress goes through [logger]
+/// (per-file lines at detail level — visible with `-v`).
 Future<int> runGeneration<T>(
   List<String> paths, {
   required String suffix,
@@ -23,14 +36,21 @@ Future<int> runGeneration<T>(
   required List<T> Function(String path, String content) parse,
   required String Function(List<T> declarations) emit,
   bool check = false,
+  Logger? logger,
 }) async {
-  var generated = 0;
-  var stale = 0;
+  final log = logger ?? Logger();
+  var written = 0;
+  var unchanged = 0;
+  final stale = <String>[];
   final failures = <LegendGenDiagnostic>[];
+  final perFile = <String>[];
+
+  final progress = log.progress(
+    check ? 'Checking $label freshness' : 'Generating $label files',
+  );
 
   for (final path in paths) {
-    final files = sourceDartFilesIn(path);
-    for (final file in files) {
+    for (final file in sourceDartFilesIn(path, logger: log)) {
       final List<T> declarations;
       try {
         declarations = parse(file.path, file.readAsStringSync());
@@ -45,43 +65,61 @@ Future<int> runGeneration<T>(
           '${file.path.substring(0, file.path.length - '.dart'.length)}'
           '$suffix';
       final outputFile = File(outputPath);
+      final current = outputFile.existsSync()
+          ? outputFile.readAsStringSync()
+          : null;
 
       if (check) {
-        final current = outputFile.existsSync()
-            ? outputFile.readAsStringSync()
-            : null;
-        if (current != output) {
-          stale++;
-          stderr.writeln('STALE: $outputPath (rerun `legend_gen $command`)');
-        }
+        if (current != output) stale.add(outputPath);
+      } else if (current == output) {
+        unchanged++;
+        perFile.add('unchanged $outputPath');
       } else {
         outputFile.writeAsStringSync(output);
-        generated++;
-        stdout.writeln('generated $outputPath');
+        written++;
+        perFile.add('generated $outputPath');
       }
     }
   }
 
-  for (final failure in failures) {
-    stderr.writeln('ERROR: $failure');
+  final counts =
+      '$written $label file(s) generated'
+      '${unchanged > 0 ? ', $unchanged unchanged' : ''}';
+
+  if (failures.isNotEmpty) {
+    progress.fail(
+      '${failures.length} $label error(s)'
+      '${check ? '' : ' — kept the last good generated output ($counts)'}',
+    );
+    perFile.forEach(log.detail);
+    for (final failure in failures) {
+      log.err('$failure');
+    }
+    return LegendGenExit.sourceError;
   }
-  if (failures.isNotEmpty) return 2;
   if (check) {
-    if (stale > 0) return 1;
-    stdout.writeln('all generated $label files are fresh');
-    return 0;
+    if (stale.isNotEmpty) {
+      progress.fail('${stale.length} stale $label file(s)');
+      for (final path in stale) {
+        log.err('STALE: $path — rerun `legend_gen $command` and commit.');
+      }
+      return LegendGenExit.dirty;
+    }
+    progress.complete('all generated $label files are fresh');
+    return LegendGenExit.success;
   }
-  stdout.writeln('$generated file(s) generated');
-  return 0;
+  progress.complete(counts);
+  perFile.forEach(log.detail);
+  return LegendGenExit.success;
 }
 
 /// All non-generated `.dart` source files under [path] (a file or a
 /// directory), sorted for deterministic output order.
-List<File> sourceDartFilesIn(String path) {
+List<File> sourceDartFilesIn(String path, {Logger? logger}) {
   final entity = FileSystemEntity.typeSync(path);
   if (entity == FileSystemEntityType.file) return [File(path)];
   if (entity != FileSystemEntityType.directory) {
-    stderr.writeln('WARNING: $path does not exist, skipping');
+    (logger ?? Logger()).warn('$path does not exist, skipping');
     return const [];
   }
   return Directory(path)
