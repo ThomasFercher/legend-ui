@@ -1,0 +1,152 @@
+import 'package:flutter/widgets.dart';
+import 'package:legend_ui/legend_ui.dart';
+
+/// Base theme presets offered by the playground.
+enum ThemePreset { light, dark, emerald, violet }
+
+/// Corner-radius scale applied on top of the preset.
+enum RadiusChoice { sharp, standard, round }
+
+/// Spacing-scale density applied on top of the preset.
+enum DensityChoice { compact, standard, comfortable }
+
+/// The playground's theme state — a plain consumer-side controller that
+/// builds a [LegendThemeData] exactly the way any real app would: start
+/// from token presets, `copyWith` adjustments, and register sparse
+/// component overrides in the open `components` map.
+class ThemeController extends ChangeNotifier {
+  ThemePreset preset = ThemePreset.light;
+  Color? primary;
+  Color? secondary;
+  RadiusChoice radius = RadiusChoice.standard;
+  DensityChoice density = DensityChoice.standard;
+
+  /// Level-3 override for [PrimaryLegendButton], edited in the playground.
+  Color? buttonBackground;
+  double? buttonRadius;
+
+  bool get dark => preset == ThemePreset.dark;
+
+  void setPreset(ThemePreset value) {
+    preset = value;
+    // A preset is a fresh starting point — custom brand colors reset.
+    primary = null;
+    secondary = null;
+    notifyListeners();
+  }
+
+  void setDark({required bool value}) =>
+      setPreset(value ? ThemePreset.dark : ThemePreset.light);
+
+  void setPrimary(Color? value) {
+    primary = value;
+    notifyListeners();
+  }
+
+  void setSecondary(Color? value) {
+    secondary = value;
+    notifyListeners();
+  }
+
+  void setRadius(RadiusChoice value) {
+    radius = value;
+    notifyListeners();
+  }
+
+  void setDensity(DensityChoice value) {
+    density = value;
+    notifyListeners();
+  }
+
+  void setButtonBackground(Color? value) {
+    buttonBackground = value;
+    notifyListeners();
+  }
+
+  void setButtonRadius(double? value) {
+    buttonRadius = value;
+    notifyListeners();
+  }
+
+  void reset() {
+    preset = ThemePreset.light;
+    primary = null;
+    secondary = null;
+    radius = RadiusChoice.standard;
+    density = DensityChoice.standard;
+    buttonBackground = null;
+    buttonRadius = null;
+    notifyListeners();
+  }
+
+  LegendTokens get _base => switch (preset) {
+    ThemePreset.light => LegendTokens.light,
+    ThemePreset.dark => LegendTokens.dark,
+    ThemePreset.emerald => LegendTokens.light.copyWith(
+      colors: LegendTokens.light.colors.copyWith(
+        primary: const Color(0xFF059669),
+        primaryContainer: const Color(0xFFD1FAE5),
+        secondary: const Color(0xFF0D9488),
+      ),
+    ),
+    ThemePreset.violet => LegendTokens.dark.copyWith(
+      colors: LegendTokens.dark.colors.copyWith(
+        primary: const Color(0xFF8B5CF6),
+        primaryContainer: const Color(0xFF3B0764),
+        secondary: const Color(0xFFEC4899),
+      ),
+    ),
+  };
+
+  /// The [LegendThemeData] the whole app runs on. `AnimatedLegendTheme`
+  /// inside `LegendApp` animates every change made here.
+  LegendThemeData get data {
+    var tokens = _base;
+
+    if (primary != null || secondary != null) {
+      tokens = tokens.copyWith(
+        colors: tokens.colors.copyWith(primary: primary, secondary: secondary),
+      );
+    }
+
+    final (radiusSm, radiusMd, radiusLg) = switch (radius) {
+      RadiusChoice.sharp => (2.0, 4.0, 8.0),
+      RadiusChoice.standard => (4.0, 8.0, 16.0),
+      RadiusChoice.round => (8.0, 16.0, 28.0),
+    };
+    final scale = switch (density) {
+      DensityChoice.compact => 0.8,
+      DensityChoice.standard => 1.0,
+      DensityChoice.comfortable => 1.25,
+    };
+    final s = tokens.sizes;
+    tokens = tokens.copyWith(
+      sizes: s.copyWith(
+        radiusSm: radiusSm,
+        radiusMd: radiusMd,
+        radiusLg: radiusLg,
+        xs: s.xs * scale,
+        sm: s.sm * scale,
+        md: s.md * scale,
+        lg: s.lg * scale,
+        xl: s.xl * scale,
+        xxl: s.xxl * scale,
+      ),
+    );
+
+    return LegendThemeData(
+      tokens: tokens,
+      components: {
+        // The open Type-keyed registry (level 3): sparse overrides only —
+        // unset properties keep resolving through the lower levels.
+        if (buttonBackground != null || buttonRadius != null)
+          PrimaryLegendButtonThemeNullable: PrimaryLegendButtonThemeNullable(
+            background: buttonBackground,
+            borderRadius: buttonRadius == null
+                ? null
+                : BorderRadius.circular(buttonRadius!),
+          ),
+      },
+    );
+  }
+}

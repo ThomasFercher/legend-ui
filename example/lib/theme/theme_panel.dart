@@ -1,0 +1,172 @@
+import 'package:example/theme/color_field.dart';
+import 'package:example/theme/theme_controller.dart';
+import 'package:flutter/widgets.dart';
+import 'package:legend_ui/legend_ui.dart';
+
+/// The live theme configurator. Everything it does goes through the public
+/// theming API — token `copyWith` plus the open `components` registry — so
+/// it doubles as executable documentation of the consumer workflow.
+class ThemePanel extends StatelessWidget {
+  const ThemePanel({required this.controller, super.key});
+
+  final ThemeController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = LegendTheme.of(context).tokens;
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (context, _) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: tokens.sizes.md,
+        children: [
+          const LegendText('Theme', variant: LegendTextVariant.h3),
+
+          const LegendText('Preset', variant: LegendTextVariant.b3),
+          Wrap(
+            spacing: tokens.sizes.xs,
+            runSpacing: tokens.sizes.xs,
+            children: [
+              for (final preset in ThemePreset.values)
+                _Chip(
+                  label: switch (preset) {
+                    ThemePreset.light => 'Light',
+                    ThemePreset.dark => 'Dark',
+                    ThemePreset.emerald => 'Emerald',
+                    ThemePreset.violet => 'Violet',
+                  },
+                  selected: controller.preset == preset,
+                  onTap: () => controller.setPreset(preset),
+                ),
+            ],
+          ),
+
+          ColorField(
+            label: 'Primary color',
+            value: controller.primary,
+            onChanged: controller.setPrimary,
+          ),
+          ColorField(
+            label: 'Secondary color',
+            value: controller.secondary,
+            onChanged: controller.setSecondary,
+          ),
+
+          const LegendText('Corner radius', variant: LegendTextVariant.b3),
+          LegendDropdown<RadiusChoice>(
+            value: controller.radius,
+            items: const [
+              LegendDropdownItem(value: RadiusChoice.sharp, label: 'Sharp'),
+              LegendDropdownItem(
+                value: RadiusChoice.standard,
+                label: 'Standard',
+              ),
+              LegendDropdownItem(value: RadiusChoice.round, label: 'Round'),
+            ],
+            onChanged: controller.setRadius,
+          ),
+
+          const LegendText('Density', variant: LegendTextVariant.b3),
+          LegendDropdown<DensityChoice>(
+            value: controller.density,
+            items: const [
+              LegendDropdownItem(
+                value: DensityChoice.compact,
+                label: 'Compact',
+              ),
+              LegendDropdownItem(
+                value: DensityChoice.standard,
+                label: 'Standard',
+              ),
+              LegendDropdownItem(
+                value: DensityChoice.comfortable,
+                label: 'Comfortable',
+              ),
+            ],
+            onChanged: controller.setDensity,
+          ),
+
+          const LegendDivider(),
+          const LegendText('Component override', variant: LegendTextVariant.h3),
+          const LegendText(
+            'Registers a sparse PrimaryLegendButtonThemeNullable in the '
+            'components map (level 3) — exactly how an app reskins one '
+            'component without touching the others.',
+            variant: LegendTextVariant.b3,
+          ),
+          ColorField(
+            label: 'Primary button background',
+            value: controller.buttonBackground,
+            onChanged: controller.setButtonBackground,
+          ),
+          const LegendText(
+            'Primary button radius',
+            variant: LegendTextVariant.b3,
+          ),
+          LegendDropdown<double>(
+            value: controller.buttonRadius,
+            placeholder: 'Theme default',
+            items: const [
+              LegendDropdownItem(value: 0, label: 'Square (0)'),
+              LegendDropdownItem(value: 8, label: 'Rounded (8)'),
+              LegendDropdownItem(value: 24, label: 'Pill (24)'),
+            ],
+            onChanged: controller.setButtonRadius,
+          ),
+
+          const LegendDivider(),
+          SecondaryLegendButton(
+            text: 'Reset everything',
+            onPressed: controller.reset,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Chip extends StatelessWidget {
+  const _Chip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = LegendTheme.of(context).tokens;
+    return LegendInteractive(
+      semanticLabel: label,
+      toggled: selected,
+      onTap: onTap,
+      builder: (context, states) => LegendSurface(
+        color: selected
+            ? tokens.colors.primary
+            : states.hovered
+            ? tokens.colors.background2
+            : tokens.colors.background1,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(
+          color: selected ? tokens.colors.primary : tokens.colors.background3,
+        ),
+        padding: EdgeInsets.symmetric(
+          horizontal: tokens.sizes.sm,
+          vertical: tokens.sizes.xs,
+        ),
+        duration: const Duration(milliseconds: 120),
+        child: Text(
+          label,
+          style: tokens.typography.b3.copyWith(
+            color: selected
+                ? tokens.colors.onPrimary
+                : tokens.colors.foreground1,
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -50,14 +50,16 @@ Consolidations per DESIGN §3; every port closes its legacy bugs.
 - [ ] Remaining legacy inventory (decided 2026-07-09: **port both, improved**): vertical menu and `LegendBody` (single-mode route body) — both need a design pass around slivers/scrolling rather than a straight port
 - [ ] Deferred (tracked in DESIGN §9.10–9.11): component-map animation, dropdown trigger theming / flip-above / keyboard nav, tap-to-position cursor, import-prefixed annotations
 
-## Phase 2.5 — showcase playground (next milestone, decided 2026-07-09)
+## Phase 2.5 — docs site + showcase playground (next milestone, decided 2026-07-09)
 
-Evolve `example/` from a static gallery into a **showcase/playground**:
+Evolve `example/` from a static gallery into a **documentation site with a live playground** (decided 2026-07-09: docs are part of the playground app):
 
-- [ ] Live theme configurator panel: edit token colors/sizes, toggle light/dark, see every component update through `AnimatedLegendTheme`
-- [ ] Per-component override editor — demonstrates the level-3 `components` map exactly as a consumer would use it
-- [ ] Sensible preset themes to start from (light/dark plus at least one brand variant)
-- [ ] Keep it the consumer-workflow reference: playground code uses only the public barrel
+- [x] Docs pages per component group: description, live demos, code snippets, themed-property tables (11 pages)
+- [x] Getting-started and theming-concepts pages (tokens, four-level resolution, consumer-widget workflow)
+- [x] Live theme configurator panel: presets (Light/Dark/Emerald/Violet), brand colors (swatches + hex), corner radius, density — animates through `AnimatedLegendTheme`; site-wide side panel on wide tiers
+- [x] Per-component override editor — registers a sparse `PrimaryLegendButtonThemeNullable` in the level-3 `components` map, tested
+- [x] Sensible preset themes to start from (light/dark plus two brand variants)
+- [x] Keep it the consumer-workflow reference: playground code uses only the public barrel (tested: preset/brand/override restyling)
 
 ## Phase 3 — icons & polish
 

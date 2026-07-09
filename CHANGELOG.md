@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.0-dev.5 (unreleased) — docs site + playground
+
+- `example/` is now the **Legend UI documentation site**: eleven doc pages (getting started, theming concepts, buttons, typography, inputs & forms, selection, overlays, layout, feedback, shell, playground) with live demos, code snippets, and themed-property tables.
+- **Live theme playground**: presets (Light/Dark/Emerald/Violet), brand-color editing (swatches + hex), corner radius and density controls — all through public token `copyWith`, animating site-wide via `AnimatedLegendTheme`. Available as a side panel on wide screens and as the Playground page everywhere.
+- **Component override editor**: registers a sparse `PrimaryLegendButtonThemeNullable` in the open `components` map (level 3) and shows the exact code it emits — executable documentation of the consumer workflow (widget-tested).
+
 ## 1.0.0-dev.4 (unreleased) — Legend rebrand
 
 - **Full rebrand from Nomo to Legend** (2026-07-09): packages renamed (`nomo_ui_kit` → `legend_ui`, `nomo_gen` → `legend_gen`), every public symbol re-prefixed (`NomoTokens` → `LegendTokens`, `@NomoThemeable` → `@LegendThemeable`, `NomoApp` → `LegendApp`, …), all generated files regenerated, docs updated. "Nomo" now only refers to the frozen legacy kit on `main`. Earlier entries below use Legend names for the same code, pre-rename.
