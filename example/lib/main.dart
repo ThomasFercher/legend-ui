@@ -15,7 +15,13 @@ import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/legend_ui.dart';
 
-void main() => runApp(const DocsApp());
+void main() {
+  // A docs site should be born accessible: force the semantics tree on so
+  // screen readers (and UI-driving tools) see every widget without the
+  // "enable accessibility" bootstrap tap Flutter web otherwise requires.
+  WidgetsFlutterBinding.ensureInitialized().ensureSemantics();
+  runApp(const DocsApp());
+}
 
 /// The Legend UI documentation site + playground. It is itself a Legend UI
 /// consumer app: public barrel only, themed live by [ThemeController].

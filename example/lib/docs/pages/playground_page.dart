@@ -12,6 +12,10 @@ class PlaygroundPage extends StatelessWidget {
 
   final ThemeController controller;
 
+  static String _hex(Color? color) => color == null
+      ? '/* unset */'
+      : 'Color(0x${color.toARGB32().toRadixString(16).padLeft(8, '0').toUpperCase()})';
+
   @override
   Widget build(BuildContext context) {
     final tokens = LegendTheme.of(context).tokens;
@@ -77,7 +81,7 @@ LegendThemeData(
   tokens: tokens,
   components: {
     PrimaryLegendButtonThemeNullable: PrimaryLegendButtonThemeNullable(
-      background: ${controller.buttonBackground ?? '/* unset */'},
+      background: ${_hex(controller.buttonBackground)},
       borderRadius: ${controller.buttonRadius == null ? '/* unset */' : 'BorderRadius.circular(${controller.buttonRadius})'},
     ),
   },

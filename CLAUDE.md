@@ -36,6 +36,14 @@ dart run legend_gen themes lib test/consumer   # regenerate committed *.theme.g.
 7. Components compose the five primitives (surface, interactive, overlay engine, text core, field core); no Material `Scaffold`/`InkWell` dependencies; no vendored forks of Flutter/third-party widgets.
 8. Quality gates are non-negotiable: tests with every feature (generator changes need golden tests), very_good_analysis clean, no public-API typos.
 
+## Previewing the docs site (visual verification)
+
+`.claude/launch.json` defines the `docs-site` server (`flutter run -d web-server --web-port=8321` in `example/`). Start it with the preview tools, then verify visually:
+
+- First page load can race the debug service — if the screenshot is black and the DOM has no `flutter-view`, reload the page once.
+- The app calls `SemanticsBinding.instance.ensureSemantics()` in `main`, so the full semantics tree is in the DOM: use the accessibility snapshot to read the UI and click nodes via their `aria-label`/role instead of guessing canvas coordinates.
+- Screenshots may render scaled relative to `window.innerWidth` — don't derive click coordinates from screenshot pixels; use semantics nodes.
+
 ## Process
 
 - Work through ROADMAP.md; check items off as they land and record measurements Phase 0 asks for.
