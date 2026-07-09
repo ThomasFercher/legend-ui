@@ -8,13 +8,18 @@ const _usage =
 legend_gen v$legendGenVersion — Legend UI Kit code generation CLI
 
 Usage:
-  legend_gen themes [paths…]     Generate *.theme.g.dart from @LegendThemeable
+  legend_gen themes [paths…]     Generate *.theme.g.dart (a part of the
+                               widget's library) from @LegendThemeable
                                widgets (default path: lib)
       --check                  Verify committed output is fresh; fail on
                                stale/missing files (CI gate)
       --watch                  Regenerate on source changes (Ctrl-C to stop)
+  legend_gen docs [paths…]       Generate *.docs.g.dart manifests (a const
+                               List<LegendDocEntry> per widget) from the
+                               same annotations (default path: lib)
+      --check                  Verify committed output is fresh (CI gate)
   legend_gen create <ClassName>  Scaffold an annotated component and generate
-                               its theme file
+                               its theme file and docs manifest
       --dir <path>             Target directory (default:
                                lib/src/components/<name>/)
   legend_gen doctor [paths…]     Report missing, stale, or orphaned generated
@@ -41,10 +46,16 @@ Future<void> main(List<String> args) async {
 
   final rest = results.rest;
   final command = rest.firstOrNull;
+  const generateCommands = {'themes', 'docs'};
   if (command != null &&
-      command != 'themes' &&
+      !generateCommands.contains(command) &&
       (results.flag('check') || results.flag('watch'))) {
-    stderr.writeln('--check and --watch are only valid with `themes`.');
+    stderr.writeln('--check and --watch are only valid with `themes`/`docs`.');
+    exitCode = 64;
+    return;
+  }
+  if (command == 'docs' && results.flag('watch')) {
+    stderr.writeln('--watch is only valid with `themes`.');
     exitCode = 64;
     return;
   }
@@ -65,6 +76,9 @@ Future<void> main(List<String> args) async {
       exitCode = results.flag('watch')
           ? await runThemesWatch(paths)
           : await runThemes(paths, check: results.flag('check'));
+    case 'docs':
+      final paths = rest.length > 1 ? rest.sublist(1) : const ['lib'];
+      exitCode = await runDocs(paths, check: results.flag('check'));
     case 'create':
       if (rest.length != 2) {
         stderr.writeln('create needs exactly one ClassName.');

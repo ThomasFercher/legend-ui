@@ -1,18 +1,20 @@
 import 'dart:io';
 
 import 'package:dart_style/dart_style.dart';
+import 'package:legend_gen/src/docs_command.dart';
 import 'package:legend_gen/src/themes_command.dart';
 import 'package:path/path.dart' as p;
 
 /// Runs `legend_gen create <ClassName>`: scaffolds an annotated component
-/// stub and immediately generates its `.theme.g.dart`, so the stub's
-/// generated-file import resolves from the first second (DESIGN.md §5.3
-/// "the kit needs a CLI anyway").
+/// stub and immediately generates its `.theme.g.dart` and `.docs.g.dart`,
+/// so the stub's `part` directive resolves from the first second
+/// (DESIGN.md §5.3 "the kit needs a CLI anyway").
 ///
 /// The stub mirrors the structure of the kit's own components (see
 /// `legend_ui/lib/src/components/card/legend_card.dart`): a
-/// `@LegendThemeable` StatelessWidget with example `@Themed` fields whose
-/// `build` resolves `<X>Theme.of(context, <X>ThemeNullable(...))`.
+/// `@LegendThemeable` StatelessWidget with example `@Style` fields whose
+/// `build` resolves with one generated `_theme(context)` call
+/// (RFC-002 R1).
 ///
 /// [dir] defaults to `lib/src/components/<name>/` where `<name>` is the
 /// snake_case class name without its `Legend` prefix (LegendBadge → `badge`).
@@ -48,7 +50,9 @@ Future<int> runCreate(String className, {String? dir}) async {
       ).format(_stub(className, snake)),
     );
   stdout.writeln('created $targetPath');
-  return runThemes([targetPath]);
+  final themesCode = await runThemes([targetPath]);
+  if (themesCode != 0) return themesCode;
+  return runDocs([targetPath]);
 }
 
 /// The directory `create` targets when `--dir` is omitted:
@@ -81,11 +85,11 @@ String _stub(String className, String snake) =>
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/legend_ui.dart';
 
-import '$snake.theme.g.dart';
+part '$snake.theme.g.dart';
 
 /// A themed [$className] — scaffolded by `legend_gen create`. Replace the
-/// example `@Themed` fields with the component's real theme surface and
-/// rerun `legend_gen themes`.
+/// example `@Style` fields with the component's real theme surface and
+/// rerun `legend_gen themes` (and `legend_gen docs`).
 @LegendThemeable()
 class $className extends StatelessWidget {
   const $className({
@@ -97,18 +101,20 @@ class $className extends StatelessWidget {
 
   final Widget child;
 
-  @Themed(defaultsTo: 't.colors.surface', lerp: true)
+  /// Fill behind [child].
+  @Style<Color>.resolve(_background, lerp: true)
   final Color? background;
+  static Color _background(LegendTokens t) => t.colors.surface;
 
-  @Themed(defaultsTo: 'EdgeInsets.all(t.sizes.md)')
+  /// Inner padding around [child].
+  @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
+  static EdgeInsetsGeometry _padding(LegendTokens t) =>
+      EdgeInsets.all(t.sizes.md);
 
   @override
   Widget build(BuildContext context) {
-    final theme = ${className}Theme.of(
-      context,
-      ${className}ThemeNullable(background: background, padding: padding),
-    );
+    final theme = _theme(context);
     return Container(
       color: theme.background,
       padding: theme.padding,

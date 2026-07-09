@@ -6,8 +6,10 @@
 library;
 
 export 'src/create_command.dart';
+export 'src/docs_command.dart';
 export 'src/doctor_command.dart';
 export 'src/emitter.dart';
+export 'src/generate_runner.dart';
 export 'src/model.dart';
 export 'src/parser.dart';
 export 'src/themes_command.dart';

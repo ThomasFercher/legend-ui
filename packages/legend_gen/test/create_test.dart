@@ -30,14 +30,23 @@ void main() {
       final widget = widgets.single;
       expect(widget.className, 'LegendBadge');
       expect(widget.fields.map((f) => f.name), ['background', 'padding']);
-      expect(widget.fields[0].defaultsTo, 't.colors.surface');
-      expect(widget.fields[1].defaultsTo, 'EdgeInsets.all(t.sizes.md)');
+      expect(widget.fields[0].kind, StyleDefaultKind.resolve);
+      expect(widget.fields[0].defaultCode, 'LegendBadge._background');
+      expect(widget.fields[0].defaultDescription, 't.colors.surface');
+      expect(widget.fields[1].defaultDescription, 'EdgeInsets.all(t.sizes.md)');
 
-      // create runs themes immediately: fresh output must already exist.
+      // create runs themes + docs immediately: fresh output must exist.
       final generated = File(p.join(tmp.path, 'legend_badge.theme.g.dart'));
       expect(generated.existsSync(), isTrue);
       expect(generated.readAsStringSync(), emitThemeFile(widgets));
       expect(generated.readAsStringSync(), contains('class LegendBadgeTheme '));
+      expect(
+        generated.readAsStringSync(),
+        contains("part of 'legend_badge.dart';"),
+      );
+      final docs = File(p.join(tmp.path, 'legend_badge.docs.g.dart'));
+      expect(docs.existsSync(), isTrue);
+      expect(docs.readAsStringSync(), emitDocsFile(widgets));
     },
   );
 

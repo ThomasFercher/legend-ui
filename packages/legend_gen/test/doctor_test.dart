@@ -9,21 +9,20 @@ const _source = '''
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/legend_ui.dart';
 
-import 'cool_box.theme.g.dart';
+part 'cool_box.theme.g.dart';
 
 @LegendThemeable()
 class CoolBox extends StatelessWidget {
   const CoolBox({super.key, this.background});
 
-  @Themed(defaultsTo: 't.colors.surface', lerp: true)
+  /// Fill behind the child.
+  @Style<Color>.resolve(_background, lerp: true)
   final Color? background;
+  static Color _background(LegendTokens t) => t.colors.surface;
 
   @override
   Widget build(BuildContext context) {
-    final theme = CoolBoxTheme.of(
-      context,
-      CoolBoxThemeNullable(background: background),
-    );
+    final theme = _theme(context);
     return ColoredBox(color: theme.background);
   }
 }
@@ -75,9 +74,11 @@ void main() {
   test('(b) stale generated output after the source changed', () async {
     final source = write('cool_box.dart', _source);
     await runThemes([tmp.path]);
-    File(source).writeAsStringSync(
-      _source.replaceFirst('t.colors.surface', 't.colors.primary'),
-    );
+    // A tear-off *body* edit doesn't change the generated file (the body
+    // lives in the widget library) — flip the lerp flag instead.
+    File(
+      source,
+    ).writeAsStringSync(_source.replaceFirst('lerp: true', 'lerp: false'));
 
     final findings = collectDoctorFindings([tmp.path]);
     expect(findings, hasLength(1));
@@ -163,7 +164,7 @@ import 'package:legend_ui/legend_ui.dart';
 class BadBox {
   const BadBox({required this.background});
 
-  @Themed(defaultsTo: 't.colors.surface')
+  @Style<Color>(Color(0xFF000000))
   final Color background;
 }
 ''');
