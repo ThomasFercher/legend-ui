@@ -53,22 +53,28 @@ Read: `nomo_primary_button.theme_data.g.dart`, `nomo_theme.dart`, `nomo_color_th
 
 All preserve the settled rules: one-file-in/one-file-out generation, open Type-keyed registry, four-level resolution, responsiveness ≠ theming.
 
-### R1 — Generate the mirror block away *(biggest per-component win)*
+### R1 — Generate the mirror block away; hide the resolution *(amended 2026-07-09: part-of emission + private in-library resolver, directed)*
 
-The generator already parses the widget file and knows every `@Themed` field; emit a resolver **extension on the widget class** into the existing `.theme.g.dart`:
+The full developer experience is: **declare one var + one annotation, run the CLI (or leave `--watch` running) — done.** The widget is a plain `StatelessWidget`/`StatefulWidget` (no custom base classes, fully compatible with ordinary Flutter widgets); the resolved values arrive through one generated, in-library call:
 
 ```dart
-// generated
-extension LegendSwitchThemeResolve on LegendSwitch {
-  LegendSwitchTheme resolveTheme(BuildContext context) =>
-      LegendSwitchTheme.of(context, LegendSwitchThemeNullable(
-        activeTrack: activeTrack, inactiveTrack: inactiveTrack,
-        thumb: thumb, width: width, height: height,
-      ));
+part 'legend_switch.theme.g.dart';          // scaffolded by `legend_gen create`
+
+@LegendThemeable()
+class LegendSwitch extends StatelessWidget {
+  /// Track color while the switch is on.
+  @Style<Color>.resolve(_activeTrack)
+  final Color? activeTrack;
+  static Color _activeTrack(LegendTokens t) => t.colors.primary;
+  ...
+  Widget build(BuildContext context) {
+    final theme = _theme(context);          // ← the whole visible resolution step
+    ...
+  }
 }
 ```
 
-Component build methods drop to `final theme = resolveTheme(context);` (`widget.resolveTheme(context)` in a `State`). Themed fields are written **2× instead of 3×**; a new field can no longer be forgotten in the resolve path. ~15–40 hand lines removed per component across 19 widgets.
+The generated part file contains a **private extension** on the widget (`extension _$LegendSwitchThemeResolve on LegendSwitch { LegendSwitchTheme _theme(BuildContext) => LegendSwitchTheme.of(context, LegendSwitchThemeNullable(activeTrack: activeTrack, ...)); }`) — it re-lists the fields so the author never does, and being `part of` the same library it needs no import, pollutes no public API, and can call the private tear-offs. (`widget._theme(context)` from a `State`.) Legacy precedent: generated `getFromContext(context, widget)` did exactly this — restored here namespaced and private. **Generation switches from import-own-source to `part of`** (amending post-review fix C1; the part directive is the stronger version of the same source↔artifact coupling, and R10's private tear-offs require it). Themed fields are written **once**; ~15–40 hand lines removed per component across 19 widgets.
 
 ### R2 — Generate `==`/`hashCode` (+ `debugFillProperties`) on `XThemeNullable`
 
@@ -184,7 +190,7 @@ static Color _foreground(LegendTokens t) => t.colors.onPrimary;
 - **`@Style<T>(value)`** — the positional const value is the default used when no theme provides anything (level 4). It is overridden by any theme override at any level: constructor ≻ subtree override ≻ components map ≻ this default. Untouched four-level semantics.
 - **`@Style<T>.resolve(tearOff)`** — the value is optional; omitting it means the developer defines the relation to the static theme values instead, as a **const tear-off** `T Function(LegendTokens)`. This replaces the `defaultsTo` string expressions wholesale and closes DESIGN §9.2 with the *typed* answer it hoped for: the default is compile-checked in the widget file itself, IDE-navigable, rename-safe, and shareable across widgets as an ordinary symbol — no analyzer-after-generation gap, no duplicated strings.
 - **Neither given** → the default is null (legacy's `@NomoColorField<Color?>(null)` case): the component treats the value as genuinely optional.
-- `lerp:` stays as the opt-in flag. The generator reads value/tear-off from the AST (structured expression spans, never index math), validates `T` against the field type, and emits `XTheme.defaults(LegendTokens t)` calling the tear-offs / inlining the consts.
+- `lerp:` stays as the opt-in flag. The generator reads value/tear-off from the AST (structured expression spans, never index math), validates `T` against the field type, and emits `XTheme.defaults(LegendTokens t)` calling the tear-offs / inlining the consts. Tear-offs may be **private** statics — the generated artifact is `part of` the widget's library (R1), so private symbols resolve.
 - `@LegendThemeable()` remains the class marker; `@Style<T>` replaces `@Themed`. Migration of the 72 existing fields is mechanical (each `defaultsTo` string becomes either a const value or a private static tear-off in the same file).
 
 **Scope: component themes only** *(clarified 2026-07-09, directed)*. `@Style`/`@LegendThemeable` and the generated artifact set apply to **components** — never to the base theme. `LegendTokens` (the base colors/sizes/typography/shadows) is its own layer, exactly as in the legacy split:
