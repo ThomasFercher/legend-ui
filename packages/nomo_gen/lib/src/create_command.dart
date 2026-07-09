@@ -29,8 +29,7 @@ Future<int> runCreate(String className, {String? dir}) async {
   }
 
   final snake = _snakeCase(className);
-  final targetDir =
-      dir ?? p.join('lib', 'src', 'components', _componentDirName(className));
+  final targetDir = dir ?? defaultCreateDir(className);
   final targetPath = p.join(targetDir, '$snake.dart');
   final target = File(targetPath);
   if (target.existsSync()) {
@@ -51,6 +50,11 @@ Future<int> runCreate(String className, {String? dir}) async {
   stdout.writeln('created $targetPath');
   return runThemes([targetPath]);
 }
+
+/// The directory `create` targets when `--dir` is omitted:
+/// `lib/src/components/<name>/` (NomoBadge → `lib/src/components/badge`).
+String defaultCreateDir(String className) =>
+    p.join('lib', 'src', 'components', _componentDirName(className));
 
 /// Default component directory name: the class name without its `Nomo`
 /// prefix, in snake_case (NomoBadge → `badge`, Chip → `chip`).
