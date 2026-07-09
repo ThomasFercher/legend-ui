@@ -8,6 +8,8 @@ part 'legend_info_item.theme.g.dart';
 /// A label/value row for detail lists — label on the left, value on the
 /// right, with optional [leading] and [trailing] widgets on the outside.
 ///
+/// Plain token-styled layout; composes no interactive primitives.
+///
 /// (Correctly spelled `trailing` this time — legacy shipped `trailling`
 /// as public API, legacy-docs 01 §4.2.)
 @LegendThemeable()
@@ -32,16 +34,19 @@ class LegendInfoItem extends StatelessWidget {
   /// Shown after the value.
   final Widget? trailing;
 
+  /// Text style of the [label] (muted, smaller than the value).
   @Style<TextStyle>.resolve(_labelStyle)
   final TextStyle? labelStyle;
   static TextStyle _labelStyle(LegendTokens t) =>
       t.typography.b3.copyWith(color: t.colors.foreground2);
 
+  /// Text style of the [value].
   @Style<TextStyle>.resolve(_valueStyle)
   final TextStyle? valueStyle;
   static TextStyle _valueStyle(LegendTokens t) =>
       t.typography.b2.copyWith(color: t.colors.foreground1);
 
+  /// Outer padding around the row.
   @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
   static EdgeInsetsGeometry _padding(LegendTokens t) =>

@@ -7,9 +7,13 @@ import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
 part 'legend_card.theme.g.dart';
 
-/// A content surface on [LegendSurface] — one shadow system, and theme
-/// values are always reachable (legacy's non-null `elevation` default
-/// made them unreachable).
+/// A shadowed content container for grouping related content.
+///
+/// Composes [LegendSurface] (and [LegendInteractive] when [onTap] is set).
+///
+/// Replaces the legacy card, which shipped one shadow system too many and
+/// a non-null `elevation` default that made its theme values unreachable
+/// (legacy-docs 01 §4.2).
 @LegendThemeable()
 class LegendCard extends StatelessWidget {
   const LegendCard({
@@ -27,19 +31,23 @@ class LegendCard extends StatelessWidget {
   /// Makes the card interactive when set.
   final VoidCallback? onTap;
 
+  /// Fill color of the card surface.
   @Style<Color>.resolve(_background, lerp: true)
   final Color? background;
   static Color _background(LegendTokens t) => t.colors.surface;
 
+  /// Corner rounding of the card surface.
   @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
   static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusLg;
 
+  /// Inner padding around [child].
   @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
   static EdgeInsetsGeometry _padding(LegendTokens t) =>
       EdgeInsets.all(t.sizes.md);
 
+  /// Drop shadow lifting the card off the background.
   @Style<List<BoxShadow>>.resolve(_shadows)
   final List<BoxShadow>? shadows;
   static List<BoxShadow> _shadows(LegendTokens t) => t.shadows.low;

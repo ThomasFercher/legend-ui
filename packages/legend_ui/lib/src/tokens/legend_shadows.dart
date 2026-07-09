@@ -19,9 +19,16 @@ class LegendShadows with _$LegendShadows {
     ],
   });
 
+  /// Flat — no shadow at all.
   final List<BoxShadow> none;
+
+  /// Subtle lift for resting content (cards).
   final List<BoxShadow> low;
+
+  /// Clear separation for floating chrome (menus, toasts, bars).
   final List<BoxShadow> medium;
+
+  /// Strong lift for modal surfaces (dialogs).
   final List<BoxShadow> high;
 
   /// Member-wise lerp (generated, RFC-002 R5).

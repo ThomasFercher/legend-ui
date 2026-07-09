@@ -14,10 +14,11 @@ enum LegendToastSeverity { info, success, error }
 
 /// A transient feedback surface, shown via [showLegendToast].
 ///
-/// Rendered through the kit's own overlay engine (a root-`Overlay` entry)
-/// — no Material `ScaffoldMessenger`. Overlapping [showLegendToast] calls
-/// queue FIFO and show one at a time, in order (legacy showed exactly one
-/// toast with no queue).
+/// Composes [LegendSurface]; rendered through the kit's own overlay
+/// engine (a root-`Overlay` entry) — no Material `ScaffoldMessenger`.
+///
+/// Overlapping [showLegendToast] calls queue FIFO and show one at a time,
+/// in order (legacy showed exactly one toast with no queue).
 @LegendThemeable()
 class LegendToast extends StatelessWidget {
   const LegendToast({
@@ -39,27 +40,33 @@ class LegendToast extends StatelessWidget {
   /// Optional trailing widget (e.g. an undo button).
   final Widget? action;
 
+  /// Fill color of the toast surface.
   @Style<Color>.resolve(_background)
   final Color? background;
   static Color _background(LegendTokens t) => t.colors.surface;
 
+  /// Corner rounding of the toast surface.
   @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
   static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusMd;
 
+  /// Inner padding around the accent bar, message and action.
   @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
   static EdgeInsetsGeometry _padding(LegendTokens t) =>
       EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm);
 
+  /// Leading accent color for [LegendToastSeverity.info].
   @Style<Color>.resolve(_infoAccent)
   final Color? infoAccent;
   static Color _infoAccent(LegendTokens t) => t.colors.primary;
 
+  /// Leading accent color for [LegendToastSeverity.success].
   @Style<Color>.resolve(_successAccent)
   final Color? successAccent;
   static Color _successAccent(LegendTokens t) => t.colors.secondary;
 
+  /// Leading accent color for [LegendToastSeverity.error].
   @Style<Color>.resolve(_errorAccent)
   final Color? errorAccent;
   static Color _errorAccent(LegendTokens t) => t.colors.error;

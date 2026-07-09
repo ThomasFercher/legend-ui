@@ -31,8 +31,14 @@ class LegendColors with _$LegendColors {
     required this.foreground3,
   });
 
+  /// The brand color — filled buttons, active states, focus accents.
   final Color primary;
+
+  /// Foreground for content sitting on [primary].
   final Color onPrimary;
+
+  /// Soft tinted fill derived from the brand — selected navigation items,
+  /// secondary button fills.
   final Color primaryContainer;
 
   /// Foreground for content sitting on [primaryContainer] (added by the
@@ -40,19 +46,46 @@ class LegendColors with _$LegendColors {
   /// drew there — the primary color).
   final Color onPrimaryContainer;
 
+  /// The supporting accent — success accents, secondary highlights.
   final Color secondary;
+
+  /// Foreground for content sitting on [secondary].
   final Color onSecondary;
+
+  /// Page background (the lowest layer).
   final Color background1;
+
+  /// Raised background — hover fills, subtle emphasis over [background1].
   final Color background2;
+
+  /// Strong background — hairlines, resting borders, dividers.
   final Color background3;
+
+  /// Elevated content surfaces: cards, menus, dialogs, bars.
   final Color surface;
+
+  /// Foreground for content sitting on [surface].
   final Color onSurface;
+
+  /// Destructive/error color — error borders, messages, accents.
   final Color error;
+
+  /// Foreground for content sitting on [error].
   final Color onError;
+
+  /// Fill of disabled interactive surfaces.
   final Color disabled;
+
+  /// Foreground for content sitting on [disabled].
   final Color onDisabled;
+
+  /// Primary text color.
   final Color foreground1;
+
+  /// Muted text color — labels, supporting copy.
   final Color foreground2;
+
+  /// Faint text color — placeholders, de-emphasized items.
   final Color foreground3;
 
   /// Placeholder light palette; the real brand palette lands with the

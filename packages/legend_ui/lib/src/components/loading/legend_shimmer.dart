@@ -10,7 +10,8 @@ part 'legend_shimmer.theme.g.dart';
 /// `LinearGradient` across the subtree (skeleton-loading effect).
 ///
 /// [LegendShimmer.box] is the convenience placeholder: a base-colored
-/// rounded box that shimmers, for skeleton layouts without content.
+/// rounded box (a [LegendSurface]) that shimmers, for skeleton layouts
+/// without content.
 @LegendThemeable()
 class LegendShimmer extends StatefulWidget {
   const LegendShimmer({
@@ -45,10 +46,12 @@ class LegendShimmer extends StatefulWidget {
   /// Placeholder box corner radius (only for [LegendShimmer.box]).
   final BorderRadius? boxBorderRadius;
 
+  /// Resting color of the sweep (and the fill of [LegendShimmer.box]).
   @Style<Color>.resolve(_baseColor)
   final Color? baseColor;
   static Color _baseColor(LegendTokens t) => t.colors.background2;
 
+  /// Color of the moving highlight band.
   @Style<Color>.resolve(_highlightColor)
   final Color? highlightColor;
   static Color _highlightColor(LegendTokens t) => t.colors.background1;

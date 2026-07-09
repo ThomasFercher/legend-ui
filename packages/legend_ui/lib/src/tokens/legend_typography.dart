@@ -18,11 +18,22 @@ class LegendTypography with _$LegendTypography {
     this.b3 = const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
   });
 
+  /// Page-level heading.
   final TextStyle h1;
+
+  /// Section heading.
   final TextStyle h2;
+
+  /// Subsection heading (dialog titles, card headers).
   final TextStyle h3;
+
+  /// Primary body text.
   final TextStyle b1;
+
+  /// Secondary body text — button labels, menu items, form values.
   final TextStyle b2;
+
+  /// Small text — captions, field titles, error messages.
   final TextStyle b3;
 
   /// Member-wise lerp (generated, RFC-002 R5).
