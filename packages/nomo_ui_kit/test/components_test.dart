@@ -1,3 +1,5 @@
+import 'dart:ui' show Tristate;
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nomo_ui_kit/nomo_ui_kit.dart';
@@ -65,7 +67,25 @@ void main() {
       await tester.pumpAndSettle();
       expect(value, isTrue);
       final align = tester.widget<AnimatedAlign>(find.byType(AnimatedAlign));
-      expect(align.alignment, Alignment.centerRight);
+      // Directional so the thumb mirrors under RTL (review M1).
+      expect(align.alignment, AlignmentDirectional.centerEnd);
+    });
+
+    testWidgets('announces as a toggle, not a button (review I3)', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _wrap(
+          NomoSwitch(value: true, onChanged: (_) {}, semanticLabel: 'Dark'),
+        ),
+      );
+      final node = tester.getSemantics(find.byType(NomoSwitch));
+      final flags = node.flagsCollection;
+      expect(flags.isToggled, Tristate.isTrue);
+      expect(flags.isButton, isFalse);
+      expect(node.label, 'Dark');
+      handle.dispose();
     });
   });
 

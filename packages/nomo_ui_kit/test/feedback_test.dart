@@ -55,9 +55,7 @@ void main() {
       expect(find.text('Saved'), findsNothing);
     });
 
-    testWidgets('queues overlapping calls FIFO, one at a time', (
-      tester,
-    ) async {
+    testWidgets('queues overlapping calls FIFO, one at a time', (tester) async {
       await tester.pumpWidget(_overlayApp());
       final context = tester.element(find.byKey(_probe));
       const duration = Duration(milliseconds: 500);

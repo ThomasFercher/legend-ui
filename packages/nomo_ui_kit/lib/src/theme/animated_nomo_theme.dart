@@ -15,6 +15,11 @@ class NomoTokensTween extends Tween<NomoTokens> {
 /// brand switches). Component themes re-derive from the animating tokens;
 /// nothing else is tweened — this replaces legacy's 400 ms lerp of all
 /// ~48 generated theme classes.
+///
+/// The [NomoThemeData.components] registry is intentionally NOT animated:
+/// if the new theme carries a different components map it snaps at the
+/// start of the transition (review I6, deferred — token-derived defaults,
+/// the common case, still animate smoothly).
 class AnimatedNomoTheme extends ImplicitlyAnimatedWidget {
   const AnimatedNomoTheme({
     required this.data,

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:nomo_ui_kit/src/tokens/nomo_tokens.dart';
 
@@ -8,6 +9,7 @@ import 'package:nomo_ui_kit/src/tokens/nomo_tokens.dart';
 /// generated code looks up (e.g. `PrimaryNomoButtonThemeNullable`).
 /// Consumers register their own generated component themes in the same map
 /// — there is no closed aggregate and no naming convention.
+@immutable
 class NomoThemeData {
   const NomoThemeData({required this.tokens, this.components = const {}});
 
@@ -24,6 +26,23 @@ class NomoThemeData {
       components: components ?? this.components,
     );
   }
+
+  // Equality keeps updateShouldNotify honest: rebuilding an app that
+  // reconstructs an identical NomoThemeData must not invalidate every
+  // theme dependent (review I7). Tokens compare by identity — presets and
+  // lerp outputs are either const or genuinely new objects.
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NomoThemeData &&
+          identical(other.tokens, tokens) &&
+          mapEquals(other.components, components);
+
+  @override
+  int get hashCode => Object.hash(
+    tokens,
+    Object.hashAllUnordered(components.entries.map((e) => (e.key, e.value))),
+  );
 }
 
 /// Provides a [NomoThemeData] to the subtree.

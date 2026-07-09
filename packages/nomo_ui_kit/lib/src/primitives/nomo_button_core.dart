@@ -53,7 +53,10 @@ class NomoButtonCore extends StatelessWidget {
       semanticLabel: text,
       builder: (context, states) {
         final effectiveBackground = switch (states) {
-          NomoInteractionStates(disabled: true) => tokens.colors.disabled,
+          // A transparent variant (text button) must stay transparent when
+          // disabled — a grey slab would invent a shape it never had.
+          NomoInteractionStates(disabled: true) =>
+            background.a == 0 ? background : tokens.colors.disabled,
           NomoInteractionStates(pressed: true) => Color.alphaBlend(
             foreground.withValues(alpha: 0.16),
             background,

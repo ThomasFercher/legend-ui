@@ -42,8 +42,8 @@ Color _backgroundOf(WidgetTester tester) {
 }
 
 void main() {
-  group('five-level resolution (DESIGN §1 goal 3)', () {
-    testWidgets('level 5: token-derived default', (tester) async {
+  group('layered resolution (DESIGN §1 goal 3, four levels per §9.9)', () {
+    testWidgets('level 4: token-derived default', (tester) async {
       await tester.pumpWidget(_app());
       expect(_backgroundOf(tester), NomoTokens.light.colors.primary);
     });

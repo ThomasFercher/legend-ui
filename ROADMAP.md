@@ -12,7 +12,7 @@ Goal: prove the token model, the decorator contract, and the CLI end-to-end on o
 - [x] `nomo_gen themes` MVP: analyzer-AST parse → full artifact set; contract diagnostics with file:line (nullable fields, null constructor defaults, adjacent strings)
 - [x] Generator golden test (`UPDATE_GOLDENS=1` flow) + contract-violation tests
 - [x] Minimal primitives: `NomoSurface`, `NomoInteractive`
-- [x] Port `PrimaryNomoButton` — five-level resolution proven by widget tests; **closes legacy "disabled buttons stay tappable"** with a regression test
+- [x] Port `PrimaryNomoButton` — layered resolution proven by widget tests (four levels — DESIGN §9.9); **closes legacy "disabled buttons stay tappable"** with a regression test
 - [x] `NomoAnchoredOverlay` primitive + unified `NomoDropdown` (one item model)
 - [x] Consumer-workflow rehearsal: `test/consumer/balance_card.dart` uses only the public barrel + `dart run nomo_gen themes test/consumer`; registers in the same components map as kit widgets (tested)
 - [x] Measurements (2026-07-09):
@@ -29,7 +29,7 @@ Goal: prove the token model, the decorator contract, and the CLI end-to-end on o
 - [x] Field core: `NomoTextField` on `EditableText` (placeholder/title/error/focus border/disabled) — replaces the 1,535-line CupertinoTextField fork; selection toolbar/handles still TODO
 - [x] Theme animation: `AnimatedNomoTheme` lerps the token object once per switch (tested mid-animation); `NomoBreakpoints`/`NomoBreakpointScope` for responsive tiers; `NomoApp` root (WidgetsApp, optional RouterConfig)
 - [ ] Golden-test infrastructure for components (behavior-level widget tests exist; screenshot goldens TODO)
-- [x] `nomo_gen` hardened: file:line diagnostics, `--check` (in CI), `--watch`, version stamping
+- [x] `nomo_gen` hardened: file:line diagnostics, `--check` (in CI), `--watch`, version stamping; `create` (annotated-widget scaffold) and `doctor` (workspace sanity) subcommands
 - [ ] Decide `nomo_gen` consumer distribution default (DESIGN §9.7) — needs a real external consumer
 
 ## Phase 2 — component ports
@@ -41,8 +41,12 @@ Consolidations per DESIGN §3; every port closes its legacy bugs.
 - [x] Menus/selection: one `NomoDropdown` (one item model), `NomoSwitch` (no Cupertino fork)
 - [x] Shell: `NomoScaffold` + `NomoAppBar` (plain Row, no custom RenderBox) + `NomoSider` + `NomoBottomBar`, chrome driven by breakpoint tier not theme swaps; one `NomoNavItem` model
 - [x] Dialog: `NomoDialog` + `showNomoDialog` on the kit's own modal engine (no Material `showDialog`)
-- [ ] Form system (registration/unregistration lifecycle, working validity model, `NomoValidator` set)
-- [ ] Remaining legacy inventory: snackbar/toast, context menu, expandable, vertical menu, divider, info item, shimmer/loading, `NomoBody` (single-mode route body)
+- [x] Form system: `NomoForm`/`NomoFormController` + `NomoFormField<T>` + `NomoValidators` — **closes legacy "fields never unregistered" and "validator-less fields pin forms invalid"** with regression tests; `NomoTextField` integrates via `formField`/`validator`
+- [x] Feedback: queued `NomoToast` (overlay engine, no ScaffoldMessenger — resolves DESIGN §9.6 toward the overlay engine), `NomoLoading`, `NomoShimmer`
+- [x] Small components: `NomoDivider`, `NomoExpandable`, `NomoInfoItem`, `NomoContextMenu` (+ shared `NomoCaret` primitive)
+- [x] Post-review hardening (2026-07-09): generated files import their own source (C1); `NomoInteractive` keyboard activation without WidgetsApp, toggle semantics, no stuck-pressed after mid-press disable (I1/I3); transparent disabled text buttons (I2); dropdown `menuMaxHeight` + scrollable menu (I4); `NomoApp` locale passthrough + navigatorKey/routerConfig assert (I5); `NomoThemeData` value equality (I7); RTL switch thumb (M1); `lerp:` type validation in nomo_gen (M4); crash-proof `--watch` (M5); upward bottom-bar shadow + translatable modal `barrierLabel` (M6)
+- [ ] Remaining legacy inventory: vertical menu, `NomoBody` (single-mode route body)
+- [ ] Deferred (tracked in DESIGN §9.10–9.11): component-map animation, dropdown trigger theming / flip-above / keyboard nav, tap-to-position cursor, import-prefixed annotations
 
 ## Phase 3 — icons & polish
 

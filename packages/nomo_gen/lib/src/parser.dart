@@ -89,6 +89,19 @@ List<ThemableWidget> parseThemableWidgets(String path, String content) {
           continue;
         }
 
+        if (args.lerp && !lerpableTypes.contains(type.replaceAll('?', ''))) {
+          diagnostics.add(
+            NomoGenDiagnostic(
+              path,
+              lineOf(annotation),
+              'lerp: true on "$name" is not supported for type "$type" — '
+              'supported: ${lerpableTypes.join(', ')}. Remove the flag '
+              '(the field will step at t=0.5 during theme animation).',
+            ),
+          );
+          continue;
+        }
+
         fields.add(
           ThemedField(
             name: name,

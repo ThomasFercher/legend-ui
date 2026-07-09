@@ -82,7 +82,13 @@ Future<int> runThemesWatch(List<String> paths) async {
             event is FileSystemDeleteEvent) {
           return;
         }
-        runThemes([changed]);
+        // Atomic saves/renames can race the read — never kill the watch.
+        unawaited(
+          runThemes([changed]).catchError((Object e) {
+            stderr.writeln('watch: $changed: $e');
+            return 1;
+          }),
+        );
       }),
     );
   }

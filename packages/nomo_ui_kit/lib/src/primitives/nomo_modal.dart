@@ -10,14 +10,17 @@ class NomoModalRoute<T> extends PopupRoute<T> {
     required this.builder,
     this.alignment = Alignment.center,
     this.dismissible = true,
+    String barrierLabel = 'Dismiss',
     Color? barrier,
     Duration? duration,
-  }) : _barrier = barrier ?? const Color(0x8A000000),
+  }) : _barrierLabel = barrierLabel,
+       _barrier = barrier ?? const Color(0x8A000000),
        _duration = duration ?? const Duration(milliseconds: 180);
 
   final WidgetBuilder builder;
   final Alignment alignment;
   final bool dismissible;
+  final String _barrierLabel;
   final Color _barrier;
   final Duration _duration;
 
@@ -28,7 +31,7 @@ class NomoModalRoute<T> extends PopupRoute<T> {
   bool get barrierDismissible => dismissible;
 
   @override
-  String? get barrierLabel => 'Dismiss';
+  String? get barrierLabel => _barrierLabel;
 
   @override
   Duration get transitionDuration => _duration;
@@ -81,6 +84,7 @@ Future<T?> showNomoModal<T>({
   required WidgetBuilder builder,
   Alignment alignment = Alignment.center,
   bool dismissible = true,
+  String barrierLabel = 'Dismiss',
   Color? barrier,
 }) {
   return Navigator.of(context, rootNavigator: true).push(
@@ -88,6 +92,7 @@ Future<T?> showNomoModal<T>({
       builder: builder,
       alignment: alignment,
       dismissible: dismissible,
+      barrierLabel: barrierLabel,
       barrier: barrier,
     ),
   );

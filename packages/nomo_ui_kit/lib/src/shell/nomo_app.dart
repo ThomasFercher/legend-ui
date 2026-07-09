@@ -17,9 +17,18 @@ class NomoApp extends StatelessWidget {
     this.compactBelow = 600,
     this.expandedFrom = 1080,
     this.navigatorKey,
+    this.locale,
+    this.localizationsDelegates,
+    this.supportedLocales = const [Locale('en', 'US')],
+    this.onGenerateTitle,
   }) : assert(
          (home != null) ^ (routerConfig != null),
          'Provide either home or routerConfig.',
+       ),
+       assert(
+         navigatorKey == null || routerConfig == null,
+         'navigatorKey is owned by the router when routerConfig is set — '
+         'pass the key to your router instead.',
        );
 
   final NomoThemeData theme;
@@ -34,6 +43,10 @@ class NomoApp extends StatelessWidget {
   final double compactBelow;
   final double expandedFrom;
   final GlobalKey<NavigatorState>? navigatorKey;
+  final Locale? locale;
+  final Iterable<LocalizationsDelegate<dynamic>>? localizationsDelegates;
+  final Iterable<Locale> supportedLocales;
+  final GenerateAppTitle? onGenerateTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -62,16 +75,24 @@ class NomoApp extends StatelessWidget {
     if (routerConfig != null) {
       return WidgetsApp.router(
         title: title,
+        onGenerateTitle: onGenerateTitle,
         color: theme.tokens.colors.primary,
         routerConfig: routerConfig,
+        locale: locale,
+        localizationsDelegates: localizationsDelegates,
+        supportedLocales: supportedLocales,
         builder: wrap,
       );
     }
     return WidgetsApp(
       title: title,
+      onGenerateTitle: onGenerateTitle,
       color: theme.tokens.colors.primary,
       navigatorKey: navigatorKey,
       home: home,
+      locale: locale,
+      localizationsDelegates: localizationsDelegates,
+      supportedLocales: supportedLocales,
       pageRouteBuilder: <T>(RouteSettings settings, WidgetBuilder builder) {
         return PageRouteBuilder<T>(
           settings: settings,

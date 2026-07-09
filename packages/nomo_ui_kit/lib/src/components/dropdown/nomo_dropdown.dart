@@ -31,6 +31,7 @@ class NomoDropdown<T> extends StatefulWidget {
     this.menuBackground,
     this.menuBorderRadius,
     this.menuShadows,
+    this.menuMaxHeight,
     this.itemPadding,
     this.textStyle,
   });
@@ -49,6 +50,11 @@ class NomoDropdown<T> extends StatefulWidget {
 
   @Themed(defaultsTo: 't.shadows.medium')
   final List<BoxShadow>? menuShadows;
+
+  /// The menu scrolls past this height instead of overflowing the screen
+  /// on long item lists.
+  @Themed(defaultsTo: '320.0')
+  final double? menuMaxHeight;
 
   @Themed(
     defaultsTo:
@@ -73,6 +79,7 @@ class _NomoDropdownState<T> extends State<NomoDropdown<T>> {
       menuBackground: widget.menuBackground,
       menuBorderRadius: widget.menuBorderRadius,
       menuShadows: widget.menuShadows,
+      menuMaxHeight: widget.menuMaxHeight,
       itemPadding: widget.itemPadding,
       textStyle: widget.textStyle,
     ),
@@ -151,32 +158,37 @@ class _NomoDropdownState<T> extends State<NomoDropdown<T>> {
       borderRadius: theme.menuBorderRadius,
       shadows: theme.menuShadows,
       clip: true,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          for (final item in widget.items)
-            NomoInteractive(
-              semanticLabel: item.label,
-              onTap: () => _select(item.value),
-              builder: (context, states) {
-                return NomoSurface(
-                  color: states.hovered || states.focused
-                      ? tokens.colors.background2
-                      : theme.menuBackground,
-                  padding: theme.itemPadding,
-                  child: Text(
-                    item.label,
-                    style: theme.textStyle.copyWith(
-                      color: item.value == widget.value
-                          ? tokens.colors.primary
-                          : tokens.colors.foreground1,
-                    ),
-                  ),
-                );
-              },
-            ),
-        ],
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: theme.menuMaxHeight),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final item in widget.items)
+                NomoInteractive(
+                  semanticLabel: item.label,
+                  onTap: () => _select(item.value),
+                  builder: (context, states) {
+                    return NomoSurface(
+                      color: states.hovered || states.focused
+                          ? tokens.colors.background2
+                          : theme.menuBackground,
+                      padding: theme.itemPadding,
+                      child: Text(
+                        item.label,
+                        style: theme.textStyle.copyWith(
+                          color: item.value == widget.value
+                              ? tokens.colors.primary
+                              : tokens.colors.foreground1,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

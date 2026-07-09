@@ -14,6 +14,7 @@ class NomoSwitch extends StatelessWidget {
     required this.onChanged,
     super.key,
     this.enabled = true,
+    this.semanticLabel,
     this.activeTrack,
     this.inactiveTrack,
     this.thumb,
@@ -24,6 +25,10 @@ class NomoSwitch extends StatelessWidget {
   final bool value;
   final ValueChanged<bool>? onChanged;
   final bool enabled;
+
+  /// What this switch controls (e.g. 'Dark mode') — the on/off state itself
+  /// is announced via toggle semantics, never as a hard-coded English label.
+  final String? semanticLabel;
 
   @Themed(defaultsTo: 't.colors.primary', lerp: true)
   final Color? activeTrack;
@@ -58,7 +63,8 @@ class NomoSwitch extends StatelessWidget {
     return NomoInteractive(
       enabled: enabled && onChanged != null,
       onTap: onChanged == null ? null : () => onChanged(!value),
-      semanticLabel: value ? 'On' : 'Off',
+      semanticLabel: semanticLabel,
+      toggled: value,
       builder: (context, states) {
         final track = states.disabled
             ? tokens.colors.disabled
@@ -79,7 +85,9 @@ class NomoSwitch extends StatelessWidget {
           child: AnimatedAlign(
             duration: const Duration(milliseconds: 150),
             curve: Curves.easeOutCubic,
-            alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+            alignment: value
+                ? AlignmentDirectional.centerEnd
+                : AlignmentDirectional.centerStart,
             child: DecoratedBox(
               decoration: BoxDecoration(
                 color: states.disabled ? tokens.colors.onDisabled : theme.thumb,

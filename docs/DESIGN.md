@@ -15,9 +15,10 @@
    1. widget constructor parameter
    2. local subtree override (`…ThemeOverride`-style inherited widget)
    3. app-theme component override (per color/sizing mode)
-   4. delegate/kit defaults
-   5. annotation-declared default on the widget (derived from tokens)
-4. **Consumer widgets are first-class citizens**: dependents of the kit don't just consume the shipped components — they can author their own widgets and give them **identical theming support**: the same decorator declaration, the same generated artifacts, the same five-level resolution, plugged into the same `NomoThemeData`. A consumer defining their widget's theme must look exactly like the kit defining `PrimaryNomoButton`'s theme. This makes the generator a **published, consumer-facing product**, not an internal maintainer tool — with major consequences for tooling choice (§5) and theme architecture (§2.3).
+   4. annotation-declared default on the widget (derived from tokens)
+
+   *(As accepted this listed a separate "delegate/kit defaults" level between 3 and 4; Phase 0 collapsed it — see §9.9.)*
+4. **Consumer widgets are first-class citizens**: dependents of the kit don't just consume the shipped components — they can author their own widgets and give them **identical theming support**: the same decorator declaration, the same generated artifacts, the same layered resolution, plugged into the same `NomoThemeData`. A consumer defining their widget's theme must look exactly like the kit defining `PrimaryNomoButton`'s theme. This makes the generator a **published, consumer-facing product**, not an internal maintainer tool — with major consequences for tooling choice (§5) and theme architecture (§2.3).
 5. **Self-contained repo**: `git clone && flutter pub get && flutter test` must work with no sibling checkouts. The generator is developed *inside this repo* (and published from it).
 6. **Keep the good ideas**: delegate-driven color×sizing modes, responsive shell, near-zero runtime deps (see 01 §5).
 7. **Honest API surface**: `lib/src/` + curated barrel, semver, no typos, tested, CI that runs.
@@ -265,3 +266,8 @@ test/                       # per package; incl. generator golden tests
 6. Snackbar: keep ScaffoldMessenger interop, or move fully onto the overlay engine and drop the last Material service dependency?
 7. `nomo_gen` distribution default for consumers: dev dependency (per-project pinning, `analyzer` enters their dev graph with wide constraints) vs `dart pub global activate` (zero dependency footprint, but team version drift — mitigated by the version stamp + `--check`). Leaning dev-dependency as the documented default with global activation as the escape hatch; confirm with real consumer feedback in Phase 1.
 8. Does the level-3 map key on the theme class (`components[BalanceCardTheme]`) suffice, or do consumers need *variant* registration (one widget, several named themes, e.g. `BalanceCard.compact`)? If yes, key by `(Type, name)` — decide before the map's API ships.
+9. Is "delegate/kit defaults" (goal 3 level 4 as accepted) a real level, or the same thing as annotation defaults?
+   *2026-07-09, post-review (C2)*: **Collapsed.** In the implementation the kit's defaults ARE the `@Themed(defaultsTo:)` annotation defaults — `XTheme.defaults(tokens)` is the bottom layer, and there is no separate delegate object. Resolution is four levels: constructor → subtree override → `components` map → token-derived annotation defaults. If the kit ever wants to ship opinionated non-token presets (a "Nomo look" layer distinct from raw tokens), that's a *preset components map* consumers spread into their `NomoThemeData` (`components: {...nomoPresets, ...mine}`) — an additive future option, not a fifth resolution level.
+10. Theme-animation coverage of the components map?
+    *2026-07-09, post-review (I6)*: `AnimatedNomoTheme` lerps **tokens only**; a changed `components` map snaps at transition start (documented on the widget). Animating registered component themes would reintroduce legacy's per-class lerp — deferred unless a real app shows the snap.
+11. Dropdown trigger theming (M7): the trigger's colors/border are currently hard-derived from tokens, not `@Themed` — expose once a consumer needs to restyle the trigger independently of the menu. Same bucket: tap-to-position cursor in `NomoTextField` (M2), import-prefixed annotations in the parser (M3), dropdown flip-above + keyboard navigation.

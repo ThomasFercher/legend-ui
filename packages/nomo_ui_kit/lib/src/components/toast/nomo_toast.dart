@@ -262,10 +262,7 @@ class _NomoToastHostState extends State<_NomoToastHost>
               begin: const Offset(0, 1),
               end: Offset.zero,
             ).animate(_curve),
-            child: FadeTransition(
-              opacity: _curve,
-              child: widget.request.toast,
-            ),
+            child: FadeTransition(opacity: _curve, child: widget.request.toast),
           ),
         ),
       ),

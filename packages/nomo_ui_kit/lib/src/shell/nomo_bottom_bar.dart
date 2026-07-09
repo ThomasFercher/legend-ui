@@ -52,7 +52,17 @@ class NomoBottomBar extends StatelessWidget {
 
     return NomoSurface(
       color: theme.background,
-      shadows: tokens.shadows.medium,
+      // Token shadows are authored downward for cards; a bottom bar sits
+      // below its content, so cast them upward instead.
+      shadows: [
+        for (final s in tokens.shadows.medium)
+          BoxShadow(
+            color: s.color,
+            offset: Offset(s.offset.dx, -s.offset.dy),
+            blurRadius: s.blurRadius,
+            spreadRadius: s.spreadRadius,
+          ),
+      ],
       duration: const Duration(milliseconds: 120),
       child: SafeArea(
         top: false,

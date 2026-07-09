@@ -24,6 +24,17 @@ class ThemedField {
   final bool lerp;
 }
 
+/// Types the emitter can interpolate — `lerp: true` on anything else is a
+/// parse-time error instead of a silent step-fallback (review M4).
+const lerpableTypes = {
+  'double',
+  'Color',
+  'EdgeInsets',
+  'EdgeInsetsGeometry',
+  'BorderRadius',
+  'TextStyle',
+};
+
 /// A `@NomoThemeable` widget class parsed from one source file.
 class ThemableWidget {
   const ThemableWidget({
