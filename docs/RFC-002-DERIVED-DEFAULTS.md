@@ -200,6 +200,19 @@ static Color _foreground(LegendTokens t) => t.colors.onPrimary;
 - **Consumer symmetry is CLI-delivered** (DESIGN goal 4, unchanged): a package user runs `legend_gen` on their own annotated widget and gets the identical feature set — generated theme classes, four-level resolution, registry entry, docs manifest — with zero kit changes.
 - R5 (generated token classes) is accordingly *mechanical only*: a separate lightweight marker generates `copyWith`/`lerp`/`==` for the token data classes — it must never grow Override widgets, registry entries, or any of the component-theme machinery.
 
+### R11 — CLI quality bar: the Serverpod / Dart Frog standard *(added 2026-07-09, from CLI field study)*
+
+`legend_gen` is consumer-facing product surface (DESIGN §5.1); it adopts the proven stack of the two best Dart CLIs:
+
+1. **Foundation**: `package:args` `CommandRunner` + `package:mason_logger` — `-v/--verbose` → `logger.detail`, `-q/--quiet`, `progress()` spinners, `ExitCode` semantics with a distinct exit code for `--check` dirty (CI-friendly).
+2. **Watch loop = Dart Frog's shape**: `package:watcher` + debounce; regenerate only the changed file (fits one-file-in/one-file-out exactly); *never exit on a source error* — print `file:line`, keep the last good output, rebuild on next save (snapshot/rollback).
+3. **Scaffolding via bundled mason bricks**: `create` templates compiled into the CLI so they version in lock-step — no network, no drift (Dart Frog's model).
+4. **`update` command on `package:pub_updater`** + post-run "new version available" nudge; `doctor` warns when the activated CLI version ≠ the project's `legend_ui` version (Serverpod's pin policy — generated output must match runtime API); version stamp in generated headers stays.
+5. **Shell completion** via `package:cli_completion` (drop-in `CompletionCommandRunner`).
+6. **Error taxonomy**: recoverable annotation/analyzer errors (keep watching) vs internal generator faults (exit `software`); messages *name the fix* ("param `size` has a non-null default; make it nullable").
+
+Skipped deliberately: a `dev`-style VM-service server (the consumer's `flutter run` already hot-reloads the emitted source), an LSP/`daemon` command (until an editor extension exists), and default-on analytics (trust cost, no benefit here).
+
 ## 4. What is deliberately NOT adopted
 
 - **No function-valued theme content; exactly one generic container** *(amendments 4–6)* — the `resolveWith` function form was dropped, and per-type wrappers (`LegendStateColor`) were replaced by the single generic `LegendStates<T>` with type-bound extensions. Themes are pure data; computed values are produced at theme-build time. Nothing in a theme receives a BuildContext or a callback.
