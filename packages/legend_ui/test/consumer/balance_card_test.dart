@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:legend_ui/legend_ui.dart';
 
 import 'balance_card.dart';
-import 'balance_card.theme.g.dart';
 
 const _appTheme = Color(0xFF101010);
 const _subtree = Color(0xFF202020);

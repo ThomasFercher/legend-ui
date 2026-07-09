@@ -1,10 +1,12 @@
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
-import 'package:legend_ui/src/components/context_menu/legend_context_menu.theme.g.dart';
 import 'package:legend_ui/src/primitives/legend_anchored_overlay.dart';
 import 'package:legend_ui/src/primitives/legend_interactive.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_tokens.dart';
+
+part 'legend_context_menu.theme.g.dart';
 
 /// One action in a [LegendContextMenu].
 ///
@@ -49,24 +51,27 @@ class LegendContextMenu extends StatefulWidget {
   /// When false, secondary taps and long-presses do nothing.
   final bool enabled;
 
-  @Themed(defaultsTo: 't.colors.surface')
+  @Style<Color>.resolve(_menuBackground)
   final Color? menuBackground;
+  static Color _menuBackground(LegendTokens t) => t.colors.surface;
 
-  @Themed(defaultsTo: 't.sizes.borderRadiusMd')
+  @Style<BorderRadius>.resolve(_menuBorderRadius)
   final BorderRadius? menuBorderRadius;
+  static BorderRadius _menuBorderRadius(LegendTokens t) =>
+      t.sizes.borderRadiusMd;
 
-  @Themed(defaultsTo: 't.shadows.medium')
+  @Style<List<BoxShadow>>.resolve(_menuShadows)
   final List<BoxShadow>? menuShadows;
+  static List<BoxShadow> _menuShadows(LegendTokens t) => t.shadows.medium;
 
-  @Themed(
-    defaultsTo:
-        'EdgeInsets.symmetric(horizontal: t.sizes.md, '
-        'vertical: t.sizes.sm)',
-  )
+  @Style<EdgeInsetsGeometry>.resolve(_itemPadding)
   final EdgeInsetsGeometry? itemPadding;
+  static EdgeInsetsGeometry _itemPadding(LegendTokens t) =>
+      EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm);
 
-  @Themed(defaultsTo: 't.typography.b2')
+  @Style<TextStyle>.resolve(_textStyle)
   final TextStyle? textStyle;
+  static TextStyle _textStyle(LegendTokens t) => t.typography.b2;
 
   @override
   State<LegendContextMenu> createState() => _LegendContextMenuState();
@@ -97,16 +102,7 @@ class _LegendContextMenuState extends State<LegendContextMenu> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = LegendContextMenuTheme.of(
-      context,
-      LegendContextMenuThemeNullable(
-        menuBackground: widget.menuBackground,
-        menuBorderRadius: widget.menuBorderRadius,
-        menuShadows: widget.menuShadows,
-        itemPadding: widget.itemPadding,
-        textStyle: widget.textStyle,
-      ),
-    );
+    final theme = widget._theme(context);
     final tokens = LegendTheme.of(context).tokens;
 
     return LegendAnchoredOverlay(

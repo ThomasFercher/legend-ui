@@ -1,7 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
-import 'package:legend_ui/src/shell/legend_scaffold.theme.g.dart';
 import 'package:legend_ui/src/theme/legend_breakpoints.dart';
+import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_tokens.dart';
+
+part 'legend_scaffold.theme.g.dart';
 
 /// The page shell: app bar on top, sider on wide tiers, bottom bar on the
 /// compact tier — driven by [LegendBreakpoints], NOT by theme swaps
@@ -28,15 +31,13 @@ class LegendScaffold extends StatelessWidget {
   /// Shown at [LegendTier.compact].
   final Widget? bottomBar;
 
-  @Themed(defaultsTo: 't.colors.background1', lerp: true)
+  @Style<Color>.resolve(_background, lerp: true)
   final Color? background;
+  static Color _background(LegendTokens t) => t.colors.background1;
 
   @override
   Widget build(BuildContext context) {
-    final theme = LegendScaffoldTheme.of(
-      context,
-      LegendScaffoldThemeNullable(background: background),
-    );
+    final theme = _theme(context);
     final tier = LegendBreakpoints.of(context).tier;
     final compact = tier == LegendTier.compact;
     final showSider = !compact && sider != null;

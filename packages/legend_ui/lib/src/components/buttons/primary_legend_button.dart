@@ -1,7 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
-import 'package:legend_ui/src/components/buttons/primary_legend_button.theme.g.dart';
 import 'package:legend_ui/src/primitives/legend_button_core.dart';
+import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_tokens.dart';
+
+part 'primary_legend_button.theme.g.dart';
 
 /// The primary action button — first component ported in the rewrite
 /// (ROADMAP Phase 0), composed on [LegendButtonCore].
@@ -39,41 +42,34 @@ class PrimaryLegendButton extends StatelessWidget {
 
   final bool enabled;
 
-  @Themed(defaultsTo: 't.colors.primary', lerp: true)
+  @Style<Color>.resolve(_background, lerp: true)
   final Color? background;
+  static Color _background(LegendTokens t) => t.colors.primary;
 
-  @Themed(defaultsTo: 't.colors.onPrimary', lerp: true)
+  @Style<Color>.resolve(_foreground, lerp: true)
   final Color? foreground;
+  static Color _foreground(LegendTokens t) => t.colors.onPrimary;
 
-  @Themed(
-    defaultsTo:
-        'EdgeInsets.symmetric(horizontal: t.sizes.md, '
-        'vertical: t.sizes.sm)',
-  )
+  @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
+  static EdgeInsetsGeometry _padding(LegendTokens t) =>
+      EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm);
 
-  @Themed(defaultsTo: 't.sizes.borderRadiusMd')
+  @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
+  static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusMd;
 
-  @Themed(defaultsTo: 't.typography.b2')
+  @Style<TextStyle>.resolve(_textStyle)
   final TextStyle? textStyle;
+  static TextStyle _textStyle(LegendTokens t) => t.typography.b2;
 
-  @Themed(defaultsTo: 't.shadows.none')
+  @Style<List<BoxShadow>>.resolve(_shadows)
   final List<BoxShadow>? shadows;
+  static List<BoxShadow> _shadows(LegendTokens t) => t.shadows.none;
 
   @override
   Widget build(BuildContext context) {
-    final theme = PrimaryLegendButtonTheme.of(
-      context,
-      PrimaryLegendButtonThemeNullable(
-        background: background,
-        foreground: foreground,
-        padding: padding,
-        borderRadius: borderRadius,
-        textStyle: textStyle,
-        shadows: shadows,
-      ),
-    );
+    final theme = _theme(context);
     return LegendButtonCore(
       onPressed: onPressed,
       text: text,

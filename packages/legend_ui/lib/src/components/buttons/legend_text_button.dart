@@ -1,7 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
-import 'package:legend_ui/src/components/buttons/legend_text_button.theme.g.dart';
 import 'package:legend_ui/src/primitives/legend_button_core.dart';
+import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_tokens.dart';
+
+part 'legend_text_button.theme.g.dart';
 
 /// A borderless, backgroundless button on [LegendButtonCore] (hover/press
 /// tint comes from blending the foreground over transparency).
@@ -28,33 +31,26 @@ class LegendTextButton extends StatelessWidget {
   final bool textFirst;
   final bool enabled;
 
-  @Themed(defaultsTo: 't.colors.primary', lerp: true)
+  @Style<Color>.resolve(_foreground, lerp: true)
   final Color? foreground;
+  static Color _foreground(LegendTokens t) => t.colors.primary;
 
-  @Themed(
-    defaultsTo:
-        'EdgeInsets.symmetric(horizontal: t.sizes.sm, '
-        'vertical: t.sizes.xs)',
-  )
+  @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
+  static EdgeInsetsGeometry _padding(LegendTokens t) =>
+      EdgeInsets.symmetric(horizontal: t.sizes.sm, vertical: t.sizes.xs);
 
-  @Themed(defaultsTo: 't.sizes.borderRadiusSm')
+  @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
+  static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusSm;
 
-  @Themed(defaultsTo: 't.typography.b2')
+  @Style<TextStyle>.resolve(_textStyle)
   final TextStyle? textStyle;
+  static TextStyle _textStyle(LegendTokens t) => t.typography.b2;
 
   @override
   Widget build(BuildContext context) {
-    final theme = LegendTextButtonTheme.of(
-      context,
-      LegendTextButtonThemeNullable(
-        foreground: foreground,
-        padding: padding,
-        borderRadius: borderRadius,
-        textStyle: textStyle,
-      ),
-    );
+    final theme = _theme(context);
     return LegendButtonCore(
       onPressed: onPressed,
       text: text,

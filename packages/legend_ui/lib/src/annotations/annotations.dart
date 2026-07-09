@@ -55,20 +55,3 @@ class Style<T> {
   /// step, since theme switches lerp tokens instead — DESIGN.md §2.4).
   final bool lerp;
 }
-
-/// Marks a field of a [LegendThemeable] widget as a themed property.
-///
-/// Superseded by [Style] (RFC-002 R10) — kept only until the kit's own
-/// widgets finish migrating; do not use in new code.
-@Target({TargetKind.field})
-class Themed {
-  const Themed({required this.defaultsTo, this.lerp = false});
-
-  /// A Dart expression over `t` (a `LegendTokens` instance), evaluated in the
-  /// generated `defaults(LegendTokens t)` factory — e.g. `'t.colors.primary'`
-  /// or `'EdgeInsets.all(t.sizes.md)'`.
-  final String defaultsTo;
-
-  /// Whether `XTheme.lerp` interpolates this field.
-  final bool lerp;
-}

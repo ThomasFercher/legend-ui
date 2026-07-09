@@ -1,8 +1,11 @@
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
-import 'package:legend_ui/src/components/card/legend_card.theme.g.dart';
 import 'package:legend_ui/src/primitives/legend_interactive.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
+import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_tokens.dart';
+
+part 'legend_card.theme.g.dart';
 
 /// A content surface on [LegendSurface] — one shadow system, and theme
 /// values are always reachable (legacy's non-null `elevation` default
@@ -24,29 +27,26 @@ class LegendCard extends StatelessWidget {
   /// Makes the card interactive when set.
   final VoidCallback? onTap;
 
-  @Themed(defaultsTo: 't.colors.surface', lerp: true)
+  @Style<Color>.resolve(_background, lerp: true)
   final Color? background;
+  static Color _background(LegendTokens t) => t.colors.surface;
 
-  @Themed(defaultsTo: 't.sizes.borderRadiusLg')
+  @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
+  static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusLg;
 
-  @Themed(defaultsTo: 'EdgeInsets.all(t.sizes.md)')
+  @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
+  static EdgeInsetsGeometry _padding(LegendTokens t) =>
+      EdgeInsets.all(t.sizes.md);
 
-  @Themed(defaultsTo: 't.shadows.low')
+  @Style<List<BoxShadow>>.resolve(_shadows)
   final List<BoxShadow>? shadows;
+  static List<BoxShadow> _shadows(LegendTokens t) => t.shadows.low;
 
   @override
   Widget build(BuildContext context) {
-    final theme = LegendCardTheme.of(
-      context,
-      LegendCardThemeNullable(
-        background: background,
-        borderRadius: borderRadius,
-        padding: padding,
-        shadows: shadows,
-      ),
-    );
+    final theme = _theme(context);
     final surface = LegendSurface(
       color: theme.background,
       borderRadius: theme.borderRadius,

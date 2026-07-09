@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:collection';
-
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
-import 'package:legend_ui/src/components/toast/legend_toast.theme.g.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_tokens.dart';
+
+part 'legend_toast.theme.g.dart';
 
 /// Severity of a [LegendToast] — maps to a leading token-color accent
 /// (`primary` = info, `secondary` = success, `error` = error).
@@ -38,41 +39,34 @@ class LegendToast extends StatelessWidget {
   /// Optional trailing widget (e.g. an undo button).
   final Widget? action;
 
-  @Themed(defaultsTo: 't.colors.surface')
+  @Style<Color>.resolve(_background)
   final Color? background;
+  static Color _background(LegendTokens t) => t.colors.surface;
 
-  @Themed(defaultsTo: 't.sizes.borderRadiusMd')
+  @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
+  static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusMd;
 
-  @Themed(
-    defaultsTo:
-        'EdgeInsets.symmetric(horizontal: t.sizes.md, '
-        'vertical: t.sizes.sm)',
-  )
+  @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
+  static EdgeInsetsGeometry _padding(LegendTokens t) =>
+      EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm);
 
-  @Themed(defaultsTo: 't.colors.primary')
+  @Style<Color>.resolve(_infoAccent)
   final Color? infoAccent;
+  static Color _infoAccent(LegendTokens t) => t.colors.primary;
 
-  @Themed(defaultsTo: 't.colors.secondary')
+  @Style<Color>.resolve(_successAccent)
   final Color? successAccent;
+  static Color _successAccent(LegendTokens t) => t.colors.secondary;
 
-  @Themed(defaultsTo: 't.colors.error')
+  @Style<Color>.resolve(_errorAccent)
   final Color? errorAccent;
+  static Color _errorAccent(LegendTokens t) => t.colors.error;
 
   @override
   Widget build(BuildContext context) {
-    final theme = LegendToastTheme.of(
-      context,
-      LegendToastThemeNullable(
-        background: background,
-        borderRadius: borderRadius,
-        padding: padding,
-        infoAccent: infoAccent,
-        successAccent: successAccent,
-        errorAccent: errorAccent,
-      ),
-    );
+    final theme = _theme(context);
     final tokens = LegendTheme.of(context).tokens;
     final accent = switch (severity) {
       LegendToastSeverity.info => theme.infoAccent,

@@ -44,10 +44,11 @@ class _ResolutionLadderState extends State<_ResolutionLadder> {
         data: appData.copyWith(
           components: {
             ...appData.components,
-            PrimaryLegendButtonThemeNullable:
-                const PrimaryLegendButtonThemeNullable(
-                  background: _midTreeColor,
-                ),
+            // RFC-002 R3: keyed by the widget type (wins over a legacy
+            // Nullable-type entry when both are present).
+            PrimaryLegendButton: const PrimaryLegendButtonThemeNullable(
+              background: _midTreeColor,
+            ),
           },
         ),
         child: target,
@@ -190,27 +191,32 @@ PrimaryLegendButtonThemeOverride(
         const DocSection(
           title: 'Declaring a themed component',
           description:
-              'Annotate the widget, run legend_gen, done. The generator '
+              'One var + one annotation, run legend_gen, done. The generator '
               'enforces the contract: themed fields must be nullable with '
               'null constructor defaults, so theme values are always '
-              'reachable. Defaults are expressions over the tokens (t).',
+              'reachable. Defaults are typed Dart — a const value, or a '
+              'tear-off relating the field to the tokens.',
           code: '''
+part 'balance_card.theme.g.dart';
+
 @LegendThemeable()
 class BalanceCard extends StatelessWidget {
   const BalanceCard({super.key, this.background, this.padding});
 
-  @Themed(defaultsTo: 't.colors.surface', lerp: true)
+  /// Fill behind the card content.
+  @Style<Color>.resolve(_background, lerp: true)
   final Color? background;
+  static Color _background(LegendTokens t) => t.colors.surface;
 
-  @Themed(defaultsTo: 'EdgeInsets.all(t.sizes.md)')
+  /// Inner padding around the content.
+  @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
+  static EdgeInsetsGeometry _padding(LegendTokens t) =>
+      EdgeInsets.all(t.sizes.md);
 
   @override
   Widget build(BuildContext context) {
-    final theme = BalanceCardTheme.of(
-      context,
-      BalanceCardThemeNullable(background: background, padding: padding),
-    );
+    final theme = _theme(context); // generated, in-library
     ...
   }
 }''',
@@ -226,12 +232,12 @@ class BalanceCard extends StatelessWidget {
 LegendThemeData(
   tokens: LegendTokens.light,
   components: {
-    // reskin a kit component (sparse — only what you set)
-    PrimaryLegendButtonThemeNullable:
+    // reskin a kit component, keyed by the widget type
+    // (sparse — only what you set)
+    PrimaryLegendButton:
         const PrimaryLegendButtonThemeNullable(background: brand),
     // and your own component, exactly the same way
-    BalanceCardThemeNullable:
-        const BalanceCardThemeNullable(padding: EdgeInsets.all(24)),
+    BalanceCard: const BalanceCardThemeNullable(padding: EdgeInsets.all(24)),
   },
 )''',
         ),
@@ -259,13 +265,14 @@ PrimaryLegendButtonThemeOverride(
 LegendTheme(
   data: appData.copyWith(components: {
     ...appData.components,
-    PrimaryLegendButtonThemeNullable:
+    // keyed by the widget type (the Nullable type still works too)
+    PrimaryLegendButton:
         PrimaryLegendButtonThemeNullable(background: teal),
   }),
   child: ...,
 )
 
-// level 4 — @Themed(defaultsTo: 't.colors.primary') on the widget''',
+// level 4 — @Style<Color>.resolve(_background) on the widget''',
         ),
         const DocSection(
           title: 'Animated theme switches',

@@ -1,8 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
-import 'package:legend_ui/src/components/switch/legend_switch.theme.g.dart';
 import 'package:legend_ui/src/primitives/legend_interactive.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_tokens.dart';
+
+part 'legend_switch.theme.g.dart';
 
 /// A toggle switch built on [LegendInteractive] — no CupertinoSwitch fork
 /// (legacy vendored one just to change its size, complete with an
@@ -30,33 +32,27 @@ class LegendSwitch extends StatelessWidget {
   /// is announced via toggle semantics, never as a hard-coded English label.
   final String? semanticLabel;
 
-  @Themed(defaultsTo: 't.colors.primary', lerp: true)
+  @Style<Color>.resolve(_activeTrack, lerp: true)
   final Color? activeTrack;
+  static Color _activeTrack(LegendTokens t) => t.colors.primary;
 
-  @Themed(defaultsTo: 't.colors.background3', lerp: true)
+  @Style<Color>.resolve(_inactiveTrack, lerp: true)
   final Color? inactiveTrack;
+  static Color _inactiveTrack(LegendTokens t) => t.colors.background3;
 
-  @Themed(defaultsTo: 't.colors.surface')
+  @Style<Color>.resolve(_thumb)
   final Color? thumb;
+  static Color _thumb(LegendTokens t) => t.colors.surface;
 
-  @Themed(defaultsTo: '44.0')
+  @Style<double>(44)
   final double? width;
 
-  @Themed(defaultsTo: '24.0')
+  @Style<double>(24)
   final double? height;
 
   @override
   Widget build(BuildContext context) {
-    final theme = LegendSwitchTheme.of(
-      context,
-      LegendSwitchThemeNullable(
-        activeTrack: activeTrack,
-        inactiveTrack: inactiveTrack,
-        thumb: thumb,
-        width: width,
-        height: height,
-      ),
-    );
+    final theme = _theme(context);
     final tokens = LegendTheme.of(context).tokens;
     final onChanged = this.onChanged;
 

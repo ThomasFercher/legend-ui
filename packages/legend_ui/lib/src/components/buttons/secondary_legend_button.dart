@@ -1,8 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
-import 'package:legend_ui/src/components/buttons/secondary_legend_button.theme.g.dart';
 import 'package:legend_ui/src/primitives/legend_button_core.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_tokens.dart';
+
+part 'secondary_legend_button.theme.g.dart';
 
 /// The secondary (tinted, outlined) action button on [LegendButtonCore].
 /// Unlike legacy, its themed padding actually applies (legacy passed raw
@@ -32,41 +34,34 @@ class SecondaryLegendButton extends StatelessWidget {
   final bool textFirst;
   final bool enabled;
 
-  @Themed(defaultsTo: 't.colors.primaryContainer', lerp: true)
+  @Style<Color>.resolve(_background, lerp: true)
   final Color? background;
+  static Color _background(LegendTokens t) => t.colors.primaryContainer;
 
-  @Themed(defaultsTo: 't.colors.primary', lerp: true)
+  @Style<Color>.resolve(_foreground, lerp: true)
   final Color? foreground;
+  static Color _foreground(LegendTokens t) => t.colors.primary;
 
-  @Themed(defaultsTo: 't.colors.primary')
+  @Style<Color>.resolve(_borderColor)
   final Color? borderColor;
+  static Color _borderColor(LegendTokens t) => t.colors.primary;
 
-  @Themed(
-    defaultsTo:
-        'EdgeInsets.symmetric(horizontal: t.sizes.md, '
-        'vertical: t.sizes.sm)',
-  )
+  @Style<EdgeInsetsGeometry>.resolve(_padding)
   final EdgeInsetsGeometry? padding;
+  static EdgeInsetsGeometry _padding(LegendTokens t) =>
+      EdgeInsets.symmetric(horizontal: t.sizes.md, vertical: t.sizes.sm);
 
-  @Themed(defaultsTo: 't.sizes.borderRadiusMd')
+  @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
+  static BorderRadius _borderRadius(LegendTokens t) => t.sizes.borderRadiusMd;
 
-  @Themed(defaultsTo: 't.typography.b2')
+  @Style<TextStyle>.resolve(_textStyle)
   final TextStyle? textStyle;
+  static TextStyle _textStyle(LegendTokens t) => t.typography.b2;
 
   @override
   Widget build(BuildContext context) {
-    final theme = SecondaryLegendButtonTheme.of(
-      context,
-      SecondaryLegendButtonThemeNullable(
-        background: background,
-        foreground: foreground,
-        borderColor: borderColor,
-        padding: padding,
-        borderRadius: borderRadius,
-        textStyle: textStyle,
-      ),
-    );
+    final theme = _theme(context);
     final tokens = LegendTheme.of(context).tokens;
     return LegendButtonCore(
       onPressed: onPressed,
