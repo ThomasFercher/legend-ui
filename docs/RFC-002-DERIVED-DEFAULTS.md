@@ -104,7 +104,27 @@ final dark   = LegendTokens.fromSeed(LegendSeed(brand: ..., brightness: Brightne
 
 `tokens/` data classes get their `copyWith`/`lerp`/`==` generated into `*.tokens.g.dart` via a separate lightweight marker (NOT `@LegendThemeable` — tokens are the base theme, not component themes, and never get Override widgets or registry entries). Removes ~230 hand LOC, makes "add a token" a one-line diff, and dogfoods the generator on the kit's own core.
 
-### R6 — Sealed widget states; ONE minimal generic container + extensions *(settled 2026-07-09 ×6, directed: `LegendStates<T>` compromise, generic annotations per the legacy pattern, flat vars as fallback)*
+### R6 — Sealed widget states; ~~ONE minimal generic container~~ → custom style classes *(re-settled 2026-07-10 ×7, directed: `LegendStates<T>` is removed — any `@Style`-annotated class is a themed value type)*
+
+> **Amendment 7 (2026-07-10, directed — supersedes the container design below; the sealed `LegendWidgetState` + overlays + ladder stay).** The kit-special generic container is gone. Instead, **users define custom style classes** and the CLI generates their type-safe resolution plumbing:
+>
+> ```dart
+> @Style()                       // class form: "this is a style value class"
+> class InteractiveColors {
+>   const InteractiveColors({this.normal, this.hovered, this.pressed, this.focused, this.disabled});
+>   /// Fill at rest.
+>   final Color? normal;
+>   /// Fill while hovered.
+>   final Color? hovered;
+>   ...
+> }
+> // legend_gen emits into the class's part: member-wise sparse merge,
+> // member-wise type-appropriate lerp, value ==/hashCode, docs-manifest entries.
+> ```
+>
+> A widget field typed with any `@Style`-annotated class gets **member-wise** treatment in the generated theme artifacts (detected from the field type's resolved element — output stays strictly one-file-in/one-file-out). The class may carry any shape — the record idea, fully user-extensible — and any methods the author likes (`pick(LegendWidgetState)`, derivations); the generator only owns the mechanical members. **The kit predefines the common cases as ordinary predefined style classes** (e.g. `InteractiveColors` for hover-bearing widgets, replacing every former `LegendStates<Color>` use one-to-one) — same mechanism as user classes, zero special-casing. The generator's `LegendStates` category, the `withDerived` post-merge hook, and the generic container itself are deleted.
+
+*(Historical — superseded by amendment 7 above:)*
 
 Interaction state becomes a **sealed type** with a single effective value, resolved by a fixed priority ladder (disabled ≻ pressed ≻ hovered ≻ focused ≻ normal):
 
@@ -212,6 +232,17 @@ static Color _foreground(LegendTokens t) => t.colors.onPrimary;
 6. **Error taxonomy**: recoverable annotation/analyzer errors (keep watching) vs internal generator faults (exit `software`); messages *name the fix* ("param `size` has a non-null default; make it nullable").
 
 Skipped deliberately: a `dev`-style VM-service server (the consumer's `flutter run` already hot-reloads the emitted source), an LSP/`daemon` command (until an editor extension exists), and default-on analytics (trust cost, no benefit here).
+
+### R12 — Granular rebuilds: per-field listening, opt-out, and ValueListenables *(added 2026-07-10, directed)*
+
+Today `_theme(context)` depends on `LegendTheme` as a whole — any theme change rebuilds every themed widget. R12 makes the dependency **per resolved field**:
+
+1. **`LegendTheme` (and the subtree override) become `InheritedModel`s** with aspect objects. The generated `_theme(context)` registers one aspect per listened field; `updateShouldNotifyDependent` re-resolves just the dependent's fields against old vs new data and notifies only on actual value change. Constructor params (level 1) are local and never a rebuild source.
+2. **`@Style(..., listen: false)`** — opt a field out of automatic rebuilds: it is still resolved (fresh value on every build) but registers no aspect, so changes to it alone never schedule a rebuild. For values consumed by imperative code (painters, controllers) or deliberately latched.
+3. **Generated per-field accessors** — alongside `_theme(context)`, each field gets `_<fieldName>(context)` resolving that single field with only its own aspect, for widgets consuming one property.
+4. **`ValueListenable<T>` per field** — generated controller-backed selectors (`XThemeListenables.background(LegendThemeController)`), distinct-until-changed, for animation/imperative consumers that want change streams without any widget rebuild. Lives against the controller (the theme's source of truth), not the element tree, so it has a well-defined lifetime.
+
+Themes remain pure data; this changes only *who gets notified*, never how values resolve.
 
 ## 4. What is deliberately NOT adopted
 
