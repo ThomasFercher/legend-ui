@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:legend_gen/src/emitter.dart';
 import 'package:legend_gen/src/generate_runner.dart';
+import 'package:legend_gen/src/parser.dart';
 
 /// Runs `legend_gen docs` (RFC-002 R9): scans [paths] for
 /// `@LegendThemeable` widgets and writes a `<source>.docs.g.dart` manifest
@@ -20,6 +21,7 @@ Future<int> runDocs(List<String> paths, {bool check = false}) {
     suffix: '.docs.g.dart',
     label: 'docs',
     command: 'docs',
+    parse: parseThemableWidgets,
     emit: emitDocsFile,
     check: check,
   );

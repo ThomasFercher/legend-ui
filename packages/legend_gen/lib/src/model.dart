@@ -107,6 +107,46 @@ class ThemableWidget {
   final String sourceBasename;
 }
 
+/// A final instance field of a `@LegendTokenData` class (RFC-002 R5).
+class TokenField {
+  const TokenField({required this.name, required this.type});
+
+  /// Field name, e.g. `primary`.
+  final String name;
+
+  /// Declared (non-nullable) type source, e.g. `Color`, `List<BoxShadow>`.
+  final String type;
+
+  /// Whether the field is a `List<…>` — value `==` compares element-wise
+  /// and `hashCode` hashes the elements (list identity would make equal
+  /// token sets unequal).
+  bool get isList => type.startsWith('List<');
+}
+
+/// A `@LegendTokenData` class parsed from one source file (RFC-002 R5):
+/// a token data class whose mechanical members (`copyWith`, member-wise
+/// `lerp`, value `==`/`hashCode`) are generated. Explicitly NOT a
+/// [ThemableWidget] — token classes never get Override widgets, registry
+/// entries, or `of()` resolvers (RFC-002 R10 scope).
+class TokenClass {
+  const TokenClass({
+    required this.className,
+    required this.fields,
+    required this.sourceBasename,
+    this.line = 1,
+  });
+
+  final String className;
+  final List<TokenField> fields;
+
+  /// 1-based line of the class name in the source file (for diagnostics).
+  final int line;
+
+  /// Basename of the source file, e.g. `legend_colors.dart` — the target
+  /// of the emitted `part of` directive.
+  final String sourceBasename;
+}
+
 /// A parse/validation problem with a source location.
 class LegendGenDiagnostic {
   const LegendGenDiagnostic(this.path, this.line, this.message);

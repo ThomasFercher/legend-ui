@@ -1,23 +1,27 @@
 import 'dart:io';
 
 import 'package:legend_gen/src/model.dart';
-import 'package:legend_gen/src/parser.dart';
 import 'package:path/path.dart' as p;
 
-/// Shared one-file-in/one-file-out driver behind `legend_gen themes` and
-/// `legend_gen docs`: scans [paths] for `@LegendThemeable` widgets, runs
-/// [emit] per source file, and writes `<source><suffix>` next to it.
+/// Shared one-file-in/one-file-out driver behind `legend_gen themes`,
+/// `legend_gen docs`, and `legend_gen tokens`: scans [paths], runs [parse]
+/// then [emit] per source file, and writes `<source><suffix>` next to it.
+///
+/// [parse] returns the annotated declarations of one source file (empty
+/// when the file declares none) and throws [LegendGenException] on
+/// contract violations.
 ///
 /// With [check], nothing is written; stale or missing output makes the run
 /// fail — the CI freshness gate (DESIGN.md §5.3).
 ///
 /// Returns the process exit code.
-Future<int> runGeneration(
+Future<int> runGeneration<T>(
   List<String> paths, {
   required String suffix,
   required String label,
   required String command,
-  required String Function(List<ThemableWidget> widgets) emit,
+  required List<T> Function(String path, String content) parse,
+  required String Function(List<T> declarations) emit,
   bool check = false,
 }) async {
   var generated = 0;
@@ -27,16 +31,16 @@ Future<int> runGeneration(
   for (final path in paths) {
     final files = sourceDartFilesIn(path);
     for (final file in files) {
-      final List<ThemableWidget> widgets;
+      final List<T> declarations;
       try {
-        widgets = parseThemableWidgets(file.path, file.readAsStringSync());
+        declarations = parse(file.path, file.readAsStringSync());
       } on LegendGenException catch (e) {
         failures.addAll(e.diagnostics);
         continue;
       }
-      if (widgets.isEmpty) continue;
+      if (declarations.isEmpty) continue;
 
-      final output = emit(widgets);
+      final output = emit(declarations);
       final outputPath =
           '${file.path.substring(0, file.path.length - '.dart'.length)}'
           '$suffix';

@@ -13,4 +13,7 @@ export 'src/generate_runner.dart';
 export 'src/model.dart';
 export 'src/parser.dart';
 export 'src/themes_command.dart';
+export 'src/tokens_command.dart';
+export 'src/tokens_emitter.dart';
+export 'src/tokens_parser.dart';
 export 'src/version.dart';

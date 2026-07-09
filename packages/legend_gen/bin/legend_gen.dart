@@ -18,6 +18,10 @@ Usage:
                                List<LegendDocEntry> per widget) from the
                                same annotations (default path: lib)
       --check                  Verify committed output is fresh (CI gate)
+  legend_gen tokens [paths…]     Generate *.tokens.g.dart (copyWith, lerp,
+                               value ==) from @LegendTokenData token
+                               classes (default path: lib)
+      --check                  Verify committed output is fresh (CI gate)
   legend_gen create <ClassName>  Scaffold an annotated component and generate
                                its theme file and docs manifest
       --dir <path>             Target directory (default:
@@ -46,15 +50,19 @@ Future<void> main(List<String> args) async {
 
   final rest = results.rest;
   final command = rest.firstOrNull;
-  const generateCommands = {'themes', 'docs'};
+  const generateCommands = {'themes', 'docs', 'tokens'};
   if (command != null &&
       !generateCommands.contains(command) &&
       (results.flag('check') || results.flag('watch'))) {
-    stderr.writeln('--check and --watch are only valid with `themes`/`docs`.');
+    stderr.writeln(
+      '--check and --watch are only valid with `themes`/`docs`/`tokens`.',
+    );
     exitCode = 64;
     return;
   }
-  if (command == 'docs' && results.flag('watch')) {
+  if (command != 'themes' &&
+      generateCommands.contains(command) &&
+      results.flag('watch')) {
     stderr.writeln('--watch is only valid with `themes`.');
     exitCode = 64;
     return;
@@ -79,6 +87,9 @@ Future<void> main(List<String> args) async {
     case 'docs':
       final paths = rest.length > 1 ? rest.sublist(1) : const ['lib'];
       exitCode = await runDocs(paths, check: results.flag('check'));
+    case 'tokens':
+      final paths = rest.length > 1 ? rest.sublist(1) : const ['lib'];
+      exitCode = await runTokens(paths, check: results.flag('check'));
     case 'create':
       if (rest.length != 2) {
         stderr.writeln('create needs exactly one ClassName.');

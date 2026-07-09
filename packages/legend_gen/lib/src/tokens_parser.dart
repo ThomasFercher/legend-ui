@@ -1,0 +1,162 @@
+import 'package:analyzer/dart/analysis/features.dart';
+import 'package:analyzer/dart/analysis/utilities.dart';
+import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/syntactic_entity.dart';
+import 'package:legend_gen/src/model.dart';
+import 'package:path/path.dart' as p;
+
+/// Parses one Dart file and returns its `@LegendTokenData` classes
+/// (RFC-002 R5).
+///
+/// Pure AST work — no element resolution, no build graph (DESIGN.md §5),
+/// exactly like the `@LegendThemeable` parser. Violations of the token
+/// contract throw [LegendGenException] with `file:line` diagnostics.
+///
+/// Contract, enforced here:
+///
+/// - the class is not also `@LegendThemeable` (tokens are the base theme,
+///   never component themes — RFC-002 R10 scope),
+/// - every instance field is `final`, explicitly typed and non-nullable,
+/// - `List<…>` fields are `List<BoxShadow>` (the one list lerper),
+/// - the class applies the generated mixin (`with _$ClassName`),
+/// - the file carries `part '<file>.tokens.g.dart';`.
+List<TokenClass> parseTokenClasses(String path, String content) {
+  final unit = parseString(
+    content: content,
+    path: path,
+    featureSet: FeatureSet.latestLanguageVersion(),
+  ).unit;
+
+  final diagnostics = <LegendGenDiagnostic>[];
+  final classes = <TokenClass>[];
+
+  int lineOf(SyntacticEntity entity) =>
+      unit.lineInfo.getLocation(entity.offset).lineNumber;
+  void report(SyntacticEntity at, String message) =>
+      diagnostics.add(LegendGenDiagnostic(path, lineOf(at), message));
+
+  for (final declaration in unit.declarations) {
+    if (declaration is! ClassDeclaration) continue;
+    final marker = declaration.metadata
+        .where((a) => a.name.name == 'LegendTokenData')
+        .firstOrNull;
+    if (marker == null) continue;
+
+    final className = declaration.name.lexeme;
+    if (declaration.metadata.any((a) => a.name.name == 'LegendThemeable')) {
+      report(
+        marker,
+        '"$className" is both @LegendTokenData and @LegendThemeable — '
+        'token classes are the base theme and never component themes '
+        '(RFC-002 R10 scope); remove one marker.',
+      );
+      continue;
+    }
+
+    final fields = <TokenField>[];
+    var fieldsValid = true;
+    for (final member in declaration.members) {
+      if (member is! FieldDeclaration || member.isStatic) continue;
+      final type = member.fields.type?.toSource();
+      for (final variable in member.fields.variables) {
+        final name = variable.name.lexeme;
+        if (type == null) {
+          report(
+            variable,
+            'token field "$name" needs an explicit type annotation.',
+          );
+          fieldsValid = false;
+          continue;
+        }
+        if (type.endsWith('?')) {
+          report(
+            variable,
+            'token field "$name" must be non-nullable ("$type" declared) — '
+            'tokens are the complete base theme; there is no "inherit" '
+            'level below them (DESIGN.md §2.1).',
+          );
+          fieldsValid = false;
+          continue;
+        }
+        if (!member.fields.isFinal) {
+          report(
+            variable,
+            'token field "$name" must be final — token classes are '
+            'immutable data (DESIGN.md §2.1).',
+          );
+          fieldsValid = false;
+          continue;
+        }
+        if (type.startsWith('List<') && type != 'List<BoxShadow>') {
+          report(
+            variable,
+            'token field "$name" has unsupported list type "$type" — the '
+            'only lerpable list is List<BoxShadow> (BoxShadow.lerpList).',
+          );
+          fieldsValid = false;
+          continue;
+        }
+        fields.add(TokenField(name: name, type: type));
+      }
+    }
+
+    if (fields.isEmpty) {
+      if (fieldsValid) {
+        report(
+          declaration.name,
+          '@LegendTokenData class "$className" has no instance fields.',
+        );
+      }
+      continue;
+    }
+
+    final mixinName = '_\$$className';
+    final appliesMixin =
+        declaration.withClause?.mixinTypes.any(
+          (t) => t.toSource() == mixinName,
+        ) ??
+        false;
+    if (!appliesMixin) {
+      report(
+        declaration.name,
+        '"$className" does not apply the generated mixin — add '
+        '`with $mixinName` to the class declaration.',
+      );
+    }
+
+    classes.add(
+      TokenClass(
+        className: className,
+        fields: fields,
+        sourceBasename: p.basename(path),
+        line: lineOf(declaration.name),
+      ),
+    );
+  }
+
+  // Generation is `part of` the token library (mirrors RFC-002 R1): the
+  // source file must carry the matching part directive.
+  if (classes.isNotEmpty) {
+    final basename = p.basename(path);
+    final expected =
+        '${basename.substring(0, basename.length - '.dart'.length)}'
+        '.tokens.g.dart';
+    final hasPart = unit.directives.whereType<PartDirective>().any(
+      (d) => d.uri.stringValue == expected,
+    );
+    if (!hasPart) {
+      diagnostics.add(
+        LegendGenDiagnostic(
+          path,
+          1,
+          "missing `part '$expected';` — the generated token file is a "
+          'part of the token library (RFC-002 R5); add the directive '
+          'below the imports.',
+        ),
+      );
+    }
+  }
+
+  if (diagnostics.isNotEmpty) throw LegendGenException(diagnostics);
+  return classes;
+}

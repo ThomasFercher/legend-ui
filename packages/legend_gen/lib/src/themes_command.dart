@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:legend_gen/src/emitter.dart';
 import 'package:legend_gen/src/generate_runner.dart';
+import 'package:legend_gen/src/parser.dart';
 
 /// Runs `legend_gen themes`: scans [paths] for `@LegendThemeable` widgets and
 /// writes `<source>.theme.g.dart` — a `part` of the widget's library
@@ -18,6 +19,7 @@ Future<int> runThemes(List<String> paths, {bool check = false}) {
     suffix: '.theme.g.dart',
     label: 'theme',
     command: 'themes',
+    parse: parseThemableWidgets,
     emit: emitThemeFile,
     check: check,
   );
