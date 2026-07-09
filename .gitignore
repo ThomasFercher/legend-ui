@@ -21,4 +21,5 @@ pubspec.lock
 
 # FVM
 .fvm/
-.claude/
+.claude/*
+!.claude/launch.json

@@ -1,0 +1,14 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "docs-site",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd example && tail -f /dev/null | flutter run -d web-server --web-port=8321"
+      ],
+      "port": 8321
+    }
+  ]
+}
