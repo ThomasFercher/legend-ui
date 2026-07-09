@@ -102,26 +102,29 @@ final class LegendStateFocused  extends LegendWidgetState { const ... }
 final class LegendStateDisabled extends LegendWidgetState { const ... }
 ```
 
-**The default stays data.** Themed fields remain plain values (`Color?` etc.); tokens gain `LegendStateOverlays` (hover/press deltas, disabled opacity), and components derive their state colors from the base value through those overlays (`t.states.hovered(background)`), so every interactive component gets consistent state styling from one color with zero extra declaration — brand restyles automatically restyle hover/press everywhere; components stop inventing hover math.
+**Every state variant is a named, overridable variable** *(amended 2026-07-09 ×3, directed)*. State-bearing fields use **`LegendStateColor`** — a data class whose members are individually named and individually overridable at every resolution level: `normal`, `hovered`, `pressed`, `focused`, `disabled`. Merging across the four levels is **member-wise sparse**, so overriding one named member at any level leaves the others resolving normally. No value is reachable only through derivation — everything the playground/manifest lists by name can be set by name.
 
-**The function is the offered option.** Where a consumer wants full per-state control, a themed field can *additionally* accept a **`LegendStateStyle<T>`** — a styling function over the sealed type — which, when set, wins over the derived overlays:
+**Derivation fills what you didn't name.** Tokens gain `LegendStateOverlays` (hover/press deltas, disabled opacity). An unset member resolves by applying the overlays to the *resolved* `normal` at resolve time — so `PrimaryLegendButton(background: LegendStateColor(normal: brand))` (or the plain-color sugar `background: brand`) gets brand-consistent hover/press for free, and they re-derive from whatever `normal` resolves to at any level. Consistent state styling from one color, zero extra declaration; hand-naming a member always wins over derivation.
+
+**The function is the offered option.** `LegendStateColor.resolveWith(fn)` — a styling function over the sealed type — is the opt-in for full programmatic control, and wins over both members and derivation when set:
 
 ```dart
-// default path — nothing extra to write:
-PrimaryLegendButton(background: brand)          // hover/press derived from overlays
-
-// opt-in path — exhaustive by the compiler:
-PrimaryLegendButton(backgroundStyle: LegendStateStyle((state) => switch (state) {
+// default: one color, states derived
+PrimaryLegendButton(background: LegendStateColor(normal: brand))
+// named override of exactly one state variant, any level:
+PrimaryLegendButtonThemeNullable(background: LegendStateColor(pressed: navy))
+// opt-in function, exhaustive by the compiler:
+LegendStateColor.resolveWith((state) => switch (state) {
   LegendStatePressed()  => brand.shade700,
   LegendStateHovered()  => brand.shade600,
   LegendStateDisabled() => grey,
   _                     => brand,
-}))
+})
 ```
 
-Precedence within a field: explicit `LegendStateStyle` (any resolution level) ≻ base value + derived overlays (same four-level resolution as today). The generator supports `LegendStateStyle<Color>` as a field category so kit and consumer widgets can expose the option uniformly; components are not required to expose it.
+Per-member precedence: function (nearest level that set one) ≻ named member (nearest level) ≻ overlays applied to resolved `normal`. The generator supports `LegendStateColor` as a field category (member-wise merge, member-wise lerp); the manifest (R9) lists each member as its own named variable.
 
-Why the option does **not** repeat Fluent v8's mistake (the reason the first draft was data-only): v8's failure was *arbitrary style-merge callbacks* composed per render with unpredictable output. A `LegendStateStyle` function is **total over a sealed 5-value domain** — exhaustively checked by the compiler, pure, and *materializable*: the kit samples it once into a per-state record for `lerp` (per-state value lerp) and equality (sampled comparison), so `AnimatedLegendTheme` and `updateShouldNotify` treat it as data. `LegendInteractive` maps its `LegendInteractionStates` snapshot onto the ladder via `states.effective`.
+Why the function option does **not** repeat Fluent v8's mistake (the reason the first draft was data-only): v8's failure was *arbitrary style-merge callbacks* composed per render with unpredictable output. A `resolveWith` function is **total over a sealed 5-value domain** — exhaustively checked by the compiler, pure, and *materializable*: the kit samples it once into per-state members for `lerp` and equality, so `AnimatedLegendTheme` and `updateShouldNotify` treat it as data. `LegendInteractive` maps its `LegendInteractionStates` snapshot onto the ladder via `states.effective`.
 
 ### R7 — Shared default expressions + variant consolidation
 
@@ -146,7 +149,7 @@ Every token field and every `@Themed` field already carries (or per CLAUDE.md mu
 
 ## 4. What is deliberately NOT adopted
 
-- **No arbitrary style callbacks in themes** — `LegendStateStyle` is the *only* function-valued theme type, it is opt-in rather than the default declaration style, and it is admitted only because its sealed domain makes it total, pure, and materializable (§R6). Nothing receives a BuildContext or arbitrary widget state.
+- **No arbitrary style callbacks in themes** — `LegendStateColor.resolveWith` is the *only* function-valued theme content, it is opt-in rather than the default declaration style, and it is admitted only because its sealed domain makes it total, pure, and materializable (§R6). Nothing receives a BuildContext or arbitrary widget state.
 - **No headless/unstyled pivot** — annotation defaults remain the styled layer; primitives remain the recomposition hatch.
 - **No closed variant registry, no naming conventions, no cross-file generation** — RFC-001 rules hold.
 - **No `sx`-style ad-hoc instance styling** — typed constructor params are the instance hatch.
@@ -156,7 +159,7 @@ Every token field and every `@Themed` field already carries (or per CLAUDE.md mu
 
 | Step | Contents | Status |
 |---|---|---|
-| **A — generator sprint** | R1 + R2 + R3 + `LegendStateStyle` field category + `legend_gen docs`; regenerate all + goldens | in progress (2026-07-09) |
+| **A — generator sprint** | R1 + R2 + R3 + `LegendStateColor` field category + `legend_gen docs`; regenerate all + goldens | in progress (2026-07-09) |
 | **B — token sprint** | R5 then R4 (`LegendRamp`, `LegendSeed`, pairs restructure, `LegendStateOverlays`); goldens pin light/dark | in progress (2026-07-09) |
 | **C — component adoption** | resolveTheme() everywhere; interactive components move to `LegendStateStyle`; R7 | in progress (2026-07-09) |
 | **D — playground & docs CMS** | manifest-driven configurator over every variable; Theme reference page; `LegendThemeController` in kit | in progress (2026-07-09) |
