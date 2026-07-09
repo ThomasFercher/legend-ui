@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:nomo_ui_kit/src/annotations/annotations.dart';
 import 'package:nomo_ui_kit/src/components/dropdown/nomo_dropdown.theme.g.dart';
 import 'package:nomo_ui_kit/src/primitives/nomo_anchored_overlay.dart';
+import 'package:nomo_ui_kit/src/primitives/nomo_caret.dart';
 import 'package:nomo_ui_kit/src/primitives/nomo_interactive.dart';
 import 'package:nomo_ui_kit/src/primitives/nomo_surface.dart';
 import 'package:nomo_ui_kit/src/theme/nomo_theme.dart';
@@ -135,7 +136,7 @@ class _NomoDropdownState<T> extends State<NomoDropdown<T>> {
                         : foreground,
                   ),
                 ),
-                _Caret(color: foreground, open: _controller.isShowing),
+                NomoCaret(color: foreground, open: _controller.isShowing),
               ],
             ),
           );
@@ -179,49 +180,4 @@ class _NomoDropdownState<T> extends State<NomoDropdown<T>> {
       ),
     );
   }
-}
-
-class _Caret extends StatelessWidget {
-  const _Caret({required this.color, required this.open});
-
-  final Color color;
-  final bool open;
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedRotation(
-      turns: open ? 0.5 : 0,
-      duration: const Duration(milliseconds: 120),
-      child: CustomPaint(
-        size: const Size(10, 6),
-        painter: _CaretPainter(color),
-      ),
-    );
-  }
-}
-
-class _CaretPainter extends CustomPainter {
-  const _CaretPainter(this.color);
-
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final path = Path()
-      ..moveTo(0, 0)
-      ..lineTo(size.width / 2, size.height)
-      ..lineTo(size.width, 0);
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = color
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.6
-        ..strokeCap = StrokeCap.round
-        ..strokeJoin = StrokeJoin.round,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_CaretPainter oldDelegate) => color != oldDelegate.color;
 }
