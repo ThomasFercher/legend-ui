@@ -64,7 +64,9 @@ List<ThemableWidget> parseThemableWidgets(String path, String content) {
             LegendGenDiagnostic(
               path,
               lineOf(variable),
-              '@Style field "$name" needs an explicit type annotation.',
+              '@Style field "$name" needs an explicit type annotation — '
+              'write the nullable type before the name '
+              '(e.g. "final Color? $name;").',
             ),
           );
           continue;
@@ -74,9 +76,10 @@ List<ThemableWidget> parseThemableWidgets(String path, String content) {
             LegendGenDiagnostic(
               path,
               lineOf(variable),
-              '@Style field "$name" must be nullable ("$type?"). Non-null '
-              'themed fields make theme values unreachable '
-              '(DESIGN.md §2.2).',
+              '@Style field "$name" must be nullable — change the '
+              'declaration to "final $type? $name;" (contract rule: all '
+              '@Style fields are nullable; a non-null field makes theme '
+              'values unreachable, DESIGN.md §2.2).',
             ),
           );
           continue;
@@ -112,9 +115,10 @@ List<ThemableWidget> parseThemableWidgets(String path, String content) {
             LegendGenDiagnostic(
               path,
               lineOf(param),
-              'Constructor parameter "$name" is @Style-themed and must '
-              'default to null — a non-null default would shadow every '
-              'theme level (DESIGN.md §2.2).',
+              'Constructor parameter "$name" has a non-null default but is '
+              '@Style-themed and must default to null — remove the default '
+              'value (write "this.$name,"); a non-null default would '
+              'shadow every theme level (DESIGN.md §2.2).',
             ),
           );
         }
@@ -129,7 +133,9 @@ List<ThemableWidget> parseThemableWidgets(String path, String content) {
           LegendGenDiagnostic(
             path,
             lineOf(declaration),
-            '@LegendThemeable class "$className" has no @Style fields.',
+            '@LegendThemeable class "$className" has no @Style fields — '
+            'annotate at least one field with @Style<T>, or remove the '
+            '@LegendThemeable marker.',
           ),
         );
       }
@@ -208,7 +214,8 @@ StyledField? _parseStyleField({
     report(
       typeArguments.single,
       '@Style<$typeArgument> on "$name" does not match the field type '
-      '"$resolvedType" — the annotation type argument must equal the '
+      '"$resolvedType" — change the annotation to @Style<$resolvedType> '
+      '(or fix the field type); the type argument must equal the '
       "field's non-null type.",
     );
     return null;

@@ -370,4 +370,97 @@ class Bad {
       );
     });
   });
+
+  group('diagnostics name the fix (RFC-002 R11.6)', () {
+    test('non-nullable @Style field: states the exact replacement', () {
+      _expectSingleDiagnostic(
+        _widgetFile('''
+@LegendThemeable()
+class Bad {
+  const Bad({required this.background});
+
+  @Style<Color>.resolve(_background)
+  final Color background;
+  static Color _background(LegendTokens t) => t.colors.surface;
+}
+'''),
+        allOf(
+          contains('must be nullable'),
+          contains('change the declaration to "final Color? background;"'),
+          contains('all @Style fields are nullable'),
+        ),
+      );
+    });
+
+    test('non-null constructor default: says to remove the default', () {
+      _expectSingleDiagnostic(
+        _widgetFile('''
+@LegendThemeable()
+class Bad {
+  const Bad({this.gap = 8.0});
+
+  @Style<double>(4.0)
+  final double? gap;
+}
+'''),
+        allOf(
+          contains('has a non-null default'),
+          contains('must default to null'),
+          contains('remove the default value (write "this.gap,")'),
+        ),
+      );
+    });
+
+    test('missing tear-off static: gives the declaration to add', () {
+      _expectSingleDiagnostic(
+        _widgetFile('''
+@LegendThemeable()
+class Bad {
+  const Bad({this.background});
+
+  @Style<Color>.resolve(_missing)
+  final Color? background;
+}
+'''),
+        allOf(
+          contains('not a static method of "Bad"'),
+          contains('declare "static Color _missing(LegendTokens t) => …;"'),
+        ),
+      );
+    });
+
+    test('missing field type: shows an example declaration', () {
+      _expectSingleDiagnostic(
+        _widgetFile('''
+@LegendThemeable()
+class Bad {
+  const Bad({this.background});
+
+  @Style<Color>(null)
+  final background;
+}
+'''),
+        allOf(
+          contains('needs an explicit type annotation'),
+          contains('e.g. "final Color? background;"'),
+        ),
+      );
+    });
+
+    test('annotation/field type mismatch: names the corrected annotation', () {
+      _expectSingleDiagnostic(
+        _widgetFile('''
+@LegendThemeable()
+class Bad {
+  const Bad({this.background});
+
+  @Style<double>.resolve(_background)
+  final Color? background;
+  static Color _background(LegendTokens t) => t.colors.surface;
+}
+'''),
+        contains('change the annotation to @Style<Color>'),
+      );
+    });
+  });
 }

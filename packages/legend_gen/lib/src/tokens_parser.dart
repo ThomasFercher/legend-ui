@@ -63,7 +63,8 @@ List<TokenClass> parseTokenClasses(String path, String content) {
         if (type == null) {
           report(
             variable,
-            'token field "$name" needs an explicit type annotation.',
+            'token field "$name" needs an explicit type annotation — '
+            'write the type before the name (e.g. "final Color $name;").',
           );
           fieldsValid = false;
           continue;
@@ -72,8 +73,9 @@ List<TokenClass> parseTokenClasses(String path, String content) {
           report(
             variable,
             'token field "$name" must be non-nullable ("$type" declared) — '
-            'tokens are the complete base theme; there is no "inherit" '
-            'level below them (DESIGN.md §2.1).',
+            'drop the "?" and give it a value everywhere; tokens are the '
+            'complete base theme with no "inherit" level below them '
+            '(DESIGN.md §2.1).',
           );
           fieldsValid = false;
           continue;
@@ -81,8 +83,8 @@ List<TokenClass> parseTokenClasses(String path, String content) {
         if (!member.fields.isFinal) {
           report(
             variable,
-            'token field "$name" must be final — token classes are '
-            'immutable data (DESIGN.md §2.1).',
+            'token field "$name" must be final — add the "final" keyword; '
+            'token classes are immutable data (DESIGN.md §2.1).',
           );
           fieldsValid = false;
           continue;
@@ -91,7 +93,8 @@ List<TokenClass> parseTokenClasses(String path, String content) {
           report(
             variable,
             'token field "$name" has unsupported list type "$type" — the '
-            'only lerpable list is List<BoxShadow> (BoxShadow.lerpList).',
+            'only lerpable list is List<BoxShadow> (BoxShadow.lerpList); '
+            'use List<BoxShadow>, or model the values as separate fields.',
           );
           fieldsValid = false;
           continue;
@@ -104,7 +107,9 @@ List<TokenClass> parseTokenClasses(String path, String content) {
       if (fieldsValid) {
         report(
           declaration.name,
-          '@LegendTokenData class "$className" has no instance fields.',
+          '@LegendTokenData class "$className" has no instance fields — '
+          'declare the token values as final instance fields, or remove '
+          'the marker.',
         );
       }
       continue;
