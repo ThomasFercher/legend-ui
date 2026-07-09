@@ -244,6 +244,19 @@ Today `_theme(context)` depends on `LegendTheme` as a whole — any theme change
 
 Themes remain pure data; this changes only *who gets notified*, never how values resolve.
 
+### R13 — The themed build signature: `build(context, theme)` *(added 2026-07-10, directed)*
+
+The resolution step disappears from author code entirely: the theme arrives **alongside the context**, riverpod-`ConsumerWidget`-style. Dart forbids overloading, so a plain `StatelessWidget` can't add a two-arg `build` — the kit owns a tiny custom-element hierarchy once (`LegendStatelessWidget<T>` / `LegendStatefulWidget` + `LegendState<T>`; the element calls `widget.build(context, widget.resolveThemeOf(context))`), and the generated part emits a per-widget base that hides every trace of it:
+
+```dart
+class LegendDivider extends _$LegendDividerBase {          // generated base in the part file
+  @override
+  Widget build(BuildContext context, LegendDividerTheme theme) { ... }
+}
+```
+
+`_$LegendDividerBase` extends `LegendStatelessWidget<LegendDividerTheme>`, declares abstract getters for the themed fields (satisfied by the widget's finals), and implements `resolveThemeOf` — which is also where R12's per-field aspects register, so granular rebuilds and `listen: false` compose unchanged. These are ordinary `Widget`s, fully interoperable with default Flutter widgets. The freezed-style bootstrap (base doesn't exist before the first CLI run) is covered by `legend_gen create` and `--watch`. The private `_theme(context)` extension keeps being emitted as the escape hatch for widgets that must extend another supertype.
+
 ## 4. What is deliberately NOT adopted
 
 - **No function-valued theme content; exactly one generic container** *(amendments 4–6)* — the `resolveWith` function form was dropped, and per-type wrappers (`LegendStateColor`) were replaced by the single generic `LegendStates<T>` with type-bound extensions. Themes are pure data; computed values are produced at theme-build time. Nothing in a theme receives a BuildContext or a callback.
