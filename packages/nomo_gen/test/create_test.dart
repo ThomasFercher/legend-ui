@@ -1,3 +1,8 @@
+// The subprocess tests cold-JIT the analyzer-heavy CLI — well over the
+// default 30s on slow CI runners.
+@Timeout(Duration(minutes: 2))
+library;
+
 import 'dart:io';
 
 import 'package:nomo_gen/nomo_gen.dart';
