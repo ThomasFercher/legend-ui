@@ -24,14 +24,37 @@ class LegendLoadingTheme {
   /// [LegendLoading] first, [LegendLoadingThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static LegendLoadingTheme of(
     BuildContext context, [
     LegendLoadingThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendLoadingThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendLoadingAspectColor);
+    LegendThemeOverride.depend<LegendLoadingThemeNullable>(
+      context,
+      _$LegendLoadingOverrideAspectColor,
+    );
+    LegendTheme.depend(context, _$LegendLoadingAspectSize);
+    LegendThemeOverride.depend<LegendLoadingThemeNullable>(
+      context,
+      _$LegendLoadingOverrideAspectSize,
+    );
+    LegendTheme.depend(context, _$LegendLoadingAspectStrokeWidth);
+    LegendThemeOverride.depend<LegendLoadingThemeNullable>(
+      context,
+      _$LegendLoadingOverrideAspectStrokeWidth,
+    );
     return LegendLoadingTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendLoadingThemeNullable>(LegendLoading))
-        .merge(LegendThemeOverride.maybeOf<LegendLoadingThemeNullable>(context))
+        .merge(override)
         .merge(local);
   }
 
@@ -112,6 +135,85 @@ class LegendLoadingThemeOverride extends StatelessWidget {
       LegendThemeOverride<LegendLoadingThemeNullable>(data: data, child: child);
 }
 
+/// Resolves [LegendLoading.color] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendLoadingSelectColor(LegendThemeData data) =>
+    data.componentOf<LegendLoadingThemeNullable>(LegendLoading)?.color ??
+    ColorRef.primary(data.tokens);
+const _$LegendLoadingAspectColor = LegendThemeAspect(
+  _$LegendLoadingSelectColor,
+);
+Object? _$LegendLoadingOverrideSelectColor(LegendLoadingThemeNullable data) =>
+    data.color;
+const _$LegendLoadingOverrideAspectColor =
+    LegendOverrideAspect<LegendLoadingThemeNullable>(
+      _$LegendLoadingOverrideSelectColor,
+    );
+
+/// Resolves [LegendLoading.size] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+double _$LegendLoadingSelectSize(LegendThemeData data) =>
+    data.componentOf<LegendLoadingThemeNullable>(LegendLoading)?.size ?? 24;
+const _$LegendLoadingAspectSize = LegendThemeAspect(_$LegendLoadingSelectSize);
+Object? _$LegendLoadingOverrideSelectSize(LegendLoadingThemeNullable data) =>
+    data.size;
+const _$LegendLoadingOverrideAspectSize =
+    LegendOverrideAspect<LegendLoadingThemeNullable>(
+      _$LegendLoadingOverrideSelectSize,
+    );
+
+/// Resolves [LegendLoading.strokeWidth] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+double _$LegendLoadingSelectStrokeWidth(LegendThemeData data) =>
+    data.componentOf<LegendLoadingThemeNullable>(LegendLoading)?.strokeWidth ??
+    3;
+const _$LegendLoadingAspectStrokeWidth = LegendThemeAspect(
+  _$LegendLoadingSelectStrokeWidth,
+);
+Object? _$LegendLoadingOverrideSelectStrokeWidth(
+  LegendLoadingThemeNullable data,
+) => data.strokeWidth;
+const _$LegendLoadingOverrideAspectStrokeWidth =
+    LegendOverrideAspect<LegendLoadingThemeNullable>(
+      _$LegendLoadingOverrideSelectStrokeWidth,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class LegendLoadingThemeListenables {
+  /// Change stream of the resolved [LegendLoadingTheme.color].
+  static ValueListenable<Color> color(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendLoadingSelectColor);
+
+  /// Change stream of the resolved [LegendLoadingTheme.size].
+  static ValueListenable<double> size(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendLoadingSelectSize);
+
+  /// Change stream of the resolved [LegendLoadingTheme.strokeWidth].
+  static ValueListenable<double> strokeWidth(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendLoadingSelectStrokeWidth);
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -126,4 +228,106 @@ extension _$LegendLoadingThemeResolve on LegendLoading {
       strokeWidth: strokeWidth,
     ),
   );
+
+  /// Resolves ONLY [LegendLoading.color] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._color(context)`).
+  Color _color(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendLoadingThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendLoadingAspectColor);
+    LegendThemeOverride.depend<LegendLoadingThemeNullable>(
+      context,
+      _$LegendLoadingOverrideAspectColor,
+    );
+    return color ?? override?.color ?? _$LegendLoadingSelectColor(data);
+  }
+
+  /// Resolves ONLY [LegendLoading.size] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._size(context)`).
+  double _size(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendLoadingThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendLoadingAspectSize);
+    LegendThemeOverride.depend<LegendLoadingThemeNullable>(
+      context,
+      _$LegendLoadingOverrideAspectSize,
+    );
+    return size ?? override?.size ?? _$LegendLoadingSelectSize(data);
+  }
+
+  /// Resolves ONLY [LegendLoading.strokeWidth] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._strokeWidth(context)`).
+  double _strokeWidth(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendLoadingThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendLoadingAspectStrokeWidth);
+    LegendThemeOverride.depend<LegendLoadingThemeNullable>(
+      context,
+      _$LegendLoadingOverrideAspectStrokeWidth,
+    );
+    return strokeWidth ??
+        override?.strokeWidth ??
+        _$LegendLoadingSelectStrokeWidth(data);
+  }
+}
+
+/// Auto-detected State wiring (RFC-002 R13): [_LegendLoadingState]
+/// is this file's `State<LegendLoading>`, so its
+/// build reads the resolved theme as a plain `theme`
+/// getter — zero visible wiring. A same-named instance
+/// member (e.g. from [_$LegendLoadingThemeState])
+/// wins over this extension.
+extension _$LegendLoadingThemeOn_LegendLoadingState on _LegendLoadingState {
+  LegendLoadingTheme get theme => widget._theme(context);
+}
+
+/// Explicit State wiring (RFC-002 R13): mix onto any
+/// `State<LegendLoading>` for the `theme` getter as a
+/// real, overridable inherited member — no State-class
+/// detection involved.
+mixin _$LegendLoadingThemeState on State<LegendLoading> {
+  LegendLoadingTheme get theme => widget._theme(context);
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class LegendLoading extends
+/// _$LegendLoadingBase` receives the resolved
+/// [LegendLoadingTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$LegendLoadingBase
+    extends LegendStatelessWidget<LegendLoadingTheme> {
+  const _$LegendLoadingBase({super.key});
+
+  Color? get color;
+  double? get size;
+  double? get strokeWidth;
+
+  @override
+  LegendLoadingTheme resolveThemeOf(BuildContext context) =>
+      LegendLoadingTheme.of(
+        context,
+        LegendLoadingThemeNullable(
+          color: color,
+          size: size,
+          strokeWidth: strokeWidth,
+        ),
+      );
 }

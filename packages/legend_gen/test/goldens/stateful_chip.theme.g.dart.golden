@@ -21,14 +21,27 @@ class StatefulChipTheme {
   /// [StatefulChip] first, [StatefulChipThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static StatefulChipTheme of(
     BuildContext context, [
     StatefulChipThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<StatefulChipThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$StatefulChipAspectAccent);
+    LegendThemeOverride.depend<StatefulChipThemeNullable>(
+      context,
+      _$StatefulChipOverrideAspectAccent,
+    );
     return StatefulChipTheme.defaults(data.tokens)
         .merge(data.componentOf<StatefulChipThemeNullable>(StatefulChip))
-        .merge(LegendThemeOverride.maybeOf<StatefulChipThemeNullable>(context))
+        .merge(override)
         .merge(local);
   }
 
@@ -100,6 +113,63 @@ class StatefulChipThemeOverride extends StatelessWidget {
       LegendThemeOverride<StatefulChipThemeNullable>(data: data, child: child);
 }
 
+/// Resolves [StatefulChip.accent] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+ChipAccent _$StatefulChipSelectAccent(LegendThemeData data) =>
+    StatefulChip._accent(
+      data.tokens,
+    ).merge(data.componentOf<StatefulChipThemeNullable>(StatefulChip)?.accent);
+const _$StatefulChipAspectAccent = LegendThemeAspect(
+  _$StatefulChipSelectAccent,
+);
+Object? _$StatefulChipOverrideSelectAccent(StatefulChipThemeNullable data) =>
+    data.accent;
+const _$StatefulChipOverrideAspectAccent =
+    LegendOverrideAspect<StatefulChipThemeNullable>(
+      _$StatefulChipOverrideSelectAccent,
+    );
+
+/// Resolves [StatefulChip.label] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$StatefulChipSelectLabel(LegendThemeData data) =>
+    data.componentOf<StatefulChipThemeNullable>(StatefulChip)?.label ??
+    StatefulChip._label(data.tokens);
+const _$StatefulChipAspectLabel = LegendThemeAspect(_$StatefulChipSelectLabel);
+Object? _$StatefulChipOverrideSelectLabel(StatefulChipThemeNullable data) =>
+    data.label;
+const _$StatefulChipOverrideAspectLabel =
+    LegendOverrideAspect<StatefulChipThemeNullable>(
+      _$StatefulChipOverrideSelectLabel,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class StatefulChipThemeListenables {
+  /// Change stream of the resolved [StatefulChipTheme.accent].
+  static ValueListenable<ChipAccent> accent(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$StatefulChipSelectAccent);
+
+  /// Change stream of the resolved [StatefulChipTheme.label].
+  static ValueListenable<Color> label(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$StatefulChipSelectLabel);
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -110,4 +180,77 @@ extension _$StatefulChipThemeResolve on StatefulChip {
     context,
     StatefulChipThemeNullable(accent: accent, label: label),
   );
+
+  /// Resolves ONLY [StatefulChip.accent] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._accent(context)`).
+  ChipAccent _accent(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<StatefulChipThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$StatefulChipAspectAccent);
+    LegendThemeOverride.depend<StatefulChipThemeNullable>(
+      context,
+      _$StatefulChipOverrideAspectAccent,
+    );
+    return _$StatefulChipSelectAccent(
+      data,
+    ).merge(override?.accent).merge(accent);
+  }
+
+  /// Resolves ONLY [StatefulChip.label] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._label(context)`).
+  Color _label(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<StatefulChipThemeNullable>(
+      context,
+    );
+    return label ?? override?.label ?? _$StatefulChipSelectLabel(data);
+  }
+}
+
+/// Auto-detected State wiring (RFC-002 R13): [_StatefulChipState]
+/// is this file's `State<StatefulChip>`, so its
+/// build reads the resolved theme as a plain `theme`
+/// getter — zero visible wiring. A same-named instance
+/// member (e.g. from [_$StatefulChipThemeState])
+/// wins over this extension.
+extension _$StatefulChipThemeOn_StatefulChipState on _StatefulChipState {
+  StatefulChipTheme get theme => widget._theme(context);
+}
+
+/// Explicit State wiring (RFC-002 R13): mix onto any
+/// `State<StatefulChip>` for the `theme` getter as a
+/// real, overridable inherited member — no State-class
+/// detection involved.
+mixin _$StatefulChipThemeState on State<StatefulChip> {
+  StatefulChipTheme get theme => widget._theme(context);
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class StatefulChip extends
+/// _$StatefulChipBase` receives the resolved
+/// [StatefulChipTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$StatefulChipBase
+    extends LegendStatelessWidget<StatefulChipTheme> {
+  const _$StatefulChipBase({super.key});
+
+  ChipAccent? get accent;
+  Color? get label;
+
+  @override
+  StatefulChipTheme resolveThemeOf(BuildContext context) =>
+      StatefulChipTheme.of(
+        context,
+        StatefulChipThemeNullable(accent: accent, label: label),
+      );
 }

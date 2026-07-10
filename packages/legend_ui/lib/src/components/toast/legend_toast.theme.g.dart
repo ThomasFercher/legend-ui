@@ -36,14 +36,52 @@ class LegendToastTheme {
   /// [LegendToast] first, [LegendToastThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static LegendToastTheme of(
     BuildContext context, [
     LegendToastThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendToastThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendToastAspectBackground);
+    LegendThemeOverride.depend<LegendToastThemeNullable>(
+      context,
+      _$LegendToastOverrideAspectBackground,
+    );
+    LegendTheme.depend(context, _$LegendToastAspectBorderRadius);
+    LegendThemeOverride.depend<LegendToastThemeNullable>(
+      context,
+      _$LegendToastOverrideAspectBorderRadius,
+    );
+    LegendTheme.depend(context, _$LegendToastAspectPadding);
+    LegendThemeOverride.depend<LegendToastThemeNullable>(
+      context,
+      _$LegendToastOverrideAspectPadding,
+    );
+    LegendTheme.depend(context, _$LegendToastAspectInfoAccent);
+    LegendThemeOverride.depend<LegendToastThemeNullable>(
+      context,
+      _$LegendToastOverrideAspectInfoAccent,
+    );
+    LegendTheme.depend(context, _$LegendToastAspectSuccessAccent);
+    LegendThemeOverride.depend<LegendToastThemeNullable>(
+      context,
+      _$LegendToastOverrideAspectSuccessAccent,
+    );
+    LegendTheme.depend(context, _$LegendToastAspectErrorAccent);
+    LegendThemeOverride.depend<LegendToastThemeNullable>(
+      context,
+      _$LegendToastOverrideAspectErrorAccent,
+    );
     return LegendToastTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendToastThemeNullable>(LegendToast))
-        .merge(LegendThemeOverride.maybeOf<LegendToastThemeNullable>(context))
+        .merge(override)
         .merge(local);
   }
 
@@ -159,6 +197,158 @@ class LegendToastThemeOverride extends StatelessWidget {
       LegendThemeOverride<LegendToastThemeNullable>(data: data, child: child);
 }
 
+/// Resolves [LegendToast.background] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendToastSelectBackground(LegendThemeData data) =>
+    data.componentOf<LegendToastThemeNullable>(LegendToast)?.background ??
+    ColorRef.surface(data.tokens);
+const _$LegendToastAspectBackground = LegendThemeAspect(
+  _$LegendToastSelectBackground,
+);
+Object? _$LegendToastOverrideSelectBackground(LegendToastThemeNullable data) =>
+    data.background;
+const _$LegendToastOverrideAspectBackground =
+    LegendOverrideAspect<LegendToastThemeNullable>(
+      _$LegendToastOverrideSelectBackground,
+    );
+
+/// Resolves [LegendToast.borderRadius] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+BorderRadius _$LegendToastSelectBorderRadius(LegendThemeData data) =>
+    data.componentOf<LegendToastThemeNullable>(LegendToast)?.borderRadius ??
+    _borderRadius(data.tokens);
+const _$LegendToastAspectBorderRadius = LegendThemeAspect(
+  _$LegendToastSelectBorderRadius,
+);
+Object? _$LegendToastOverrideSelectBorderRadius(
+  LegendToastThemeNullable data,
+) => data.borderRadius;
+const _$LegendToastOverrideAspectBorderRadius =
+    LegendOverrideAspect<LegendToastThemeNullable>(
+      _$LegendToastOverrideSelectBorderRadius,
+    );
+
+/// Resolves [LegendToast.padding] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+EdgeInsetsGeometry _$LegendToastSelectPadding(LegendThemeData data) =>
+    data.componentOf<LegendToastThemeNullable>(LegendToast)?.padding ??
+    _padding(data.tokens);
+const _$LegendToastAspectPadding = LegendThemeAspect(
+  _$LegendToastSelectPadding,
+);
+Object? _$LegendToastOverrideSelectPadding(LegendToastThemeNullable data) =>
+    data.padding;
+const _$LegendToastOverrideAspectPadding =
+    LegendOverrideAspect<LegendToastThemeNullable>(
+      _$LegendToastOverrideSelectPadding,
+    );
+
+/// Resolves [LegendToast.infoAccent] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendToastSelectInfoAccent(LegendThemeData data) =>
+    data.componentOf<LegendToastThemeNullable>(LegendToast)?.infoAccent ??
+    ColorRef.primary(data.tokens);
+const _$LegendToastAspectInfoAccent = LegendThemeAspect(
+  _$LegendToastSelectInfoAccent,
+);
+Object? _$LegendToastOverrideSelectInfoAccent(LegendToastThemeNullable data) =>
+    data.infoAccent;
+const _$LegendToastOverrideAspectInfoAccent =
+    LegendOverrideAspect<LegendToastThemeNullable>(
+      _$LegendToastOverrideSelectInfoAccent,
+    );
+
+/// Resolves [LegendToast.successAccent] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendToastSelectSuccessAccent(LegendThemeData data) =>
+    data.componentOf<LegendToastThemeNullable>(LegendToast)?.successAccent ??
+    ColorRef.secondary(data.tokens);
+const _$LegendToastAspectSuccessAccent = LegendThemeAspect(
+  _$LegendToastSelectSuccessAccent,
+);
+Object? _$LegendToastOverrideSelectSuccessAccent(
+  LegendToastThemeNullable data,
+) => data.successAccent;
+const _$LegendToastOverrideAspectSuccessAccent =
+    LegendOverrideAspect<LegendToastThemeNullable>(
+      _$LegendToastOverrideSelectSuccessAccent,
+    );
+
+/// Resolves [LegendToast.errorAccent] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendToastSelectErrorAccent(LegendThemeData data) =>
+    data.componentOf<LegendToastThemeNullable>(LegendToast)?.errorAccent ??
+    ColorRef.error(data.tokens);
+const _$LegendToastAspectErrorAccent = LegendThemeAspect(
+  _$LegendToastSelectErrorAccent,
+);
+Object? _$LegendToastOverrideSelectErrorAccent(LegendToastThemeNullable data) =>
+    data.errorAccent;
+const _$LegendToastOverrideAspectErrorAccent =
+    LegendOverrideAspect<LegendToastThemeNullable>(
+      _$LegendToastOverrideSelectErrorAccent,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class LegendToastThemeListenables {
+  /// Change stream of the resolved [LegendToastTheme.background].
+  static ValueListenable<Color> background(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendToastSelectBackground);
+
+  /// Change stream of the resolved [LegendToastTheme.borderRadius].
+  static ValueListenable<BorderRadius> borderRadius(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendToastSelectBorderRadius);
+
+  /// Change stream of the resolved [LegendToastTheme.padding].
+  static ValueListenable<EdgeInsetsGeometry> padding(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendToastSelectPadding);
+
+  /// Change stream of the resolved [LegendToastTheme.infoAccent].
+  static ValueListenable<Color> infoAccent(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendToastSelectInfoAccent);
+
+  /// Change stream of the resolved [LegendToastTheme.successAccent].
+  static ValueListenable<Color> successAccent(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendToastSelectSuccessAccent);
+
+  /// Change stream of the resolved [LegendToastTheme.errorAccent].
+  static ValueListenable<Color> errorAccent(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendToastSelectErrorAccent);
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -166,6 +356,160 @@ extension _$LegendToastThemeResolve on LegendToast {
   /// [LegendToastTheme.of] with this widget's constructor params as
   /// level 1.
   LegendToastTheme _theme(BuildContext context) => LegendToastTheme.of(
+    context,
+    LegendToastThemeNullable(
+      background: background,
+      borderRadius: borderRadius,
+      padding: padding,
+      infoAccent: infoAccent,
+      successAccent: successAccent,
+      errorAccent: errorAccent,
+    ),
+  );
+
+  /// Resolves ONLY [LegendToast.background] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._background(context)`).
+  Color _background(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendToastThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendToastAspectBackground);
+    LegendThemeOverride.depend<LegendToastThemeNullable>(
+      context,
+      _$LegendToastOverrideAspectBackground,
+    );
+    return background ??
+        override?.background ??
+        _$LegendToastSelectBackground(data);
+  }
+
+  /// Resolves ONLY [LegendToast.borderRadius] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._borderRadius(context)`).
+  BorderRadius _borderRadius(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendToastThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendToastAspectBorderRadius);
+    LegendThemeOverride.depend<LegendToastThemeNullable>(
+      context,
+      _$LegendToastOverrideAspectBorderRadius,
+    );
+    return borderRadius ??
+        override?.borderRadius ??
+        _$LegendToastSelectBorderRadius(data);
+  }
+
+  /// Resolves ONLY [LegendToast.padding] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._padding(context)`).
+  EdgeInsetsGeometry _padding(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendToastThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendToastAspectPadding);
+    LegendThemeOverride.depend<LegendToastThemeNullable>(
+      context,
+      _$LegendToastOverrideAspectPadding,
+    );
+    return padding ?? override?.padding ?? _$LegendToastSelectPadding(data);
+  }
+
+  /// Resolves ONLY [LegendToast.infoAccent] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._infoAccent(context)`).
+  Color _infoAccent(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendToastThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendToastAspectInfoAccent);
+    LegendThemeOverride.depend<LegendToastThemeNullable>(
+      context,
+      _$LegendToastOverrideAspectInfoAccent,
+    );
+    return infoAccent ??
+        override?.infoAccent ??
+        _$LegendToastSelectInfoAccent(data);
+  }
+
+  /// Resolves ONLY [LegendToast.successAccent] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._successAccent(context)`).
+  Color _successAccent(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendToastThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendToastAspectSuccessAccent);
+    LegendThemeOverride.depend<LegendToastThemeNullable>(
+      context,
+      _$LegendToastOverrideAspectSuccessAccent,
+    );
+    return successAccent ??
+        override?.successAccent ??
+        _$LegendToastSelectSuccessAccent(data);
+  }
+
+  /// Resolves ONLY [LegendToast.errorAccent] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._errorAccent(context)`).
+  Color _errorAccent(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendToastThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendToastAspectErrorAccent);
+    LegendThemeOverride.depend<LegendToastThemeNullable>(
+      context,
+      _$LegendToastOverrideAspectErrorAccent,
+    );
+    return errorAccent ??
+        override?.errorAccent ??
+        _$LegendToastSelectErrorAccent(data);
+  }
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class LegendToast extends
+/// _$LegendToastBase` receives the resolved
+/// [LegendToastTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$LegendToastBase
+    extends LegendStatelessWidget<LegendToastTheme> {
+  const _$LegendToastBase({super.key});
+
+  Color? get background;
+  BorderRadius? get borderRadius;
+  EdgeInsetsGeometry? get padding;
+  Color? get infoAccent;
+  Color? get successAccent;
+  Color? get errorAccent;
+
+  @override
+  LegendToastTheme resolveThemeOf(BuildContext context) => LegendToastTheme.of(
     context,
     LegendToastThemeNullable(
       background: background,

@@ -27,14 +27,37 @@ class LegendDividerTheme {
   /// [LegendDivider] first, [LegendDividerThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static LegendDividerTheme of(
     BuildContext context, [
     LegendDividerThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendDividerThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendDividerAspectColor);
+    LegendThemeOverride.depend<LegendDividerThemeNullable>(
+      context,
+      _$LegendDividerOverrideAspectColor,
+    );
+    LegendTheme.depend(context, _$LegendDividerAspectThickness);
+    LegendThemeOverride.depend<LegendDividerThemeNullable>(
+      context,
+      _$LegendDividerOverrideAspectThickness,
+    );
+    LegendTheme.depend(context, _$LegendDividerAspectSpacing);
+    LegendThemeOverride.depend<LegendDividerThemeNullable>(
+      context,
+      _$LegendDividerOverrideAspectSpacing,
+    );
     return LegendDividerTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendDividerThemeNullable>(LegendDivider))
-        .merge(LegendThemeOverride.maybeOf<LegendDividerThemeNullable>(context))
+        .merge(override)
         .merge(local);
   }
 
@@ -115,6 +138,88 @@ class LegendDividerThemeOverride extends StatelessWidget {
       LegendThemeOverride<LegendDividerThemeNullable>(data: data, child: child);
 }
 
+/// Resolves [LegendDivider.color] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendDividerSelectColor(LegendThemeData data) =>
+    data.componentOf<LegendDividerThemeNullable>(LegendDivider)?.color ??
+    ColorRef.background3(data.tokens);
+const _$LegendDividerAspectColor = LegendThemeAspect(
+  _$LegendDividerSelectColor,
+);
+Object? _$LegendDividerOverrideSelectColor(LegendDividerThemeNullable data) =>
+    data.color;
+const _$LegendDividerOverrideAspectColor =
+    LegendOverrideAspect<LegendDividerThemeNullable>(
+      _$LegendDividerOverrideSelectColor,
+    );
+
+/// Resolves [LegendDivider.thickness] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+double _$LegendDividerSelectThickness(LegendThemeData data) =>
+    data.componentOf<LegendDividerThemeNullable>(LegendDivider)?.thickness ??
+    SizeRef.borderWidth(data.tokens);
+const _$LegendDividerAspectThickness = LegendThemeAspect(
+  _$LegendDividerSelectThickness,
+);
+Object? _$LegendDividerOverrideSelectThickness(
+  LegendDividerThemeNullable data,
+) => data.thickness;
+const _$LegendDividerOverrideAspectThickness =
+    LegendOverrideAspect<LegendDividerThemeNullable>(
+      _$LegendDividerOverrideSelectThickness,
+    );
+
+/// Resolves [LegendDivider.spacing] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+double _$LegendDividerSelectSpacing(LegendThemeData data) =>
+    data.componentOf<LegendDividerThemeNullable>(LegendDivider)?.spacing ??
+    SizeRef.md(data.tokens);
+const _$LegendDividerAspectSpacing = LegendThemeAspect(
+  _$LegendDividerSelectSpacing,
+);
+Object? _$LegendDividerOverrideSelectSpacing(LegendDividerThemeNullable data) =>
+    data.spacing;
+const _$LegendDividerOverrideAspectSpacing =
+    LegendOverrideAspect<LegendDividerThemeNullable>(
+      _$LegendDividerOverrideSelectSpacing,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class LegendDividerThemeListenables {
+  /// Change stream of the resolved [LegendDividerTheme.color].
+  static ValueListenable<Color> color(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendDividerSelectColor);
+
+  /// Change stream of the resolved [LegendDividerTheme.thickness].
+  static ValueListenable<double> thickness(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendDividerSelectThickness);
+
+  /// Change stream of the resolved [LegendDividerTheme.spacing].
+  static ValueListenable<double> spacing(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendDividerSelectSpacing);
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -129,4 +234,88 @@ extension _$LegendDividerThemeResolve on LegendDivider {
       spacing: spacing,
     ),
   );
+
+  /// Resolves ONLY [LegendDivider.color] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._color(context)`).
+  Color _color(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendDividerThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendDividerAspectColor);
+    LegendThemeOverride.depend<LegendDividerThemeNullable>(
+      context,
+      _$LegendDividerOverrideAspectColor,
+    );
+    return color ?? override?.color ?? _$LegendDividerSelectColor(data);
+  }
+
+  /// Resolves ONLY [LegendDivider.thickness] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._thickness(context)`).
+  double _thickness(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendDividerThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendDividerAspectThickness);
+    LegendThemeOverride.depend<LegendDividerThemeNullable>(
+      context,
+      _$LegendDividerOverrideAspectThickness,
+    );
+    return thickness ??
+        override?.thickness ??
+        _$LegendDividerSelectThickness(data);
+  }
+
+  /// Resolves ONLY [LegendDivider.spacing] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._spacing(context)`).
+  double _spacing(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendDividerThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendDividerAspectSpacing);
+    LegendThemeOverride.depend<LegendDividerThemeNullable>(
+      context,
+      _$LegendDividerOverrideAspectSpacing,
+    );
+    return spacing ?? override?.spacing ?? _$LegendDividerSelectSpacing(data);
+  }
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class LegendDivider extends
+/// _$LegendDividerBase` receives the resolved
+/// [LegendDividerTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$LegendDividerBase
+    extends LegendStatelessWidget<LegendDividerTheme> {
+  const _$LegendDividerBase({super.key});
+
+  Color? get color;
+  double? get thickness;
+  double? get spacing;
+
+  @override
+  LegendDividerTheme resolveThemeOf(BuildContext context) =>
+      LegendDividerTheme.of(
+        context,
+        LegendDividerThemeNullable(
+          color: color,
+          thickness: thickness,
+          spacing: spacing,
+        ),
+      );
 }

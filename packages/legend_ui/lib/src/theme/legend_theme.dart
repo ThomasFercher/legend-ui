@@ -2,6 +2,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
+// The generated theme parts (RFC-002 R12/R13) reference the opt-in base,
+// the listenable selector, and the foundation listenable types; every
+// themable library already imports this file (its part uses
+// LegendTheme/LegendThemeOverride), so exporting them here keeps
+// generation working without new import requirements.
+export 'package:flutter/foundation.dart' show Listenable, ValueListenable;
+export 'package:legend_ui/src/theme/legend_stateless_widget.dart';
+export 'package:legend_ui/src/theme/legend_theme_selector.dart';
+
 /// The app-level theme: tokens plus an **open, Type-keyed registry** of
 /// component themes (DESIGN.md §2.3).
 ///

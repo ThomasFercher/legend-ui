@@ -27,14 +27,37 @@ class LegendAppBarTheme {
   /// [LegendAppBar] first, [LegendAppBarThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static LegendAppBarTheme of(
     BuildContext context, [
     LegendAppBarThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendAppBarThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendAppBarAspectBackground);
+    LegendThemeOverride.depend<LegendAppBarThemeNullable>(
+      context,
+      _$LegendAppBarOverrideAspectBackground,
+    );
+    LegendTheme.depend(context, _$LegendAppBarAspectHeight);
+    LegendThemeOverride.depend<LegendAppBarThemeNullable>(
+      context,
+      _$LegendAppBarOverrideAspectHeight,
+    );
+    LegendTheme.depend(context, _$LegendAppBarAspectPadding);
+    LegendThemeOverride.depend<LegendAppBarThemeNullable>(
+      context,
+      _$LegendAppBarOverrideAspectPadding,
+    );
     return LegendAppBarTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendAppBarThemeNullable>(LegendAppBar))
-        .merge(LegendThemeOverride.maybeOf<LegendAppBarThemeNullable>(context))
+        .merge(override)
         .merge(local);
   }
 
@@ -115,6 +138,87 @@ class LegendAppBarThemeOverride extends StatelessWidget {
       LegendThemeOverride<LegendAppBarThemeNullable>(data: data, child: child);
 }
 
+/// Resolves [LegendAppBar.background] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendAppBarSelectBackground(LegendThemeData data) =>
+    data.componentOf<LegendAppBarThemeNullable>(LegendAppBar)?.background ??
+    ColorRef.surface(data.tokens);
+const _$LegendAppBarAspectBackground = LegendThemeAspect(
+  _$LegendAppBarSelectBackground,
+);
+Object? _$LegendAppBarOverrideSelectBackground(
+  LegendAppBarThemeNullable data,
+) => data.background;
+const _$LegendAppBarOverrideAspectBackground =
+    LegendOverrideAspect<LegendAppBarThemeNullable>(
+      _$LegendAppBarOverrideSelectBackground,
+    );
+
+/// Resolves [LegendAppBar.height] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+double _$LegendAppBarSelectHeight(LegendThemeData data) =>
+    data.componentOf<LegendAppBarThemeNullable>(LegendAppBar)?.height ?? 56;
+const _$LegendAppBarAspectHeight = LegendThemeAspect(
+  _$LegendAppBarSelectHeight,
+);
+Object? _$LegendAppBarOverrideSelectHeight(LegendAppBarThemeNullable data) =>
+    data.height;
+const _$LegendAppBarOverrideAspectHeight =
+    LegendOverrideAspect<LegendAppBarThemeNullable>(
+      _$LegendAppBarOverrideSelectHeight,
+    );
+
+/// Resolves [LegendAppBar.padding] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+EdgeInsetsGeometry _$LegendAppBarSelectPadding(LegendThemeData data) =>
+    data.componentOf<LegendAppBarThemeNullable>(LegendAppBar)?.padding ??
+    _padding(data.tokens);
+const _$LegendAppBarAspectPadding = LegendThemeAspect(
+  _$LegendAppBarSelectPadding,
+);
+Object? _$LegendAppBarOverrideSelectPadding(LegendAppBarThemeNullable data) =>
+    data.padding;
+const _$LegendAppBarOverrideAspectPadding =
+    LegendOverrideAspect<LegendAppBarThemeNullable>(
+      _$LegendAppBarOverrideSelectPadding,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class LegendAppBarThemeListenables {
+  /// Change stream of the resolved [LegendAppBarTheme.background].
+  static ValueListenable<Color> background(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendAppBarSelectBackground);
+
+  /// Change stream of the resolved [LegendAppBarTheme.height].
+  static ValueListenable<double> height(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendAppBarSelectHeight);
+
+  /// Change stream of the resolved [LegendAppBarTheme.padding].
+  static ValueListenable<EdgeInsetsGeometry> padding(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendAppBarSelectPadding);
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -129,4 +233,88 @@ extension _$LegendAppBarThemeResolve on LegendAppBar {
       padding: padding,
     ),
   );
+
+  /// Resolves ONLY [LegendAppBar.background] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._background(context)`).
+  Color _background(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendAppBarThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendAppBarAspectBackground);
+    LegendThemeOverride.depend<LegendAppBarThemeNullable>(
+      context,
+      _$LegendAppBarOverrideAspectBackground,
+    );
+    return background ??
+        override?.background ??
+        _$LegendAppBarSelectBackground(data);
+  }
+
+  /// Resolves ONLY [LegendAppBar.height] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._height(context)`).
+  double _height(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendAppBarThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendAppBarAspectHeight);
+    LegendThemeOverride.depend<LegendAppBarThemeNullable>(
+      context,
+      _$LegendAppBarOverrideAspectHeight,
+    );
+    return height ?? override?.height ?? _$LegendAppBarSelectHeight(data);
+  }
+
+  /// Resolves ONLY [LegendAppBar.padding] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._padding(context)`).
+  EdgeInsetsGeometry _padding(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendAppBarThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendAppBarAspectPadding);
+    LegendThemeOverride.depend<LegendAppBarThemeNullable>(
+      context,
+      _$LegendAppBarOverrideAspectPadding,
+    );
+    return padding ?? override?.padding ?? _$LegendAppBarSelectPadding(data);
+  }
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class LegendAppBar extends
+/// _$LegendAppBarBase` receives the resolved
+/// [LegendAppBarTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$LegendAppBarBase
+    extends LegendStatelessWidget<LegendAppBarTheme> {
+  const _$LegendAppBarBase({super.key});
+
+  Color? get background;
+  double? get height;
+  EdgeInsetsGeometry? get padding;
+
+  @override
+  LegendAppBarTheme resolveThemeOf(BuildContext context) =>
+      LegendAppBarTheme.of(
+        context,
+        LegendAppBarThemeNullable(
+          background: background,
+          height: height,
+          padding: padding,
+        ),
+      );
 }

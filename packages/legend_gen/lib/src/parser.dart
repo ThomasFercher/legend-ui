@@ -172,6 +172,7 @@ List<ThemableWidget> parseThemableWidgets(
     }
 
     final stateClass = _stateClassOf(unit, className);
+    final superclass = declaration.extendsClause?.superclass.name.lexeme ?? '';
     widgets.add(
       ThemableWidget(
         className: className,
@@ -179,6 +180,7 @@ List<ThemableWidget> parseThemableWidgets(
         sourceBasename: p.basename(path),
         stateClassName: stateClass?.$1,
         stateTypeParameters: stateClass?.$2 ?? '',
+        isStateful: stateClass != null || superclass == 'StatefulWidget',
         line: lineOf(declaration.name),
       ),
     );

@@ -467,6 +467,122 @@ class Bad {
       expect(output, isNot(contains('lerpDouble(')));
     });
 
+    test('of() registers aspects for listen-true fields only '
+        '(RFC-002 R12)', () {
+      final output = emitThemeFile(
+        parseThemableWidgets(
+          'stateful_chip.dart',
+          statefulChip,
+          styleClasses: chipIndex(),
+        ),
+      );
+      // Reads without a whole-object dependency, then per-field aspects.
+      expect(output, contains('LegendTheme.read(context)'));
+      expect(output, isNot(contains('LegendTheme.of(context)')));
+      expect(
+        output,
+        contains(
+          'LegendTheme.depend(context, '
+          r'_$StatefulChipAspectAccent'
+          ');',
+        ),
+      );
+      // label is listen: false — resolved fresh, no aspect in of().
+      final ofBody = output.substring(
+        output.indexOf('static StatefulChipTheme of('),
+        output.indexOf('StatefulChipTheme merge('),
+      );
+      expect(ofBody, isNot(contains(r'_$StatefulChipAspectLabel')));
+      // The per-field accessor still exists and carries its own aspect.
+      expect(output, contains('Color _label(BuildContext context)'));
+      expect(output, contains(r'const _$StatefulChipAspectLabel'));
+    });
+
+    test('per-field accessors resolve the full chain with only their own '
+        'aspect (R12.3)', () {
+      final output = emitThemeFile(
+        parseThemableWidgets(
+          'stateful_chip.dart',
+          statefulChip,
+          styleClasses: chipIndex(),
+        ),
+      );
+      expect(output, contains('ChipAccent _accent(BuildContext context)'));
+      expect(
+        output,
+        contains(
+          'return label ?? override?.label ?? '
+          r'_$StatefulChipSelectLabel(data);',
+        ),
+      );
+    });
+
+    test('emits ValueListenable selectors per field (R12.4)', () {
+      final output = emitThemeFile(
+        parseThemableWidgets(
+          'stateful_chip.dart',
+          statefulChip,
+          styleClasses: chipIndex(),
+        ),
+      );
+      expect(
+        output,
+        contains('abstract final class StatefulChipThemeListenables {'),
+      );
+      expect(output, contains('static ValueListenable<ChipAccent> accent'));
+      expect(
+        output,
+        contains(
+          'LegendThemeSelector(source, data, '
+          r'_$StatefulChipSelectAccent)',
+        ),
+      );
+    });
+
+    test('emits all R13 wiring forms; the State auto-extension only when '
+        'a State class is detected', () {
+      final chip = emitThemeFile(
+        parseThemableWidgets(
+          'stateful_chip.dart',
+          statefulChip,
+          styleClasses: chipIndex(),
+        ),
+      );
+      // Auto-detected State getter.
+      expect(chip, contains('on _StatefulChipState {'));
+      expect(
+        chip,
+        contains('StatefulChipTheme get theme => widget._theme(context);'),
+      );
+      // Explicit mixin, always.
+      expect(
+        chip,
+        contains(r'mixin _$StatefulChipThemeState on State<StatefulChip>'),
+      );
+      // Opt-in base, always: abstract getters + resolveThemeOf.
+      expect(chip, contains(r'abstract class _$StatefulChipBase'));
+      expect(
+        chip,
+        contains('extends LegendStatelessWidget<StatefulChipTheme>'),
+      );
+      expect(chip, contains('ChipAccent? get accent;'));
+      expect(
+        chip,
+        contains('StatefulChipTheme resolveThemeOf(BuildContext context)'),
+      );
+
+      // fancy_box has no State class: no auto-extension, mixin + base
+      // still emitted.
+      final box = emitThemeFile(
+        parseThemableWidgets('fancy_box.dart', fancyBox),
+      );
+      expect(box, isNot(contains('ThemeOn')));
+      // Stateless: no State mixin either (`on State<X>` would violate
+      // State's bound) — the hook and the opt-in base cover it.
+      expect(box, isNot(contains(r'mixin _$FancyBoxThemeState')));
+      expect(box, contains(r'abstract class _$FancyBoxBase'));
+    });
+
     test('nested style classes lerp via their own lerp static', () {
       const source = r'''
 import 'package:legend_ui/legend_ui.dart';

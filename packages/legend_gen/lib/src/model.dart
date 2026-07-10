@@ -97,11 +97,18 @@ class ThemableWidget {
     required this.sourceBasename,
     this.stateClassName,
     this.stateTypeParameters = '',
+    this.isStateful = false,
     this.line = 1,
   });
 
   final String className;
   final List<StyledField> fields;
+
+  /// Whether the widget is known to be stateful — it `extends
+  /// StatefulWidget` directly, or its State class was detected in the
+  /// same file. Gates the `_\$XThemeState` mixin (RFC-002 R13):
+  /// `on State<X>` only satisfies State's bound for stateful widgets.
+  final bool isStateful;
 
   /// The widget's `State` class when it is unambiguously detected in the
   /// same file (`class _XState extends State<X>`), else null (not found or

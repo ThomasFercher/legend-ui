@@ -33,14 +33,47 @@ class LegendSiderTheme {
   /// [LegendSider] first, [LegendSiderThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static LegendSiderTheme of(
     BuildContext context, [
     LegendSiderThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendSiderThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendSiderAspectBackground);
+    LegendThemeOverride.depend<LegendSiderThemeNullable>(
+      context,
+      _$LegendSiderOverrideAspectBackground,
+    );
+    LegendTheme.depend(context, _$LegendSiderAspectWidth);
+    LegendThemeOverride.depend<LegendSiderThemeNullable>(
+      context,
+      _$LegendSiderOverrideAspectWidth,
+    );
+    LegendTheme.depend(context, _$LegendSiderAspectSelectedColor);
+    LegendThemeOverride.depend<LegendSiderThemeNullable>(
+      context,
+      _$LegendSiderOverrideAspectSelectedColor,
+    );
+    LegendTheme.depend(context, _$LegendSiderAspectUnselectedColor);
+    LegendThemeOverride.depend<LegendSiderThemeNullable>(
+      context,
+      _$LegendSiderOverrideAspectUnselectedColor,
+    );
+    LegendTheme.depend(context, _$LegendSiderAspectItemPadding);
+    LegendThemeOverride.depend<LegendSiderThemeNullable>(
+      context,
+      _$LegendSiderOverrideAspectItemPadding,
+    );
     return LegendSiderTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendSiderThemeNullable>(LegendSider))
-        .merge(LegendThemeOverride.maybeOf<LegendSiderThemeNullable>(context))
+        .merge(override)
         .merge(local);
   }
 
@@ -147,6 +180,133 @@ class LegendSiderThemeOverride extends StatelessWidget {
       LegendThemeOverride<LegendSiderThemeNullable>(data: data, child: child);
 }
 
+/// Resolves [LegendSider.background] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+InteractiveColors _$LegendSiderSelectBackground(LegendThemeData data) =>
+    _background(data.tokens).merge(
+      data.componentOf<LegendSiderThemeNullable>(LegendSider)?.background,
+    );
+const _$LegendSiderAspectBackground = LegendThemeAspect(
+  _$LegendSiderSelectBackground,
+);
+Object? _$LegendSiderOverrideSelectBackground(LegendSiderThemeNullable data) =>
+    data.background;
+const _$LegendSiderOverrideAspectBackground =
+    LegendOverrideAspect<LegendSiderThemeNullable>(
+      _$LegendSiderOverrideSelectBackground,
+    );
+
+/// Resolves [LegendSider.width] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+double _$LegendSiderSelectWidth(LegendThemeData data) =>
+    data.componentOf<LegendSiderThemeNullable>(LegendSider)?.width ?? 240;
+const _$LegendSiderAspectWidth = LegendThemeAspect(_$LegendSiderSelectWidth);
+Object? _$LegendSiderOverrideSelectWidth(LegendSiderThemeNullable data) =>
+    data.width;
+const _$LegendSiderOverrideAspectWidth =
+    LegendOverrideAspect<LegendSiderThemeNullable>(
+      _$LegendSiderOverrideSelectWidth,
+    );
+
+/// Resolves [LegendSider.selectedColor] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendSiderSelectSelectedColor(LegendThemeData data) =>
+    data.componentOf<LegendSiderThemeNullable>(LegendSider)?.selectedColor ??
+    ColorRef.primary(data.tokens);
+const _$LegendSiderAspectSelectedColor = LegendThemeAspect(
+  _$LegendSiderSelectSelectedColor,
+);
+Object? _$LegendSiderOverrideSelectSelectedColor(
+  LegendSiderThemeNullable data,
+) => data.selectedColor;
+const _$LegendSiderOverrideAspectSelectedColor =
+    LegendOverrideAspect<LegendSiderThemeNullable>(
+      _$LegendSiderOverrideSelectSelectedColor,
+    );
+
+/// Resolves [LegendSider.unselectedColor] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendSiderSelectUnselectedColor(LegendThemeData data) =>
+    data.componentOf<LegendSiderThemeNullable>(LegendSider)?.unselectedColor ??
+    ColorRef.foreground2(data.tokens);
+const _$LegendSiderAspectUnselectedColor = LegendThemeAspect(
+  _$LegendSiderSelectUnselectedColor,
+);
+Object? _$LegendSiderOverrideSelectUnselectedColor(
+  LegendSiderThemeNullable data,
+) => data.unselectedColor;
+const _$LegendSiderOverrideAspectUnselectedColor =
+    LegendOverrideAspect<LegendSiderThemeNullable>(
+      _$LegendSiderOverrideSelectUnselectedColor,
+    );
+
+/// Resolves [LegendSider.itemPadding] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+EdgeInsetsGeometry _$LegendSiderSelectItemPadding(LegendThemeData data) =>
+    data.componentOf<LegendSiderThemeNullable>(LegendSider)?.itemPadding ??
+    _itemPadding(data.tokens);
+const _$LegendSiderAspectItemPadding = LegendThemeAspect(
+  _$LegendSiderSelectItemPadding,
+);
+Object? _$LegendSiderOverrideSelectItemPadding(LegendSiderThemeNullable data) =>
+    data.itemPadding;
+const _$LegendSiderOverrideAspectItemPadding =
+    LegendOverrideAspect<LegendSiderThemeNullable>(
+      _$LegendSiderOverrideSelectItemPadding,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class LegendSiderThemeListenables {
+  /// Change stream of the resolved [LegendSiderTheme.background].
+  static ValueListenable<InteractiveColors> background(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendSiderSelectBackground);
+
+  /// Change stream of the resolved [LegendSiderTheme.width].
+  static ValueListenable<double> width(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendSiderSelectWidth);
+
+  /// Change stream of the resolved [LegendSiderTheme.selectedColor].
+  static ValueListenable<Color> selectedColor(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendSiderSelectSelectedColor);
+
+  /// Change stream of the resolved [LegendSiderTheme.unselectedColor].
+  static ValueListenable<Color> unselectedColor(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendSiderSelectUnselectedColor);
+
+  /// Change stream of the resolved [LegendSiderTheme.itemPadding].
+  static ValueListenable<EdgeInsetsGeometry> itemPadding(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendSiderSelectItemPadding);
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -154,6 +314,137 @@ extension _$LegendSiderThemeResolve on LegendSider {
   /// [LegendSiderTheme.of] with this widget's constructor params as
   /// level 1.
   LegendSiderTheme _theme(BuildContext context) => LegendSiderTheme.of(
+    context,
+    LegendSiderThemeNullable(
+      background: background,
+      width: width,
+      selectedColor: selectedColor,
+      unselectedColor: unselectedColor,
+      itemPadding: itemPadding,
+    ),
+  );
+
+  /// Resolves ONLY [LegendSider.background] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._background(context)`).
+  InteractiveColors _background(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendSiderThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendSiderAspectBackground);
+    LegendThemeOverride.depend<LegendSiderThemeNullable>(
+      context,
+      _$LegendSiderOverrideAspectBackground,
+    );
+    return _$LegendSiderSelectBackground(
+      data,
+    ).merge(override?.background).merge(background);
+  }
+
+  /// Resolves ONLY [LegendSider.width] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._width(context)`).
+  double _width(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendSiderThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendSiderAspectWidth);
+    LegendThemeOverride.depend<LegendSiderThemeNullable>(
+      context,
+      _$LegendSiderOverrideAspectWidth,
+    );
+    return width ?? override?.width ?? _$LegendSiderSelectWidth(data);
+  }
+
+  /// Resolves ONLY [LegendSider.selectedColor] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._selectedColor(context)`).
+  Color _selectedColor(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendSiderThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendSiderAspectSelectedColor);
+    LegendThemeOverride.depend<LegendSiderThemeNullable>(
+      context,
+      _$LegendSiderOverrideAspectSelectedColor,
+    );
+    return selectedColor ??
+        override?.selectedColor ??
+        _$LegendSiderSelectSelectedColor(data);
+  }
+
+  /// Resolves ONLY [LegendSider.unselectedColor] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._unselectedColor(context)`).
+  Color _unselectedColor(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendSiderThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendSiderAspectUnselectedColor);
+    LegendThemeOverride.depend<LegendSiderThemeNullable>(
+      context,
+      _$LegendSiderOverrideAspectUnselectedColor,
+    );
+    return unselectedColor ??
+        override?.unselectedColor ??
+        _$LegendSiderSelectUnselectedColor(data);
+  }
+
+  /// Resolves ONLY [LegendSider.itemPadding] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._itemPadding(context)`).
+  EdgeInsetsGeometry _itemPadding(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendSiderThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendSiderAspectItemPadding);
+    LegendThemeOverride.depend<LegendSiderThemeNullable>(
+      context,
+      _$LegendSiderOverrideAspectItemPadding,
+    );
+    return itemPadding ??
+        override?.itemPadding ??
+        _$LegendSiderSelectItemPadding(data);
+  }
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class LegendSider extends
+/// _$LegendSiderBase` receives the resolved
+/// [LegendSiderTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$LegendSiderBase
+    extends LegendStatelessWidget<LegendSiderTheme> {
+  const _$LegendSiderBase({super.key});
+
+  InteractiveColors? get background;
+  double? get width;
+  Color? get selectedColor;
+  Color? get unselectedColor;
+  EdgeInsetsGeometry? get itemPadding;
+
+  @override
+  LegendSiderTheme resolveThemeOf(BuildContext context) => LegendSiderTheme.of(
     context,
     LegendSiderThemeNullable(
       background: background,

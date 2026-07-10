@@ -31,22 +31,45 @@ class SecondaryLegendButtonTheme {
   /// [SecondaryLegendButton] first, [SecondaryLegendButtonThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static SecondaryLegendButtonTheme of(
     BuildContext context, [
     SecondaryLegendButtonThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
+    final data = LegendTheme.read(context);
+    final override =
+        LegendThemeOverride.read<SecondaryLegendButtonThemeNullable>(context);
+    LegendTheme.depend(context, _$SecondaryLegendButtonAspectBackground);
+    LegendThemeOverride.depend<SecondaryLegendButtonThemeNullable>(
+      context,
+      _$SecondaryLegendButtonOverrideAspectBackground,
+    );
+    LegendTheme.depend(context, _$SecondaryLegendButtonAspectForeground);
+    LegendThemeOverride.depend<SecondaryLegendButtonThemeNullable>(
+      context,
+      _$SecondaryLegendButtonOverrideAspectForeground,
+    );
+    LegendTheme.depend(context, _$SecondaryLegendButtonAspectBorderColor);
+    LegendThemeOverride.depend<SecondaryLegendButtonThemeNullable>(
+      context,
+      _$SecondaryLegendButtonOverrideAspectBorderColor,
+    );
+    LegendTheme.depend(context, _$SecondaryLegendButtonAspectTextStyle);
+    LegendThemeOverride.depend<SecondaryLegendButtonThemeNullable>(
+      context,
+      _$SecondaryLegendButtonOverrideAspectTextStyle,
+    );
     return SecondaryLegendButtonTheme.defaults(data.tokens)
         .merge(
           data.componentOf<SecondaryLegendButtonThemeNullable>(
             SecondaryLegendButton,
           ),
         )
-        .merge(
-          LegendThemeOverride.maybeOf<SecondaryLegendButtonThemeNullable>(
-            context,
-          ),
-        )
+        .merge(override)
         .merge(local);
   }
 
@@ -145,6 +168,139 @@ class SecondaryLegendButtonThemeOverride extends StatelessWidget {
       );
 }
 
+/// Resolves [SecondaryLegendButton.background] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+InteractiveColors _$SecondaryLegendButtonSelectBackground(
+  LegendThemeData data,
+) => _background(data.tokens).merge(
+  data
+      .componentOf<SecondaryLegendButtonThemeNullable>(SecondaryLegendButton)
+      ?.background,
+);
+const _$SecondaryLegendButtonAspectBackground = LegendThemeAspect(
+  _$SecondaryLegendButtonSelectBackground,
+);
+Object? _$SecondaryLegendButtonOverrideSelectBackground(
+  SecondaryLegendButtonThemeNullable data,
+) => data.background;
+const _$SecondaryLegendButtonOverrideAspectBackground =
+    LegendOverrideAspect<SecondaryLegendButtonThemeNullable>(
+      _$SecondaryLegendButtonOverrideSelectBackground,
+    );
+
+/// Resolves [SecondaryLegendButton.foreground] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+InteractiveColors _$SecondaryLegendButtonSelectForeground(
+  LegendThemeData data,
+) => _foreground(data.tokens).merge(
+  data
+      .componentOf<SecondaryLegendButtonThemeNullable>(SecondaryLegendButton)
+      ?.foreground,
+);
+const _$SecondaryLegendButtonAspectForeground = LegendThemeAspect(
+  _$SecondaryLegendButtonSelectForeground,
+);
+Object? _$SecondaryLegendButtonOverrideSelectForeground(
+  SecondaryLegendButtonThemeNullable data,
+) => data.foreground;
+const _$SecondaryLegendButtonOverrideAspectForeground =
+    LegendOverrideAspect<SecondaryLegendButtonThemeNullable>(
+      _$SecondaryLegendButtonOverrideSelectForeground,
+    );
+
+/// Resolves [SecondaryLegendButton.borderColor] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$SecondaryLegendButtonSelectBorderColor(LegendThemeData data) =>
+    data
+        .componentOf<SecondaryLegendButtonThemeNullable>(SecondaryLegendButton)
+        ?.borderColor ??
+    ColorRef.primary(data.tokens);
+const _$SecondaryLegendButtonAspectBorderColor = LegendThemeAspect(
+  _$SecondaryLegendButtonSelectBorderColor,
+);
+Object? _$SecondaryLegendButtonOverrideSelectBorderColor(
+  SecondaryLegendButtonThemeNullable data,
+) => data.borderColor;
+const _$SecondaryLegendButtonOverrideAspectBorderColor =
+    LegendOverrideAspect<SecondaryLegendButtonThemeNullable>(
+      _$SecondaryLegendButtonOverrideSelectBorderColor,
+    );
+
+/// Resolves [SecondaryLegendButton.textStyle] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+TextStyle _$SecondaryLegendButtonSelectTextStyle(LegendThemeData data) =>
+    data
+        .componentOf<SecondaryLegendButtonThemeNullable>(SecondaryLegendButton)
+        ?.textStyle ??
+    TextRef.b2(data.tokens);
+const _$SecondaryLegendButtonAspectTextStyle = LegendThemeAspect(
+  _$SecondaryLegendButtonSelectTextStyle,
+);
+Object? _$SecondaryLegendButtonOverrideSelectTextStyle(
+  SecondaryLegendButtonThemeNullable data,
+) => data.textStyle;
+const _$SecondaryLegendButtonOverrideAspectTextStyle =
+    LegendOverrideAspect<SecondaryLegendButtonThemeNullable>(
+      _$SecondaryLegendButtonOverrideSelectTextStyle,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class SecondaryLegendButtonThemeListenables {
+  /// Change stream of the resolved [SecondaryLegendButtonTheme.background].
+  static ValueListenable<InteractiveColors> background(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(
+    source,
+    data,
+    _$SecondaryLegendButtonSelectBackground,
+  );
+
+  /// Change stream of the resolved [SecondaryLegendButtonTheme.foreground].
+  static ValueListenable<InteractiveColors> foreground(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(
+    source,
+    data,
+    _$SecondaryLegendButtonSelectForeground,
+  );
+
+  /// Change stream of the resolved [SecondaryLegendButtonTheme.borderColor].
+  static ValueListenable<Color> borderColor(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(
+    source,
+    data,
+    _$SecondaryLegendButtonSelectBorderColor,
+  );
+
+  /// Change stream of the resolved [SecondaryLegendButtonTheme.textStyle].
+  static ValueListenable<TextStyle> textStyle(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) =>
+      LegendThemeSelector(source, data, _$SecondaryLegendButtonSelectTextStyle);
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -152,6 +308,113 @@ extension _$SecondaryLegendButtonThemeResolve on SecondaryLegendButton {
   /// [SecondaryLegendButtonTheme.of] with this widget's constructor params as
   /// level 1.
   SecondaryLegendButtonTheme _theme(BuildContext context) =>
+      SecondaryLegendButtonTheme.of(
+        context,
+        SecondaryLegendButtonThemeNullable(
+          background: background,
+          foreground: foreground,
+          borderColor: borderColor,
+          textStyle: textStyle,
+        ),
+      );
+
+  /// Resolves ONLY [SecondaryLegendButton.background] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._background(context)`).
+  InteractiveColors _background(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override =
+        LegendThemeOverride.read<SecondaryLegendButtonThemeNullable>(context);
+    LegendTheme.depend(context, _$SecondaryLegendButtonAspectBackground);
+    LegendThemeOverride.depend<SecondaryLegendButtonThemeNullable>(
+      context,
+      _$SecondaryLegendButtonOverrideAspectBackground,
+    );
+    return _$SecondaryLegendButtonSelectBackground(
+      data,
+    ).merge(override?.background).merge(background);
+  }
+
+  /// Resolves ONLY [SecondaryLegendButton.foreground] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._foreground(context)`).
+  InteractiveColors _foreground(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override =
+        LegendThemeOverride.read<SecondaryLegendButtonThemeNullable>(context);
+    LegendTheme.depend(context, _$SecondaryLegendButtonAspectForeground);
+    LegendThemeOverride.depend<SecondaryLegendButtonThemeNullable>(
+      context,
+      _$SecondaryLegendButtonOverrideAspectForeground,
+    );
+    return _$SecondaryLegendButtonSelectForeground(
+      data,
+    ).merge(override?.foreground).merge(foreground);
+  }
+
+  /// Resolves ONLY [SecondaryLegendButton.borderColor] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._borderColor(context)`).
+  Color _borderColor(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override =
+        LegendThemeOverride.read<SecondaryLegendButtonThemeNullable>(context);
+    LegendTheme.depend(context, _$SecondaryLegendButtonAspectBorderColor);
+    LegendThemeOverride.depend<SecondaryLegendButtonThemeNullable>(
+      context,
+      _$SecondaryLegendButtonOverrideAspectBorderColor,
+    );
+    return borderColor ??
+        override?.borderColor ??
+        _$SecondaryLegendButtonSelectBorderColor(data);
+  }
+
+  /// Resolves ONLY [SecondaryLegendButton.textStyle] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._textStyle(context)`).
+  TextStyle _textStyle(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override =
+        LegendThemeOverride.read<SecondaryLegendButtonThemeNullable>(context);
+    LegendTheme.depend(context, _$SecondaryLegendButtonAspectTextStyle);
+    LegendThemeOverride.depend<SecondaryLegendButtonThemeNullable>(
+      context,
+      _$SecondaryLegendButtonOverrideAspectTextStyle,
+    );
+    return textStyle ??
+        override?.textStyle ??
+        _$SecondaryLegendButtonSelectTextStyle(data);
+  }
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class SecondaryLegendButton extends
+/// _$SecondaryLegendButtonBase` receives the resolved
+/// [SecondaryLegendButtonTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$SecondaryLegendButtonBase
+    extends LegendStatelessWidget<SecondaryLegendButtonTheme> {
+  const _$SecondaryLegendButtonBase({super.key});
+
+  InteractiveColors? get background;
+  InteractiveColors? get foreground;
+  Color? get borderColor;
+  TextStyle? get textStyle;
+
+  @override
+  SecondaryLegendButtonTheme resolveThemeOf(BuildContext context) =>
       SecondaryLegendButtonTheme.of(
         context,
         SecondaryLegendButtonThemeNullable(

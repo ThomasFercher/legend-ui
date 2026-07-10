@@ -36,16 +36,52 @@ class LegendTextFieldTheme {
   /// [LegendTextField] first, [LegendTextFieldThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static LegendTextFieldTheme of(
     BuildContext context, [
     LegendTextFieldThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendTextFieldThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendTextFieldAspectBackground);
+    LegendThemeOverride.depend<LegendTextFieldThemeNullable>(
+      context,
+      _$LegendTextFieldOverrideAspectBackground,
+    );
+    LegendTheme.depend(context, _$LegendTextFieldAspectBorderRadius);
+    LegendThemeOverride.depend<LegendTextFieldThemeNullable>(
+      context,
+      _$LegendTextFieldOverrideAspectBorderRadius,
+    );
+    LegendTheme.depend(context, _$LegendTextFieldAspectPadding);
+    LegendThemeOverride.depend<LegendTextFieldThemeNullable>(
+      context,
+      _$LegendTextFieldOverrideAspectPadding,
+    );
+    LegendTheme.depend(context, _$LegendTextFieldAspectTextStyle);
+    LegendThemeOverride.depend<LegendTextFieldThemeNullable>(
+      context,
+      _$LegendTextFieldOverrideAspectTextStyle,
+    );
+    LegendTheme.depend(context, _$LegendTextFieldAspectBorderColor);
+    LegendThemeOverride.depend<LegendTextFieldThemeNullable>(
+      context,
+      _$LegendTextFieldOverrideAspectBorderColor,
+    );
+    LegendTheme.depend(context, _$LegendTextFieldAspectFocusedBorderColor);
+    LegendThemeOverride.depend<LegendTextFieldThemeNullable>(
+      context,
+      _$LegendTextFieldOverrideAspectFocusedBorderColor,
+    );
     return LegendTextFieldTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendTextFieldThemeNullable>(LegendTextField))
-        .merge(
-          LegendThemeOverride.maybeOf<LegendTextFieldThemeNullable>(context),
-        )
+        .merge(override)
         .merge(local);
   }
 
@@ -164,6 +200,176 @@ class LegendTextFieldThemeOverride extends StatelessWidget {
       );
 }
 
+/// Resolves [LegendTextField.background] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendTextFieldSelectBackground(LegendThemeData data) =>
+    data
+        .componentOf<LegendTextFieldThemeNullable>(LegendTextField)
+        ?.background ??
+    ColorRef.background1(data.tokens);
+const _$LegendTextFieldAspectBackground = LegendThemeAspect(
+  _$LegendTextFieldSelectBackground,
+);
+Object? _$LegendTextFieldOverrideSelectBackground(
+  LegendTextFieldThemeNullable data,
+) => data.background;
+const _$LegendTextFieldOverrideAspectBackground =
+    LegendOverrideAspect<LegendTextFieldThemeNullable>(
+      _$LegendTextFieldOverrideSelectBackground,
+    );
+
+/// Resolves [LegendTextField.borderRadius] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+BorderRadius _$LegendTextFieldSelectBorderRadius(LegendThemeData data) =>
+    data
+        .componentOf<LegendTextFieldThemeNullable>(LegendTextField)
+        ?.borderRadius ??
+    _borderRadius(data.tokens);
+const _$LegendTextFieldAspectBorderRadius = LegendThemeAspect(
+  _$LegendTextFieldSelectBorderRadius,
+);
+Object? _$LegendTextFieldOverrideSelectBorderRadius(
+  LegendTextFieldThemeNullable data,
+) => data.borderRadius;
+const _$LegendTextFieldOverrideAspectBorderRadius =
+    LegendOverrideAspect<LegendTextFieldThemeNullable>(
+      _$LegendTextFieldOverrideSelectBorderRadius,
+    );
+
+/// Resolves [LegendTextField.padding] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+EdgeInsetsGeometry _$LegendTextFieldSelectPadding(LegendThemeData data) =>
+    data.componentOf<LegendTextFieldThemeNullable>(LegendTextField)?.padding ??
+    _padding(data.tokens);
+const _$LegendTextFieldAspectPadding = LegendThemeAspect(
+  _$LegendTextFieldSelectPadding,
+);
+Object? _$LegendTextFieldOverrideSelectPadding(
+  LegendTextFieldThemeNullable data,
+) => data.padding;
+const _$LegendTextFieldOverrideAspectPadding =
+    LegendOverrideAspect<LegendTextFieldThemeNullable>(
+      _$LegendTextFieldOverrideSelectPadding,
+    );
+
+/// Resolves [LegendTextField.textStyle] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+TextStyle _$LegendTextFieldSelectTextStyle(LegendThemeData data) =>
+    data
+        .componentOf<LegendTextFieldThemeNullable>(LegendTextField)
+        ?.textStyle ??
+    TextRef.b1(data.tokens);
+const _$LegendTextFieldAspectTextStyle = LegendThemeAspect(
+  _$LegendTextFieldSelectTextStyle,
+);
+Object? _$LegendTextFieldOverrideSelectTextStyle(
+  LegendTextFieldThemeNullable data,
+) => data.textStyle;
+const _$LegendTextFieldOverrideAspectTextStyle =
+    LegendOverrideAspect<LegendTextFieldThemeNullable>(
+      _$LegendTextFieldOverrideSelectTextStyle,
+    );
+
+/// Resolves [LegendTextField.borderColor] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendTextFieldSelectBorderColor(LegendThemeData data) =>
+    data
+        .componentOf<LegendTextFieldThemeNullable>(LegendTextField)
+        ?.borderColor ??
+    ColorRef.background3(data.tokens);
+const _$LegendTextFieldAspectBorderColor = LegendThemeAspect(
+  _$LegendTextFieldSelectBorderColor,
+);
+Object? _$LegendTextFieldOverrideSelectBorderColor(
+  LegendTextFieldThemeNullable data,
+) => data.borderColor;
+const _$LegendTextFieldOverrideAspectBorderColor =
+    LegendOverrideAspect<LegendTextFieldThemeNullable>(
+      _$LegendTextFieldOverrideSelectBorderColor,
+    );
+
+/// Resolves [LegendTextField.focusedBorderColor] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendTextFieldSelectFocusedBorderColor(LegendThemeData data) =>
+    data
+        .componentOf<LegendTextFieldThemeNullable>(LegendTextField)
+        ?.focusedBorderColor ??
+    ColorRef.primary(data.tokens);
+const _$LegendTextFieldAspectFocusedBorderColor = LegendThemeAspect(
+  _$LegendTextFieldSelectFocusedBorderColor,
+);
+Object? _$LegendTextFieldOverrideSelectFocusedBorderColor(
+  LegendTextFieldThemeNullable data,
+) => data.focusedBorderColor;
+const _$LegendTextFieldOverrideAspectFocusedBorderColor =
+    LegendOverrideAspect<LegendTextFieldThemeNullable>(
+      _$LegendTextFieldOverrideSelectFocusedBorderColor,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class LegendTextFieldThemeListenables {
+  /// Change stream of the resolved [LegendTextFieldTheme.background].
+  static ValueListenable<Color> background(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendTextFieldSelectBackground);
+
+  /// Change stream of the resolved [LegendTextFieldTheme.borderRadius].
+  static ValueListenable<BorderRadius> borderRadius(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendTextFieldSelectBorderRadius);
+
+  /// Change stream of the resolved [LegendTextFieldTheme.padding].
+  static ValueListenable<EdgeInsetsGeometry> padding(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendTextFieldSelectPadding);
+
+  /// Change stream of the resolved [LegendTextFieldTheme.textStyle].
+  static ValueListenable<TextStyle> textStyle(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendTextFieldSelectTextStyle);
+
+  /// Change stream of the resolved [LegendTextFieldTheme.borderColor].
+  static ValueListenable<Color> borderColor(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendTextFieldSelectBorderColor);
+
+  /// Change stream of the resolved [LegendTextFieldTheme.focusedBorderColor].
+  static ValueListenable<Color> focusedBorderColor(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(
+    source,
+    data,
+    _$LegendTextFieldSelectFocusedBorderColor,
+  );
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -181,4 +387,178 @@ extension _$LegendTextFieldThemeResolve on LegendTextField {
       focusedBorderColor: focusedBorderColor,
     ),
   );
+
+  /// Resolves ONLY [LegendTextField.background] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._background(context)`).
+  Color _background(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendTextFieldThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendTextFieldAspectBackground);
+    LegendThemeOverride.depend<LegendTextFieldThemeNullable>(
+      context,
+      _$LegendTextFieldOverrideAspectBackground,
+    );
+    return background ??
+        override?.background ??
+        _$LegendTextFieldSelectBackground(data);
+  }
+
+  /// Resolves ONLY [LegendTextField.borderRadius] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._borderRadius(context)`).
+  BorderRadius _borderRadius(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendTextFieldThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendTextFieldAspectBorderRadius);
+    LegendThemeOverride.depend<LegendTextFieldThemeNullable>(
+      context,
+      _$LegendTextFieldOverrideAspectBorderRadius,
+    );
+    return borderRadius ??
+        override?.borderRadius ??
+        _$LegendTextFieldSelectBorderRadius(data);
+  }
+
+  /// Resolves ONLY [LegendTextField.padding] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._padding(context)`).
+  EdgeInsetsGeometry _padding(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendTextFieldThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendTextFieldAspectPadding);
+    LegendThemeOverride.depend<LegendTextFieldThemeNullable>(
+      context,
+      _$LegendTextFieldOverrideAspectPadding,
+    );
+    return padding ?? override?.padding ?? _$LegendTextFieldSelectPadding(data);
+  }
+
+  /// Resolves ONLY [LegendTextField.textStyle] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._textStyle(context)`).
+  TextStyle _textStyle(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendTextFieldThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendTextFieldAspectTextStyle);
+    LegendThemeOverride.depend<LegendTextFieldThemeNullable>(
+      context,
+      _$LegendTextFieldOverrideAspectTextStyle,
+    );
+    return textStyle ??
+        override?.textStyle ??
+        _$LegendTextFieldSelectTextStyle(data);
+  }
+
+  /// Resolves ONLY [LegendTextField.borderColor] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._borderColor(context)`).
+  Color _borderColor(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendTextFieldThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendTextFieldAspectBorderColor);
+    LegendThemeOverride.depend<LegendTextFieldThemeNullable>(
+      context,
+      _$LegendTextFieldOverrideAspectBorderColor,
+    );
+    return borderColor ??
+        override?.borderColor ??
+        _$LegendTextFieldSelectBorderColor(data);
+  }
+
+  /// Resolves ONLY [LegendTextField.focusedBorderColor] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._focusedBorderColor(context)`).
+  Color _focusedBorderColor(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendTextFieldThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendTextFieldAspectFocusedBorderColor);
+    LegendThemeOverride.depend<LegendTextFieldThemeNullable>(
+      context,
+      _$LegendTextFieldOverrideAspectFocusedBorderColor,
+    );
+    return focusedBorderColor ??
+        override?.focusedBorderColor ??
+        _$LegendTextFieldSelectFocusedBorderColor(data);
+  }
+}
+
+/// Auto-detected State wiring (RFC-002 R13): [_LegendTextFieldState]
+/// is this file's `State<LegendTextField>`, so its
+/// build reads the resolved theme as a plain `theme`
+/// getter — zero visible wiring. A same-named instance
+/// member (e.g. from [_$LegendTextFieldThemeState])
+/// wins over this extension.
+extension _$LegendTextFieldThemeOn_LegendTextFieldState
+    on _LegendTextFieldState {
+  LegendTextFieldTheme get theme => widget._theme(context);
+}
+
+/// Explicit State wiring (RFC-002 R13): mix onto any
+/// `State<LegendTextField>` for the `theme` getter as a
+/// real, overridable inherited member — no State-class
+/// detection involved.
+mixin _$LegendTextFieldThemeState on State<LegendTextField> {
+  LegendTextFieldTheme get theme => widget._theme(context);
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class LegendTextField extends
+/// _$LegendTextFieldBase` receives the resolved
+/// [LegendTextFieldTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$LegendTextFieldBase
+    extends LegendStatelessWidget<LegendTextFieldTheme> {
+  const _$LegendTextFieldBase({super.key});
+
+  Color? get background;
+  BorderRadius? get borderRadius;
+  EdgeInsetsGeometry? get padding;
+  TextStyle? get textStyle;
+  Color? get borderColor;
+  Color? get focusedBorderColor;
+
+  @override
+  LegendTextFieldTheme resolveThemeOf(BuildContext context) =>
+      LegendTextFieldTheme.of(
+        context,
+        LegendTextFieldThemeNullable(
+          background: background,
+          borderRadius: borderRadius,
+          padding: padding,
+          textStyle: textStyle,
+          borderColor: borderColor,
+          focusedBorderColor: focusedBorderColor,
+        ),
+      );
 }

@@ -18,16 +18,27 @@ class LegendScaffoldTheme {
   /// [LegendScaffold] first, [LegendScaffoldThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static LegendScaffoldTheme of(
     BuildContext context, [
     LegendScaffoldThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendScaffoldThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendScaffoldAspectBackground);
+    LegendThemeOverride.depend<LegendScaffoldThemeNullable>(
+      context,
+      _$LegendScaffoldOverrideAspectBackground,
+    );
     return LegendScaffoldTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendScaffoldThemeNullable>(LegendScaffold))
-        .merge(
-          LegendThemeOverride.maybeOf<LegendScaffoldThemeNullable>(context),
-        )
+        .merge(override)
         .merge(local);
   }
 
@@ -91,6 +102,42 @@ class LegendScaffoldThemeOverride extends StatelessWidget {
       );
 }
 
+/// Resolves [LegendScaffold.background] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendScaffoldSelectBackground(LegendThemeData data) =>
+    data.componentOf<LegendScaffoldThemeNullable>(LegendScaffold)?.background ??
+    ColorRef.background1(data.tokens);
+const _$LegendScaffoldAspectBackground = LegendThemeAspect(
+  _$LegendScaffoldSelectBackground,
+);
+Object? _$LegendScaffoldOverrideSelectBackground(
+  LegendScaffoldThemeNullable data,
+) => data.background;
+const _$LegendScaffoldOverrideAspectBackground =
+    LegendOverrideAspect<LegendScaffoldThemeNullable>(
+      _$LegendScaffoldOverrideSelectBackground,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class LegendScaffoldThemeListenables {
+  /// Change stream of the resolved [LegendScaffoldTheme.background].
+  static ValueListenable<Color> background(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendScaffoldSelectBackground);
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -101,4 +148,44 @@ extension _$LegendScaffoldThemeResolve on LegendScaffold {
     context,
     LegendScaffoldThemeNullable(background: background),
   );
+
+  /// Resolves ONLY [LegendScaffold.background] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._background(context)`).
+  Color _background(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendScaffoldThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendScaffoldAspectBackground);
+    LegendThemeOverride.depend<LegendScaffoldThemeNullable>(
+      context,
+      _$LegendScaffoldOverrideAspectBackground,
+    );
+    return background ??
+        override?.background ??
+        _$LegendScaffoldSelectBackground(data);
+  }
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class LegendScaffold extends
+/// _$LegendScaffoldBase` receives the resolved
+/// [LegendScaffoldTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$LegendScaffoldBase
+    extends LegendStatelessWidget<LegendScaffoldTheme> {
+  const _$LegendScaffoldBase({super.key});
+
+  Color? get background;
+
+  @override
+  LegendScaffoldTheme resolveThemeOf(BuildContext context) =>
+      LegendScaffoldTheme.of(
+        context,
+        LegendScaffoldThemeNullable(background: background),
+      );
 }

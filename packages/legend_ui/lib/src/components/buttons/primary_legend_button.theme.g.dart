@@ -31,22 +31,46 @@ class PrimaryLegendButtonTheme {
   /// [PrimaryLegendButton] first, [PrimaryLegendButtonThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static PrimaryLegendButtonTheme of(
     BuildContext context, [
     PrimaryLegendButtonThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<PrimaryLegendButtonThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$PrimaryLegendButtonAspectBackground);
+    LegendThemeOverride.depend<PrimaryLegendButtonThemeNullable>(
+      context,
+      _$PrimaryLegendButtonOverrideAspectBackground,
+    );
+    LegendTheme.depend(context, _$PrimaryLegendButtonAspectForeground);
+    LegendThemeOverride.depend<PrimaryLegendButtonThemeNullable>(
+      context,
+      _$PrimaryLegendButtonOverrideAspectForeground,
+    );
+    LegendTheme.depend(context, _$PrimaryLegendButtonAspectTextStyle);
+    LegendThemeOverride.depend<PrimaryLegendButtonThemeNullable>(
+      context,
+      _$PrimaryLegendButtonOverrideAspectTextStyle,
+    );
+    LegendTheme.depend(context, _$PrimaryLegendButtonAspectShadows);
+    LegendThemeOverride.depend<PrimaryLegendButtonThemeNullable>(
+      context,
+      _$PrimaryLegendButtonOverrideAspectShadows,
+    );
     return PrimaryLegendButtonTheme.defaults(data.tokens)
         .merge(
           data.componentOf<PrimaryLegendButtonThemeNullable>(
             PrimaryLegendButton,
           ),
         )
-        .merge(
-          LegendThemeOverride.maybeOf<PrimaryLegendButtonThemeNullable>(
-            context,
-          ),
-        )
+        .merge(override)
         .merge(local);
   }
 
@@ -145,6 +169,124 @@ class PrimaryLegendButtonThemeOverride extends StatelessWidget {
       );
 }
 
+/// Resolves [PrimaryLegendButton.background] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+InteractiveColors _$PrimaryLegendButtonSelectBackground(LegendThemeData data) =>
+    _background(data.tokens).merge(
+      data
+          .componentOf<PrimaryLegendButtonThemeNullable>(PrimaryLegendButton)
+          ?.background,
+    );
+const _$PrimaryLegendButtonAspectBackground = LegendThemeAspect(
+  _$PrimaryLegendButtonSelectBackground,
+);
+Object? _$PrimaryLegendButtonOverrideSelectBackground(
+  PrimaryLegendButtonThemeNullable data,
+) => data.background;
+const _$PrimaryLegendButtonOverrideAspectBackground =
+    LegendOverrideAspect<PrimaryLegendButtonThemeNullable>(
+      _$PrimaryLegendButtonOverrideSelectBackground,
+    );
+
+/// Resolves [PrimaryLegendButton.foreground] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+InteractiveColors _$PrimaryLegendButtonSelectForeground(LegendThemeData data) =>
+    _foreground(data.tokens).merge(
+      data
+          .componentOf<PrimaryLegendButtonThemeNullable>(PrimaryLegendButton)
+          ?.foreground,
+    );
+const _$PrimaryLegendButtonAspectForeground = LegendThemeAspect(
+  _$PrimaryLegendButtonSelectForeground,
+);
+Object? _$PrimaryLegendButtonOverrideSelectForeground(
+  PrimaryLegendButtonThemeNullable data,
+) => data.foreground;
+const _$PrimaryLegendButtonOverrideAspectForeground =
+    LegendOverrideAspect<PrimaryLegendButtonThemeNullable>(
+      _$PrimaryLegendButtonOverrideSelectForeground,
+    );
+
+/// Resolves [PrimaryLegendButton.textStyle] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+TextStyle _$PrimaryLegendButtonSelectTextStyle(LegendThemeData data) =>
+    data
+        .componentOf<PrimaryLegendButtonThemeNullable>(PrimaryLegendButton)
+        ?.textStyle ??
+    TextRef.b2(data.tokens);
+const _$PrimaryLegendButtonAspectTextStyle = LegendThemeAspect(
+  _$PrimaryLegendButtonSelectTextStyle,
+);
+Object? _$PrimaryLegendButtonOverrideSelectTextStyle(
+  PrimaryLegendButtonThemeNullable data,
+) => data.textStyle;
+const _$PrimaryLegendButtonOverrideAspectTextStyle =
+    LegendOverrideAspect<PrimaryLegendButtonThemeNullable>(
+      _$PrimaryLegendButtonOverrideSelectTextStyle,
+    );
+
+/// Resolves [PrimaryLegendButton.shadows] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+List<BoxShadow> _$PrimaryLegendButtonSelectShadows(LegendThemeData data) =>
+    data
+        .componentOf<PrimaryLegendButtonThemeNullable>(PrimaryLegendButton)
+        ?.shadows ??
+    ShadowRef.none(data.tokens);
+const _$PrimaryLegendButtonAspectShadows = LegendThemeAspect(
+  _$PrimaryLegendButtonSelectShadows,
+);
+Object? _$PrimaryLegendButtonOverrideSelectShadows(
+  PrimaryLegendButtonThemeNullable data,
+) => data.shadows;
+const _$PrimaryLegendButtonOverrideAspectShadows =
+    LegendOverrideAspect<PrimaryLegendButtonThemeNullable>(
+      _$PrimaryLegendButtonOverrideSelectShadows,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class PrimaryLegendButtonThemeListenables {
+  /// Change stream of the resolved [PrimaryLegendButtonTheme.background].
+  static ValueListenable<InteractiveColors> background(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$PrimaryLegendButtonSelectBackground);
+
+  /// Change stream of the resolved [PrimaryLegendButtonTheme.foreground].
+  static ValueListenable<InteractiveColors> foreground(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$PrimaryLegendButtonSelectForeground);
+
+  /// Change stream of the resolved [PrimaryLegendButtonTheme.textStyle].
+  static ValueListenable<TextStyle> textStyle(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$PrimaryLegendButtonSelectTextStyle);
+
+  /// Change stream of the resolved [PrimaryLegendButtonTheme.shadows].
+  static ValueListenable<List<BoxShadow>> shadows(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$PrimaryLegendButtonSelectShadows);
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -152,6 +294,117 @@ extension _$PrimaryLegendButtonThemeResolve on PrimaryLegendButton {
   /// [PrimaryLegendButtonTheme.of] with this widget's constructor params as
   /// level 1.
   PrimaryLegendButtonTheme _theme(BuildContext context) =>
+      PrimaryLegendButtonTheme.of(
+        context,
+        PrimaryLegendButtonThemeNullable(
+          background: background,
+          foreground: foreground,
+          textStyle: textStyle,
+          shadows: shadows,
+        ),
+      );
+
+  /// Resolves ONLY [PrimaryLegendButton.background] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._background(context)`).
+  InteractiveColors _background(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<PrimaryLegendButtonThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$PrimaryLegendButtonAspectBackground);
+    LegendThemeOverride.depend<PrimaryLegendButtonThemeNullable>(
+      context,
+      _$PrimaryLegendButtonOverrideAspectBackground,
+    );
+    return _$PrimaryLegendButtonSelectBackground(
+      data,
+    ).merge(override?.background).merge(background);
+  }
+
+  /// Resolves ONLY [PrimaryLegendButton.foreground] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._foreground(context)`).
+  InteractiveColors _foreground(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<PrimaryLegendButtonThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$PrimaryLegendButtonAspectForeground);
+    LegendThemeOverride.depend<PrimaryLegendButtonThemeNullable>(
+      context,
+      _$PrimaryLegendButtonOverrideAspectForeground,
+    );
+    return _$PrimaryLegendButtonSelectForeground(
+      data,
+    ).merge(override?.foreground).merge(foreground);
+  }
+
+  /// Resolves ONLY [PrimaryLegendButton.textStyle] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._textStyle(context)`).
+  TextStyle _textStyle(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<PrimaryLegendButtonThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$PrimaryLegendButtonAspectTextStyle);
+    LegendThemeOverride.depend<PrimaryLegendButtonThemeNullable>(
+      context,
+      _$PrimaryLegendButtonOverrideAspectTextStyle,
+    );
+    return textStyle ??
+        override?.textStyle ??
+        _$PrimaryLegendButtonSelectTextStyle(data);
+  }
+
+  /// Resolves ONLY [PrimaryLegendButton.shadows] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._shadows(context)`).
+  List<BoxShadow> _shadows(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<PrimaryLegendButtonThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$PrimaryLegendButtonAspectShadows);
+    LegendThemeOverride.depend<PrimaryLegendButtonThemeNullable>(
+      context,
+      _$PrimaryLegendButtonOverrideAspectShadows,
+    );
+    return shadows ??
+        override?.shadows ??
+        _$PrimaryLegendButtonSelectShadows(data);
+  }
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class PrimaryLegendButton extends
+/// _$PrimaryLegendButtonBase` receives the resolved
+/// [PrimaryLegendButtonTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$PrimaryLegendButtonBase
+    extends LegendStatelessWidget<PrimaryLegendButtonTheme> {
+  const _$PrimaryLegendButtonBase({super.key});
+
+  InteractiveColors? get background;
+  InteractiveColors? get foreground;
+  TextStyle? get textStyle;
+  List<BoxShadow>? get shadows;
+
+  @override
+  PrimaryLegendButtonTheme resolveThemeOf(BuildContext context) =>
       PrimaryLegendButtonTheme.of(
         context,
         PrimaryLegendButtonThemeNullable(

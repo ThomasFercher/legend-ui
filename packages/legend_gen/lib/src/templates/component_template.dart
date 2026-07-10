@@ -36,9 +36,11 @@ class ComponentTemplateVars {
 /// the formatter): a `@LegendThemeable` StatelessWidget with example
 /// `@Style` fields (one `.resolve` tear-off per field), the `part`
 /// directive for its generated theme, and a `build` that resolves with one
-/// generated `_theme(context)` call (RFC-002 R1). Mirrors the structure of
-/// the kit's own components (see
-/// `legend_ui/lib/src/components/card/legend_card.dart`).
+/// generated `_theme(context)` call — the default wiring form, with
+/// comments pointing at the R13 alternatives (State `theme` getter /
+/// `_\$XThemeState` mixin for stateful widgets, the opt-in `_\$XBase`
+/// two-argument build). Mirrors the structure of the kit's own components
+/// (see `legend_ui/lib/src/components/card/legend_card.dart`).
 String renderComponentTemplate(ComponentTemplateVars vars) =>
     '''
 import 'package:flutter/widgets.dart';
@@ -73,6 +75,16 @@ class ${vars.className} extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // The generated hook (RFC-002 R13): one call resolves all four theme
+    // levels and registers the per-field rebuild aspects (R12).
+    //
+    // Alternatives, all emitted into ${vars.snake}.theme.g.dart:
+    //  - stateful: read `theme` directly in the State's build — the
+    //    getter extension is generated when the State class lives in this
+    //    file; or mix in `_\$${vars.className}ThemeState` explicitly;
+    //  - two-argument build: `extends _\$${vars.className}Base` and write
+    //    `Widget build(BuildContext context, ${vars.className}Theme theme)`
+    //    (stateless only — the opt-in base form).
     final theme = _theme(context);
     return Container(
       color: theme.background,

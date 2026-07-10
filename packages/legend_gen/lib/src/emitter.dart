@@ -55,18 +55,40 @@ void _emitWidget(StringBuffer b, ThemableWidget widget) {
     ..writeln()
     ..writeln(fields.map((f) => 'final ${f.themeType} ${f.name};').join());
 
-  // of(): the four-level resolution chain (DESIGN.md §1 goal 3).
+  // of(): the four-level resolution chain (DESIGN.md §1 goal 3), with
+  // per-field rebuild aspects (RFC-002 R12).
+  final listened = fields.where((f) => f.listen).toList();
   b
     ..writeln()
     ..writeln('/// Resolves the theme: defaults <- app registry (keyed by')
     ..writeln('/// [${widget.className}] first, [$nullable] as the legacy')
     ..writeln('/// fallback — RFC-002 R3) <- subtree override <- constructor')
     ..writeln('/// params ([local]).')
+    ..writeln('///')
+    ..writeln('/// Registers one rebuild aspect per `listen: true` field')
+    ..writeln('/// (RFC-002 R12): the caller rebuilds only when a listened')
+    ..writeln("/// field's resolved value changes; `listen: false` fields")
+    ..writeln('/// resolve fresh but never cause a rebuild by themselves.')
     ..writeln('static $theme of(BuildContext context, [$nullable? local]) {')
-    ..writeln('final data = LegendTheme.of(context);')
+    ..writeln('final data = LegendTheme.read(context);')
+    ..writeln('final override = LegendThemeOverride.read<$nullable>(context);');
+  if (listened.isNotEmpty) {
+    b.writeln(
+      listened
+          .map(
+            (f) =>
+                'LegendTheme.depend(context, '
+                '_\$${widget.className}Aspect${_pascal(f.name)});'
+                'LegendThemeOverride.depend<$nullable>(context, '
+                '_\$${widget.className}OverrideAspect${_pascal(f.name)});',
+          )
+          .join(),
+    );
+  }
+  b
     ..writeln('return $theme.defaults(data.tokens)')
     ..writeln('.merge(data.componentOf<$nullable>(${widget.className}))')
-    ..writeln('.merge(LegendThemeOverride.maybeOf<$nullable>(context))')
+    ..writeln('.merge(override)')
     ..writeln('.merge(local);')
     ..writeln('}');
 
@@ -154,7 +176,63 @@ void _emitWidget(StringBuffer b, ThemableWidget widget) {
     ..writeln('LegendThemeOverride<$nullable>(data: data, child: child);')
     ..writeln('}');
 
-  // ── Private in-library resolver (RFC-002 R1) ──────────────────────
+  // ── Per-field selectors + rebuild aspects (RFC-002 R12) ───────────
+  for (final f in fields) {
+    final pascal = _pascal(f.name);
+    b
+      ..writeln()
+      ..writeln('/// Resolves [${widget.className}.${f.name}] through the')
+      ..writeln('/// registry and the token defaults (levels 4+3) — the')
+      ..writeln('/// comparator behind its rebuild aspect and listenable')
+      ..writeln('/// (RFC-002 R12).')
+      ..writeln(
+        '${f.themeType} _\$${widget.className}Select$pascal'
+        '(LegendThemeData data) => ${_selectExpression(widget, f)};',
+      )
+      ..writeln(
+        'const _\$${widget.className}Aspect$pascal = '
+        'LegendThemeAspect(_\$${widget.className}Select$pascal);',
+      )
+      ..writeln(
+        'Object? _\$${widget.className}OverrideSelect$pascal('
+        '$nullable data) => data.${f.name};',
+      )
+      ..writeln(
+        'const _\$${widget.className}OverrideAspect$pascal = '
+        'LegendOverrideAspect<$nullable>('
+        '_\$${widget.className}OverrideSelect$pascal);',
+      );
+  }
+
+  // ── Per-field ValueListenable selectors (RFC-002 R12.4) ───────────
+  b
+    ..writeln()
+    ..writeln('/// Distinct-until-changed per-field change streams over a')
+    ..writeln('/// theme source (RFC-002 R12.4) — for animation and')
+    ..writeln('/// imperative consumers that want theme changes without any')
+    ..writeln('/// widget rebuild. Bind `source` to the app theme')
+    ..writeln('/// controller (any [Listenable]) and `data` to its')
+    ..writeln('/// [LegendThemeData] getter; dispose the returned selector')
+    ..writeln('/// when done. Values resolve through registry + token')
+    ..writeln('/// defaults (constructor params and subtree overrides are')
+    ..writeln('/// element-tree concerns and have no controller-level')
+    ..writeln('/// equivalent).')
+    ..writeln('abstract final class ${theme}Listenables {');
+  for (final f in fields) {
+    b
+      ..writeln('/// Change stream of the resolved [$theme.${f.name}].')
+      ..writeln(
+        'static ValueListenable<${f.themeType}> ${f.name}'
+        '(Listenable source, LegendThemeData Function() data) =>',
+      )
+      ..writeln(
+        'LegendThemeSelector(source, data, '
+        '_\$${widget.className}Select${_pascal(f.name)});',
+      );
+  }
+  b.writeln('}');
+
+  // ── Private in-library resolver (RFC-002 R1) + accessors (R12.3) ──
   b
     ..writeln()
     ..writeln('/// In-library resolver (RFC-002 R1): re-lists the themed')
@@ -171,8 +249,168 @@ void _emitWidget(StringBuffer b, ThemableWidget widget) {
     ..writeln('$nullable(')
     ..writeln(fields.map((f) => '${f.name}: ${f.name},').join())
     ..writeln('),')
+    ..writeln(');');
+  for (final f in fields) {
+    final pascal = _pascal(f.name);
+    b
+      ..writeln()
+      ..writeln('/// Resolves ONLY [${widget.className}.${f.name}] (full')
+      ..writeln("/// four-level chain), registering just this field's")
+      ..writeln('/// rebuild aspect (RFC-002 R12.3) — for widgets consuming')
+      ..writeln('/// one property. When a top-level tear-off shares the')
+      ..writeln('/// name, call it receiver-qualified')
+      ..writeln('/// (`this._${f.name}(context)`).')
+      ..writeln('${f.themeType} _${f.name}(BuildContext context) {')
+      ..writeln('final data = LegendTheme.read(context);')
+      ..writeln(
+        'final override = LegendThemeOverride.read<$nullable>(context);',
+      );
+    if (f.listen) {
+      b
+        ..writeln(
+          'LegendTheme.depend(context, '
+          '_\$${widget.className}Aspect$pascal);',
+        )
+        ..writeln(
+          'LegendThemeOverride.depend<$nullable>(context, '
+          '_\$${widget.className}OverrideAspect$pascal);',
+        );
+    }
+    b
+      ..writeln('return ${_accessorExpression(widget, f)};')
+      ..writeln('}');
+  }
+  b.writeln('}');
+
+  _emitWiringForms(b, widget);
+}
+
+/// The R13 wiring forms: the auto-detected State getter extension, the
+/// explicit `_\$XThemeState` mixin, and the opt-in `_\$XBase` two-argument
+/// build base (RFC-002 R13 revision 2 + opt-in base).
+void _emitWiringForms(StringBuffer b, ThemableWidget widget) {
+  final theme = '${widget.className}Theme';
+  final nullable = '${widget.className}ThemeNullable';
+  final fields = widget.fields;
+
+  final stateClass = widget.stateClassName;
+  if (stateClass != null) {
+    final parameters = widget.stateTypeParameters;
+    final arguments = _typeParameterNames(parameters);
+    b
+      ..writeln()
+      ..writeln('/// Auto-detected State wiring (RFC-002 R13): [$stateClass]')
+      ..writeln("/// is this file's `State<${widget.className}>`, so its")
+      ..writeln('/// build reads the resolved theme as a plain `theme`')
+      ..writeln('/// getter — zero visible wiring. A same-named instance')
+      ..writeln('/// member (e.g. from [_\$${widget.className}ThemeState])')
+      ..writeln('/// wins over this extension.')
+      ..writeln(
+        'extension _\$${widget.className}ThemeOn$stateClass$parameters '
+        'on $stateClass$arguments {',
+      )
+      ..writeln('$theme get theme => widget._theme(context);')
+      ..writeln('}');
+  }
+
+  // `on State<X>` only satisfies State's bound when X is a
+  // StatefulWidget — stateless widgets get the hook and the opt-in base.
+  if (widget.isStateful) {
+    b
+      ..writeln()
+      ..writeln('/// Explicit State wiring (RFC-002 R13): mix onto any')
+      ..writeln('/// `State<${widget.className}>` for the `theme` getter as a')
+      ..writeln('/// real, overridable inherited member — no State-class')
+      ..writeln('/// detection involved.')
+      ..writeln(
+        'mixin _\$${widget.className}ThemeState '
+        'on State<${widget.className}> {',
+      )
+      ..writeln('$theme get theme => widget._theme(context);')
+      ..writeln('}');
+  }
+
+  b
+    ..writeln()
+    ..writeln('/// Opt-in two-argument build base (RFC-002 R13, opt-in')
+    ..writeln('/// base): `class ${widget.className} extends')
+    ..writeln('/// _\$${widget.className}Base` receives the resolved')
+    ..writeln('/// [$theme] as a build parameter. Plain-widget forms stay')
+    ..writeln('/// the default; there is no stateful two-argument variant.')
+    ..writeln(
+      'abstract class _\$${widget.className}Base '
+      'extends LegendStatelessWidget<$theme> {',
+    )
+    ..writeln('const _\$${widget.className}Base({super.key});')
+    ..writeln();
+  for (final f in fields) {
+    b.writeln('${f.type} get ${f.name};');
+  }
+  b
+    ..writeln()
+    ..writeln('@override')
+    ..writeln('$theme resolveThemeOf(BuildContext context) => $theme.of(')
+    ..writeln('context,')
+    ..writeln('$nullable(')
+    ..writeln(fields.map((f) => '${f.name}: ${f.name},').join())
+    ..writeln('),')
     ..writeln(');')
     ..writeln('}');
+}
+
+/// Levels 4+3 resolution of [f] over the theme data — the aspect
+/// comparator and listenable selector body.
+String _selectExpression(ThemableWidget widget, StyledField f) {
+  final registry =
+      'data.componentOf<${widget.className}ThemeNullable>'
+      '(${widget.className})?.${f.name}';
+  if (f.kind == StyleDefaultKind.none) return registry;
+  final defaults = switch (f.kind) {
+    StyleDefaultKind.value => f.defaultCode,
+    StyleDefaultKind.resolve => '${f.defaultCode}(data.tokens)',
+    StyleDefaultKind.none => 'null',
+  };
+  if (f.styleClass != null) return '$defaults.merge($registry)';
+  return '$registry ?? $defaults';
+}
+
+/// Full four-level resolution of [f] inside its per-field accessor
+/// (constructor param > override member > select over registry+defaults).
+String _accessorExpression(ThemableWidget widget, StyledField f) {
+  final select = '_\$${widget.className}Select${_pascal(f.name)}(data)';
+  final overrideMember = 'override?.${f.name}';
+  if (f.styleClass == null) {
+    return '${f.name} ?? $overrideMember ?? $select';
+  }
+  if (f.kind == StyleDefaultKind.none) {
+    final upper = '($select?.merge($overrideMember) ?? $overrideMember)';
+    return '$upper?.merge(${f.name}) ?? ${f.name}';
+  }
+  return '$select.merge($overrideMember).merge(${f.name})';
+}
+
+String _pascal(String name) => name[0].toUpperCase() + name.substring(1);
+
+/// `<T extends num, S>` → `<T, S>` — re-applies a declaration's type
+/// parameters as type arguments on the extension's `on` type.
+String _typeParameterNames(String parameters) {
+  if (parameters.isEmpty) return '';
+  final inner = parameters.substring(1, parameters.length - 1);
+  final names = <String>[];
+  var depth = 0;
+  var start = 0;
+  for (var i = 0; i <= inner.length; i++) {
+    if (i == inner.length || (inner[i] == ',' && depth == 0)) {
+      final part = inner.substring(start, i).trim();
+      names.add(part.split(RegExp(r'[\s<]')).first);
+      start = i + 1;
+    } else if (inner[i] == '<') {
+      depth++;
+    } else if (inner[i] == '>') {
+      depth--;
+    }
+  }
+  return '<${names.join(', ')}>';
 }
 
 String _defaultExpression(StyledField f) {

@@ -76,7 +76,8 @@ const List<LegendDocEntry> statefulChipDocEntries = [
     owner: 'StatefulChip',
     name: 'label',
     type: 'Color?',
-    doc: 'Label color (steps on theme animation).',
+    doc:
+        'Label color (steps on theme animation; `listen: false` — read\nfresh every build, never a rebuild source, RFC-002 R12.2).',
     defaultDescription: 't.colors.onPrimary',
     group: 'component',
   ),

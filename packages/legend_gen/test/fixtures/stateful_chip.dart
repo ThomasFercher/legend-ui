@@ -38,8 +38,9 @@ class StatefulChip extends StatefulWidget {
   static ChipAccent _accent(LegendTokens t) =>
       ChipAccent(fill: t.colors.primary);
 
-  /// Label color (steps on theme animation).
-  @Style<Color>.resolve(_label)
+  /// Label color (steps on theme animation; `listen: false` — read
+  /// fresh every build, never a rebuild source, RFC-002 R12.2).
+  @Style<Color>.resolve(_label, listen: false)
   final Color? label;
   static Color _label(LegendTokens t) => t.colors.onPrimary;
 
@@ -50,7 +51,8 @@ class StatefulChip extends StatefulWidget {
 class _StatefulChipState extends State<StatefulChip> {
   @override
   Widget build(BuildContext context) {
-    final theme = widget._theme(context);
+    // The `theme` getter comes from the generated auto-extension on this
+    // State class (RFC-002 R13) — zero visible wiring.
     return ColoredBox(color: theme.accent.fill ?? theme.label);
   }
 }
