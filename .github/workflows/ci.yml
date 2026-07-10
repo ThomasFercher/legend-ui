@@ -23,7 +23,10 @@ jobs:
 
       - name: Generated output is fresh
         working-directory: packages/legend_ui
-        run: dart run legend_gen themes lib test/consumer --check
+        run: |
+          dart run legend_gen themes lib test/consumer --check
+          dart run legend_gen docs lib test/consumer --check
+          dart run legend_gen tokens lib --check
 
       - name: Example builds for web
         working-directory: example

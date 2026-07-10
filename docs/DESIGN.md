@@ -147,7 +147,7 @@ The ~26 legacy components rebuild on top of **five kit-internal primitives** (al
 Public components then become thin compositions (`PrimaryLegendButton` = `LegendInteractive` + `LegendSurface` + slot layout), each carrying its `@LegendThemeable` declaration. Consolidations while porting:
 
 - **One dropdown** (menu + button unified, one item model), **one switch** (no Cupertino fork — build on `LegendInteractive`), **one modal sheet** (actually implemented this time).
-- **legacy `NomoRouteBody` → `LegendBody`** with a single sliver-based mode; convenience constructors cover the legacy use cases instead of six exclusive flag-modes.
+- **legacy `NomoRouteBody` → `LegendBody`** with a single sliver-based mode; convenience constructors cover the legacy use cases instead of six exclusive flag-modes. *(2026-07-10: designed in [RFC-003](RFC-003-LEGEND-BODY.md) — always-`CustomScrollView` core, named-constructor archetypes, `LegendSliver*` helpers; implementation queued in RFC-002 §5 step F.)*
 - Forms get a real lifecycle: field registration/unregistration, a working validity model, and an actual `LegendValidator` set (the API CLAUDE.md always claimed existed).
 - All vendored third-party code (FadeIn, InAppNotification, switch/textfield forks) is dropped or rebuilt on the primitives (~3,500 LOC deleted).
 
