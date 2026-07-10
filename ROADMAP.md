@@ -74,6 +74,15 @@ The accepted [RFC-002](docs/RFC-002-DERIVED-DEFAULTS.md) drives this phase; its 
 - [ ] **E — custom style classes, granular rebuilds, wiring** (in flight): custom `@Style` classes replace `LegendStates<T>` (R6 final, `InteractiveColors` predefined), per-field `listen:` opt-out + `_field` accessors + `ValueListenable`s (R12), extensions-first wiring with the opt-in `_$XBase` (R13), terse Ref renames (`ColorRef` et al.)
 - [ ] **F — remaining ports & primitives** (queued): implement [RFC-003 `LegendBody`](docs/RFC-003-LEGEND-BODY.md) + `LegendSliver*` helpers and migrate the docs site onto them, extract `LegendFieldCore` from `LegendTextField`, widen the `LegendInteractive` vocabulary (secondary-tap, focus-tap), port the vertical menu; regression tests for every legacy bug closed on the way
 
+### Audit follow-ups (2026-07-10 — LegendApp/rebuild audit, measured on Flutter 3.38.6)
+
+Verdict: `LegendApp` is **current** — zero window-singleton usage, no deprecated WidgetsApp params, multi-window (experimental in 3.38) needs no structural change. The R12-relevant findings (type-scoped registry notification + lerp identity fast-paths) are folded into RFC-002 R12 and Phase E. Remaining maintenance items:
+
+- [ ] `LegendBreakpoints`: switch `MediaQuery.sizeOf(context).width` to `MediaQuery.widthOf` (3.35+) and split tier vs width dependencies (aspects or `tierOf`/`widthOf` statics) — measured: same-tier drag-resize rebuilds every tier consumer
+- [ ] `LegendSelectionArea`: widgets-layer `SelectableRegion` + kit-styled `contextMenuBuilder` — drops the `MaterialLocalizations` delegate requirement from consumers and the docs site's last Material import; evaluate 3.38 `OverlayPortal.overlayChildLayoutBuilder` for the anchored-overlay engine in the same pass
+- [ ] `LegendApp` passthroughs: `restorationScopeId`, `shortcuts`/`actions`, `debugShowCheckedModeBanner`; document the Android predictive-back gap for custom routes
+- [ ] Consumer rebuild guidance (docs site as reference): controller above `LegendApp`, stable home child, token reads in the narrowest `Builder` — measured: inline children under a root `ListenableBuilder` rebuild the whole tree 17× per theme toggle vs dependents-only with a stable child; document the (semantically necessary) `DefaultTextStyle` cascade during color animation
+
 ## Phase 3 — icons & polish
 
 - [ ] `packages/legend_icons` (optional, tree-shakeable, no reflection map) + `legend_gen icons`

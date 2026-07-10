@@ -246,6 +246,12 @@ Today `_theme(context)` depends on `LegendTheme` as a whole — any theme change
 
 Themes remain pure data; this changes only *who gets notified*, never how values resolve.
 
+**Audit amendments (2026-07-10, measured — rebuild audit at fc5494d, probe suite + microbench):** the baseline R12 fixes is now quantified, and two requirements are added from the numbers:
+
+- *Measured baseline*: a 250 ms token lerp rebuilds **every** `LegendTheme` dependent once per frame (16× at 60 Hz), and changing **one** registry entry rebuilds **all** themed widgets regardless of type. Breakpoints/theme independence holds both ways (DESIGN §2.4 verified). Costs: full component resolution ~155 ns, `LegendThemeData !=` ~14 ns, whole-token lerp ~0.9 µs/frame — so aspect comparators (~310 ns/dependent/frame ≈ re-resolve old+new) are ~0.2 % of frame budget at 100 dependents. Honest scope: during a light↔dark lerp color-dependents' values genuinely change per frame, so aspects don't cut *those* rebuilds — the wins are registry changes (type-scoped by construction via `componentOf` in `updateShouldNotifyDependent`; the one-entry-change scenario is the regression test), sizes/typography-only dependents during color animation, and at-rest precision.
+- **Lerp identity fast-paths (extends R5)**: generated member-wise lerp must short-circuit — `if (identical(a, b)) return a;` per sub-object and in the tokens tween. `light`/`dark` share const `sizes`/`typography`/`shadows`/`states` instances, but today's lerp allocates fresh objects every frame, which would defeat R12's comparators for aspects that never change. With the fast-path, unchanged aspects stay identity-stable per frame and comparators short-circuit for free.
+- Non-R12 audit routes: `MediaQuery.widthOf` + tier/width aspect split in `LegendBreakpoints` (same-tier drag-resize rebuilds all tier consumers today), and a widgets-layer `LegendSelectionArea` (`SelectableRegion` + kit context menu — no `MaterialLocalizations`) → tracked in ROADMAP Phase 2.6/F follow-ups, not R12.
+
 ### R13 — Theme wiring: extensions only, no base classes *(revised ×2, 2026-07-10, directed)*
 
 > **Revision 2 (final):** the custom widget hierarchy and generated per-widget base classes from the first draft are **dropped** — the only thing they bought was a two-arg stateless `build(context, theme)` signature, at the price of a riverpod-style custom-element layer, `extends _$XBase` in every declaration, and a freezed-style bootstrap. The settled wiring is **generated extensions only**, on plain Flutter widgets:
