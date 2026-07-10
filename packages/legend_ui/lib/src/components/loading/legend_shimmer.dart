@@ -74,7 +74,7 @@ class _LegendShimmerState extends State<LegendShimmer>
 
   @override
   Widget build(BuildContext context) {
-    final theme = widget._theme(context);
+    final theme = this.theme;
     final content =
         widget.child ??
         LegendSurface(

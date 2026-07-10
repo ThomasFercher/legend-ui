@@ -109,7 +109,7 @@ class _LegendContextMenuState extends State<LegendContextMenu> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = widget._theme(context);
+    final theme = this.theme;
     final tokens = LegendTheme.of(context).tokens;
 
     return LegendAnchoredOverlay(

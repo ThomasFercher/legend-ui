@@ -90,8 +90,6 @@ class LegendDropdown<T> extends StatefulWidget {
 class _LegendDropdownState<T> extends State<LegendDropdown<T>> {
   final _controller = OverlayPortalController();
 
-  LegendDropdownTheme _theme(BuildContext context) => widget._theme(context);
-
   void _select(T value) {
     _controller.hide();
     setState(() {});
@@ -100,7 +98,8 @@ class _LegendDropdownState<T> extends State<LegendDropdown<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = _theme(context);
+    // R13 auto-extension: `theme` is the generated State getter.
+    final theme = this.theme;
     final tokens = LegendTheme.of(context).tokens;
     final selected = widget.items
         .where((item) => item.value == widget.value)

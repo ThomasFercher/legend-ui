@@ -202,7 +202,7 @@ class _LegendTextFieldState extends State<LegendTextField>
 
   @override
   Widget build(BuildContext context) {
-    final theme = widget._theme(context);
+    final theme = this.theme;
     final tokens = LegendTheme.of(context).tokens;
     // Explicit errorText wins over the form's validation error.
     final errorText = widget.errorText ?? _formError;

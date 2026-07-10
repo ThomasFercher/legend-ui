@@ -73,5 +73,45 @@ void main() {
       // Param (level 1) wins over subtree (2) wins over app theme (3).
       expect(_cardColor(tester), _param);
     });
+
+    testWidgets('a consumer-defined @Style class resolves member-wise '
+        '(RFC-002 R6 amendment 7)', (tester) async {
+      Color textColor(String text) =>
+          tester.widget<Text>(find.text(text)).style!.color!;
+
+      // Defaults: both members from the consumer tear-off.
+      await tester.pumpWidget(_wrap(const BalanceCard(amount: '12')));
+      expect(textColor('12'), LegendTokens.light.colors.secondary);
+      expect(textColor('Balance'), LegendTokens.light.colors.foreground2);
+
+      // A registry override naming ONLY `amount` keeps `caption`
+      // resolving through the defaults — member-wise sparse merge via the
+      // GENERATED BalanceAccent.merge.
+      await tester.pumpWidget(
+        _wrap(
+          const BalanceCard(amount: '12'),
+          components: {
+            BalanceCard: const BalanceCardThemeNullable(
+              accent: BalanceAccent(amount: _appTheme),
+            ),
+          },
+        ),
+      );
+      expect(textColor('12'), _appTheme);
+      expect(textColor('Balance'), LegendTokens.light.colors.foreground2);
+
+      // Generated value equality on the style class.
+      expect(
+        const BalanceAccent(amount: _appTheme),
+        const BalanceAccent(amount: _appTheme),
+      );
+      // Generated member-wise lerp through the hand-written redirect.
+      final mid = BalanceAccent.lerp(
+        const BalanceAccent(amount: _subtree),
+        const BalanceAccent(amount: _param),
+        0.5,
+      )!;
+      expect(mid.amount, Color.lerp(_subtree, _param, 0.5));
+    });
   });
 }

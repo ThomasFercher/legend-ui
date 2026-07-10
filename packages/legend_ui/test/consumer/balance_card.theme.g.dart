@@ -15,12 +15,12 @@ class BalanceCardTheme {
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory BalanceCardTheme.defaults(LegendTokens t) => BalanceCardTheme(
     background: ColorRef.surface(t),
-    accent: ColorRef.secondary(t),
+    accent: _accent(t),
     padding: _padding(t),
   );
 
   final Color background;
-  final Color accent;
+  final BalanceAccent accent;
   final EdgeInsetsGeometry padding;
 
   /// Resolves the theme: defaults <- app registry (keyed by
@@ -65,14 +65,14 @@ class BalanceCardTheme {
     if (other == null) return this;
     return BalanceCardTheme(
       background: other.background ?? background,
-      accent: other.accent ?? accent,
+      accent: accent.merge(other.accent),
       padding: other.padding ?? padding,
     );
   }
 
   BalanceCardTheme copyWith({
     Color? background,
-    Color? accent,
+    BalanceAccent? accent,
     EdgeInsetsGeometry? padding,
   }) => BalanceCardTheme(
     background: background ?? this.background,
@@ -98,14 +98,14 @@ class BalanceCardThemeNullable {
   const BalanceCardThemeNullable({this.background, this.accent, this.padding});
 
   final Color? background;
-  final Color? accent;
+  final BalanceAccent? accent;
   final EdgeInsetsGeometry? padding;
 
   BalanceCardThemeNullable merge(BalanceCardThemeNullable? other) {
     if (other == null) return this;
     return BalanceCardThemeNullable(
       background: other.background ?? background,
-      accent: other.accent ?? accent,
+      accent: accent?.merge(other.accent) ?? other.accent,
       padding: other.padding ?? padding,
     );
   }
@@ -159,9 +159,9 @@ const _$BalanceCardOverrideAspectBackground =
 /// registry and the token defaults (levels 4+3) — the
 /// comparator behind its rebuild aspect and listenable
 /// (RFC-002 R12).
-Color _$BalanceCardSelectAccent(LegendThemeData data) =>
-    data.componentOf<BalanceCardThemeNullable>(BalanceCard)?.accent ??
-    ColorRef.secondary(data.tokens);
+BalanceAccent _$BalanceCardSelectAccent(LegendThemeData data) => _accent(
+  data.tokens,
+).merge(data.componentOf<BalanceCardThemeNullable>(BalanceCard)?.accent);
 const _$BalanceCardAspectAccent = LegendThemeAspect(_$BalanceCardSelectAccent);
 Object? _$BalanceCardOverrideSelectAccent(BalanceCardThemeNullable data) =>
     data.accent;
@@ -205,7 +205,7 @@ abstract final class BalanceCardThemeListenables {
   ) => LegendThemeSelector(source, data, _$BalanceCardSelectBackground);
 
   /// Change stream of the resolved [BalanceCardTheme.accent].
-  static ValueListenable<Color> accent(
+  static ValueListenable<BalanceAccent> accent(
     Listenable source,
     LegendThemeData Function() data,
   ) => LegendThemeSelector(source, data, _$BalanceCardSelectAccent);
@@ -259,7 +259,7 @@ extension _$BalanceCardThemeResolve on BalanceCard {
   /// one property. When a top-level tear-off shares the
   /// name, call it receiver-qualified
   /// (`this._accent(context)`).
-  Color _accent(BuildContext context) {
+  BalanceAccent _accent(BuildContext context) {
     final data = LegendTheme.read(context);
     final override = LegendThemeOverride.read<BalanceCardThemeNullable>(
       context,
@@ -269,7 +269,9 @@ extension _$BalanceCardThemeResolve on BalanceCard {
       context,
       _$BalanceCardOverrideAspectAccent,
     );
-    return accent ?? override?.accent ?? _$BalanceCardSelectAccent(data);
+    return _$BalanceCardSelectAccent(
+      data,
+    ).merge(override?.accent).merge(accent);
   }
 
   /// Resolves ONLY [BalanceCard.padding] (full
@@ -302,7 +304,7 @@ abstract class _$BalanceCardBase
   const _$BalanceCardBase({super.key});
 
   Color? get background;
-  Color? get accent;
+  BalanceAccent? get accent;
   EdgeInsetsGeometry? get padding;
 
   @override
