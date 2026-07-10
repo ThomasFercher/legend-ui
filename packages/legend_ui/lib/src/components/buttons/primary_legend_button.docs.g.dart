@@ -133,7 +133,7 @@ const List<LegendDocEntry> primaryLegendButtonDocEntries = [
     name: 'textStyle',
     type: 'TextStyle?',
     doc: 'Text style of the [text] label (its color comes from [foreground]).',
-    defaultDescription: 'LegendTypographyRef.b2',
+    defaultDescription: 'TextRef.b2',
     group: 'component',
   ),
   LegendDocEntry(
@@ -141,7 +141,7 @@ const List<LegendDocEntry> primaryLegendButtonDocEntries = [
     name: 'shadows',
     type: 'List<BoxShadow>?',
     doc: 'Drop shadow under the button (flat by default).',
-    defaultDescription: 'LegendShadowsRef.none',
+    defaultDescription: 'ShadowRef.none',
     group: 'component',
   ),
 ];

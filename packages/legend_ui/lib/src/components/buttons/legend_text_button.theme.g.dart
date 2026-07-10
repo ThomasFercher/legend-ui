@@ -19,7 +19,7 @@ class LegendTextButtonTheme {
         foreground: _foreground(t),
         padding: _padding(t),
         borderRadius: _borderRadius(t),
-        textStyle: LegendTypographyRef.b2(t),
+        textStyle: TextRef.b2(t),
       );
 
   final LegendStates<Color> foreground;

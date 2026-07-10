@@ -81,7 +81,7 @@ const List<LegendDocEntry> legendSiderDocEntries = [
     name: 'selectedColor',
     type: 'Color?',
     doc: 'Label/icon color of the selected item.',
-    defaultDescription: 'LegendColorsRef.primary',
+    defaultDescription: 'ColorRef.primary',
     group: 'component',
   ),
   LegendDocEntry(
@@ -89,7 +89,7 @@ const List<LegendDocEntry> legendSiderDocEntries = [
     name: 'unselectedColor',
     type: 'Color?',
     doc: 'Label/icon color of unselected items.',
-    defaultDescription: 'LegendColorsRef.foreground2',
+    defaultDescription: 'ColorRef.foreground2',
     group: 'component',
   ),
   LegendDocEntry(

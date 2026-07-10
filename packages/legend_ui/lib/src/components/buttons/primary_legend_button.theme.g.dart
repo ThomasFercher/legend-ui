@@ -18,8 +18,8 @@ class PrimaryLegendButtonTheme {
       PrimaryLegendButtonTheme(
         background: _background(t),
         foreground: _foreground(t),
-        textStyle: LegendTypographyRef.b2(t),
-        shadows: LegendShadowsRef.none(t),
+        textStyle: TextRef.b2(t),
+        shadows: ShadowRef.none(t),
       );
 
   final LegendStates<Color> background;

@@ -15,9 +15,9 @@ class LegendBottomBarTheme {
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendBottomBarTheme.defaults(LegendTokens t) => LegendBottomBarTheme(
-    background: LegendColorsRef.surface(t),
-    selectedColor: LegendColorsRef.primary(t),
-    unselectedColor: LegendColorsRef.foreground3(t),
+    background: ColorRef.surface(t),
+    selectedColor: ColorRef.primary(t),
+    unselectedColor: ColorRef.foreground3(t),
     height: 64,
   );
 

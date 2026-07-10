@@ -9,7 +9,7 @@ part 'legend_colors.tokens.g.dart';
 ///
 /// Component defaults reference these via `@Style<T>.resolve` tear-offs
 /// (`(t) => t.colors.…`).
-@LegendTokenData(mountedAt: 'colors')
+@LegendTokenData(mountedAt: 'colors', refName: 'ColorRef')
 class LegendColors with _$LegendColors {
   const LegendColors({
     required this.primary,

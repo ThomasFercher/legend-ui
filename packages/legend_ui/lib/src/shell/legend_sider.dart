@@ -51,11 +51,11 @@ class LegendSider extends StatelessWidget {
   final double? width;
 
   /// Label/icon color of the selected item.
-  @Style<Color>.resolve(LegendColorsRef.primary, lerp: true)
+  @Style<Color>.resolve(ColorRef.primary, lerp: true)
   final Color? selectedColor;
 
   /// Label/icon color of unselected items.
-  @Style<Color>.resolve(LegendColorsRef.foreground2, lerp: true)
+  @Style<Color>.resolve(ColorRef.foreground2, lerp: true)
   final Color? unselectedColor;
 
   /// Inner padding of each item row.

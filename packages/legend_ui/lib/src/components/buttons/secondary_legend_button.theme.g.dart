@@ -18,8 +18,8 @@ class SecondaryLegendButtonTheme {
       SecondaryLegendButtonTheme(
         background: _background(t),
         foreground: _foreground(t),
-        borderColor: LegendColorsRef.primary(t),
-        textStyle: LegendTypographyRef.b2(t),
+        borderColor: ColorRef.primary(t),
+        textStyle: TextRef.b2(t),
       );
 
   final LegendStates<Color> background;

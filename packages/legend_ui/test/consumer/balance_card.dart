@@ -21,11 +21,11 @@ class BalanceCard extends StatelessWidget {
   final String amount;
 
   /// Fill color of the card surface.
-  @Style<Color>.resolve(LegendColorsRef.surface, lerp: true)
+  @Style<Color>.resolve(ColorRef.surface, lerp: true)
   final Color? background;
 
   /// Color of the amount text.
-  @Style<Color>.resolve(LegendColorsRef.secondary)
+  @Style<Color>.resolve(ColorRef.secondary)
   final Color? accent;
 
   /// Inner padding around the amount.

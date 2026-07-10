@@ -19,10 +19,10 @@ class LegendDropdownTheme {
   factory LegendDropdownTheme.defaults(LegendTokens t) => LegendDropdownTheme(
     menuBackground: _menuBackground(t),
     menuBorderRadius: _menuBorderRadius(t),
-    menuShadows: LegendShadowsRef.medium(t),
+    menuShadows: ShadowRef.medium(t),
     menuMaxHeight: 320,
     itemPadding: _itemPadding(t),
-    textStyle: LegendTypographyRef.b2(t),
+    textStyle: TextRef.b2(t),
   );
 
   final LegendStates<Color> menuBackground;

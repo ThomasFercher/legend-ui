@@ -44,7 +44,7 @@ class LegendThemeable {
 ///   catalog's parameter type; an in-package circular import is fine).
 @Target({TargetKind.classType})
 class LegendTokenData {
-  const LegendTokenData({this.mountedAt});
+  const LegendTokenData({this.mountedAt, this.refName});
 
   /// The [LegendTokens] getter this class sits behind — `'colors'`,
   /// `'sizes'`, `'typography'`, `'shadows'`, or `'states'` for the kit's
@@ -58,6 +58,14 @@ class LegendTokenData {
   /// Null (the default) skips the Ref catalog — for nested groups a
   /// consumer never styles against.
   final String? mountedAt;
+
+  /// The name of the emitted Ref catalog class. Null (the default) uses
+  /// `<ClassName>Ref`; an explicit name overrides it — the kit sets short
+  /// names (`ColorRef`, `SizeRef`, `TextRef`, `ShadowRef`, `StateRef`,
+  /// `TokenRef`) because annotation ubiquity earns terseness (a
+  /// **documented exception** to the Legend-prefix rule; still an explicit
+  /// declaration, never a naming convention). Ignored without [mountedAt].
+  final String? refName;
 }
 
 /// Marks a field of a [LegendThemeable] widget as a themed property and
@@ -76,7 +84,7 @@ class LegendTokenData {
 ///   ordinary symbol. Two tear-off shapes (Dart's const rules allow
 ///   exactly these):
 ///   - a **Ref catalog member** for the common one-hop token read —
-///     `@Style<double>.resolve(LegendSizesRef.md)`; the catalogs are
+///     `@Style<double>.resolve(SizeRef.md)`; the catalogs are
 ///     generated from the token classes ([LegendTokenData.mountedAt]),
 ///     so no adjacent hand-written static is needed;
 ///   - a **private top-level function** (or a static method) in the

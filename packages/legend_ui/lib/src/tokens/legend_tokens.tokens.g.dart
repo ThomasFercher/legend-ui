@@ -60,8 +60,8 @@ LegendTokens _$LegendTokensLerp(LegendTokens a, LegendTokens b, double t) =>
 /// Const tear-off catalog for [LegendTokens] (RFC-002 R10
 /// amendment): one static per token field, usable directly
 /// inside `@Style<T>.resolve` annotations —
-/// `@Style<LegendColors>.resolve(LegendTokensRef.colors)`.
-abstract final class LegendTokensRef {
+/// `@Style<LegendColors>.resolve(TokenRef.colors)`.
+abstract final class TokenRef {
   /// The semantic color palette.
   static LegendColors colors(LegendTokens t) => t.colors;
 

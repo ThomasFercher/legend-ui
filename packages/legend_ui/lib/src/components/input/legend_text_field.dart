@@ -78,7 +78,7 @@ class LegendTextField extends StatefulWidget {
   final ValueChanged<String>? onSubmitted;
 
   /// Fill color of the field surface.
-  @Style<Color>.resolve(LegendColorsRef.background1)
+  @Style<Color>.resolve(ColorRef.background1)
   final Color? background;
 
   /// Corner rounding of the field surface.
@@ -90,15 +90,15 @@ class LegendTextField extends StatefulWidget {
   final EdgeInsetsGeometry? padding;
 
   /// Text style of the entered text (and the placeholder, recolored).
-  @Style<TextStyle>.resolve(LegendTypographyRef.b1)
+  @Style<TextStyle>.resolve(TextRef.b1)
   final TextStyle? textStyle;
 
   /// Border color while unfocused (error state uses the error token).
-  @Style<Color>.resolve(LegendColorsRef.background3)
+  @Style<Color>.resolve(ColorRef.background3)
   final Color? borderColor;
 
   /// Border color while focused — also the caret and selection color.
-  @Style<Color>.resolve(LegendColorsRef.primary)
+  @Style<Color>.resolve(ColorRef.primary)
   final Color? focusedBorderColor;
 
   @override

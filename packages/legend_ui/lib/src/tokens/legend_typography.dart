@@ -8,7 +8,7 @@ part 'legend_typography.tokens.g.dart';
 ///
 /// Colors are not baked in here — text color resolves from the color
 /// tokens (`LegendColors`) at the component level.
-@LegendTokenData(mountedAt: 'typography')
+@LegendTokenData(mountedAt: 'typography', refName: 'TextRef')
 class LegendTypography with _$LegendTypography {
   const LegendTypography({
     this.h1 = const TextStyle(fontSize: 32, fontWeight: FontWeight.w700),

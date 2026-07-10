@@ -133,7 +133,7 @@ const List<LegendDocEntry> secondaryLegendButtonDocEntries = [
     name: 'borderColor',
     type: 'Color?',
     doc: 'Color of the outline (dropped entirely while disabled).',
-    defaultDescription: 'LegendColorsRef.primary',
+    defaultDescription: 'ColorRef.primary',
     group: 'component',
   ),
   LegendDocEntry(
@@ -141,7 +141,7 @@ const List<LegendDocEntry> secondaryLegendButtonDocEntries = [
     name: 'textStyle',
     type: 'TextStyle?',
     doc: 'Text style of the [text] label (its color comes from [foreground]).',
-    defaultDescription: 'LegendTypographyRef.b2',
+    defaultDescription: 'TextRef.b2',
     group: 'component',
   ),
 ];

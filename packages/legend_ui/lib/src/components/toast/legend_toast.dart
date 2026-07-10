@@ -42,7 +42,7 @@ class LegendToast extends StatelessWidget {
   final Widget? action;
 
   /// Fill color of the toast surface.
-  @Style<Color>.resolve(LegendColorsRef.surface)
+  @Style<Color>.resolve(ColorRef.surface)
   final Color? background;
 
   /// Corner rounding of the toast surface.
@@ -54,15 +54,15 @@ class LegendToast extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
 
   /// Leading accent color for [LegendToastSeverity.info].
-  @Style<Color>.resolve(LegendColorsRef.primary)
+  @Style<Color>.resolve(ColorRef.primary)
   final Color? infoAccent;
 
   /// Leading accent color for [LegendToastSeverity.success].
-  @Style<Color>.resolve(LegendColorsRef.secondary)
+  @Style<Color>.resolve(ColorRef.secondary)
   final Color? successAccent;
 
   /// Leading accent color for [LegendToastSeverity.error].
-  @Style<Color>.resolve(LegendColorsRef.error)
+  @Style<Color>.resolve(ColorRef.error)
   final Color? errorAccent;
 
   @override

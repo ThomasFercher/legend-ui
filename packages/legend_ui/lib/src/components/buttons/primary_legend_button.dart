@@ -73,11 +73,11 @@ class PrimaryLegendButton extends StatelessWidget {
   final BorderRadius? borderRadius;
 
   /// Text style of the [text] label (its color comes from [foreground]).
-  @Style<TextStyle>.resolve(LegendTypographyRef.b2)
+  @Style<TextStyle>.resolve(TextRef.b2)
   final TextStyle? textStyle;
 
   /// Drop shadow under the button (flat by default).
-  @Style<List<BoxShadow>>.resolve(LegendShadowsRef.none)
+  @Style<List<BoxShadow>>.resolve(ShadowRef.none)
   final List<BoxShadow>? shadows;
 
   @override

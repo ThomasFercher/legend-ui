@@ -13,7 +13,7 @@ const List<LegendDocEntry> legendShimmerDocEntries = [
     name: 'baseColor',
     type: 'Color?',
     doc: 'Resting color of the sweep (and the fill of [LegendShimmer.box]).',
-    defaultDescription: 'LegendColorsRef.background2',
+    defaultDescription: 'ColorRef.background2',
     group: 'component',
   ),
   LegendDocEntry(
@@ -21,7 +21,7 @@ const List<LegendDocEntry> legendShimmerDocEntries = [
     name: 'highlightColor',
     type: 'Color?',
     doc: 'Color of the moving highlight band.',
-    defaultDescription: 'LegendColorsRef.background1',
+    defaultDescription: 'ColorRef.background1',
     group: 'component',
   ),
 ];

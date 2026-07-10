@@ -17,12 +17,12 @@ class LegendToastTheme {
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendToastTheme.defaults(LegendTokens t) => LegendToastTheme(
-    background: LegendColorsRef.surface(t),
+    background: ColorRef.surface(t),
     borderRadius: _borderRadius(t),
     padding: _padding(t),
-    infoAccent: LegendColorsRef.primary(t),
-    successAccent: LegendColorsRef.secondary(t),
-    errorAccent: LegendColorsRef.error(t),
+    infoAccent: ColorRef.primary(t),
+    successAccent: ColorRef.secondary(t),
+    errorAccent: ColorRef.error(t),
   );
 
   final Color background;

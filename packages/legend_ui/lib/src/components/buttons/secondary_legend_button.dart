@@ -65,7 +65,7 @@ class SecondaryLegendButton extends StatelessWidget {
   final LegendStates<Color>? foreground;
 
   /// Color of the outline (dropped entirely while disabled).
-  @Style<Color>.resolve(LegendColorsRef.primary)
+  @Style<Color>.resolve(ColorRef.primary)
   final Color? borderColor;
 
   /// Per-instance padding; when null the shared button surface applies
@@ -77,7 +77,7 @@ class SecondaryLegendButton extends StatelessWidget {
   final BorderRadius? borderRadius;
 
   /// Text style of the [text] label (its color comes from [foreground]).
-  @Style<TextStyle>.resolve(LegendTypographyRef.b2)
+  @Style<TextStyle>.resolve(TextRef.b2)
   final TextStyle? textStyle;
 
   @override

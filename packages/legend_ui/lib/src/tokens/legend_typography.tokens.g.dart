@@ -68,8 +68,8 @@ LegendTypography _$LegendTypographyLerp(
 /// Const tear-off catalog for [LegendTypography] (RFC-002 R10
 /// amendment): one static per token field, usable directly
 /// inside `@Style<T>.resolve` annotations —
-/// `@Style<TextStyle>.resolve(LegendTypographyRef.h1)`.
-abstract final class LegendTypographyRef {
+/// `@Style<TextStyle>.resolve(TextRef.h1)`.
+abstract final class TextRef {
   /// Page-level heading.
   static TextStyle h1(LegendTokens t) => t.typography.h1;
 

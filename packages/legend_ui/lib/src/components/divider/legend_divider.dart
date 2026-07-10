@@ -36,15 +36,15 @@ class LegendDivider extends StatelessWidget {
   final Axis axis;
 
   /// Color of the line.
-  @Style<Color>.resolve(LegendColorsRef.background3)
+  @Style<Color>.resolve(ColorRef.background3)
   final Color? color;
 
   /// Stroke width of the line.
-  @Style<double>.resolve(LegendSizesRef.borderWidth)
+  @Style<double>.resolve(SizeRef.borderWidth)
   final double? thickness;
 
   /// Outer margin on both sides of the line.
-  @Style<double>.resolve(LegendSizesRef.md)
+  @Style<double>.resolve(SizeRef.md)
   final double? spacing;
 
   @override

@@ -67,7 +67,7 @@ class LegendContextMenu extends StatefulWidget {
   final BorderRadius? menuBorderRadius;
 
   /// Drop shadow lifting the menu off the page.
-  @Style<List<BoxShadow>>.resolve(LegendShadowsRef.medium)
+  @Style<List<BoxShadow>>.resolve(ShadowRef.medium)
   final List<BoxShadow>? menuShadows;
 
   /// Inner padding of each menu entry row.
@@ -75,7 +75,7 @@ class LegendContextMenu extends StatefulWidget {
   final EdgeInsetsGeometry? itemPadding;
 
   /// Text style of the entry labels.
-  @Style<TextStyle>.resolve(LegendTypographyRef.b2)
+  @Style<TextStyle>.resolve(TextRef.b2)
   final TextStyle? textStyle;
 
   @override

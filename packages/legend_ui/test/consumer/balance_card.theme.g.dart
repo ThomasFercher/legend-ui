@@ -14,8 +14,8 @@ class BalanceCardTheme {
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory BalanceCardTheme.defaults(LegendTokens t) => BalanceCardTheme(
-    background: LegendColorsRef.surface(t),
-    accent: LegendColorsRef.secondary(t),
+    background: ColorRef.surface(t),
+    accent: ColorRef.secondary(t),
     padding: _padding(t),
   );
 

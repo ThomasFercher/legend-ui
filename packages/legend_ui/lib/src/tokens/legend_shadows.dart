@@ -5,7 +5,7 @@ import 'package:legend_ui/src/tokens/legend_tokens.dart';
 part 'legend_shadows.tokens.g.dart';
 
 /// The single elevation system (replaces legacy ElevatedBox + LegendElevation).
-@LegendTokenData(mountedAt: 'shadows')
+@LegendTokenData(mountedAt: 'shadows', refName: 'ShadowRef')
 class LegendShadows with _$LegendShadows {
   const LegendShadows({
     this.none = const [],

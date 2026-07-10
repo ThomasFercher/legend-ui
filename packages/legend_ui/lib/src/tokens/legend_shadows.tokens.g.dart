@@ -55,8 +55,8 @@ LegendShadows _$LegendShadowsLerp(LegendShadows a, LegendShadows b, double t) =>
 /// Const tear-off catalog for [LegendShadows] (RFC-002 R10
 /// amendment): one static per token field, usable directly
 /// inside `@Style<T>.resolve` annotations —
-/// `@Style<List<BoxShadow>>.resolve(LegendShadowsRef.none)`.
-abstract final class LegendShadowsRef {
+/// `@Style<List<BoxShadow>>.resolve(ShadowRef.none)`.
+abstract final class ShadowRef {
   /// Flat — no shadow at all.
   static List<BoxShadow> none(LegendTokens t) => t.shadows.none;
 

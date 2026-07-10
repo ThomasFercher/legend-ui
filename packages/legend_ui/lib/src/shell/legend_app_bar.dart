@@ -35,7 +35,7 @@ class LegendAppBar extends StatelessWidget {
   final List<Widget> actions;
 
   /// Fill color of the bar.
-  @Style<Color>.resolve(LegendColorsRef.surface)
+  @Style<Color>.resolve(ColorRef.surface)
   final Color? background;
 
   /// Height of the bar content (excluding any safe-area inset).

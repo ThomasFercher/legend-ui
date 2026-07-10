@@ -16,7 +16,7 @@ part 'legend_tokens.tokens.g.dart';
 ///
 /// Written once, by hand. Every component default derives from an instance
 /// of this class (the `t` in `@Style<T>.resolve` tear-offs).
-@LegendTokenData(mountedAt: '')
+@LegendTokenData(mountedAt: '', refName: 'TokenRef')
 class LegendTokens with _$LegendTokens {
   const LegendTokens({
     required this.colors,

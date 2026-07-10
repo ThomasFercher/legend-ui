@@ -65,7 +65,7 @@ class LegendTextButton extends StatelessWidget {
   final BorderRadius? borderRadius;
 
   /// Text style of the [text] label (its color comes from [foreground]).
-  @Style<TextStyle>.resolve(LegendTypographyRef.b2)
+  @Style<TextStyle>.resolve(TextRef.b2)
   final TextStyle? textStyle;
 
   @override

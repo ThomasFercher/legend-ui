@@ -139,6 +139,7 @@ class TokenClass {
     required this.fields,
     required this.sourceBasename,
     this.mountedAt,
+    this.refName,
     this.line = 1,
   });
 
@@ -147,9 +148,20 @@ class TokenClass {
 
   /// The `LegendTokens` getter this class sits behind (e.g. `'colors'`),
   /// from `@LegendTokenData(mountedAt: …)`. Non-null makes the emitter
-  /// additionally generate the `<ClassName>Ref` const tear-off catalog
+  /// additionally generate the [effectiveRefName] const tear-off catalog
   /// (RFC-002 R10 amendment); null emits no catalog.
   final String? mountedAt;
+
+  /// The emitted Ref catalog's class name, from
+  /// `@LegendTokenData(refName: …)`; null defaults to `<ClassName>Ref`.
+  /// The kit sets short explicit names (`ColorRef`, `SizeRef`, `TextRef`,
+  /// `ShadowRef`, `StateRef`, `TokenRef`) — annotation ubiquity earns
+  /// terseness (a documented exception to the Legend-prefix rule; still
+  /// an explicit declaration, never a naming convention).
+  final String? refName;
+
+  /// The effective catalog name: [refName], else `<ClassName>Ref`.
+  String get effectiveRefName => refName ?? '${className}Ref';
 
   /// 1-based line of the class name in the source file (for diagnostics).
   final int line;

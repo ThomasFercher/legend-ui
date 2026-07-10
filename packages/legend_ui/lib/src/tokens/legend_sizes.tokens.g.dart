@@ -111,8 +111,8 @@ LegendSizes _$LegendSizesLerp(
 /// Const tear-off catalog for [LegendSizes] (RFC-002 R10
 /// amendment): one static per token field, usable directly
 /// inside `@Style<T>.resolve` annotations —
-/// `@Style<double>.resolve(LegendSizesRef.xs)`.
-abstract final class LegendSizesRef {
+/// `@Style<double>.resolve(SizeRef.xs)`.
+abstract final class SizeRef {
   /// Extra-small spacing step (tight gaps, chip padding).
   static double xs(LegendTokens t) => t.sizes.xs;
 

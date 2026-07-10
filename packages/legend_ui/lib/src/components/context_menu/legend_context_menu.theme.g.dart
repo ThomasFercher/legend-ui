@@ -19,9 +19,9 @@ class LegendContextMenuTheme {
       LegendContextMenuTheme(
         menuBackground: _menuBackground(t),
         menuBorderRadius: _menuBorderRadius(t),
-        menuShadows: LegendShadowsRef.medium(t),
+        menuShadows: ShadowRef.medium(t),
         itemPadding: _itemPadding(t),
-        textStyle: LegendTypographyRef.b2(t),
+        textStyle: TextRef.b2(t),
       );
 
   final LegendStates<Color> menuBackground;

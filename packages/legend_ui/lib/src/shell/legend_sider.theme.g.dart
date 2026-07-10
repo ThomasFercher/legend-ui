@@ -18,8 +18,8 @@ class LegendSiderTheme {
   factory LegendSiderTheme.defaults(LegendTokens t) => LegendSiderTheme(
     background: _background(t),
     width: 240,
-    selectedColor: LegendColorsRef.primary(t),
-    unselectedColor: LegendColorsRef.foreground2(t),
+    selectedColor: ColorRef.primary(t),
+    unselectedColor: ColorRef.foreground2(t),
     itemPadding: _itemPadding(t),
   );
 

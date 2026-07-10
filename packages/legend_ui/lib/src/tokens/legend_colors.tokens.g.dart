@@ -129,8 +129,8 @@ LegendColors _$LegendColorsLerp(LegendColors a, LegendColors b, double t) =>
 /// Const tear-off catalog for [LegendColors] (RFC-002 R10
 /// amendment): one static per token field, usable directly
 /// inside `@Style<T>.resolve` annotations —
-/// `@Style<Color>.resolve(LegendColorsRef.primary)`.
-abstract final class LegendColorsRef {
+/// `@Style<Color>.resolve(ColorRef.primary)`.
+abstract final class ColorRef {
   /// The brand color — filled buttons, active states, focus accents.
   static Color primary(LegendTokens t) => t.colors.primary;
 

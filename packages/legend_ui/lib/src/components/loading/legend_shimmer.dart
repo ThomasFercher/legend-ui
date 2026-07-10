@@ -48,11 +48,11 @@ class LegendShimmer extends StatefulWidget {
   final BorderRadius? boxBorderRadius;
 
   /// Resting color of the sweep (and the fill of [LegendShimmer.box]).
-  @Style<Color>.resolve(LegendColorsRef.background2)
+  @Style<Color>.resolve(ColorRef.background2)
   final Color? baseColor;
 
   /// Color of the moving highlight band.
-  @Style<Color>.resolve(LegendColorsRef.background1)
+  @Style<Color>.resolve(ColorRef.background1)
   final Color? highlightColor;
 
   @override
