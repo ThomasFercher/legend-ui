@@ -39,7 +39,7 @@ class LegendScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = _theme(context);
-    final tier = LegendBreakpoints.of(context).tier;
+    final tier = LegendBreakpoints.tierOf(context);
     final compact = tier == LegendTier.compact;
     final showSider = !compact && sider != null;
     final showBottomBar = compact && bottomBar != null;

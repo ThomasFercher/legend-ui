@@ -32,7 +32,7 @@ class ShellPage extends StatelessWidget {
             ],
           ),
           code: '''
-final tier = LegendBreakpoints.of(context).tier;
+final tier = LegendBreakpoints.tierOf(context);
 switch (tier) {
   case LegendTier.compact:   ...   // < 600
   case LegendTier.medium:    ...   // 600–1079
