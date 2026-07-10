@@ -34,13 +34,22 @@ class LegendInteractionStates {
 /// handling (and instead of Material's InkWell).
 ///
 /// A disabled [LegendInteractive] is genuinely inert: no hit-testing
-/// callbacks, no keyboard activation, semantics marked disabled — fixing
-/// the legacy bug where "disabled" buttons stayed tappable.
+/// callbacks (primary, secondary, or long-press), no keyboard activation,
+/// no hover callback, semantics marked disabled — fixing the legacy bug
+/// where "disabled" buttons stayed tappable.
+///
+/// Beyond primary [onTap] it carries the context-trigger vocabulary
+/// ([onSecondaryTap], [onLongPress] — both delivering a local anchor
+/// position) and a hover callback ([onHoverChange]); `LegendContextMenu`
+/// composes it instead of a raw `GestureDetector`.
 class LegendInteractive extends StatefulWidget {
   const LegendInteractive({
     required this.builder,
     super.key,
     this.onTap,
+    this.onSecondaryTap,
+    this.onLongPress,
+    this.onHoverChange,
     this.enabled = true,
     this.semanticLabel,
     this.toggled,
@@ -49,7 +58,26 @@ class LegendInteractive extends StatefulWidget {
 
   final Widget Function(BuildContext context, LegendInteractionStates states)
   builder;
+
+  /// Primary activation — tap, and (when focused) Enter/Space. Its
+  /// presence makes the widget a semantic button and drives the
+  /// pressed/focused visual states.
   final VoidCallback? onTap;
+
+  /// Secondary activation — desktop right-click, a context trigger.
+  /// Receives the pointer position local to this widget (an anchor for a
+  /// `LegendAnchoredOverlay`). Inert while [enabled] is false.
+  final ValueChanged<Offset>? onSecondaryTap;
+
+  /// Long-press activation — the touch equivalent of [onSecondaryTap] —
+  /// receiving the press position local to this widget. Inert while
+  /// [enabled] is false.
+  final ValueChanged<Offset>? onLongPress;
+
+  /// Pointer enter (true) / exit (false). Never fires while [enabled] is
+  /// false.
+  final ValueChanged<bool>? onHoverChange;
+
   final bool enabled;
   final String? semanticLabel;
 
@@ -68,7 +96,19 @@ class _LegendInteractiveState extends State<LegendInteractive> {
   var _pressed = false;
   var _focused = false;
 
+  /// The primary-tap path: unchanged four-year contract — a semantic
+  /// button that presses/focuses and keyboard-activates.
   bool get _enabled => widget.enabled && widget.onTap != null;
+
+  /// Whether the widget reacts to a pointer at all — the primary tap, a
+  /// context trigger, or a hover callback. Gates the hover/focus detector
+  /// so context-menu-only wrappers (no `onTap`) still hover and pin.
+  bool get _interactive =>
+      widget.enabled &&
+      (widget.onTap != null ||
+          widget.onSecondaryTap != null ||
+          widget.onLongPress != null ||
+          widget.onHoverChange != null);
 
   @override
   void didUpdateWidget(LegendInteractive oldWidget) {
@@ -90,7 +130,9 @@ class _LegendInteractiveState extends State<LegendInteractive> {
   @override
   Widget build(BuildContext context) {
     final states = LegendInteractionStates(
-      hovered: _hovered && _enabled,
+      // Hover is valid whenever the widget is enabled (a context trigger
+      // hovers even without a primary tap); press/focus stay primary-only.
+      hovered: _hovered && widget.enabled,
       pressed: _pressed && _enabled,
       focused: _focused && _enabled,
       disabled: !_enabled,
@@ -104,7 +146,10 @@ class _LegendInteractiveState extends State<LegendInteractive> {
       // (and semantics-driven tooling) activates the node it announces.
       onTap: _enabled ? _activate : null,
       child: FocusableActionDetector(
-        enabled: _enabled,
+        // Enabled for any interaction (primary, context trigger, or hover)
+        // so hover/focus tracking works without a primary tap; a fully
+        // non-interactive widget stays out of the focus traversal.
+        enabled: _interactive,
         focusNode: widget.focusNode,
         mouseCursor: _enabled ? SystemMouseCursors.click : MouseCursor.defer,
         onShowHoverHighlight: (value) => setState(() => _hovered = value),
@@ -137,7 +182,30 @@ class _LegendInteractiveState extends State<LegendInteractive> {
           onTapUp: _enabled ? (_) => _setPressed(false) : null,
           onTapCancel: _enabled ? () => _setPressed(false) : null,
           onTap: _enabled ? widget.onTap : null,
-          child: widget.builder(context, states),
+          // Context triggers deliver a local anchor position and are inert
+          // while disabled (widget.enabled guards them independently of the
+          // primary-tap _enabled).
+          onSecondaryTapUp: widget.enabled && widget.onSecondaryTap != null
+              ? (details) => widget.onSecondaryTap!(details.localPosition)
+              : null,
+          onLongPressStart: widget.enabled && widget.onLongPress != null
+              ? (details) => widget.onLongPress!(details.localPosition)
+              : null,
+          // A dedicated hover region for onHoverChange: a raw pointer
+          // enter/exit signal, independent of the styled hover-highlight
+          // (which the focus system gates by highlight mode). Inert while
+          // disabled.
+          child: widget.onHoverChange == null
+              ? widget.builder(context, states)
+              : MouseRegion(
+                  onEnter: (_) {
+                    if (widget.enabled) widget.onHoverChange!(true);
+                  },
+                  onExit: (_) {
+                    if (widget.enabled) widget.onHoverChange!(false);
+                  },
+                  child: widget.builder(context, states),
+                ),
         ),
       ),
     );

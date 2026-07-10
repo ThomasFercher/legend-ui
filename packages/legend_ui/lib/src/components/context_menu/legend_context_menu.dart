@@ -154,11 +154,15 @@ class _LegendContextMenuState extends State<LegendContextMenu> {
           ],
         ),
       ),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onSecondaryTapUp: (details) => _openAt(details.localPosition),
-        onLongPressStart: (details) => _openAt(details.localPosition),
-        child: widget.child,
+      // The context trigger is now LegendInteractive vocabulary (secondary
+      // tap / long-press, each delivering the local anchor position)
+      // instead of a raw GestureDetector — disabled stays inert via
+      // `enabled`, and `_openAt` already no-ops when disabled or empty.
+      child: LegendInteractive(
+        enabled: widget.enabled,
+        onSecondaryTap: _openAt,
+        onLongPress: _openAt,
+        builder: (context, states) => widget.child,
       ),
     );
   }
