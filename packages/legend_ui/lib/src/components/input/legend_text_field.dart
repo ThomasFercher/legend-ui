@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/components/form/legend_form.dart';
+import 'package:legend_ui/src/primitives/legend_field_core.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
 import 'package:legend_ui/src/tokens/legend_colors.dart';
@@ -10,10 +11,17 @@ import 'package:legend_ui/src/tokens/legend_typography.dart';
 
 part 'legend_text_field.theme.g.dart';
 
-/// The field core (DESIGN.md §3): a thin composition over Flutter's
-/// `EditableText`, wrapped in a [LegendSurface] for the field chrome.
+/// A single- or multi-line text field: the [LegendFieldCore] editing
+/// primitive dressed in field chrome — a [LegendSurface] surface + focus
+/// border, an optional title, placeholder, and error line.
 ///
-/// Replaces legacy's 1,535-line CupertinoTextField fork.
+/// Composes [LegendFieldCore] (text editing/focus/cursor/selection) and
+/// [LegendSurface] (the field's fill, border, and rounding); integrates
+/// with [LegendForm] when [formField] names it.
+///
+/// Replaces legacy's 1,535-line CupertinoTextField fork (the editing core
+/// is now the framework's own `EditableText`, wrapped by
+/// [LegendFieldCore]).
 ///
 /// MVP scope: single/multi-line text, placeholder, title, error state,
 /// focus border. Selection toolbar/handles land in a later phase.
@@ -235,7 +243,7 @@ class _LegendTextFieldState extends State<LegendTextField>
                   ),
                 ),
               ),
-            EditableText(
+            LegendFieldCore(
               controller: _controller,
               focusNode: _focusNode,
               style: theme.textStyle.copyWith(

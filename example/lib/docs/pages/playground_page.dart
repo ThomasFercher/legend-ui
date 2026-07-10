@@ -66,6 +66,28 @@ class PlaygroundPage extends StatelessWidget {
                 ),
               ),
               const LegendLoading(),
+              LegendSurface(
+                color: tokens.colors.background1,
+                borderRadius: tokens.sizes.borderRadiusMd,
+                // A live LegendBody — its centered reading column follows
+                // the panel's maxContentWidth knob (level-3 override).
+                child: const SizedBox(
+                  height: 180,
+                  child: LegendBody(
+                    children: [
+                      LegendText('LegendBody', variant: LegendTextVariant.h3),
+                      LegendText(
+                        'The reading column narrows and widens with the '
+                        'maxContentWidth knob in the theme panel.',
+                        variant: LegendTextVariant.b2,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // A live LegendVerticalMenu — its selected color follows the
+              // theme panel's knob (level-3 override).
+              const SizedBox(width: 260, child: _MenuPreview()),
             ],
           ),
         ),
@@ -91,6 +113,43 @@ LegendThemeData(
 )''',
         ),
       ],
+    );
+  }
+}
+
+/// A self-contained live [LegendVerticalMenu] with an expandable section,
+/// for the playground preview column. Its selected color is themed by the
+/// panel's level-3 override.
+class _MenuPreview extends StatefulWidget {
+  const _MenuPreview();
+
+  @override
+  State<_MenuPreview> createState() => _MenuPreviewState();
+}
+
+class _MenuPreviewState extends State<_MenuPreview> {
+  static const _wallet = LegendNavItem(
+    label: 'Wallet',
+    children: [
+      LegendNavItem(label: 'Balances'),
+      LegendNavItem(label: 'History'),
+    ],
+  );
+  static const _items = [
+    LegendNavItem(label: 'Dashboard'),
+    _wallet,
+    LegendNavItem(label: 'Settings'),
+  ];
+
+  LegendNavItem _selected = _items.first;
+
+  @override
+  Widget build(BuildContext context) {
+    return LegendVerticalMenu(
+      items: _items,
+      selected: _selected,
+      initiallyExpanded: const {_wallet},
+      onSelected: (item) => setState(() => _selected = item),
     );
   }
 }

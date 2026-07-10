@@ -116,6 +116,27 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setButtonRadius,
           ),
 
+          const LegendText(
+            'Body reading-column width (LegendBody.maxContentWidth)',
+            variant: LegendTextVariant.b3,
+          ),
+          LegendDropdown<double>(
+            value: controller.bodyMaxContentWidth,
+            placeholder: 'Unconstrained',
+            items: const [
+              LegendDropdownItem(value: 480, label: 'Narrow (480)'),
+              LegendDropdownItem(value: 720, label: 'Reading (720)'),
+              LegendDropdownItem(value: 1040, label: 'Wide (1040)'),
+            ],
+            onChanged: controller.setBodyMaxContentWidth,
+          ),
+
+          ColorField(
+            label: 'Vertical-menu selected color',
+            value: controller.menuSelectedColor,
+            onChanged: controller.setMenuSelectedColor,
+          ),
+
           const LegendDivider(),
           SecondaryLegendButton(
             text: 'Reset everything',

@@ -1,5 +1,6 @@
-import 'dart:ui' show SemanticsAction, Tristate;
+import 'dart:ui' show PointerDeviceKind, SemanticsAction, Tristate;
 
+import 'package:flutter/gestures.dart' show kSecondaryMouseButton;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -134,6 +135,146 @@ void main() {
       await tester.pump();
       expect(taps, 1);
       handle.dispose();
+    });
+  });
+
+  group('LegendInteractive — widened vocabulary', () {
+    testWidgets('onSecondaryTap fires with the local pointer position', (
+      tester,
+    ) async {
+      Offset? at;
+      await tester.pumpWidget(
+        _wrap(
+          LegendInteractive(
+            onSecondaryTap: (p) => at = p,
+            builder: (context, states) => const SizedBox.square(dimension: 48),
+          ),
+        ),
+      );
+      final topLeft = tester.getTopLeft(find.byType(LegendInteractive));
+      final gesture = await tester.startGesture(
+        topLeft + const Offset(12, 8),
+        kind: PointerDeviceKind.mouse,
+        buttons: kSecondaryMouseButton,
+      );
+      await gesture.up();
+      await tester.pump();
+      expect(at, const Offset(12, 8));
+    });
+
+    testWidgets('onLongPress fires with the local press position', (
+      tester,
+    ) async {
+      Offset? at;
+      await tester.pumpWidget(
+        _wrap(
+          LegendInteractive(
+            onLongPress: (p) => at = p,
+            builder: (context, states) => const SizedBox.square(dimension: 48),
+          ),
+        ),
+      );
+      final topLeft = tester.getTopLeft(find.byType(LegendInteractive));
+      await tester.longPressAt(topLeft + const Offset(20, 20));
+      await tester.pump();
+      expect(at, const Offset(20, 20));
+    });
+
+    testWidgets('onHoverChange reports enter and exit', (tester) async {
+      final events = <bool>[];
+      await tester.pumpWidget(
+        _wrap(
+          LegendInteractive(
+            onHoverChange: events.add,
+            builder: (context, states) => const SizedBox.square(dimension: 48),
+          ),
+        ),
+      );
+      final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await gesture.addPointer(location: const Offset(500, 500));
+      addTearDown(gesture.removePointer);
+      await tester.pump();
+
+      await gesture.moveTo(tester.getCenter(find.byType(LegendInteractive)));
+      await tester.pump();
+      expect(events, [true]);
+      await gesture.moveTo(const Offset(500, 500));
+      await tester.pump();
+      expect(events, [true, false]);
+    });
+
+    testWidgets('disabled is inert to onHoverChange (legacy "disabled '
+        'buttons stay tappable" regression)', (tester) async {
+      final hover = <bool>[];
+      await tester.pumpWidget(
+        _wrap(
+          LegendInteractive(
+            enabled: false,
+            onHoverChange: hover.add,
+            builder: (context, states) => const SizedBox.square(dimension: 48),
+          ),
+        ),
+      );
+      final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await gesture.addPointer(location: const Offset(500, 500));
+      addTearDown(gesture.removePointer);
+      await tester.pump();
+      await gesture.moveTo(tester.getCenter(find.byType(LegendInteractive)));
+      await tester.pump();
+      expect(hover, isEmpty);
+    });
+
+    testWidgets('disabled is inert to secondary tap and long-press '
+        '(legacy "disabled buttons stay tappable" regression)', (tester) async {
+      var secondary = 0;
+      var long = 0;
+      await tester.pumpWidget(
+        _wrap(
+          LegendInteractive(
+            enabled: false,
+            onSecondaryTap: (_) => secondary++,
+            onLongPress: (_) => long++,
+            builder: (context, states) => const SizedBox.square(dimension: 48),
+          ),
+        ),
+      );
+      final center = tester.getCenter(find.byType(LegendInteractive));
+
+      final secondaryTap = await tester.startGesture(
+        center,
+        kind: PointerDeviceKind.mouse,
+        buttons: kSecondaryMouseButton,
+      );
+      await secondaryTap.up();
+      await secondaryTap.removePointer();
+      await tester.pump();
+      await tester.longPressAt(center);
+      await tester.pump();
+
+      expect(secondary, 0);
+      expect(long, 0);
+    });
+
+    testWidgets('a context-menu-only wrapper (no onTap) still triggers on '
+        'secondary tap', (tester) async {
+      var opens = 0;
+      await tester.pumpWidget(
+        _wrap(
+          LegendInteractive(
+            onSecondaryTap: (_) => opens++,
+            builder: (context, states) => const SizedBox.square(dimension: 48),
+          ),
+        ),
+      );
+
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.byType(LegendInteractive)),
+        kind: PointerDeviceKind.mouse,
+        buttons: kSecondaryMouseButton,
+      );
+      await gesture.up();
+      await tester.pump();
+      expect(opens, 1);
     });
   });
 }

@@ -9,6 +9,8 @@
 library;
 
 export 'src/annotations/annotations.dart';
+export 'src/components/body/legend_body.dart';
+export 'src/components/body/legend_slivers.dart';
 export 'src/components/buttons/legend_text_button.dart';
 export 'src/components/buttons/primary_legend_button.dart';
 export 'src/components/buttons/secondary_legend_button.dart';
@@ -32,6 +34,7 @@ export 'src/docs/legend_doc_entry.dart';
 export 'src/primitives/legend_anchored_overlay.dart';
 export 'src/primitives/legend_button_core.dart';
 export 'src/primitives/legend_caret.dart';
+export 'src/primitives/legend_field_core.dart';
 export 'src/primitives/legend_interactive.dart';
 export 'src/primitives/legend_modal.dart';
 export 'src/primitives/legend_surface.dart';
@@ -41,6 +44,7 @@ export 'src/shell/legend_bottom_bar.dart';
 export 'src/shell/legend_nav_item.dart';
 export 'src/shell/legend_scaffold.dart';
 export 'src/shell/legend_sider.dart';
+export 'src/shell/legend_vertical_menu.dart';
 export 'src/theme/animated_legend_theme.dart';
 export 'src/theme/interactive_colors.dart';
 export 'src/theme/legend_breakpoints.dart';

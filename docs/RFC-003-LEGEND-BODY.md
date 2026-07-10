@@ -1,6 +1,6 @@
 # RFC-003 — LegendBody: one sliver core, named-constructor page archetypes
 
-> Status: **proposed** (2026-07-10) — research-backed design for the last major ROADMAP Phase 2 port. Implements DESIGN.md §3's settled direction ("single sliver-based mode; convenience constructors cover the legacy use cases instead of six exclusive flag-modes"). Sources and full findings: session research 2026-07-10 (legacy `NomoRouteBody` on `main`, legacy-docs 01 §4.2 / 04 §10, sliver_tools/extended_sliver/super_sliver_list, Flutter ≥3.13 sliver groups, fluent_ui `ScaffoldPage`, macos_ui, SliverFillRemaining issues #141256/#62194).
+> Status: **implemented** (2026-07-10) — `.refresh`/`LegendSliverRefresh` deferred. Research-backed design for the last major ROADMAP Phase 2 port. Implements DESIGN.md §3's settled direction ("single sliver-based mode; convenience constructors cover the legacy use cases instead of six exclusive flag-modes"). Sources and full findings: session research 2026-07-10 (legacy `NomoRouteBody` on `main`, legacy-docs 01 §4.2 / 04 §10, sliver_tools/extended_sliver/super_sliver_list, Flutter ≥3.13 sliver groups, fluent_ui `ScaffoldPage`, macos_ui, SliverFillRemaining issues #141256/#62194).
 
 ## 1. What the legacy widget got wrong (evidence)
 

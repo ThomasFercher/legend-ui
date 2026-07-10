@@ -115,15 +115,15 @@ class _DocsShellState extends State<_DocsShell> {
     final tokens = LegendTheme.of(context).tokens;
     final compact = LegendBreakpoints.tierOf(context) == LegendTier.compact;
     // SelectionArea makes all doc prose selectable on web (CanvasKit paints
-    // text to a canvas, so nothing is selectable without it).
+    // text to a canvas, so nothing is selectable without it). LegendBody
+    // owns the scroll pipeline (single padding, centered reading column,
+    // safe area, keyboard inset); the ValueKey resets the scroll position
+    // on page change (RFC-003 §5).
     final content = SelectionArea(
-      child: SingleChildScrollView(
+      child: LegendBody(
         key: ValueKey(_page),
-        padding: EdgeInsets.all(tokens.sizes.lg),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 860),
-          child: _buildPage(_page),
-        ),
+        maxContentWidth: 860,
+        children: [_buildPage(_page)],
       ),
     );
 

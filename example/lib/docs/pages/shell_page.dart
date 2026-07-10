@@ -2,8 +2,28 @@ import 'package:example/docs/doc_page.dart';
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/legend_ui.dart';
 
-class ShellPage extends StatelessWidget {
+class ShellPage extends StatefulWidget {
   const ShellPage({super.key});
+
+  @override
+  State<ShellPage> createState() => _ShellPageState();
+}
+
+class _ShellPageState extends State<ShellPage> {
+  static const _wallet = LegendNavItem(
+    label: 'Wallet',
+    children: [
+      LegendNavItem(label: 'Balances'),
+      LegendNavItem(label: 'History'),
+    ],
+  );
+  static const _menuItems = [
+    LegendNavItem(label: 'Dashboard'),
+    _wallet,
+    LegendNavItem(label: 'Settings'),
+  ];
+
+  LegendNavItem _menuSelected = _menuItems.first;
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +83,37 @@ LegendApp(
   compactBelow: 700,
   expandedFrom: 1200,
   ...
+)''',
+        ),
+        DocSection(
+          title: 'Vertical menu',
+          description:
+              'LegendVerticalMenu is a nesting navigation list on '
+              'LegendInteractive + LegendSurface — expandable sections '
+              '(items with children), a selected state, all from the shared '
+              'LegendNavItem model. Expansion is plain setState + '
+              'AnimatedSize; unlike the legacy tile it needs no per-row '
+              'AnimationController or post-frame reveal.',
+          demo: SizedBox(
+            width: 280,
+            child: LegendVerticalMenu(
+              items: _menuItems,
+              selected: _menuSelected,
+              initiallyExpanded: const {_wallet},
+              onSelected: (item) => setState(() => _menuSelected = item),
+            ),
+          ),
+          code: '''
+LegendVerticalMenu(
+  items: const [
+    LegendNavItem(label: 'Dashboard'),
+    LegendNavItem(label: 'Wallet', children: [
+      LegendNavItem(label: 'Balances'),
+      LegendNavItem(label: 'History'),
+    ]),
+  ],
+  selected: current,
+  onSelected: (item) => setState(() => current = item),
 )''',
         ),
       ],
