@@ -66,6 +66,25 @@ class PlaygroundPage extends StatelessWidget {
                 ),
               ),
               const LegendLoading(),
+              LegendSurface(
+                color: tokens.colors.background1,
+                borderRadius: tokens.sizes.borderRadiusMd,
+                // A live LegendBody — its centered reading column follows
+                // the panel's maxContentWidth knob (level-3 override).
+                child: const SizedBox(
+                  height: 180,
+                  child: LegendBody(
+                    children: [
+                      LegendText('LegendBody', variant: LegendTextVariant.h3),
+                      LegendText(
+                        'The reading column narrows and widens with the '
+                        'maxContentWidth knob in the theme panel.',
+                        variant: LegendTextVariant.b2,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),

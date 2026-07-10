@@ -77,6 +77,50 @@ LegendExpandable(
   child: LegendText('A Material-free component kit ...'),
 )''',
         ),
+        DocSection(
+          title: 'Body',
+          description:
+              'The page scroll pipeline: one always-CustomScrollView core '
+              'behind named constructors — LegendBody(children:) for a plain '
+              'page, .pinnedFooter for a form whose footer pins to the bottom '
+              'when the content is short and flows after it when long, '
+              '.slivers for raw slivers (with LegendSliverPinnedHeader / '
+              'LegendSliverSection), and .fixed for a non-scrolling fill '
+              'page. It owns padding, a centered maxContentWidth reading '
+              'column, the safe area, and the keyboard inset — this page '
+              'itself is a LegendBody.',
+          demo: LegendSurface(
+            color: tokens.colors.background1,
+            borderRadius: tokens.sizes.borderRadiusMd,
+            child: SizedBox(
+              height: 220,
+              child: LegendBody.pinnedFooter(
+                maxContentWidth: 320,
+                footer: PrimaryLegendButton(text: 'Submit', onPressed: () {}),
+                children: const [
+                  LegendText(
+                    'Pinned-footer archetype',
+                    variant: LegendTextVariant.h3,
+                  ),
+                  LegendText(
+                    'The footer pins to the bottom while the content is '
+                    'short, and flows after it once the content scrolls.',
+                    variant: LegendTextVariant.b2,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          code: '''
+LegendBody.pinnedFooter(
+  maxContentWidth: 320,
+  footer: PrimaryLegendButton(text: 'Submit', onPressed: submit),
+  children: const [
+    LegendText('Title', variant: LegendTextVariant.h3),
+    LegendText('Body copy ...'),
+  ],
+)''',
+        ),
         const DocSection(
           title: 'Info item',
           description: 'Label/value rows for detail screens.',

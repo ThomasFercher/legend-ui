@@ -27,6 +27,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for the shared [LegendButtonCore] surface.
   double? buttonRadius;
 
+  /// Level-3 override for [LegendBody]'s centered reading-column width.
+  double? bodyMaxContentWidth;
+
   bool get dark => preset == ThemePreset.dark;
 
   void setPreset(ThemePreset value) {
@@ -70,6 +73,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setBodyMaxContentWidth(double? value) {
+    bodyMaxContentWidth = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -78,6 +86,7 @@ class ThemeController extends ChangeNotifier {
     density = DensityChoice.standard;
     buttonBackground = null;
     buttonRadius = null;
+    bodyMaxContentWidth = null;
     notifyListeners();
   }
 
@@ -153,6 +162,11 @@ class ThemeController extends ChangeNotifier {
         if (buttonRadius != null)
           LegendButtonCore: LegendButtonCoreThemeNullable(
             borderRadius: BorderRadius.circular(buttonRadius!),
+          ),
+        // LegendBody's centered reading-column width (RFC-003).
+        if (bodyMaxContentWidth != null)
+          LegendBody: LegendBodyThemeNullable(
+            maxContentWidth: bodyMaxContentWidth,
           ),
       },
     );
