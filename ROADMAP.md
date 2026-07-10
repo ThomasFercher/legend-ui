@@ -4,7 +4,7 @@ Phases per [docs/DESIGN.md](docs/DESIGN.md) §8. Check items off as they land; a
 
 > **2026-07-09 — direction set**: the kit is rebranded **Legend UI** (`legend_ui`/`legend_gen`, `Legend*` symbols). Next milestone: the **showcase/playground** (below). Distribution decision deferred; screenshot goldens deferred until visual regressions bite.
 
-## Phase 0 — validate the theory (current)
+## Phase 0 — validate the theory
 
 Goal: prove the token model, the decorator contract, and the CLI end-to-end on one hard component — including the consumer workflow. Go/no-go review at the end; revisit DESIGN §2/§5 if targets are missed.
 
@@ -47,10 +47,10 @@ Consolidations per DESIGN §3; every port closes its legacy bugs.
 - [x] Feedback: queued `LegendToast` (overlay engine, no ScaffoldMessenger — resolves DESIGN §9.6 toward the overlay engine), `LegendLoading`, `LegendShimmer`
 - [x] Small components: `LegendDivider`, `LegendExpandable`, `LegendInfoItem`, `LegendContextMenu` (+ shared `LegendCaret` primitive)
 - [x] Post-review hardening (2026-07-09): generated files import their own source (C1); `LegendInteractive` keyboard activation without WidgetsApp, toggle semantics, no stuck-pressed after mid-press disable (I1/I3); transparent disabled text buttons (I2); dropdown `menuMaxHeight` + scrollable menu (I4); `LegendApp` locale passthrough + navigatorKey/routerConfig assert (I5); `LegendThemeData` value equality (I7); RTL switch thumb (M1); `lerp:` type validation in legend_gen (M4); crash-proof `--watch` (M5); upward bottom-bar shadow + translatable modal `barrierLabel` (M6)
-- [ ] Remaining legacy inventory (decided 2026-07-09: **port both, improved**): vertical menu and `LegendBody` (single-mode route body) — both need a design pass around slivers/scrolling rather than a straight port
+- [ ] Remaining legacy inventory (decided 2026-07-09: **port both, improved**): vertical menu and `LegendBody` (single-mode route body) — the sliver/scrolling design pass is done: [RFC-003](docs/RFC-003-LEGEND-BODY.md) (proposed 2026-07-10) specs `LegendBody` + the `LegendSliver*` helpers; both ports are queued as Phase 2.6 step F
 - [ ] Deferred (tracked in DESIGN §9.10–9.11): component-map animation, dropdown trigger theming / flip-above / keyboard nav, tap-to-position cursor, import-prefixed annotations
 
-## Phase 2.5 — docs site + showcase playground (next milestone, decided 2026-07-09)
+## Phase 2.5 — docs site + showcase playground (landed 2026-07-09)
 
 Evolve `example/` from a static gallery into a **documentation site with a live playground** (decided 2026-07-09: docs are part of the playground app):
 
@@ -60,6 +60,28 @@ Evolve `example/` from a static gallery into a **documentation site with a live 
 - [x] Per-component override editor — registers a sparse `PrimaryLegendButtonThemeNullable` in the level-3 `components` map, tested
 - [x] Sensible preset themes to start from (light/dark plus two brand variants)
 - [x] Keep it the consumer-workflow reference: playground code uses only the public barrel (tested: preset/brand/override restyling)
+
+## Phase 2.6 — RFC-002 refactor: derived defaults & generated ceremony (current)
+
+The accepted [RFC-002](docs/RFC-002-DERIVED-DEFAULTS.md) drives this phase; its §5 table carries the dated landed notes and measurements. Checklist mirror:
+
+- [x] **A — generator sprint** (2026-07-09): typed `@Style<T>` contract, part-of emission with the hidden `_theme(context)` resolver, widget-type registry keys, `legend_gen docs` manifests; 82 fields migrated, all 20 hand-written mirror blocks deleted
+- [x] **B — token sprint** (2026-07-09): `@LegendTokenData` generated token members (−217 hand LOC); `LegendSeed`/`LegendRamp`/`LegendTokens.fromSeed` (AntD-adapted ramp, ≥ 4.5:1 pair guarantee)
+- [x] **A2 — CLI polish** (2026-07-09): `legend_gen` rebuilt to the Serverpod/Dart Frog bar — mason_logger, exit-code table, never-crash `--watch`, `update`/`doctor`/completion; suite 46 → 87
+- [x] **C — component adoption** (2026-07-09): state-styled interactive surfaces, shared `LegendButtonCore` chassis theme, standardized doc comments (21/21 manifests non-empty), `LegendText.rich`; kit suite 110 → 144
+- [x] **C2 — Ref catalogs** (2026-07-10): token defaults live fully inside `@Style.resolve` via generated const tear-off catalogs (`LegendColorsRef` …); composites as private top-level functions
+- [ ] **D — playground & docs CMS** (in flight): `LegendThemeController` in the kit, manifest-driven configurator over every themed variable, Theme reference page, seed section
+- [ ] **E — custom style classes, granular rebuilds, wiring** (in flight): custom `@Style` classes replace `LegendStates<T>` (R6 final, `InteractiveColors` predefined), per-field `listen:` opt-out + `_field` accessors + `ValueListenable`s (R12), extensions-first wiring with the opt-in `_$XBase` (R13), terse Ref renames (`ColorRef` et al.)
+- [ ] **F — remaining ports & primitives** (queued): implement [RFC-003 `LegendBody`](docs/RFC-003-LEGEND-BODY.md) + `LegendSliver*` helpers and migrate the docs site onto them, extract `LegendFieldCore` from `LegendTextField`, widen the `LegendInteractive` vocabulary (secondary-tap, focus-tap), port the vertical menu; regression tests for every legacy bug closed on the way
+
+### Audit follow-ups (2026-07-10 — LegendApp/rebuild audit, measured on Flutter 3.38.6)
+
+Verdict: `LegendApp` is **current** — zero window-singleton usage, no deprecated WidgetsApp params, multi-window (experimental in 3.38) needs no structural change. The R12-relevant findings (type-scoped registry notification + lerp identity fast-paths) are folded into RFC-002 R12 and Phase E. Remaining maintenance items:
+
+- [ ] `LegendBreakpoints`: switch `MediaQuery.sizeOf(context).width` to `MediaQuery.widthOf` (3.35+) and split tier vs width dependencies (aspects or `tierOf`/`widthOf` statics) — measured: same-tier drag-resize rebuilds every tier consumer
+- [ ] `LegendSelectionArea`: widgets-layer `SelectableRegion` + kit-styled `contextMenuBuilder` — drops the `MaterialLocalizations` delegate requirement from consumers and the docs site's last Material import; evaluate 3.38 `OverlayPortal.overlayChildLayoutBuilder` for the anchored-overlay engine in the same pass
+- [ ] `LegendApp` passthroughs: `restorationScopeId`, `shortcuts`/`actions`, `debugShowCheckedModeBanner`; document the Android predictive-back gap for custom routes
+- [ ] Consumer rebuild guidance (docs site as reference): controller above `LegendApp`, stable home child, token reads in the narrowest `Builder` — measured: inline children under a root `ListenableBuilder` rebuild the whole tree 17× per theme toggle vs dependents-only with a stable child; document the (semantically necessary) `DefaultTextStyle` cascade during color animation
 
 ## Phase 3 — icons & polish
 
