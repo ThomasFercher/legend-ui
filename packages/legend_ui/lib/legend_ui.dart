@@ -9,6 +9,8 @@
 library;
 
 export 'src/annotations/annotations.dart';
+export 'src/components/body/legend_body.dart';
+export 'src/components/body/legend_slivers.dart';
 export 'src/components/buttons/legend_text_button.dart';
 export 'src/components/buttons/primary_legend_button.dart';
 export 'src/components/buttons/secondary_legend_button.dart';
