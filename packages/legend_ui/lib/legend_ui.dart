@@ -45,6 +45,7 @@ export 'src/theme/animated_legend_theme.dart';
 export 'src/theme/interactive_colors.dart';
 export 'src/theme/legend_breakpoints.dart';
 export 'src/theme/legend_theme.dart';
+export 'src/theme/legend_theme_selector.dart';
 export 'src/theme/legend_widget_state.dart';
 export 'src/tokens/legend_colors.dart';
 // legend_ramp.dart is deliberately NOT exported (RFC-002 R4, Fluent's
