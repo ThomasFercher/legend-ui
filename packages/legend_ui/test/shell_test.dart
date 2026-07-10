@@ -97,4 +97,31 @@ void main() {
     expect(app.actions, same(actions));
     expect(app.debugShowCheckedModeBanner, isFalse);
   });
+
+  testWidgets('first frame builds once — no post-frame size/theme '
+      're-initialization (legacy MetricReactor pattern is gone)', (
+    tester,
+  ) async {
+    var builds = 0;
+    await tester.pumpWidget(
+      LegendApp(
+        theme: const LegendThemeData(tokens: LegendTokens.light),
+        home: Builder(
+          builder: (context) {
+            builds++;
+            // Depend on everything the legacy pattern re-initialized
+            // post-frame: theme tokens and the width-derived tier.
+            LegendTheme.of(context);
+            final tier = LegendBreakpoints.tierOf(context);
+            expect(tier, isNotNull);
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
+    expect(builds, 1, reason: 'the first build must see the real size');
+
+    await tester.pumpAndSettle();
+    expect(builds, 1, reason: 'nothing may schedule a second initial pass');
+  });
 }
