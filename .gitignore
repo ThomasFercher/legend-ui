@@ -24,3 +24,4 @@ pubspec.lock
 .claude/*
 !.claude/launch.json
 !.claude/skills/
+!.claude/agents/
