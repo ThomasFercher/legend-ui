@@ -142,7 +142,8 @@ class ThemeController extends ChangeNotifier {
         // The open Type-keyed registry (level 3): sparse overrides only —
         // unset properties keep resolving through the lower levels.
         if (buttonBackground != null)
-          PrimaryLegendButtonThemeNullable: PrimaryLegendButtonThemeNullable(
+          // Keyed by the widget type — the natural key form (RFC-002 R3).
+          PrimaryLegendButton: PrimaryLegendButtonThemeNullable(
             background: buttonBackground == null
                 ? null
                 : InteractiveColors(normal: buttonBackground),
