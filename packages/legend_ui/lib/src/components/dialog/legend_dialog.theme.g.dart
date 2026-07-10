@@ -35,11 +35,10 @@ class LegendDialogTheme {
     LegendDialogThemeNullable? local,
   ]) {
     final data = LegendTheme.of(context);
-    final resolved = LegendDialogTheme.defaults(data.tokens)
+    return LegendDialogTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendDialogThemeNullable>(LegendDialog))
         .merge(LegendThemeOverride.maybeOf<LegendDialogThemeNullable>(context))
         .merge(local);
-    return resolved;
   }
 
   LegendDialogTheme merge(LegendDialogThemeNullable? other) {

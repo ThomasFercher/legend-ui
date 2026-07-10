@@ -41,11 +41,10 @@ class LegendToastTheme {
     LegendToastThemeNullable? local,
   ]) {
     final data = LegendTheme.of(context);
-    final resolved = LegendToastTheme.defaults(data.tokens)
+    return LegendToastTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendToastThemeNullable>(LegendToast))
         .merge(LegendThemeOverride.maybeOf<LegendToastThemeNullable>(context))
         .merge(local);
-    return resolved;
   }
 
   LegendToastTheme merge(LegendToastThemeNullable? other) {

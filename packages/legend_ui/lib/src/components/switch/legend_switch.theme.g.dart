@@ -38,11 +38,10 @@ class LegendSwitchTheme {
     LegendSwitchThemeNullable? local,
   ]) {
     final data = LegendTheme.of(context);
-    final resolved = LegendSwitchTheme.defaults(data.tokens)
+    return LegendSwitchTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendSwitchThemeNullable>(LegendSwitch))
         .merge(LegendThemeOverride.maybeOf<LegendSwitchThemeNullable>(context))
         .merge(local);
-    return resolved;
   }
 
   LegendSwitchTheme merge(LegendSwitchThemeNullable? other) {

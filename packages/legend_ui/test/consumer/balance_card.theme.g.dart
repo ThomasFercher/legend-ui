@@ -32,11 +32,10 @@ class BalanceCardTheme {
     BalanceCardThemeNullable? local,
   ]) {
     final data = LegendTheme.of(context);
-    final resolved = BalanceCardTheme.defaults(data.tokens)
+    return BalanceCardTheme.defaults(data.tokens)
         .merge(data.componentOf<BalanceCardThemeNullable>(BalanceCard))
         .merge(LegendThemeOverride.maybeOf<BalanceCardThemeNullable>(context))
         .merge(local);
-    return resolved;
   }
 
   BalanceCardTheme merge(BalanceCardThemeNullable? other) {

@@ -30,7 +30,7 @@ class LegendButtonCoreTheme {
     LegendButtonCoreThemeNullable? local,
   ]) {
     final data = LegendTheme.of(context);
-    final resolved = LegendButtonCoreTheme.defaults(data.tokens)
+    return LegendButtonCoreTheme.defaults(data.tokens)
         .merge(
           data.componentOf<LegendButtonCoreThemeNullable>(LegendButtonCore),
         )
@@ -38,7 +38,6 @@ class LegendButtonCoreTheme {
           LegendThemeOverride.maybeOf<LegendButtonCoreThemeNullable>(context),
         )
         .merge(local);
-    return resolved;
   }
 
   LegendButtonCoreTheme merge(LegendButtonCoreThemeNullable? other) {

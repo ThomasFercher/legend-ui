@@ -42,6 +42,7 @@ export 'src/shell/legend_nav_item.dart';
 export 'src/shell/legend_scaffold.dart';
 export 'src/shell/legend_sider.dart';
 export 'src/theme/animated_legend_theme.dart';
+export 'src/theme/interactive_colors.dart';
 export 'src/theme/legend_breakpoints.dart';
 export 'src/theme/legend_states.dart';
 export 'src/theme/legend_theme.dart';

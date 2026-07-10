@@ -28,16 +28,12 @@ class LegendExpandableTheme {
   /// [LegendExpandable] first, [LegendExpandableThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
-  ///
-  /// Post-merge, unset `LegendStates<Color>` members fill
-  /// from the resolved `normal` via `tokens.states`
-  /// (RFC-002 R6) — named members at any level always win.
   static LegendExpandableTheme of(
     BuildContext context, [
     LegendExpandableThemeNullable? local,
   ]) {
     final data = LegendTheme.of(context);
-    final resolved = LegendExpandableTheme.defaults(data.tokens)
+    return LegendExpandableTheme.defaults(data.tokens)
         .merge(
           data.componentOf<LegendExpandableThemeNullable>(LegendExpandable),
         )
@@ -45,18 +41,13 @@ class LegendExpandableTheme {
           LegendThemeOverride.maybeOf<LegendExpandableThemeNullable>(context),
         )
         .merge(local);
-    return resolved.copyWith(
-      backgroundColor: resolved.backgroundColor.withDerived(data.tokens.states),
-    );
   }
 
   LegendExpandableTheme merge(LegendExpandableThemeNullable? other) {
     if (other == null) return this;
     return LegendExpandableTheme(
       headerPadding: other.headerPadding ?? headerPadding,
-      backgroundColor:
-          LegendStates.merge(backgroundColor, other.backgroundColor) ??
-          backgroundColor,
+      backgroundColor: other.backgroundColor ?? backgroundColor,
       borderRadius: other.borderRadius ?? borderRadius,
     );
   }
@@ -100,10 +91,7 @@ class LegendExpandableThemeNullable {
     if (other == null) return this;
     return LegendExpandableThemeNullable(
       headerPadding: other.headerPadding ?? headerPadding,
-      backgroundColor: LegendStates.merge(
-        backgroundColor,
-        other.backgroundColor,
-      ),
+      backgroundColor: other.backgroundColor ?? backgroundColor,
       borderRadius: other.borderRadius ?? borderRadius,
     );
   }

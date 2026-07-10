@@ -34,16 +34,12 @@ class LegendContextMenuTheme {
   /// [LegendContextMenu] first, [LegendContextMenuThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
-  ///
-  /// Post-merge, unset `LegendStates<Color>` members fill
-  /// from the resolved `normal` via `tokens.states`
-  /// (RFC-002 R6) — named members at any level always win.
   static LegendContextMenuTheme of(
     BuildContext context, [
     LegendContextMenuThemeNullable? local,
   ]) {
     final data = LegendTheme.of(context);
-    final resolved = LegendContextMenuTheme.defaults(data.tokens)
+    return LegendContextMenuTheme.defaults(data.tokens)
         .merge(
           data.componentOf<LegendContextMenuThemeNullable>(LegendContextMenu),
         )
@@ -51,17 +47,12 @@ class LegendContextMenuTheme {
           LegendThemeOverride.maybeOf<LegendContextMenuThemeNullable>(context),
         )
         .merge(local);
-    return resolved.copyWith(
-      menuBackground: resolved.menuBackground.withDerived(data.tokens.states),
-    );
   }
 
   LegendContextMenuTheme merge(LegendContextMenuThemeNullable? other) {
     if (other == null) return this;
     return LegendContextMenuTheme(
-      menuBackground:
-          LegendStates.merge(menuBackground, other.menuBackground) ??
-          menuBackground,
+      menuBackground: other.menuBackground ?? menuBackground,
       menuBorderRadius: other.menuBorderRadius ?? menuBorderRadius,
       menuShadows: other.menuShadows ?? menuShadows,
       itemPadding: other.itemPadding ?? itemPadding,
@@ -117,7 +108,7 @@ class LegendContextMenuThemeNullable {
   LegendContextMenuThemeNullable merge(LegendContextMenuThemeNullable? other) {
     if (other == null) return this;
     return LegendContextMenuThemeNullable(
-      menuBackground: LegendStates.merge(menuBackground, other.menuBackground),
+      menuBackground: other.menuBackground ?? menuBackground,
       menuBorderRadius: other.menuBorderRadius ?? menuBorderRadius,
       menuShadows: other.menuShadows ?? menuShadows,
       itemPadding: other.itemPadding ?? itemPadding,

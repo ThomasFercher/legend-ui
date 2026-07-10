@@ -32,13 +32,12 @@ class LegendInfoItemTheme {
     LegendInfoItemThemeNullable? local,
   ]) {
     final data = LegendTheme.of(context);
-    final resolved = LegendInfoItemTheme.defaults(data.tokens)
+    return LegendInfoItemTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendInfoItemThemeNullable>(LegendInfoItem))
         .merge(
           LegendThemeOverride.maybeOf<LegendInfoItemThemeNullable>(context),
         )
         .merge(local);
-    return resolved;
   }
 
   LegendInfoItemTheme merge(LegendInfoItemThemeNullable? other) {

@@ -33,29 +33,21 @@ class LegendSiderTheme {
   /// [LegendSider] first, [LegendSiderThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
-  ///
-  /// Post-merge, unset `LegendStates<Color>` members fill
-  /// from the resolved `normal` via `tokens.states`
-  /// (RFC-002 R6) — named members at any level always win.
   static LegendSiderTheme of(
     BuildContext context, [
     LegendSiderThemeNullable? local,
   ]) {
     final data = LegendTheme.of(context);
-    final resolved = LegendSiderTheme.defaults(data.tokens)
+    return LegendSiderTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendSiderThemeNullable>(LegendSider))
         .merge(LegendThemeOverride.maybeOf<LegendSiderThemeNullable>(context))
         .merge(local);
-    return resolved.copyWith(
-      background: resolved.background.withDerived(data.tokens.states),
-    );
   }
 
   LegendSiderTheme merge(LegendSiderThemeNullable? other) {
     if (other == null) return this;
     return LegendSiderTheme(
-      background:
-          LegendStates.merge(background, other.background) ?? background,
+      background: other.background ?? background,
       width: other.width ?? width,
       selectedColor: other.selectedColor ?? selectedColor,
       unselectedColor: other.unselectedColor ?? unselectedColor,
@@ -111,7 +103,7 @@ class LegendSiderThemeNullable {
   LegendSiderThemeNullable merge(LegendSiderThemeNullable? other) {
     if (other == null) return this;
     return LegendSiderThemeNullable(
-      background: LegendStates.merge(background, other.background),
+      background: other.background ?? background,
       width: other.width ?? width,
       selectedColor: other.selectedColor ?? selectedColor,
       unselectedColor: other.unselectedColor ?? unselectedColor,

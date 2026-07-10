@@ -29,11 +29,10 @@ class LegendShimmerTheme {
     LegendShimmerThemeNullable? local,
   ]) {
     final data = LegendTheme.of(context);
-    final resolved = LegendShimmerTheme.defaults(data.tokens)
+    return LegendShimmerTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendShimmerThemeNullable>(LegendShimmer))
         .merge(LegendThemeOverride.maybeOf<LegendShimmerThemeNullable>(context))
         .merge(local);
-    return resolved;
   }
 
   LegendShimmerTheme merge(LegendShimmerThemeNullable? other) {

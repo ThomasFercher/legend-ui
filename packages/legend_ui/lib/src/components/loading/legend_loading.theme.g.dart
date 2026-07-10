@@ -29,11 +29,10 @@ class LegendLoadingTheme {
     LegendLoadingThemeNullable? local,
   ]) {
     final data = LegendTheme.of(context);
-    final resolved = LegendLoadingTheme.defaults(data.tokens)
+    return LegendLoadingTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendLoadingThemeNullable>(LegendLoading))
         .merge(LegendThemeOverride.maybeOf<LegendLoadingThemeNullable>(context))
         .merge(local);
-    return resolved;
   }
 
   LegendLoadingTheme merge(LegendLoadingThemeNullable? other) {

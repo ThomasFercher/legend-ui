@@ -35,11 +35,10 @@ class LegendCardTheme {
     LegendCardThemeNullable? local,
   ]) {
     final data = LegendTheme.of(context);
-    final resolved = LegendCardTheme.defaults(data.tokens)
+    return LegendCardTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendCardThemeNullable>(LegendCard))
         .merge(LegendThemeOverride.maybeOf<LegendCardThemeNullable>(context))
         .merge(local);
-    return resolved;
   }
 
   LegendCardTheme merge(LegendCardThemeNullable? other) {

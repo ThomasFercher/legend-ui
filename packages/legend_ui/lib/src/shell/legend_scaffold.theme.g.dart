@@ -23,13 +23,12 @@ class LegendScaffoldTheme {
     LegendScaffoldThemeNullable? local,
   ]) {
     final data = LegendTheme.of(context);
-    final resolved = LegendScaffoldTheme.defaults(data.tokens)
+    return LegendScaffoldTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendScaffoldThemeNullable>(LegendScaffold))
         .merge(
           LegendThemeOverride.maybeOf<LegendScaffoldThemeNullable>(context),
         )
         .merge(local);
-    return resolved;
   }
 
   LegendScaffoldTheme merge(LegendScaffoldThemeNullable? other) {

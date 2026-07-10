@@ -35,13 +35,12 @@ class LegendBottomBarTheme {
     LegendBottomBarThemeNullable? local,
   ]) {
     final data = LegendTheme.of(context);
-    final resolved = LegendBottomBarTheme.defaults(data.tokens)
+    return LegendBottomBarTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendBottomBarThemeNullable>(LegendBottomBar))
         .merge(
           LegendThemeOverride.maybeOf<LegendBottomBarThemeNullable>(context),
         )
         .merge(local);
-    return resolved;
   }
 
   LegendBottomBarTheme merge(LegendBottomBarThemeNullable? other) {

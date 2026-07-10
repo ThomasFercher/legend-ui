@@ -32,11 +32,10 @@ class LegendDividerTheme {
     LegendDividerThemeNullable? local,
   ]) {
     final data = LegendTheme.of(context);
-    final resolved = LegendDividerTheme.defaults(data.tokens)
+    return LegendDividerTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendDividerThemeNullable>(LegendDivider))
         .merge(LegendThemeOverride.maybeOf<LegendDividerThemeNullable>(context))
         .merge(local);
-    return resolved;
   }
 
   LegendDividerTheme merge(LegendDividerThemeNullable? other) {

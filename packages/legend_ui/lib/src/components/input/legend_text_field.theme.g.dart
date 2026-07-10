@@ -41,13 +41,12 @@ class LegendTextFieldTheme {
     LegendTextFieldThemeNullable? local,
   ]) {
     final data = LegendTheme.of(context);
-    final resolved = LegendTextFieldTheme.defaults(data.tokens)
+    return LegendTextFieldTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendTextFieldThemeNullable>(LegendTextField))
         .merge(
           LegendThemeOverride.maybeOf<LegendTextFieldThemeNullable>(context),
         )
         .merge(local);
-    return resolved;
   }
 
   LegendTextFieldTheme merge(LegendTextFieldThemeNullable? other) {

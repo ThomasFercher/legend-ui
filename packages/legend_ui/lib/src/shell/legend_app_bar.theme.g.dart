@@ -32,11 +32,10 @@ class LegendAppBarTheme {
     LegendAppBarThemeNullable? local,
   ]) {
     final data = LegendTheme.of(context);
-    final resolved = LegendAppBarTheme.defaults(data.tokens)
+    return LegendAppBarTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendAppBarThemeNullable>(LegendAppBar))
         .merge(LegendThemeOverride.maybeOf<LegendAppBarThemeNullable>(context))
         .merge(local);
-    return resolved;
   }
 
   LegendAppBarTheme merge(LegendAppBarThemeNullable? other) {
