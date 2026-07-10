@@ -23,3 +23,4 @@ pubspec.lock
 .fvm/
 .claude/*
 !.claude/launch.json
+!.claude/skills/
