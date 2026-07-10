@@ -44,6 +44,7 @@ export 'src/shell/legend_bottom_bar.dart';
 export 'src/shell/legend_nav_item.dart';
 export 'src/shell/legend_scaffold.dart';
 export 'src/shell/legend_sider.dart';
+export 'src/shell/legend_vertical_menu.dart';
 export 'src/theme/animated_legend_theme.dart';
 export 'src/theme/interactive_colors.dart';
 export 'src/theme/legend_breakpoints.dart';

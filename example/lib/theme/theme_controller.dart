@@ -30,6 +30,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendBody]'s centered reading-column width.
   double? bodyMaxContentWidth;
 
+  /// Level-3 override for [LegendVerticalMenu]'s selected-item color.
+  Color? menuSelectedColor;
+
   bool get dark => preset == ThemePreset.dark;
 
   void setPreset(ThemePreset value) {
@@ -78,6 +81,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setMenuSelectedColor(Color? value) {
+    menuSelectedColor = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -87,6 +95,7 @@ class ThemeController extends ChangeNotifier {
     buttonBackground = null;
     buttonRadius = null;
     bodyMaxContentWidth = null;
+    menuSelectedColor = null;
     notifyListeners();
   }
 
@@ -167,6 +176,11 @@ class ThemeController extends ChangeNotifier {
         if (bodyMaxContentWidth != null)
           LegendBody: LegendBodyThemeNullable(
             maxContentWidth: bodyMaxContentWidth,
+          ),
+        // LegendVerticalMenu's selected-item color.
+        if (menuSelectedColor != null)
+          LegendVerticalMenu: LegendVerticalMenuThemeNullable(
+            selectedColor: menuSelectedColor,
           ),
       },
     );

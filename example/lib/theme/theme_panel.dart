@@ -131,6 +131,12 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setBodyMaxContentWidth,
           ),
 
+          ColorField(
+            label: 'Vertical-menu selected color',
+            value: controller.menuSelectedColor,
+            onChanged: controller.setMenuSelectedColor,
+          ),
+
           const LegendDivider(),
           SecondaryLegendButton(
             text: 'Reset everything',
