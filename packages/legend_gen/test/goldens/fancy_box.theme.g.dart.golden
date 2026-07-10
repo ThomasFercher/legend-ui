@@ -38,11 +38,10 @@ class FancyBoxTheme {
     FancyBoxThemeNullable? local,
   ]) {
     final data = LegendTheme.of(context);
-    final resolved = FancyBoxTheme.defaults(data.tokens)
+    return FancyBoxTheme.defaults(data.tokens)
         .merge(data.componentOf<FancyBoxThemeNullable>(FancyBox))
         .merge(LegendThemeOverride.maybeOf<FancyBoxThemeNullable>(context))
         .merge(local);
-    return resolved;
   }
 
   FancyBoxTheme merge(FancyBoxThemeNullable? other) {

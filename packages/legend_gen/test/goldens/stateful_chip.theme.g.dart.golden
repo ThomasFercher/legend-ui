@@ -5,52 +5,44 @@ part of 'stateful_chip.dart';
 
 /// Resolved theme for [StatefulChip].
 class StatefulChipTheme {
-  const StatefulChipTheme({required this.background, required this.label});
+  const StatefulChipTheme({required this.accent, required this.label});
 
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory StatefulChipTheme.defaults(LegendTokens t) => StatefulChipTheme(
-    background: StatefulChip._background(t),
+    accent: StatefulChip._accent(t),
     label: StatefulChip._label(t),
   );
 
-  final LegendStates<Color> background;
+  final ChipAccent accent;
   final Color label;
 
   /// Resolves the theme: defaults <- app registry (keyed by
   /// [StatefulChip] first, [StatefulChipThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
-  ///
-  /// Post-merge, unset `LegendStates<Color>` members fill
-  /// from the resolved `normal` via `tokens.states`
-  /// (RFC-002 R6) — named members at any level always win.
   static StatefulChipTheme of(
     BuildContext context, [
     StatefulChipThemeNullable? local,
   ]) {
     final data = LegendTheme.of(context);
-    final resolved = StatefulChipTheme.defaults(data.tokens)
+    return StatefulChipTheme.defaults(data.tokens)
         .merge(data.componentOf<StatefulChipThemeNullable>(StatefulChip))
         .merge(LegendThemeOverride.maybeOf<StatefulChipThemeNullable>(context))
         .merge(local);
-    return resolved.copyWith(
-      background: resolved.background.withDerived(data.tokens.states),
-    );
   }
 
   StatefulChipTheme merge(StatefulChipThemeNullable? other) {
     if (other == null) return this;
     return StatefulChipTheme(
-      background:
-          LegendStates.merge(background, other.background) ?? background,
+      accent: accent.merge(other.accent),
       label: other.label ?? label,
     );
   }
 
-  StatefulChipTheme copyWith({LegendStates<Color>? background, Color? label}) =>
+  StatefulChipTheme copyWith({ChipAccent? accent, Color? label}) =>
       StatefulChipTheme(
-        background: background ?? this.background,
+        accent: accent ?? this.accent,
         label: label ?? this.label,
       );
 
@@ -59,12 +51,7 @@ class StatefulChipTheme {
     StatefulChipTheme b,
     double t,
   ) => StatefulChipTheme(
-    background: LegendStates.lerpWith(
-      a.background,
-      b.background,
-      t,
-      Color.lerp,
-    ),
+    accent: ChipAccent.lerp(a.accent, b.accent, t)!,
     label: t < 0.5 ? a.label : b.label,
   );
 }
@@ -73,15 +60,15 @@ class StatefulChipTheme {
 /// Value-compared (RFC-002 R2), so rebuilding an ancestor
 /// with an equal override never invalidates dependents.
 class StatefulChipThemeNullable {
-  const StatefulChipThemeNullable({this.background, this.label});
+  const StatefulChipThemeNullable({this.accent, this.label});
 
-  final LegendStates<Color>? background;
+  final ChipAccent? accent;
   final Color? label;
 
   StatefulChipThemeNullable merge(StatefulChipThemeNullable? other) {
     if (other == null) return this;
     return StatefulChipThemeNullable(
-      background: LegendStates.merge(background, other.background),
+      accent: accent?.merge(other.accent) ?? other.accent,
       label: other.label ?? label,
     );
   }
@@ -90,11 +77,11 @@ class StatefulChipThemeNullable {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is StatefulChipThemeNullable &&
-          other.background == background &&
+          other.accent == accent &&
           other.label == label;
 
   @override
-  int get hashCode => Object.hashAll([background, label]);
+  int get hashCode => Object.hashAll([accent, label]);
 }
 
 /// Overrides [StatefulChipTheme] for a subtree (level 2).
@@ -121,6 +108,6 @@ extension _$StatefulChipThemeResolve on StatefulChip {
   /// level 1.
   StatefulChipTheme _theme(BuildContext context) => StatefulChipTheme.of(
     context,
-    StatefulChipThemeNullable(background: background, label: label),
+    StatefulChipThemeNullable(accent: accent, label: label),
   );
 }

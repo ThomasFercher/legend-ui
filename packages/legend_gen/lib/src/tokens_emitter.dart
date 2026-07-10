@@ -103,10 +103,17 @@ void _emitTokenClass(StringBuffer b, TokenClass tokenClass) {
     ..writeln()
     ..writeln('/// Member-wise lerp for [$name]; the public [$name.lerp]')
     ..writeln('/// redirects here (part of the one token lerp a theme switch')
-    ..writeln('/// pays, DESIGN.md §2.4).')
-    ..writeln('$name ${mixinName}Lerp($name a, $name b, double t) => $name(')
+    ..writeln('/// pays, DESIGN.md §2.4). Identical endpoints short-circuit')
+    ..writeln('/// to the same instance (RFC-002 R12 amendment): sub-objects')
+    ..writeln('/// shared between theme poles stay identity-stable through')
+    ..writeln('/// an animation, so per-field rebuild comparators never')
+    ..writeln('/// re-diff unchanged token groups.')
+    ..writeln('$name ${mixinName}Lerp($name a, $name b, double t) {')
+    ..writeln('if (identical(a, b)) return a;')
+    ..writeln('return $name(')
     ..writeln(fields.map((f) => '${f.name}: ${_lerpExpression(f)},').join())
-    ..writeln(');');
+    ..writeln(');')
+    ..writeln('}');
 
   final mount = tokenClass.mountedAt;
   if (mount == null) return;

@@ -42,8 +42,14 @@ abstract class GenerationCommand extends Command<int> {
   /// Human label for progress lines ('theme', 'docs', 'token').
   String get label;
 
-  /// The wrapped generation core (e.g. `runThemes`).
-  Future<int> generate(List<String> paths, {required bool check});
+  /// The wrapped generation core (e.g. `runThemes`). [indexPaths] feeds
+  /// the style-class index for commands that resolve style value classes
+  /// (themes/docs); `tokens` ignores it.
+  Future<int> generate(
+    List<String> paths, {
+    required bool check,
+    List<String>? indexPaths,
+  });
 
   @override
   String get invocation => 'legend_gen $name [paths…]';
@@ -62,7 +68,11 @@ abstract class GenerationCommand extends Command<int> {
         paths,
         label: label,
         logger: cliLogger,
-        generate: (changed) => generate(changed, check: false),
+        // Single-file regeneration still resolves style classes against
+        // the FULL configured path set (RFC-002 R6 amendment 7) — a saved
+        // widget must see style classes declared in unchanged files.
+        generate: (changed) =>
+            generate(changed, check: false, indexPaths: paths),
       );
     }
     return generate(paths, check: check);
@@ -86,8 +96,12 @@ class ThemesCommand extends GenerationCommand {
   String get label => 'theme';
 
   @override
-  Future<int> generate(List<String> paths, {required bool check}) =>
-      runThemes(paths, check: check, logger: cliLogger);
+  Future<int> generate(
+    List<String> paths, {
+    required bool check,
+    List<String>? indexPaths,
+  }) =>
+      runThemes(paths, check: check, logger: cliLogger, indexPaths: indexPaths);
 }
 
 /// `legend_gen docs` — the docs-manifest generator (RFC-002 R9).
@@ -107,8 +121,11 @@ class DocsCommand extends GenerationCommand {
   String get label => 'docs';
 
   @override
-  Future<int> generate(List<String> paths, {required bool check}) =>
-      runDocs(paths, check: check, logger: cliLogger);
+  Future<int> generate(
+    List<String> paths, {
+    required bool check,
+    List<String>? indexPaths,
+  }) => runDocs(paths, check: check, logger: cliLogger, indexPaths: indexPaths);
 }
 
 /// `legend_gen tokens` — the token-class mechanical-member generator
@@ -129,8 +146,11 @@ class TokensCommand extends GenerationCommand {
   String get label => 'token';
 
   @override
-  Future<int> generate(List<String> paths, {required bool check}) =>
-      runTokens(paths, check: check, logger: cliLogger);
+  Future<int> generate(
+    List<String> paths, {
+    required bool check,
+    List<String>? indexPaths,
+  }) => runTokens(paths, check: check, logger: cliLogger);
 }
 
 /// `legend_gen create <ClassName>` — scaffolds an annotated component from

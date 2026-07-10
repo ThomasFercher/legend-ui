@@ -49,6 +49,10 @@ void main() {
   final statefulChip = File(
     'test/fixtures/stateful_chip.dart',
   ).readAsStringSync();
+  Map<String, StyleClass> chipIndex() => {
+    for (final s in parseStyleClasses('stateful_chip.dart', statefulChip))
+      s.className: s,
+  };
 
   group('parser (@Style<T>, RFC-002 R10)', () {
     test('extracts the three default kinds and the lerp flag', () {
@@ -100,16 +104,47 @@ void main() {
       expect(outline.defaultDescription, 'null');
     });
 
-    test('recognizes LegendStates<T> fields with their inner type', () {
-      final widgets = parseThemableWidgets('stateful_chip.dart', statefulChip);
-      final background = widgets.single.fields.first;
-      expect(background.isStates, isTrue);
-      expect(background.statesInnerType, 'Color');
-      expect(background.resolvedType, 'LegendStates<Color>');
-      expect(
-        background.defaultDescription,
-        'LegendStates(normal: t.colors.primary)',
+    test('recognizes @Style() value-class fields through the index '
+        '(RFC-002 R6 amendment 7)', () {
+      final styles = parseStyleClasses('stateful_chip.dart', statefulChip);
+      expect(styles.single.className, 'ChipAccent');
+      expect(styles.single.fields.map((f) => f.name), [
+        'fill',
+        'outline',
+        'weight',
+      ]);
+      expect(styles.single.fields.first.doc, 'Fill behind the chip label.');
+
+      final widgets = parseThemableWidgets(
+        'stateful_chip.dart',
+        statefulChip,
+        styleClasses: {for (final s in styles) s.className: s},
       );
+      final accent = widgets.single.fields.first;
+      expect(accent.styleClass?.className, 'ChipAccent');
+      expect(accent.resolvedType, 'ChipAccent');
+      expect(accent.defaultDescription, 'ChipAccent(fill: t.colors.primary)');
+
+      // Without the index the same field parses as a plain opaque type
+      // (and lerp: true on it is rejected — covered below).
+      expect(
+        () => parseThemableWidgets('stateful_chip.dart', statefulChip),
+        throwsA(isA<LegendGenException>()),
+      );
+    });
+
+    test('detects the widget State class in the same file (R13)', () {
+      final styles = parseStyleClasses('stateful_chip.dart', statefulChip);
+      final widgets = parseThemableWidgets(
+        'stateful_chip.dart',
+        statefulChip,
+        styleClasses: {for (final s in styles) s.className: s},
+      );
+      expect(widgets.single.stateClassName, '_StatefulChipState');
+      expect(widgets.single.stateTypeParameters, isEmpty);
+
+      final none = parseThemableWidgets('fancy_box.dart', fancyBox);
+      expect(none.single.stateClassName, isNull);
     });
 
     test('extracts field dartdoc for the docs manifest (R9)', () {
@@ -333,8 +368,21 @@ class Bad {
     });
 
     test('stateful_chip emits the expected theme part file', () {
-      final widgets = parseThemableWidgets('stateful_chip.dart', statefulChip);
+      final widgets = parseThemableWidgets(
+        'stateful_chip.dart',
+        statefulChip,
+        styleClasses: chipIndex(),
+      );
       _matchGolden(emitThemeFile(widgets), 'stateful_chip.theme.g.dart.golden');
+    });
+
+    test('stateful_chip emits the expected style part file '
+        '(RFC-002 R6 amendment 7)', () {
+      final styles = parseStyleClasses('stateful_chip.dart', statefulChip);
+      _matchGolden(
+        emitStyleFile(styles, styleClasses: chipIndex()),
+        'stateful_chip.style.g.dart.golden',
+      );
     });
 
     test('emitted code is a part file with the full artifact set', () {
@@ -378,22 +426,73 @@ class Bad {
       expect(output, contains('Color.lerp(a.outline, b.outline, t),'));
     });
 
-    test('LegendStates<Color> fields merge member-wise and fill in of()', () {
+    test('style value class fields merge member-wise and lerp via the '
+        "class's own lerp static", () {
       final output = emitThemeFile(
-        parseThemableWidgets('stateful_chip.dart', statefulChip),
-      );
-      expect(
-        output,
-        contains('LegendStates.merge(background, other.background)'),
-      );
-      expect(output, contains('LegendStates.lerpWith('));
-      expect(output, contains('Color.lerp,'));
-      expect(
-        output,
-        contains(
-          'background: resolved.background.withDerived(data.tokens.states)',
+        parseThemableWidgets(
+          'stateful_chip.dart',
+          statefulChip,
+          styleClasses: chipIndex(),
         ),
       );
+      // Resolved theme (non-null field): instance merge, other wins.
+      expect(output, contains('accent: accent.merge(other.accent)'));
+      // Sparse theme: null receivers pass the other through.
+      expect(
+        output,
+        contains('accent: accent?.merge(other.accent) ?? other.accent'),
+      );
+      expect(output, contains('ChipAccent.lerp(a.accent, b.accent, t)!'));
+      // The withDerived post-hook is gone (RFC-002 R6 amendment 7) —
+      // derivation now happens at pick/resolve call sites only.
+      expect(output, isNot(contains('withDerived')));
+    });
+
+    test('style part: member-wise merge/==/lerp with the type-appropriate '
+        'lerper table', () {
+      final output = emitStyleFile(
+        parseStyleClasses('stateful_chip.dart', statefulChip),
+        styleClasses: chipIndex(),
+      );
+      expect(output, contains("part of 'stateful_chip.dart';"));
+      expect(output, contains(r'mixin _$ChipAccent {'));
+      expect(output, contains('ChipAccent merge(ChipAccent? other)'));
+      expect(output, contains('fill: other.fill ?? _self.fill,'));
+      expect(output, contains('bool operator ==(Object other)'));
+      expect(output, contains('Color.lerp(a?.fill, b?.fill, t)'));
+      expect(
+        output,
+        contains(r'_$ChipAccentLerpDouble(a?.weight, b?.weight, t)'),
+      );
+      expect(output, isNot(contains('lerpDouble(')));
+    });
+
+    test('nested style classes lerp via their own lerp static', () {
+      const source = r'''
+import 'package:legend_ui/legend_ui.dart';
+
+part 'nested.style.g.dart';
+
+@Style()
+class Inner with _$Inner {
+  const Inner({this.fill});
+  final Color? fill;
+  static Inner? lerp(Inner? a, Inner? b, double t) => _$InnerLerp(a, b, t);
+}
+
+@Style()
+class Outer with _$Outer {
+  const Outer({this.inner});
+  final Inner? inner;
+  static Outer? lerp(Outer? a, Outer? b, double t) => _$OuterLerp(a, b, t);
+}
+''';
+      final styles = parseStyleClasses('nested.dart', source);
+      final output = emitStyleFile(
+        styles,
+        styleClasses: {for (final s in styles) s.className: s},
+      );
+      expect(output, contains('inner: Inner.lerp(a?.inner, b?.inner, t)'));
     });
   });
 
@@ -418,25 +517,52 @@ class Bad {
       expect(output, contains("owner: 'FancyBox'"));
     });
 
-    test('LegendStates fields emit one extra entry per state member', () {
+    test('stateful_chip emits the expected docs manifest (style class + '
+        'widget)', () {
       final output = emitDocsFile(
-        parseThemableWidgets('stateful_chip.dart', statefulChip),
-      );
-      for (final member in [
-        'background.normal',
-        'background.hovered',
-        'background.pressed',
-        'background.focused',
-        'background.disabled',
-      ]) {
-        expect(output, contains("name: '$member'"));
-      }
-      expect(
-        output,
-        contains(
-          "defaultDescription: 'LegendStates(normal: t.colors.primary)'",
+        parseDocsDeclarations(
+          'stateful_chip.dart',
+          statefulChip,
+          styleClasses: chipIndex(),
         ),
       );
+      _matchGolden(output, 'stateful_chip.docs.g.dart.golden');
+    });
+
+    test('style-value-class fields emit one dot-path entry per member '
+        '(RFC-002 R6 amendment 7)', () {
+      final output = emitDocsFile(
+        parseDocsDeclarations(
+          'stateful_chip.dart',
+          statefulChip,
+          styleClasses: chipIndex(),
+        ),
+      );
+      for (final member in ['accent.fill', 'accent.outline', 'accent.weight']) {
+        expect(output, contains("name: '$member'"));
+      }
+      // Member entries carry the member's own dartdoc.
+      expect(output, contains("doc: 'Fill behind the chip label.'"));
+      expect(
+        output,
+        contains("defaultDescription: 'ChipAccent(fill: t.colors.primary)'"),
+      );
+    });
+
+    test("the style class file gets its own group: 'style' manifest", () {
+      final output = emitDocsFile(
+        parseDocsDeclarations(
+          'stateful_chip.dart',
+          statefulChip,
+          styleClasses: chipIndex(),
+        ),
+      );
+      expect(
+        output,
+        contains('const List<LegendDocEntry> chipAccentDocEntries'),
+      );
+      expect(output, contains("owner: 'ChipAccent'"));
+      expect(output, contains("group: 'style'"));
     });
   });
 
@@ -497,7 +623,7 @@ class Bad {
             'function',
           ),
           contains('declare "Color _missing(LegendTokens t) => …;"'),
-          contains('LegendColorsRef.primary'),
+          contains('ColorRef.primary'),
         ),
       );
     });
@@ -533,6 +659,151 @@ class Bad {
 }
 '''),
         contains('change the annotation to @Style<Color>'),
+      );
+    });
+  });
+
+  group('@Style() class-form contract (RFC-002 R6 amendment 7)', () {
+    void expectStyleDiagnostic(String body, Matcher matcher) {
+      expect(
+        () => parseStyleClasses('bad.dart', '''
+import 'package:legend_ui/legend_ui.dart';
+
+part 'bad.style.g.dart';
+
+$body
+'''),
+        throwsA(
+          isA<LegendGenException>().having(
+            (e) => e.diagnostics.single.toString(),
+            'diagnostic',
+            matcher,
+          ),
+        ),
+      );
+    }
+
+    test('the class form takes no value, resolve, flags, or type '
+        'argument', () {
+      expectStyleDiagnostic(r'''
+@Style(Color(0xFF000000))
+class Bad with _$Bad {
+  const Bad({this.fill});
+  final Color? fill;
+  static Bad? lerp(Bad? a, Bad? b, double t) => _$BadLerp(a, b, t);
+}
+''', allOf(contains('bad.dart:5'), contains('exactly @Style()')));
+      expectStyleDiagnostic(r'''
+@Style<Color>()
+class Bad with _$Bad {
+  const Bad({this.fill});
+  final Color? fill;
+  static Bad? lerp(Bad? a, Bad? b, double t) => _$BadLerp(a, b, t);
+}
+''', contains('takes no value, resolve tear-off, flags, or type argument'));
+    });
+
+    test('rejects double-marking with @LegendThemeable', () {
+      expectStyleDiagnostic(r'''
+@LegendThemeable()
+@Style()
+class Bad with _$Bad {
+  const Bad({this.fill});
+  final Color? fill;
+  static Bad? lerp(Bad? a, Bad? b, double t) => _$BadLerp(a, b, t);
+}
+''', contains('keep exactly one marker'));
+    });
+
+    test('members must be final, typed, and nullable', () {
+      expectStyleDiagnostic(r'''
+@Style()
+class Bad with _$Bad {
+  const Bad({this.fill});
+  final Color fill;
+  static Bad? lerp(Bad? a, Bad? b, double t) => _$BadLerp(a, b, t);
+}
+''', allOf(contains('must be nullable'), contains('sparse')));
+    });
+
+    test('constructor must be const with every member as a named '
+        'null-defaulted parameter', () {
+      expectStyleDiagnostic(r'''
+@Style()
+class Bad with _$Bad {
+  const Bad({this.fill});
+  final Color? fill;
+  final Color? outline;
+  static Bad? lerp(Bad? a, Bad? b, double t) => _$BadLerp(a, b, t);
+}
+''', contains('missing the named parameter "this.outline"'));
+      expectStyleDiagnostic(r'''
+@Style()
+class Bad with _$Bad {
+  const Bad({this.fill = const Color(0xFF000000)});
+  final Color? fill;
+  static Bad? lerp(Bad? a, Bad? b, double t) => _$BadLerp(a, b, t);
+}
+''', contains('has a non-null default'));
+    });
+
+    test('the generated mixin and the lerp redirect must be applied, '
+        'with the fix named', () {
+      expectStyleDiagnostic(r'''
+@Style()
+class Bad {
+  const Bad({this.fill});
+  final Color? fill;
+  static Bad? lerp(Bad? a, Bad? b, double t) => _$BadLerp(a, b, t);
+}
+''', contains(r'add `with _$Bad`'));
+      expectStyleDiagnostic(r'''
+@Style()
+class Bad with _$Bad {
+  const Bad({this.fill});
+  final Color? fill;
+}
+''', allOf(contains('missing its lerp redirect'), contains(r'_$BadLerp')));
+    });
+
+    test('requires the style part directive', () {
+      expect(
+        () => parseStyleClasses('bad.dart', r'''
+import 'package:legend_ui/legend_ui.dart';
+
+@Style()
+class Bad with _$Bad {
+  const Bad({this.fill});
+  final Color? fill;
+  static Bad? lerp(Bad? a, Bad? b, double t) => _$BadLerp(a, b, t);
+}
+'''),
+        throwsA(
+          isA<LegendGenException>().having(
+            (e) => e.diagnostics.single.toString(),
+            'diagnostic',
+            contains("missing `part 'bad.style.g.dart';`"),
+          ),
+        ),
+      );
+    });
+
+    test('lerp: true on an unindexed opaque type still diagnoses', () {
+      _expectSingleDiagnostic(
+        _widgetFile('''
+@LegendThemeable()
+class Bad {
+  const Bad({this.accent});
+
+  @Style<UnknownThing>.resolve(_accent, lerp: true)
+  final UnknownThing? accent;
+  static UnknownThing _accent(LegendTokens t) => UnknownThing();
+}
+'''),
+        allOf(
+          contains('lerp: true on "accent" is not supported'),
+          contains('style value classes'),
+        ),
       );
     });
   });

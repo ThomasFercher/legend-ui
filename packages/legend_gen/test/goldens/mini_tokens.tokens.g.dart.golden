@@ -47,14 +47,21 @@ mixin _$MiniTokens {
 
 /// Member-wise lerp for [MiniTokens]; the public [MiniTokens.lerp]
 /// redirects here (part of the one token lerp a theme switch
-/// pays, DESIGN.md §2.4).
-MiniTokens _$MiniTokensLerp(MiniTokens a, MiniTokens b, double t) => MiniTokens(
-  accent: Color.lerp(a.accent, b.accent, t)!,
-  gap: a.gap == b.gap ? a.gap : a.gap * (1.0 - t) + b.gap * t,
-  label: TextStyle.lerp(a.label, b.label, t)!,
-  glow: BoxShadow.lerpList(a.glow, b.glow, t)!,
-  nested: MiniNested.lerp(a.nested, b.nested, t),
-);
+/// pays, DESIGN.md §2.4). Identical endpoints short-circuit
+/// to the same instance (RFC-002 R12 amendment): sub-objects
+/// shared between theme poles stay identity-stable through
+/// an animation, so per-field rebuild comparators never
+/// re-diff unchanged token groups.
+MiniTokens _$MiniTokensLerp(MiniTokens a, MiniTokens b, double t) {
+  if (identical(a, b)) return a;
+  return MiniTokens(
+    accent: Color.lerp(a.accent, b.accent, t)!,
+    gap: a.gap == b.gap ? a.gap : a.gap * (1.0 - t) + b.gap * t,
+    label: TextStyle.lerp(a.label, b.label, t)!,
+    glow: BoxShadow.lerpList(a.glow, b.glow, t)!,
+    nested: MiniNested.lerp(a.nested, b.nested, t),
+  );
+}
 
 /// Const tear-off catalog for [MiniTokens] (RFC-002 R10
 /// amendment): one static per token field, usable directly
@@ -99,10 +106,19 @@ mixin _$MiniNested {
 
 /// Member-wise lerp for [MiniNested]; the public [MiniNested.lerp]
 /// redirects here (part of the one token lerp a theme switch
-/// pays, DESIGN.md §2.4).
-MiniNested _$MiniNestedLerp(MiniNested a, MiniNested b, double t) => MiniNested(
-  amount: a.amount == b.amount ? a.amount : a.amount * (1.0 - t) + b.amount * t,
-);
+/// pays, DESIGN.md §2.4). Identical endpoints short-circuit
+/// to the same instance (RFC-002 R12 amendment): sub-objects
+/// shared between theme poles stay identity-stable through
+/// an animation, so per-field rebuild comparators never
+/// re-diff unchanged token groups.
+MiniNested _$MiniNestedLerp(MiniNested a, MiniNested b, double t) {
+  if (identical(a, b)) return a;
+  return MiniNested(
+    amount: a.amount == b.amount
+        ? a.amount
+        : a.amount * (1.0 - t) + b.amount * t,
+  );
+}
 
 /// Const tear-off catalog for [MiniNested] (RFC-002 R10
 /// amendment): one static per token field, usable directly

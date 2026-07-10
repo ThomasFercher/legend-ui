@@ -21,6 +21,8 @@ class StyledField {
     required this.defaultCode,
     required this.defaultDescription,
     required this.lerp,
+    this.listen = true,
+    this.styleClass,
     this.doc = '',
   });
 
@@ -38,18 +40,14 @@ class StyledField {
   /// a default, the declared nullable type when it is genuinely optional.
   String get themeType => kind == StyleDefaultKind.none ? type : resolvedType;
 
-  /// Whether this is a `LegendStates<X>` field (RFC-002 R6): the emitter
-  /// merges it member-wise sparse and lerps member-wise instead of
-  /// whole-value.
-  bool get isStates => statesInnerType != null;
-
-  /// `X` for a `LegendStates<X>` field, else null.
-  String? get statesInnerType {
-    final resolved = resolvedType;
-    const prefix = 'LegendStates<';
-    if (!resolved.startsWith(prefix) || !resolved.endsWith('>')) return null;
-    return resolved.substring(prefix.length, resolved.length - 1).trim();
-  }
+  /// The `@Style()`-annotated style value class this field is typed with
+  /// (RFC-002 R6 amendment 7), or null for a plain field. Set when the
+  /// field's non-null type resolves to a style class in the run's index
+  /// (same-run sources plus [builtinStyleClasses]); the emitter then
+  /// merges member-wise sparse (via the class's generated `merge`), lerps
+  /// via the class's `lerp` static, and the docs manifest lists one entry
+  /// per member (`background.hovered`).
+  final StyleClass? styleClass;
 
   /// How the default is declared.
   final StyleDefaultKind kind;
@@ -67,6 +65,11 @@ class StyledField {
   /// Whether `XTheme.lerp` interpolates this field (else it steps at t=0.5).
   final bool lerp;
 
+  /// Whether the generated resolver registers a rebuild aspect for this
+  /// field (RFC-002 R12). `listen: false` fields resolve fresh on every
+  /// build but register no dependency.
+  final bool listen;
+
   /// The field's dartdoc text with `///` markers stripped (empty when the
   /// field carries no doc comment) — the `legend_gen docs` content
   /// (RFC-002 R9).
@@ -75,6 +78,8 @@ class StyledField {
 
 /// Plain types the emitter can interpolate — `lerp: true` on anything else
 /// is a parse-time error instead of a silent step-fallback (review M4).
+/// Fields typed with a `@Style()` class are additionally lerpable through
+/// the class's own `lerp` static (RFC-002 R6 amendment 7).
 const lerpableTypes = {
   'double',
   'Color',
@@ -84,20 +89,29 @@ const lerpableTypes = {
   'TextStyle',
 };
 
-/// `LegendStates<X>` inner types the emitter can interpolate member-wise.
-const lerpableStatesInnerTypes = {'Color', 'double'};
-
 /// A `@LegendThemeable` widget class parsed from one source file.
 class ThemableWidget {
   const ThemableWidget({
     required this.className,
     required this.fields,
     required this.sourceBasename,
+    this.stateClassName,
+    this.stateTypeParameters = '',
     this.line = 1,
   });
 
   final String className;
   final List<StyledField> fields;
+
+  /// The widget's `State` class when it is unambiguously detected in the
+  /// same file (`class _XState extends State<X>`), else null (not found or
+  /// ambiguous — RFC-002 R13). Non-null makes the emitter add the
+  /// `theme` getter extension on the State class.
+  final String? stateClassName;
+
+  /// The detected State class's type parameter list source (e.g. `<T>`),
+  /// empty when it has none — re-declared on the generated extension.
+  final String stateTypeParameters;
 
   /// 1-based line of the class name in the source file (for diagnostics).
   final int line;
@@ -106,6 +120,95 @@ class ThemableWidget {
   /// target of the emitted `part of` directive.
   final String sourceBasename;
 }
+
+/// A member of a `@Style()` style value class (RFC-002 R6 amendment 7).
+class StyleClassField {
+  const StyleClassField({
+    required this.name,
+    required this.type,
+    this.doc = '',
+  });
+
+  /// Member name, e.g. `hovered`.
+  final String name;
+
+  /// Declared (nullable) type source, e.g. `Color?`.
+  final String type;
+
+  /// Non-null type, e.g. `Color`.
+  String get resolvedType =>
+      type.endsWith('?') ? type.substring(0, type.length - 1) : type;
+
+  /// The member's dartdoc text (empty when undocumented) — surfaces in the
+  /// docs manifests (RFC-002 R9).
+  final String doc;
+}
+
+/// A `@Style()`-annotated style value class parsed from one source file
+/// (RFC-002 R6 amendment 7): a pure-data bundle of themed members whose
+/// mechanical members (member-wise sparse `merge`, member-wise lerp, value
+/// `==`/`hashCode`) are generated into a `<file>.style.g.dart` part.
+/// Explicitly NOT a [ThemableWidget]: style classes never get Override
+/// widgets, registry entries, or `of()` resolvers — they are value types
+/// carried BY widget theme fields.
+class StyleClass {
+  const StyleClass({
+    required this.className,
+    required this.fields,
+    required this.sourceBasename,
+    this.line = 1,
+  });
+
+  final String className;
+  final List<StyleClassField> fields;
+
+  /// 1-based line of the class name in the source file (for diagnostics).
+  final int line;
+
+  /// Basename of the source file, e.g. `interactive_colors.dart` — the
+  /// target of the emitted `part of` directive.
+  final String sourceBasename;
+}
+
+/// The kit's predefined style classes, compiled into the CLI so a consumer
+/// project's widgets get member-wise treatment for fields typed with them
+/// without the CLI scanning the kit's sources (generation stays strictly
+/// one-file-in/one-file-out; CLI↔kit version lock-step is enforced by the
+/// `doctor` pin, RFC-002 R11.4). Same-run declarations win on a name
+/// clash.
+const Map<String, StyleClass> builtinStyleClasses = {
+  'InteractiveColors': StyleClass(
+    className: 'InteractiveColors',
+    sourceBasename: 'interactive_colors.dart',
+    fields: [
+      StyleClassField(
+        name: 'normal',
+        type: 'Color?',
+        doc: 'Fill at rest (and the base unset members fall back to).',
+      ),
+      StyleClassField(
+        name: 'hovered',
+        type: 'Color?',
+        doc: 'Fill while a pointer hovers the widget.',
+      ),
+      StyleClassField(
+        name: 'pressed',
+        type: 'Color?',
+        doc: 'Fill while the widget is actively pressed.',
+      ),
+      StyleClassField(
+        name: 'focused',
+        type: 'Color?',
+        doc: 'Fill while the widget holds keyboard focus.',
+      ),
+      StyleClassField(
+        name: 'disabled',
+        type: 'Color?',
+        doc: 'Fill while the widget is disabled.',
+      ),
+    ],
+  ),
+};
 
 /// A final instance field of a `@LegendTokenData` class (RFC-002 R5).
 class TokenField {

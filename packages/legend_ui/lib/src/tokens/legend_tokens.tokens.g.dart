@@ -47,15 +47,21 @@ mixin _$LegendTokens {
 
 /// Member-wise lerp for [LegendTokens]; the public [LegendTokens.lerp]
 /// redirects here (part of the one token lerp a theme switch
-/// pays, DESIGN.md §2.4).
-LegendTokens _$LegendTokensLerp(LegendTokens a, LegendTokens b, double t) =>
-    LegendTokens(
-      colors: LegendColors.lerp(a.colors, b.colors, t),
-      sizes: LegendSizes.lerp(a.sizes, b.sizes, t),
-      typography: LegendTypography.lerp(a.typography, b.typography, t),
-      shadows: LegendShadows.lerp(a.shadows, b.shadows, t),
-      states: LegendStateOverlays.lerp(a.states, b.states, t),
-    );
+/// pays, DESIGN.md §2.4). Identical endpoints short-circuit
+/// to the same instance (RFC-002 R12 amendment): sub-objects
+/// shared between theme poles stay identity-stable through
+/// an animation, so per-field rebuild comparators never
+/// re-diff unchanged token groups.
+LegendTokens _$LegendTokensLerp(LegendTokens a, LegendTokens b, double t) {
+  if (identical(a, b)) return a;
+  return LegendTokens(
+    colors: LegendColors.lerp(a.colors, b.colors, t),
+    sizes: LegendSizes.lerp(a.sizes, b.sizes, t),
+    typography: LegendTypography.lerp(a.typography, b.typography, t),
+    shadows: LegendShadows.lerp(a.shadows, b.shadows, t),
+    states: LegendStateOverlays.lerp(a.states, b.states, t),
+  );
+}
 
 /// Const tear-off catalog for [LegendTokens] (RFC-002 R10
 /// amendment): one static per token field, usable directly
