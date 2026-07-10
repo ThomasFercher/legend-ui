@@ -2,8 +2,9 @@
 //
 // These tests were written against the PRE-conversion behavior (hand-rolled
 // `states.hovered ? … : …` builders) and pin the exact color every
-// representative interaction state produced. The `LegendStates<Color>`
-// conversion must keep every pin green — zero visual drift.
+// representative interaction state produced. The per-state conversion —
+// `LegendStates<Color>` in Phase C, `InteractiveColors` since RFC-002 R6
+// amendment 7 — must keep every pin green — zero visual drift.
 import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
@@ -420,7 +421,7 @@ void main() {
     const navy = Color(0xFF001F54);
     final finder = find.byType(PrimaryLegendButton);
 
-    Widget app({LegendStates<Color>? background, Color? param}) {
+    Widget app({InteractiveColors? background, Color? param}) {
       return LegendTheme(
         data: LegendThemeData(
           tokens: _tokens,
@@ -447,7 +448,7 @@ void main() {
     testWidgets('naming only `pressed` restyles the pressed state and '
         'inherits every other member', (tester) async {
       await tester.pumpWidget(
-        app(background: const LegendStates(pressed: navy)),
+        app(background: const InteractiveColors(pressed: navy)),
       );
       expect(_buttonDecoration(tester, finder).color, _colors.primary);
 
@@ -471,18 +472,25 @@ void main() {
     });
 
     testWidgets('an unnamed member derives from the resolved normal via the '
-        'token overlays (withDerived)', (tester) async {
-      // Override that names ONLY normal-like members: replace the whole
-      // container so hovered is genuinely unset at every level. That is
-      // only possible for a consumer widget default; for the kit button the
-      // override merges over the fully-named default, so instead pin the
-      // container-level behavior directly.
-      const sparse = LegendStates<Color>(normal: navy);
-      final derived = sparse.withDerived(_tokens.states);
-      expect(derived.hovered, _tokens.states.hovered(navy));
-      expect(derived.pressed, _tokens.states.pressed(navy));
-      expect(derived.disabled, _tokens.states.disabled(navy));
-      expect(derived.focused, navy);
+        'token overlays (resolve)', (tester) async {
+      // Derivation happens at pick/resolve call sites since RFC-002 R6
+      // amendment 7 (the of() withDerived post-hook is deleted): an
+      // InteractiveColors that names only `normal` resolves its other
+      // states through the token overlays — named members always win.
+      const sparse = InteractiveColors(normal: navy);
+      expect(
+        sparse.resolve(const LegendStateHovered(), _tokens.states),
+        _tokens.states.hovered(navy),
+      );
+      expect(
+        sparse.resolve(const LegendStatePressed(), _tokens.states),
+        _tokens.states.pressed(navy),
+      );
+      expect(
+        sparse.resolve(const LegendStateDisabled(), _tokens.states),
+        _tokens.states.disabled(navy),
+      );
+      expect(sparse.resolve(const LegendStateFocused(), _tokens.states), navy);
     });
   });
 }

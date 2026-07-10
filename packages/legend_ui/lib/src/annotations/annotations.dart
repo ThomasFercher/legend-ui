@@ -1,4 +1,5 @@
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
+import 'package:meta/meta.dart';
 import 'package:meta/meta_meta.dart';
 
 /// Marks a widget as themable — `legend_gen themes` generates its theme
@@ -44,7 +45,7 @@ class LegendThemeable {
 ///   catalog's parameter type; an in-package circular import is fine).
 @Target({TargetKind.classType})
 class LegendTokenData {
-  const LegendTokenData({this.mountedAt});
+  const LegendTokenData({this.mountedAt, this.refName});
 
   /// The [LegendTokens] getter this class sits behind — `'colors'`,
   /// `'sizes'`, `'typography'`, `'shadows'`, or `'states'` for the kit's
@@ -58,6 +59,14 @@ class LegendTokenData {
   /// Null (the default) skips the Ref catalog — for nested groups a
   /// consumer never styles against.
   final String? mountedAt;
+
+  /// The name of the emitted Ref catalog class. Null (the default) uses
+  /// `<ClassName>Ref`; an explicit name overrides it — the kit sets short
+  /// names (`ColorRef`, `SizeRef`, `TextRef`, `ShadowRef`, `StateRef`,
+  /// `TokenRef`) because annotation ubiquity earns terseness (a
+  /// **documented exception** to the Legend-prefix rule; still an explicit
+  /// declaration, never a naming convention). Ignored without [mountedAt].
+  final String? refName;
 }
 
 /// Marks a field of a [LegendThemeable] widget as a themed property and
@@ -76,7 +85,7 @@ class LegendTokenData {
 ///   ordinary symbol. Two tear-off shapes (Dart's const rules allow
 ///   exactly these):
 ///   - a **Ref catalog member** for the common one-hop token read —
-///     `@Style<double>.resolve(LegendSizesRef.md)`; the catalogs are
+///     `@Style<double>.resolve(SizeRef.md)`; the catalogs are
 ///     generated from the token classes ([LegendTokenData.mountedAt]),
 ///     so no adjacent hand-written static is needed;
 ///   - a **private top-level function** (or a static method) in the
@@ -89,15 +98,52 @@ class LegendTokenData {
 ///
 /// The generic type argument is required and must match the field's
 /// declared (non-null) type; the generator validates it from the AST.
-@Target({TargetKind.field})
+///
+/// ## Class form (RFC-002 R6 amendment 7)
+///
+/// `@Style()` on a CLASS marks a **style value class** — a pure-data,
+/// user-extensible bundle of themed members (the kit's `InteractiveColors`
+/// is one; consumers define their own). `legend_gen themes` generates the
+/// mechanical members into a `<file>.style.g.dart` part: a member-wise
+/// sparse `merge` plus value `==`/`hashCode` as a `_$ClassName` mixin the
+/// class applies, and the member-wise `_$ClassNameLerp` function (with the
+/// type-appropriate lerper per member; nested style classes lerp via their
+/// own `lerp` static) that the class's one-line `static lerp` redirects to.
+///
+/// A `@Style<T>` FIELD whose `T` is a style value class gets **member-wise
+/// treatment** in the widget's generated theme artifacts: every member is
+/// an individually overridable variable at every resolution level, and the
+/// docs manifest lists each member as a dot-path (`background.hovered`).
+///
+/// Contract for the class form (enforced by the generator):
+/// - the class form takes no default and no flags — write exactly
+///   `@Style()` (defaults belong on the widget fields typed with it),
+/// - every instance field is `final`, explicitly typed and nullable,
+/// - the const unnamed constructor takes every field as a named parameter,
+/// - the class applies the generated mixin (`with _$ClassName`) and
+///   redirects `static ClassName? lerp(ClassName? a, ClassName? b,
+///   double t) => _$ClassNameLerp(a, b, t);`,
+/// - the file carries `part '<file>.style.g.dart';`.
+@Target({TargetKind.field, TargetKind.classType})
+@optionalTypeArgs
 class Style<T> {
-  /// A const default value (or `null` for "genuinely optional").
-  const Style(this.value, {this.lerp = false}) : resolve = null;
+  /// A const default value (`@Style<T>(v)`), `null` for "genuinely
+  /// optional" (`@Style<T>(null)`) — or, with no argument, the CLASS form
+  /// (`@Style()`). Dart allows no named flags next to an optional
+  /// positional; use [Style.value] when a const-value field needs flags.
+  const Style([this.value]) : resolve = null, lerp = false, listen = true;
+
+  /// The const-value form with flags — semantically identical to the
+  /// unnamed form, spelled as a named constructor because Dart forbids
+  /// named parameters beside an optional positional one.
+  const Style.value(this.value, {this.lerp = false, this.listen = true})
+    : resolve = null;
 
   /// An author-defined relation to the tokens: a const tear-off
   /// `T Function(LegendTokens)`, evaluated by the generated
   /// `XTheme.defaults(LegendTokens t)`.
-  const Style.resolve(this.resolve, {this.lerp = false}) : value = null;
+  const Style.resolve(this.resolve, {this.lerp = false, this.listen = true})
+    : value = null;
 
   /// The typed const default ("without theme"), for the value form.
   final T? value;
@@ -108,4 +154,12 @@ class Style<T> {
   /// Whether `XTheme.lerp` interpolates this field (opt-in; most fields
   /// step, since theme switches lerp tokens instead — DESIGN.md §2.4).
   final bool lerp;
+
+  /// Whether the generated resolver registers a rebuild dependency for
+  /// this field (RFC-002 R12). Default true: a theme change that alters
+  /// this field's resolved value rebuilds the widget. With `listen: false`
+  /// the field still resolves fresh on every build but never *causes* a
+  /// rebuild by itself — for values consumed by imperative code (painters,
+  /// controllers) or deliberately latched until the next build.
+  final bool listen;
 }

@@ -79,40 +79,49 @@ mixin _$LegendSizes {
 
 /// Member-wise lerp for [LegendSizes]; the public [LegendSizes.lerp]
 /// redirects here (part of the one token lerp a theme switch
-/// pays, DESIGN.md §2.4).
-LegendSizes _$LegendSizesLerp(
-  LegendSizes a,
-  LegendSizes b,
-  double t,
-) => LegendSizes(
-  xs: a.xs == b.xs ? a.xs : a.xs * (1.0 - t) + b.xs * t,
-  sm: a.sm == b.sm ? a.sm : a.sm * (1.0 - t) + b.sm * t,
-  md: a.md == b.md ? a.md : a.md * (1.0 - t) + b.md * t,
-  lg: a.lg == b.lg ? a.lg : a.lg * (1.0 - t) + b.lg * t,
-  xl: a.xl == b.xl ? a.xl : a.xl * (1.0 - t) + b.xl * t,
-  xxl: a.xxl == b.xxl ? a.xxl : a.xxl * (1.0 - t) + b.xxl * t,
-  radiusSm: a.radiusSm == b.radiusSm
-      ? a.radiusSm
-      : a.radiusSm * (1.0 - t) + b.radiusSm * t,
-  radiusMd: a.radiusMd == b.radiusMd
-      ? a.radiusMd
-      : a.radiusMd * (1.0 - t) + b.radiusMd * t,
-  radiusLg: a.radiusLg == b.radiusLg
-      ? a.radiusLg
-      : a.radiusLg * (1.0 - t) + b.radiusLg * t,
-  borderWidth: a.borderWidth == b.borderWidth
-      ? a.borderWidth
-      : a.borderWidth * (1.0 - t) + b.borderWidth * t,
-  iconSm: a.iconSm == b.iconSm ? a.iconSm : a.iconSm * (1.0 - t) + b.iconSm * t,
-  iconMd: a.iconMd == b.iconMd ? a.iconMd : a.iconMd * (1.0 - t) + b.iconMd * t,
-  iconLg: a.iconLg == b.iconLg ? a.iconLg : a.iconLg * (1.0 - t) + b.iconLg * t,
-);
+/// pays, DESIGN.md §2.4). Identical endpoints short-circuit
+/// to the same instance (RFC-002 R12 amendment): sub-objects
+/// shared between theme poles stay identity-stable through
+/// an animation, so per-field rebuild comparators never
+/// re-diff unchanged token groups.
+LegendSizes _$LegendSizesLerp(LegendSizes a, LegendSizes b, double t) {
+  if (identical(a, b)) return a;
+  return LegendSizes(
+    xs: a.xs == b.xs ? a.xs : a.xs * (1.0 - t) + b.xs * t,
+    sm: a.sm == b.sm ? a.sm : a.sm * (1.0 - t) + b.sm * t,
+    md: a.md == b.md ? a.md : a.md * (1.0 - t) + b.md * t,
+    lg: a.lg == b.lg ? a.lg : a.lg * (1.0 - t) + b.lg * t,
+    xl: a.xl == b.xl ? a.xl : a.xl * (1.0 - t) + b.xl * t,
+    xxl: a.xxl == b.xxl ? a.xxl : a.xxl * (1.0 - t) + b.xxl * t,
+    radiusSm: a.radiusSm == b.radiusSm
+        ? a.radiusSm
+        : a.radiusSm * (1.0 - t) + b.radiusSm * t,
+    radiusMd: a.radiusMd == b.radiusMd
+        ? a.radiusMd
+        : a.radiusMd * (1.0 - t) + b.radiusMd * t,
+    radiusLg: a.radiusLg == b.radiusLg
+        ? a.radiusLg
+        : a.radiusLg * (1.0 - t) + b.radiusLg * t,
+    borderWidth: a.borderWidth == b.borderWidth
+        ? a.borderWidth
+        : a.borderWidth * (1.0 - t) + b.borderWidth * t,
+    iconSm: a.iconSm == b.iconSm
+        ? a.iconSm
+        : a.iconSm * (1.0 - t) + b.iconSm * t,
+    iconMd: a.iconMd == b.iconMd
+        ? a.iconMd
+        : a.iconMd * (1.0 - t) + b.iconMd * t,
+    iconLg: a.iconLg == b.iconLg
+        ? a.iconLg
+        : a.iconLg * (1.0 - t) + b.iconLg * t,
+  );
+}
 
 /// Const tear-off catalog for [LegendSizes] (RFC-002 R10
 /// amendment): one static per token field, usable directly
 /// inside `@Style<T>.resolve` annotations —
-/// `@Style<double>.resolve(LegendSizesRef.xs)`.
-abstract final class LegendSizesRef {
+/// `@Style<double>.resolve(SizeRef.xs)`.
+abstract final class SizeRef {
   /// Extra-small spacing step (tight gaps, chip padding).
   static double xs(LegendTokens t) => t.sizes.xs;
 

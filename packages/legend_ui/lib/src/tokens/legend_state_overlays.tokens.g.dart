@@ -39,28 +39,35 @@ mixin _$LegendStateOverlays {
 
 /// Member-wise lerp for [LegendStateOverlays]; the public [LegendStateOverlays.lerp]
 /// redirects here (part of the one token lerp a theme switch
-/// pays, DESIGN.md §2.4).
+/// pays, DESIGN.md §2.4). Identical endpoints short-circuit
+/// to the same instance (RFC-002 R12 amendment): sub-objects
+/// shared between theme poles stay identity-stable through
+/// an animation, so per-field rebuild comparators never
+/// re-diff unchanged token groups.
 LegendStateOverlays _$LegendStateOverlaysLerp(
   LegendStateOverlays a,
   LegendStateOverlays b,
   double t,
-) => LegendStateOverlays(
-  hoverAmount: a.hoverAmount == b.hoverAmount
-      ? a.hoverAmount
-      : a.hoverAmount * (1.0 - t) + b.hoverAmount * t,
-  pressAmount: a.pressAmount == b.pressAmount
-      ? a.pressAmount
-      : a.pressAmount * (1.0 - t) + b.pressAmount * t,
-  disabledOpacity: a.disabledOpacity == b.disabledOpacity
-      ? a.disabledOpacity
-      : a.disabledOpacity * (1.0 - t) + b.disabledOpacity * t,
-);
+) {
+  if (identical(a, b)) return a;
+  return LegendStateOverlays(
+    hoverAmount: a.hoverAmount == b.hoverAmount
+        ? a.hoverAmount
+        : a.hoverAmount * (1.0 - t) + b.hoverAmount * t,
+    pressAmount: a.pressAmount == b.pressAmount
+        ? a.pressAmount
+        : a.pressAmount * (1.0 - t) + b.pressAmount * t,
+    disabledOpacity: a.disabledOpacity == b.disabledOpacity
+        ? a.disabledOpacity
+        : a.disabledOpacity * (1.0 - t) + b.disabledOpacity * t,
+  );
+}
 
 /// Const tear-off catalog for [LegendStateOverlays] (RFC-002 R10
 /// amendment): one static per token field, usable directly
 /// inside `@Style<T>.resolve` annotations —
-/// `@Style<double>.resolve(LegendStateOverlaysRef.hoverAmount)`.
-abstract final class LegendStateOverlaysRef {
+/// `@Style<double>.resolve(StateRef.hoverAmount)`.
+abstract final class StateRef {
   /// How far [hovered] shifts the base toward black/white (0–1).
   static double hoverAmount(LegendTokens t) => t.states.hoverAmount;
 

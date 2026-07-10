@@ -51,25 +51,32 @@ mixin _$LegendTypography {
 
 /// Member-wise lerp for [LegendTypography]; the public [LegendTypography.lerp]
 /// redirects here (part of the one token lerp a theme switch
-/// pays, DESIGN.md §2.4).
+/// pays, DESIGN.md §2.4). Identical endpoints short-circuit
+/// to the same instance (RFC-002 R12 amendment): sub-objects
+/// shared between theme poles stay identity-stable through
+/// an animation, so per-field rebuild comparators never
+/// re-diff unchanged token groups.
 LegendTypography _$LegendTypographyLerp(
   LegendTypography a,
   LegendTypography b,
   double t,
-) => LegendTypography(
-  h1: TextStyle.lerp(a.h1, b.h1, t)!,
-  h2: TextStyle.lerp(a.h2, b.h2, t)!,
-  h3: TextStyle.lerp(a.h3, b.h3, t)!,
-  b1: TextStyle.lerp(a.b1, b.b1, t)!,
-  b2: TextStyle.lerp(a.b2, b.b2, t)!,
-  b3: TextStyle.lerp(a.b3, b.b3, t)!,
-);
+) {
+  if (identical(a, b)) return a;
+  return LegendTypography(
+    h1: TextStyle.lerp(a.h1, b.h1, t)!,
+    h2: TextStyle.lerp(a.h2, b.h2, t)!,
+    h3: TextStyle.lerp(a.h3, b.h3, t)!,
+    b1: TextStyle.lerp(a.b1, b.b1, t)!,
+    b2: TextStyle.lerp(a.b2, b.b2, t)!,
+    b3: TextStyle.lerp(a.b3, b.b3, t)!,
+  );
+}
 
 /// Const tear-off catalog for [LegendTypography] (RFC-002 R10
 /// amendment): one static per token field, usable directly
 /// inside `@Style<T>.resolve` annotations —
-/// `@Style<TextStyle>.resolve(LegendTypographyRef.h1)`.
-abstract final class LegendTypographyRef {
+/// `@Style<TextStyle>.resolve(TextRef.h1)`.
+abstract final class TextRef {
   /// Page-level heading.
   static TextStyle h1(LegendTokens t) => t.typography.h1;
 

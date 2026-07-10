@@ -14,43 +14,65 @@ class BalanceCardTheme {
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory BalanceCardTheme.defaults(LegendTokens t) => BalanceCardTheme(
-    background: LegendColorsRef.surface(t),
-    accent: LegendColorsRef.secondary(t),
+    background: ColorRef.surface(t),
+    accent: _accent(t),
     padding: _padding(t),
   );
 
   final Color background;
-  final Color accent;
+  final BalanceAccent accent;
   final EdgeInsetsGeometry padding;
 
   /// Resolves the theme: defaults <- app registry (keyed by
   /// [BalanceCard] first, [BalanceCardThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static BalanceCardTheme of(
     BuildContext context, [
     BalanceCardThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
-    final resolved = BalanceCardTheme.defaults(data.tokens)
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<BalanceCardThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$BalanceCardAspectBackground);
+    LegendThemeOverride.depend<BalanceCardThemeNullable>(
+      context,
+      _$BalanceCardOverrideAspectBackground,
+    );
+    LegendTheme.depend(context, _$BalanceCardAspectAccent);
+    LegendThemeOverride.depend<BalanceCardThemeNullable>(
+      context,
+      _$BalanceCardOverrideAspectAccent,
+    );
+    LegendTheme.depend(context, _$BalanceCardAspectPadding);
+    LegendThemeOverride.depend<BalanceCardThemeNullable>(
+      context,
+      _$BalanceCardOverrideAspectPadding,
+    );
+    return BalanceCardTheme.defaults(data.tokens)
         .merge(data.componentOf<BalanceCardThemeNullable>(BalanceCard))
-        .merge(LegendThemeOverride.maybeOf<BalanceCardThemeNullable>(context))
+        .merge(override)
         .merge(local);
-    return resolved;
   }
 
   BalanceCardTheme merge(BalanceCardThemeNullable? other) {
     if (other == null) return this;
     return BalanceCardTheme(
       background: other.background ?? background,
-      accent: other.accent ?? accent,
+      accent: accent.merge(other.accent),
       padding: other.padding ?? padding,
     );
   }
 
   BalanceCardTheme copyWith({
     Color? background,
-    Color? accent,
+    BalanceAccent? accent,
     EdgeInsetsGeometry? padding,
   }) => BalanceCardTheme(
     background: background ?? this.background,
@@ -76,14 +98,14 @@ class BalanceCardThemeNullable {
   const BalanceCardThemeNullable({this.background, this.accent, this.padding});
 
   final Color? background;
-  final Color? accent;
+  final BalanceAccent? accent;
   final EdgeInsetsGeometry? padding;
 
   BalanceCardThemeNullable merge(BalanceCardThemeNullable? other) {
     if (other == null) return this;
     return BalanceCardThemeNullable(
       background: other.background ?? background,
-      accent: other.accent ?? accent,
+      accent: accent?.merge(other.accent) ?? other.accent,
       padding: other.padding ?? padding,
     );
   }
@@ -116,6 +138,85 @@ class BalanceCardThemeOverride extends StatelessWidget {
       LegendThemeOverride<BalanceCardThemeNullable>(data: data, child: child);
 }
 
+/// Resolves [BalanceCard.background] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$BalanceCardSelectBackground(LegendThemeData data) =>
+    data.componentOf<BalanceCardThemeNullable>(BalanceCard)?.background ??
+    ColorRef.surface(data.tokens);
+const _$BalanceCardAspectBackground = LegendThemeAspect(
+  _$BalanceCardSelectBackground,
+);
+Object? _$BalanceCardOverrideSelectBackground(BalanceCardThemeNullable data) =>
+    data.background;
+const _$BalanceCardOverrideAspectBackground =
+    LegendOverrideAspect<BalanceCardThemeNullable>(
+      _$BalanceCardOverrideSelectBackground,
+    );
+
+/// Resolves [BalanceCard.accent] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+BalanceAccent _$BalanceCardSelectAccent(LegendThemeData data) => _accent(
+  data.tokens,
+).merge(data.componentOf<BalanceCardThemeNullable>(BalanceCard)?.accent);
+const _$BalanceCardAspectAccent = LegendThemeAspect(_$BalanceCardSelectAccent);
+Object? _$BalanceCardOverrideSelectAccent(BalanceCardThemeNullable data) =>
+    data.accent;
+const _$BalanceCardOverrideAspectAccent =
+    LegendOverrideAspect<BalanceCardThemeNullable>(
+      _$BalanceCardOverrideSelectAccent,
+    );
+
+/// Resolves [BalanceCard.padding] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+EdgeInsetsGeometry _$BalanceCardSelectPadding(LegendThemeData data) =>
+    data.componentOf<BalanceCardThemeNullable>(BalanceCard)?.padding ??
+    _padding(data.tokens);
+const _$BalanceCardAspectPadding = LegendThemeAspect(
+  _$BalanceCardSelectPadding,
+);
+Object? _$BalanceCardOverrideSelectPadding(BalanceCardThemeNullable data) =>
+    data.padding;
+const _$BalanceCardOverrideAspectPadding =
+    LegendOverrideAspect<BalanceCardThemeNullable>(
+      _$BalanceCardOverrideSelectPadding,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class BalanceCardThemeListenables {
+  /// Change stream of the resolved [BalanceCardTheme.background].
+  static ValueListenable<Color> background(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$BalanceCardSelectBackground);
+
+  /// Change stream of the resolved [BalanceCardTheme.accent].
+  static ValueListenable<BalanceAccent> accent(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$BalanceCardSelectAccent);
+
+  /// Change stream of the resolved [BalanceCardTheme.padding].
+  static ValueListenable<EdgeInsetsGeometry> padding(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$BalanceCardSelectPadding);
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -123,6 +224,91 @@ extension _$BalanceCardThemeResolve on BalanceCard {
   /// [BalanceCardTheme.of] with this widget's constructor params as
   /// level 1.
   BalanceCardTheme _theme(BuildContext context) => BalanceCardTheme.of(
+    context,
+    BalanceCardThemeNullable(
+      background: background,
+      accent: accent,
+      padding: padding,
+    ),
+  );
+
+  /// Resolves ONLY [BalanceCard.background] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._background(context)`).
+  Color _background(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<BalanceCardThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$BalanceCardAspectBackground);
+    LegendThemeOverride.depend<BalanceCardThemeNullable>(
+      context,
+      _$BalanceCardOverrideAspectBackground,
+    );
+    return background ??
+        override?.background ??
+        _$BalanceCardSelectBackground(data);
+  }
+
+  /// Resolves ONLY [BalanceCard.accent] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._accent(context)`).
+  BalanceAccent _accent(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<BalanceCardThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$BalanceCardAspectAccent);
+    LegendThemeOverride.depend<BalanceCardThemeNullable>(
+      context,
+      _$BalanceCardOverrideAspectAccent,
+    );
+    return _$BalanceCardSelectAccent(
+      data,
+    ).merge(override?.accent).merge(accent);
+  }
+
+  /// Resolves ONLY [BalanceCard.padding] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._padding(context)`).
+  EdgeInsetsGeometry _padding(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<BalanceCardThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$BalanceCardAspectPadding);
+    LegendThemeOverride.depend<BalanceCardThemeNullable>(
+      context,
+      _$BalanceCardOverrideAspectPadding,
+    );
+    return padding ?? override?.padding ?? _$BalanceCardSelectPadding(data);
+  }
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class BalanceCard extends
+/// _$BalanceCardBase` receives the resolved
+/// [BalanceCardTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$BalanceCardBase
+    extends LegendStatelessWidget<BalanceCardTheme> {
+  const _$BalanceCardBase({super.key});
+
+  Color? get background;
+  BalanceAccent? get accent;
+  EdgeInsetsGeometry? get padding;
+
+  @override
+  BalanceCardTheme resolveThemeOf(BuildContext context) => BalanceCardTheme.of(
     context,
     BalanceCardThemeNullable(
       background: background,

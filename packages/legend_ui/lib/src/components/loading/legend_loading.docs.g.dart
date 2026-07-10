@@ -13,7 +13,7 @@ const List<LegendDocEntry> legendLoadingDocEntries = [
     name: 'color',
     type: 'Color?',
     doc: 'Color of the spinning arc.',
-    defaultDescription: 'LegendColorsRef.primary',
+    defaultDescription: 'ColorRef.primary',
     group: 'component',
   ),
   LegendDocEntry(

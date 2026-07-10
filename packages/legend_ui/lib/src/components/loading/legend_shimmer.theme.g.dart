@@ -13,8 +13,8 @@ class LegendShimmerTheme {
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendShimmerTheme.defaults(LegendTokens t) => LegendShimmerTheme(
-    baseColor: LegendColorsRef.background2(t),
-    highlightColor: LegendColorsRef.background1(t),
+    baseColor: ColorRef.background2(t),
+    highlightColor: ColorRef.background1(t),
   );
 
   final Color baseColor;
@@ -24,16 +24,33 @@ class LegendShimmerTheme {
   /// [LegendShimmer] first, [LegendShimmerThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static LegendShimmerTheme of(
     BuildContext context, [
     LegendShimmerThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
-    final resolved = LegendShimmerTheme.defaults(data.tokens)
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendShimmerThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendShimmerAspectBaseColor);
+    LegendThemeOverride.depend<LegendShimmerThemeNullable>(
+      context,
+      _$LegendShimmerOverrideAspectBaseColor,
+    );
+    LegendTheme.depend(context, _$LegendShimmerAspectHighlightColor);
+    LegendThemeOverride.depend<LegendShimmerThemeNullable>(
+      context,
+      _$LegendShimmerOverrideAspectHighlightColor,
+    );
+    return LegendShimmerTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendShimmerThemeNullable>(LegendShimmer))
-        .merge(LegendThemeOverride.maybeOf<LegendShimmerThemeNullable>(context))
+        .merge(override)
         .merge(local);
-    return resolved;
   }
 
   LegendShimmerTheme merge(LegendShimmerThemeNullable? other) {
@@ -104,6 +121,68 @@ class LegendShimmerThemeOverride extends StatelessWidget {
       LegendThemeOverride<LegendShimmerThemeNullable>(data: data, child: child);
 }
 
+/// Resolves [LegendShimmer.baseColor] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendShimmerSelectBaseColor(LegendThemeData data) =>
+    data.componentOf<LegendShimmerThemeNullable>(LegendShimmer)?.baseColor ??
+    ColorRef.background2(data.tokens);
+const _$LegendShimmerAspectBaseColor = LegendThemeAspect(
+  _$LegendShimmerSelectBaseColor,
+);
+Object? _$LegendShimmerOverrideSelectBaseColor(
+  LegendShimmerThemeNullable data,
+) => data.baseColor;
+const _$LegendShimmerOverrideAspectBaseColor =
+    LegendOverrideAspect<LegendShimmerThemeNullable>(
+      _$LegendShimmerOverrideSelectBaseColor,
+    );
+
+/// Resolves [LegendShimmer.highlightColor] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendShimmerSelectHighlightColor(LegendThemeData data) =>
+    data
+        .componentOf<LegendShimmerThemeNullable>(LegendShimmer)
+        ?.highlightColor ??
+    ColorRef.background1(data.tokens);
+const _$LegendShimmerAspectHighlightColor = LegendThemeAspect(
+  _$LegendShimmerSelectHighlightColor,
+);
+Object? _$LegendShimmerOverrideSelectHighlightColor(
+  LegendShimmerThemeNullable data,
+) => data.highlightColor;
+const _$LegendShimmerOverrideAspectHighlightColor =
+    LegendOverrideAspect<LegendShimmerThemeNullable>(
+      _$LegendShimmerOverrideSelectHighlightColor,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class LegendShimmerThemeListenables {
+  /// Change stream of the resolved [LegendShimmerTheme.baseColor].
+  static ValueListenable<Color> baseColor(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendShimmerSelectBaseColor);
+
+  /// Change stream of the resolved [LegendShimmerTheme.highlightColor].
+  static ValueListenable<Color> highlightColor(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendShimmerSelectHighlightColor);
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -117,4 +196,87 @@ extension _$LegendShimmerThemeResolve on LegendShimmer {
       highlightColor: highlightColor,
     ),
   );
+
+  /// Resolves ONLY [LegendShimmer.baseColor] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._baseColor(context)`).
+  Color _baseColor(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendShimmerThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendShimmerAspectBaseColor);
+    LegendThemeOverride.depend<LegendShimmerThemeNullable>(
+      context,
+      _$LegendShimmerOverrideAspectBaseColor,
+    );
+    return baseColor ??
+        override?.baseColor ??
+        _$LegendShimmerSelectBaseColor(data);
+  }
+
+  /// Resolves ONLY [LegendShimmer.highlightColor] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._highlightColor(context)`).
+  Color _highlightColor(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendShimmerThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendShimmerAspectHighlightColor);
+    LegendThemeOverride.depend<LegendShimmerThemeNullable>(
+      context,
+      _$LegendShimmerOverrideAspectHighlightColor,
+    );
+    return highlightColor ??
+        override?.highlightColor ??
+        _$LegendShimmerSelectHighlightColor(data);
+  }
+}
+
+/// Auto-detected State wiring (RFC-002 R13): [_LegendShimmerState]
+/// is this file's `State<LegendShimmer>`, so its
+/// build reads the resolved theme as a plain `theme`
+/// getter — zero visible wiring. A same-named instance
+/// member (e.g. from [_$LegendShimmerThemeState])
+/// wins over this extension.
+extension _$LegendShimmerThemeOn_LegendShimmerState on _LegendShimmerState {
+  LegendShimmerTheme get theme => widget._theme(context);
+}
+
+/// Explicit State wiring (RFC-002 R13): mix onto any
+/// `State<LegendShimmer>` for the `theme` getter as a
+/// real, overridable inherited member — no State-class
+/// detection involved.
+mixin _$LegendShimmerThemeState on State<LegendShimmer> {
+  LegendShimmerTheme get theme => widget._theme(context);
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class LegendShimmer extends
+/// _$LegendShimmerBase` receives the resolved
+/// [LegendShimmerTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$LegendShimmerBase
+    extends LegendStatelessWidget<LegendShimmerTheme> {
+  const _$LegendShimmerBase({super.key});
+
+  Color? get baseColor;
+  Color? get highlightColor;
+
+  @override
+  LegendShimmerTheme resolveThemeOf(BuildContext context) =>
+      LegendShimmerTheme.of(
+        context,
+        LegendShimmerThemeNullable(
+          baseColor: baseColor,
+          highlightColor: highlightColor,
+        ),
+      );
 }

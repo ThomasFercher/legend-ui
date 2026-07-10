@@ -33,7 +33,7 @@ class LegendDialog extends StatelessWidget {
   final List<Widget> actions;
 
   /// Fill color of the dialog surface.
-  @Style<Color>.resolve(LegendColorsRef.surface)
+  @Style<Color>.resolve(ColorRef.surface)
   final Color? background;
 
   /// Corner rounding of the dialog surface.

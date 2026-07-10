@@ -34,7 +34,7 @@ class LegendCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   /// Fill color of the card surface.
-  @Style<Color>.resolve(LegendColorsRef.surface, lerp: true)
+  @Style<Color>.resolve(ColorRef.surface, lerp: true)
   final Color? background;
 
   /// Corner rounding of the card surface.
@@ -46,7 +46,7 @@ class LegendCard extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
 
   /// Drop shadow lifting the card off the background.
-  @Style<List<BoxShadow>>.resolve(LegendShadowsRef.low)
+  @Style<List<BoxShadow>>.resolve(ShadowRef.low)
   final List<BoxShadow>? shadows;
 
   @override

@@ -25,20 +25,35 @@ class LegendButtonCoreTheme {
   /// [LegendButtonCore] first, [LegendButtonCoreThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static LegendButtonCoreTheme of(
     BuildContext context, [
     LegendButtonCoreThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
-    final resolved = LegendButtonCoreTheme.defaults(data.tokens)
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendButtonCoreThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendButtonCoreAspectPadding);
+    LegendThemeOverride.depend<LegendButtonCoreThemeNullable>(
+      context,
+      _$LegendButtonCoreOverrideAspectPadding,
+    );
+    LegendTheme.depend(context, _$LegendButtonCoreAspectBorderRadius);
+    LegendThemeOverride.depend<LegendButtonCoreThemeNullable>(
+      context,
+      _$LegendButtonCoreOverrideAspectBorderRadius,
+    );
+    return LegendButtonCoreTheme.defaults(data.tokens)
         .merge(
           data.componentOf<LegendButtonCoreThemeNullable>(LegendButtonCore),
         )
-        .merge(
-          LegendThemeOverride.maybeOf<LegendButtonCoreThemeNullable>(context),
-        )
+        .merge(override)
         .merge(local);
-    return resolved;
   }
 
   LegendButtonCoreTheme merge(LegendButtonCoreThemeNullable? other) {
@@ -114,6 +129,70 @@ class LegendButtonCoreThemeOverride extends StatelessWidget {
       );
 }
 
+/// Resolves [LegendButtonCore.padding] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+EdgeInsetsGeometry _$LegendButtonCoreSelectPadding(LegendThemeData data) =>
+    data
+        .componentOf<LegendButtonCoreThemeNullable>(LegendButtonCore)
+        ?.padding ??
+    _padding(data.tokens);
+const _$LegendButtonCoreAspectPadding = LegendThemeAspect(
+  _$LegendButtonCoreSelectPadding,
+);
+Object? _$LegendButtonCoreOverrideSelectPadding(
+  LegendButtonCoreThemeNullable data,
+) => data.padding;
+const _$LegendButtonCoreOverrideAspectPadding =
+    LegendOverrideAspect<LegendButtonCoreThemeNullable>(
+      _$LegendButtonCoreOverrideSelectPadding,
+    );
+
+/// Resolves [LegendButtonCore.borderRadius] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+BorderRadius _$LegendButtonCoreSelectBorderRadius(LegendThemeData data) =>
+    data
+        .componentOf<LegendButtonCoreThemeNullable>(LegendButtonCore)
+        ?.borderRadius ??
+    _borderRadius(data.tokens);
+const _$LegendButtonCoreAspectBorderRadius = LegendThemeAspect(
+  _$LegendButtonCoreSelectBorderRadius,
+);
+Object? _$LegendButtonCoreOverrideSelectBorderRadius(
+  LegendButtonCoreThemeNullable data,
+) => data.borderRadius;
+const _$LegendButtonCoreOverrideAspectBorderRadius =
+    LegendOverrideAspect<LegendButtonCoreThemeNullable>(
+      _$LegendButtonCoreOverrideSelectBorderRadius,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class LegendButtonCoreThemeListenables {
+  /// Change stream of the resolved [LegendButtonCoreTheme.padding].
+  static ValueListenable<EdgeInsetsGeometry> padding(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendButtonCoreSelectPadding);
+
+  /// Change stream of the resolved [LegendButtonCoreTheme.borderRadius].
+  static ValueListenable<BorderRadius> borderRadius(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendButtonCoreSelectBorderRadius);
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -121,6 +200,71 @@ extension _$LegendButtonCoreThemeResolve on LegendButtonCore {
   /// [LegendButtonCoreTheme.of] with this widget's constructor params as
   /// level 1.
   LegendButtonCoreTheme _theme(BuildContext context) =>
+      LegendButtonCoreTheme.of(
+        context,
+        LegendButtonCoreThemeNullable(
+          padding: padding,
+          borderRadius: borderRadius,
+        ),
+      );
+
+  /// Resolves ONLY [LegendButtonCore.padding] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._padding(context)`).
+  EdgeInsetsGeometry _padding(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendButtonCoreThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendButtonCoreAspectPadding);
+    LegendThemeOverride.depend<LegendButtonCoreThemeNullable>(
+      context,
+      _$LegendButtonCoreOverrideAspectPadding,
+    );
+    return padding ??
+        override?.padding ??
+        _$LegendButtonCoreSelectPadding(data);
+  }
+
+  /// Resolves ONLY [LegendButtonCore.borderRadius] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._borderRadius(context)`).
+  BorderRadius _borderRadius(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendButtonCoreThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendButtonCoreAspectBorderRadius);
+    LegendThemeOverride.depend<LegendButtonCoreThemeNullable>(
+      context,
+      _$LegendButtonCoreOverrideAspectBorderRadius,
+    );
+    return borderRadius ??
+        override?.borderRadius ??
+        _$LegendButtonCoreSelectBorderRadius(data);
+  }
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class LegendButtonCore extends
+/// _$LegendButtonCoreBase` receives the resolved
+/// [LegendButtonCoreTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$LegendButtonCoreBase
+    extends LegendStatelessWidget<LegendButtonCoreTheme> {
+  const _$LegendButtonCoreBase({super.key});
+
+  EdgeInsetsGeometry? get padding;
+  BorderRadius? get borderRadius;
+
+  @override
+  LegendButtonCoreTheme resolveThemeOf(BuildContext context) =>
       LegendButtonCoreTheme.of(
         context,
         LegendButtonCoreThemeNullable(

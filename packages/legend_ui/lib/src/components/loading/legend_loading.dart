@@ -15,7 +15,7 @@ class LegendLoading extends StatefulWidget {
   const LegendLoading({super.key, this.color, this.size, this.strokeWidth});
 
   /// Color of the spinning arc.
-  @Style<Color>.resolve(LegendColorsRef.primary)
+  @Style<Color>.resolve(ColorRef.primary)
   final Color? color;
 
   /// Diameter of the spinner.

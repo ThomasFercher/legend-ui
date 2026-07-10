@@ -4,6 +4,29 @@
 
 import 'package:legend_ui/legend_ui.dart';
 
+/// Docs manifest for the `@Style()` value class
+/// `BalanceAccent` (RFC-002 R6 amendment 7): one
+/// entry per member, extracted from the dartdoc in
+/// balance_card.dart.
+const List<LegendDocEntry> balanceAccentDocEntries = [
+  LegendDocEntry(
+    owner: 'BalanceAccent',
+    name: 'amount',
+    type: 'Color?',
+    doc: 'Color of the amount text.',
+    defaultDescription: 'null',
+    group: 'style',
+  ),
+  LegendDocEntry(
+    owner: 'BalanceAccent',
+    name: 'caption',
+    type: 'Color?',
+    doc: 'Color of the caption line under the amount.',
+    defaultDescription: 'null',
+    group: 'style',
+  ),
+];
+
 /// Theme docs manifest for `BalanceCard`
 /// (RFC-002 R9): one entry per themed variable, extracted
 /// from the dartdoc in balance_card.dart.
@@ -13,15 +36,35 @@ const List<LegendDocEntry> balanceCardDocEntries = [
     name: 'background',
     type: 'Color?',
     doc: 'Fill color of the card surface.',
-    defaultDescription: 'LegendColorsRef.surface',
+    defaultDescription: 'ColorRef.surface',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'BalanceCard',
     name: 'accent',
+    type: 'BalanceAccent?',
+    doc:
+        'Accent colors of the texts — a consumer-defined style value class:\neach member is individually overridable at every theme level.',
+    defaultDescription:
+        'BalanceAccent(amount: t.colors.secondary, caption: t.colors.foreground2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'BalanceCard',
+    name: 'accent.amount',
     type: 'Color?',
     doc: 'Color of the amount text.',
-    defaultDescription: 'LegendColorsRef.secondary',
+    defaultDescription:
+        'BalanceAccent(amount: t.colors.secondary, caption: t.colors.foreground2)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'BalanceCard',
+    name: 'accent.caption',
+    type: 'Color?',
+    doc: 'Color of the caption line under the amount.',
+    defaultDescription:
+        'BalanceAccent(amount: t.colors.secondary, caption: t.colors.foreground2)',
     group: 'component',
   ),
   LegendDocEntry(

@@ -13,7 +13,7 @@ const List<LegendDocEntry> legendAppBarDocEntries = [
     name: 'background',
     type: 'Color?',
     doc: 'Fill color of the bar.',
-    defaultDescription: 'LegendColorsRef.surface',
+    defaultDescription: 'ColorRef.surface',
     group: 'component',
   ),
   LegendDocEntry(

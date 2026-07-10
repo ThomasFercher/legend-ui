@@ -11,61 +11,56 @@ const List<LegendDocEntry> legendContextMenuDocEntries = [
   LegendDocEntry(
     owner: 'LegendContextMenu',
     name: 'menuBackground',
-    type: 'LegendStates<Color>?',
+    type: 'InteractiveColors?',
     doc:
         'Fill of the menu surface and its entries, per interaction state —\n`normal` paints the whole menu, `hovered`/`pressed`/`focused`\nhighlight the entry under the pointer.',
     defaultDescription:
-        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+        'InteractiveColors(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'LegendContextMenu',
     name: 'menuBackground.normal',
     type: 'Color?',
-    doc:
-        'Fill of the menu surface and its entries, per interaction state —\n`normal` paints the whole menu, `hovered`/`pressed`/`focused`\nhighlight the entry under the pointer.',
+    doc: 'Fill at rest (and the base unset members fall back to).',
     defaultDescription:
-        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+        'InteractiveColors(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'LegendContextMenu',
     name: 'menuBackground.hovered',
     type: 'Color?',
-    doc:
-        'Fill of the menu surface and its entries, per interaction state —\n`normal` paints the whole menu, `hovered`/`pressed`/`focused`\nhighlight the entry under the pointer.',
+    doc: 'Fill while a pointer hovers the widget.',
     defaultDescription:
-        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+        'InteractiveColors(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'LegendContextMenu',
     name: 'menuBackground.pressed',
     type: 'Color?',
-    doc:
-        'Fill of the menu surface and its entries, per interaction state —\n`normal` paints the whole menu, `hovered`/`pressed`/`focused`\nhighlight the entry under the pointer.',
+    doc: 'Fill while the widget is actively pressed.',
     defaultDescription:
-        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+        'InteractiveColors(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'LegendContextMenu',
     name: 'menuBackground.focused',
     type: 'Color?',
-    doc:
-        'Fill of the menu surface and its entries, per interaction state —\n`normal` paints the whole menu, `hovered`/`pressed`/`focused`\nhighlight the entry under the pointer.',
+    doc: 'Fill while the widget holds keyboard focus.',
     defaultDescription:
-        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+        'InteractiveColors(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'LegendContextMenu',
     name: 'menuBackground.disabled',
     type: 'Color?',
-    doc:
-        'Fill of the menu surface and its entries, per interaction state —\n`normal` paints the whole menu, `hovered`/`pressed`/`focused`\nhighlight the entry under the pointer.',
+    doc: 'Fill while the widget is disabled.',
     defaultDescription:
-        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+        'InteractiveColors(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
     group: 'component',
   ),
   LegendDocEntry(
@@ -81,7 +76,7 @@ const List<LegendDocEntry> legendContextMenuDocEntries = [
     name: 'menuShadows',
     type: 'List<BoxShadow>?',
     doc: 'Drop shadow lifting the menu off the page.',
-    defaultDescription: 'LegendShadowsRef.medium',
+    defaultDescription: 'ShadowRef.medium',
     group: 'component',
   ),
   LegendDocEntry(
@@ -98,7 +93,7 @@ const List<LegendDocEntry> legendContextMenuDocEntries = [
     name: 'textStyle',
     type: 'TextStyle?',
     doc: 'Text style of the entry labels.',
-    defaultDescription: 'LegendTypographyRef.b2',
+    defaultDescription: 'TextRef.b2',
     group: 'component',
   ),
 ];

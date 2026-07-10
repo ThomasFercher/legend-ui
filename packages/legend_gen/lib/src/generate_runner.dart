@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:legend_gen/src/exit_codes.dart';
 import 'package:legend_gen/src/model.dart';
+import 'package:legend_gen/src/parser.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:path/path.dart' as p;
 
@@ -111,6 +112,45 @@ Future<int> runGeneration<T>(
   progress.complete(counts);
   perFile.forEach(log.detail);
   return LegendGenExit.success;
+}
+
+/// The worse of two `LegendGenExit` codes — combining multi-pass commands
+/// (`themes` runs styles + themes): source errors beat a dirty `--check`,
+/// which beats success. The numeric codes are ordered accordingly
+/// (0 < 65 dirty < 66 sourceError < 70 software), so max is exact.
+int worseExit(int a, int b) => a > b ? a : b;
+
+/// Builds the run's style-class index (RFC-002 R6 amendment 7): declared
+/// class name → parsed [StyleClass], from every source file under [paths]
+/// plus the kit's compiled-in [builtinStyleClasses] (same-run declarations
+/// win on a clash).
+///
+/// This is the *detection* half of "a field whose type resolves to an
+/// `@Style()`-annotated class gets member-wise treatment": the same
+/// pure-AST scan generation performs anyway, shared across the run —
+/// emission stays strictly one-file-in/one-file-out, and the parser stays
+/// synchronous and resolution-free (no analysis context, no on-disk
+/// package config — the properties the never-crash watch loop and the
+/// in-memory test fixtures rely on). Contract violations are *not*
+/// reported here — a broken style class fails its own file's styles pass;
+/// the index simply omits it.
+Map<String, StyleClass> buildStyleClassIndex(
+  List<String> paths, {
+  Logger? logger,
+}) {
+  final index = {...builtinStyleClasses};
+  for (final path in paths) {
+    for (final file in sourceDartFilesIn(path, logger: logger)) {
+      final (classes, _) = collectStyleClasses(
+        file.path,
+        file.readAsStringSync(),
+      );
+      for (final styleClass in classes) {
+        index[styleClass.className] = styleClass;
+      }
+    }
+  }
+  return index;
 }
 
 /// All non-generated `.dart` source files under [path] (a file or a

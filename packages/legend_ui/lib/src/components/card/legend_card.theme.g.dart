@@ -15,10 +15,10 @@ class LegendCardTheme {
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendCardTheme.defaults(LegendTokens t) => LegendCardTheme(
-    background: LegendColorsRef.surface(t),
+    background: ColorRef.surface(t),
     borderRadius: _borderRadius(t),
     padding: _padding(t),
-    shadows: LegendShadowsRef.low(t),
+    shadows: ShadowRef.low(t),
   );
 
   final Color background;
@@ -30,16 +30,41 @@ class LegendCardTheme {
   /// [LegendCard] first, [LegendCardThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static LegendCardTheme of(
     BuildContext context, [
     LegendCardThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
-    final resolved = LegendCardTheme.defaults(data.tokens)
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendCardThemeNullable>(context);
+    LegendTheme.depend(context, _$LegendCardAspectBackground);
+    LegendThemeOverride.depend<LegendCardThemeNullable>(
+      context,
+      _$LegendCardOverrideAspectBackground,
+    );
+    LegendTheme.depend(context, _$LegendCardAspectBorderRadius);
+    LegendThemeOverride.depend<LegendCardThemeNullable>(
+      context,
+      _$LegendCardOverrideAspectBorderRadius,
+    );
+    LegendTheme.depend(context, _$LegendCardAspectPadding);
+    LegendThemeOverride.depend<LegendCardThemeNullable>(
+      context,
+      _$LegendCardOverrideAspectPadding,
+    );
+    LegendTheme.depend(context, _$LegendCardAspectShadows);
+    LegendThemeOverride.depend<LegendCardThemeNullable>(
+      context,
+      _$LegendCardOverrideAspectShadows,
+    );
+    return LegendCardTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendCardThemeNullable>(LegendCard))
-        .merge(LegendThemeOverride.maybeOf<LegendCardThemeNullable>(context))
+        .merge(override)
         .merge(local);
-    return resolved;
   }
 
   LegendCardTheme merge(LegendCardThemeNullable? other) {
@@ -129,6 +154,106 @@ class LegendCardThemeOverride extends StatelessWidget {
       LegendThemeOverride<LegendCardThemeNullable>(data: data, child: child);
 }
 
+/// Resolves [LegendCard.background] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendCardSelectBackground(LegendThemeData data) =>
+    data.componentOf<LegendCardThemeNullable>(LegendCard)?.background ??
+    ColorRef.surface(data.tokens);
+const _$LegendCardAspectBackground = LegendThemeAspect(
+  _$LegendCardSelectBackground,
+);
+Object? _$LegendCardOverrideSelectBackground(LegendCardThemeNullable data) =>
+    data.background;
+const _$LegendCardOverrideAspectBackground =
+    LegendOverrideAspect<LegendCardThemeNullable>(
+      _$LegendCardOverrideSelectBackground,
+    );
+
+/// Resolves [LegendCard.borderRadius] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+BorderRadius _$LegendCardSelectBorderRadius(LegendThemeData data) =>
+    data.componentOf<LegendCardThemeNullable>(LegendCard)?.borderRadius ??
+    _borderRadius(data.tokens);
+const _$LegendCardAspectBorderRadius = LegendThemeAspect(
+  _$LegendCardSelectBorderRadius,
+);
+Object? _$LegendCardOverrideSelectBorderRadius(LegendCardThemeNullable data) =>
+    data.borderRadius;
+const _$LegendCardOverrideAspectBorderRadius =
+    LegendOverrideAspect<LegendCardThemeNullable>(
+      _$LegendCardOverrideSelectBorderRadius,
+    );
+
+/// Resolves [LegendCard.padding] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+EdgeInsetsGeometry _$LegendCardSelectPadding(LegendThemeData data) =>
+    data.componentOf<LegendCardThemeNullable>(LegendCard)?.padding ??
+    _padding(data.tokens);
+const _$LegendCardAspectPadding = LegendThemeAspect(_$LegendCardSelectPadding);
+Object? _$LegendCardOverrideSelectPadding(LegendCardThemeNullable data) =>
+    data.padding;
+const _$LegendCardOverrideAspectPadding =
+    LegendOverrideAspect<LegendCardThemeNullable>(
+      _$LegendCardOverrideSelectPadding,
+    );
+
+/// Resolves [LegendCard.shadows] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+List<BoxShadow> _$LegendCardSelectShadows(LegendThemeData data) =>
+    data.componentOf<LegendCardThemeNullable>(LegendCard)?.shadows ??
+    ShadowRef.low(data.tokens);
+const _$LegendCardAspectShadows = LegendThemeAspect(_$LegendCardSelectShadows);
+Object? _$LegendCardOverrideSelectShadows(LegendCardThemeNullable data) =>
+    data.shadows;
+const _$LegendCardOverrideAspectShadows =
+    LegendOverrideAspect<LegendCardThemeNullable>(
+      _$LegendCardOverrideSelectShadows,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class LegendCardThemeListenables {
+  /// Change stream of the resolved [LegendCardTheme.background].
+  static ValueListenable<Color> background(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendCardSelectBackground);
+
+  /// Change stream of the resolved [LegendCardTheme.borderRadius].
+  static ValueListenable<BorderRadius> borderRadius(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendCardSelectBorderRadius);
+
+  /// Change stream of the resolved [LegendCardTheme.padding].
+  static ValueListenable<EdgeInsetsGeometry> padding(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendCardSelectPadding);
+
+  /// Change stream of the resolved [LegendCardTheme.shadows].
+  static ValueListenable<List<BoxShadow>> shadows(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendCardSelectShadows);
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -136,6 +261,103 @@ extension _$LegendCardThemeResolve on LegendCard {
   /// [LegendCardTheme.of] with this widget's constructor params as
   /// level 1.
   LegendCardTheme _theme(BuildContext context) => LegendCardTheme.of(
+    context,
+    LegendCardThemeNullable(
+      background: background,
+      borderRadius: borderRadius,
+      padding: padding,
+      shadows: shadows,
+    ),
+  );
+
+  /// Resolves ONLY [LegendCard.background] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._background(context)`).
+  Color _background(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendCardThemeNullable>(context);
+    LegendTheme.depend(context, _$LegendCardAspectBackground);
+    LegendThemeOverride.depend<LegendCardThemeNullable>(
+      context,
+      _$LegendCardOverrideAspectBackground,
+    );
+    return background ??
+        override?.background ??
+        _$LegendCardSelectBackground(data);
+  }
+
+  /// Resolves ONLY [LegendCard.borderRadius] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._borderRadius(context)`).
+  BorderRadius _borderRadius(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendCardThemeNullable>(context);
+    LegendTheme.depend(context, _$LegendCardAspectBorderRadius);
+    LegendThemeOverride.depend<LegendCardThemeNullable>(
+      context,
+      _$LegendCardOverrideAspectBorderRadius,
+    );
+    return borderRadius ??
+        override?.borderRadius ??
+        _$LegendCardSelectBorderRadius(data);
+  }
+
+  /// Resolves ONLY [LegendCard.padding] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._padding(context)`).
+  EdgeInsetsGeometry _padding(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendCardThemeNullable>(context);
+    LegendTheme.depend(context, _$LegendCardAspectPadding);
+    LegendThemeOverride.depend<LegendCardThemeNullable>(
+      context,
+      _$LegendCardOverrideAspectPadding,
+    );
+    return padding ?? override?.padding ?? _$LegendCardSelectPadding(data);
+  }
+
+  /// Resolves ONLY [LegendCard.shadows] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._shadows(context)`).
+  List<BoxShadow> _shadows(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendCardThemeNullable>(context);
+    LegendTheme.depend(context, _$LegendCardAspectShadows);
+    LegendThemeOverride.depend<LegendCardThemeNullable>(
+      context,
+      _$LegendCardOverrideAspectShadows,
+    );
+    return shadows ?? override?.shadows ?? _$LegendCardSelectShadows(data);
+  }
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class LegendCard extends
+/// _$LegendCardBase` receives the resolved
+/// [LegendCardTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$LegendCardBase extends LegendStatelessWidget<LegendCardTheme> {
+  const _$LegendCardBase({super.key});
+
+  Color? get background;
+  BorderRadius? get borderRadius;
+  EdgeInsetsGeometry? get padding;
+  List<BoxShadow>? get shadows;
+
+  @override
+  LegendCardTheme resolveThemeOf(BuildContext context) => LegendCardTheme.of(
     context,
     LegendCardThemeNullable(
       background: background,

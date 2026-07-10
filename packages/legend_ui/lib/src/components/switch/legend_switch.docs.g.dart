@@ -13,7 +13,7 @@ const List<LegendDocEntry> legendSwitchDocEntries = [
     name: 'activeTrack',
     type: 'Color?',
     doc: 'Track color while the switch is on.',
-    defaultDescription: 'LegendColorsRef.primary',
+    defaultDescription: 'ColorRef.primary',
     group: 'component',
   ),
   LegendDocEntry(
@@ -21,7 +21,7 @@ const List<LegendDocEntry> legendSwitchDocEntries = [
     name: 'inactiveTrack',
     type: 'Color?',
     doc: 'Track color while the switch is off.',
-    defaultDescription: 'LegendColorsRef.background3',
+    defaultDescription: 'ColorRef.background3',
     group: 'component',
   ),
   LegendDocEntry(
@@ -29,7 +29,7 @@ const List<LegendDocEntry> legendSwitchDocEntries = [
     name: 'thumb',
     type: 'Color?',
     doc: 'Color of the sliding thumb.',
-    defaultDescription: 'LegendColorsRef.surface',
+    defaultDescription: 'ColorRef.surface',
     group: 'component',
   ),
   LegendDocEntry(

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/primitives/legend_button_core.dart';
-import 'package:legend_ui/src/theme/legend_states.dart';
+import 'package:legend_ui/src/theme/interactive_colors.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
 import 'package:legend_ui/src/tokens/legend_colors.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
@@ -19,7 +19,8 @@ part 'secondary_legend_button.theme.g.dart';
 class SecondaryLegendButton extends StatelessWidget {
   /// The [background]/[foreground] colors lift into the `normal` member of
   /// the per-state theme fields (RFC-002 R6) — pass a sparse
-  /// [LegendStates] via the theme levels to restyle individual states.
+  /// [InteractiveColors] via the theme levels to restyle individual
+  /// states.
   SecondaryLegendButton({
     required this.onPressed,
     super.key,
@@ -34,8 +35,12 @@ class SecondaryLegendButton extends StatelessWidget {
     this.padding,
     this.borderRadius,
     this.textStyle,
-  }) : background = background?.states,
-       foreground = foreground?.states,
+  }) : background = background == null
+           ? null
+           : InteractiveColors(normal: background),
+       foreground = foreground == null
+           ? null
+           : InteractiveColors(normal: foreground),
        assert(
          text != null || icon != null || child != null,
          'Provide text, an icon, or a child.',
@@ -56,16 +61,16 @@ class SecondaryLegendButton extends StatelessWidget {
   /// Tinted fill behind the label, per interaction state — hover/press
   /// blend the foreground over the container tint (8%/16%), disabled
   /// swaps to the token disabled fill.
-  @Style<LegendStates<Color>>.resolve(_background, lerp: true)
-  final LegendStates<Color>? background;
+  @Style<InteractiveColors>.resolve(_background, lerp: true)
+  final InteractiveColors? background;
 
   /// Color of the label and icon, per interaction state (steady except
   /// while disabled).
-  @Style<LegendStates<Color>>.resolve(_foreground, lerp: true)
-  final LegendStates<Color>? foreground;
+  @Style<InteractiveColors>.resolve(_foreground, lerp: true)
+  final InteractiveColors? foreground;
 
   /// Color of the outline (dropped entirely while disabled).
-  @Style<Color>.resolve(LegendColorsRef.primary)
+  @Style<Color>.resolve(ColorRef.primary)
   final Color? borderColor;
 
   /// Per-instance padding; when null the shared button surface applies
@@ -77,7 +82,7 @@ class SecondaryLegendButton extends StatelessWidget {
   final BorderRadius? borderRadius;
 
   /// Text style of the [text] label (its color comes from [foreground]).
-  @Style<TextStyle>.resolve(LegendTypographyRef.b2)
+  @Style<TextStyle>.resolve(TextRef.b2)
   final TextStyle? textStyle;
 
   @override
@@ -104,7 +109,7 @@ class SecondaryLegendButton extends StatelessWidget {
   }
 }
 
-LegendStates<Color> _background(LegendTokens t) => LegendStates(
+InteractiveColors _background(LegendTokens t) => InteractiveColors(
   normal: t.colors.primaryContainer,
   hovered: Color.alphaBlend(
     t.colors.primary.withValues(alpha: 0.08),
@@ -121,7 +126,7 @@ LegendStates<Color> _background(LegendTokens t) => LegendStates(
   disabled: t.colors.disabled,
 );
 
-LegendStates<Color> _foreground(LegendTokens t) => LegendStates(
+InteractiveColors _foreground(LegendTokens t) => InteractiveColors(
   normal: t.colors.primary,
   hovered: t.colors.primary,
   pressed: t.colors.primary,

@@ -3,7 +3,7 @@ import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/primitives/legend_anchored_overlay.dart';
 import 'package:legend_ui/src/primitives/legend_interactive.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
-import 'package:legend_ui/src/theme/legend_states.dart';
+import 'package:legend_ui/src/theme/interactive_colors.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
 import 'package:legend_ui/src/tokens/legend_shadows.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
@@ -48,7 +48,9 @@ class LegendContextMenu extends StatefulWidget {
     this.menuShadows,
     this.itemPadding,
     this.textStyle,
-  }) : menuBackground = menuBackground?.states;
+  }) : menuBackground = menuBackground == null
+           ? null
+           : InteractiveColors(normal: menuBackground);
 
   final List<LegendContextMenuEntry> entries;
   final Widget child;
@@ -59,15 +61,15 @@ class LegendContextMenu extends StatefulWidget {
   /// Fill of the menu surface and its entries, per interaction state —
   /// `normal` paints the whole menu, `hovered`/`pressed`/`focused`
   /// highlight the entry under the pointer.
-  @Style<LegendStates<Color>>.resolve(_menuBackground)
-  final LegendStates<Color>? menuBackground;
+  @Style<InteractiveColors>.resolve(_menuBackground)
+  final InteractiveColors? menuBackground;
 
   /// Corner rounding of the menu surface.
   @Style<BorderRadius>.resolve(_menuBorderRadius)
   final BorderRadius? menuBorderRadius;
 
   /// Drop shadow lifting the menu off the page.
-  @Style<List<BoxShadow>>.resolve(LegendShadowsRef.medium)
+  @Style<List<BoxShadow>>.resolve(ShadowRef.medium)
   final List<BoxShadow>? menuShadows;
 
   /// Inner padding of each menu entry row.
@@ -75,7 +77,7 @@ class LegendContextMenu extends StatefulWidget {
   final EdgeInsetsGeometry? itemPadding;
 
   /// Text style of the entry labels.
-  @Style<TextStyle>.resolve(LegendTypographyRef.b2)
+  @Style<TextStyle>.resolve(TextRef.b2)
   final TextStyle? textStyle;
 
   @override
@@ -107,7 +109,7 @@ class _LegendContextMenuState extends State<LegendContextMenu> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = widget._theme(context);
+    final theme = this.theme;
     final tokens = LegendTheme.of(context).tokens;
 
     return LegendAnchoredOverlay(
@@ -129,7 +131,10 @@ class _LegendContextMenuState extends State<LegendContextMenu> {
                 semanticLabel: entry.label,
                 onTap: () => _select(entry),
                 builder: (context, states) => LegendSurface(
-                  color: theme.menuBackground.pick(states.effective),
+                  color: theme.menuBackground.resolve(
+                    states.effective,
+                    tokens.states,
+                  ),
                   padding: theme.itemPadding,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -159,7 +164,7 @@ class _LegendContextMenuState extends State<LegendContextMenu> {
   }
 }
 
-LegendStates<Color> _menuBackground(LegendTokens t) => LegendStates(
+InteractiveColors _menuBackground(LegendTokens t) => InteractiveColors(
   normal: t.colors.surface,
   hovered: t.colors.background2,
   pressed: t.colors.background2,

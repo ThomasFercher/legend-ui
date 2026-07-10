@@ -19,13 +19,13 @@ class LegendDropdownTheme {
   factory LegendDropdownTheme.defaults(LegendTokens t) => LegendDropdownTheme(
     menuBackground: _menuBackground(t),
     menuBorderRadius: _menuBorderRadius(t),
-    menuShadows: LegendShadowsRef.medium(t),
+    menuShadows: ShadowRef.medium(t),
     menuMaxHeight: 320,
     itemPadding: _itemPadding(t),
-    textStyle: LegendTypographyRef.b2(t),
+    textStyle: TextRef.b2(t),
   );
 
-  final LegendStates<Color> menuBackground;
+  final InteractiveColors menuBackground;
   final BorderRadius menuBorderRadius;
   final List<BoxShadow> menuShadows;
   final double menuMaxHeight;
@@ -37,31 +37,58 @@ class LegendDropdownTheme {
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
   ///
-  /// Post-merge, unset `LegendStates<Color>` members fill
-  /// from the resolved `normal` via `tokens.states`
-  /// (RFC-002 R6) — named members at any level always win.
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static LegendDropdownTheme of(
     BuildContext context, [
     LegendDropdownThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
-    final resolved = LegendDropdownTheme.defaults(data.tokens)
-        .merge(data.componentOf<LegendDropdownThemeNullable>(LegendDropdown))
-        .merge(
-          LegendThemeOverride.maybeOf<LegendDropdownThemeNullable>(context),
-        )
-        .merge(local);
-    return resolved.copyWith(
-      menuBackground: resolved.menuBackground.withDerived(data.tokens.states),
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendDropdownThemeNullable>(
+      context,
     );
+    LegendTheme.depend(context, _$LegendDropdownAspectMenuBackground);
+    LegendThemeOverride.depend<LegendDropdownThemeNullable>(
+      context,
+      _$LegendDropdownOverrideAspectMenuBackground,
+    );
+    LegendTheme.depend(context, _$LegendDropdownAspectMenuBorderRadius);
+    LegendThemeOverride.depend<LegendDropdownThemeNullable>(
+      context,
+      _$LegendDropdownOverrideAspectMenuBorderRadius,
+    );
+    LegendTheme.depend(context, _$LegendDropdownAspectMenuShadows);
+    LegendThemeOverride.depend<LegendDropdownThemeNullable>(
+      context,
+      _$LegendDropdownOverrideAspectMenuShadows,
+    );
+    LegendTheme.depend(context, _$LegendDropdownAspectMenuMaxHeight);
+    LegendThemeOverride.depend<LegendDropdownThemeNullable>(
+      context,
+      _$LegendDropdownOverrideAspectMenuMaxHeight,
+    );
+    LegendTheme.depend(context, _$LegendDropdownAspectItemPadding);
+    LegendThemeOverride.depend<LegendDropdownThemeNullable>(
+      context,
+      _$LegendDropdownOverrideAspectItemPadding,
+    );
+    LegendTheme.depend(context, _$LegendDropdownAspectTextStyle);
+    LegendThemeOverride.depend<LegendDropdownThemeNullable>(
+      context,
+      _$LegendDropdownOverrideAspectTextStyle,
+    );
+    return LegendDropdownTheme.defaults(data.tokens)
+        .merge(data.componentOf<LegendDropdownThemeNullable>(LegendDropdown))
+        .merge(override)
+        .merge(local);
   }
 
   LegendDropdownTheme merge(LegendDropdownThemeNullable? other) {
     if (other == null) return this;
     return LegendDropdownTheme(
-      menuBackground:
-          LegendStates.merge(menuBackground, other.menuBackground) ??
-          menuBackground,
+      menuBackground: menuBackground.merge(other.menuBackground),
       menuBorderRadius: other.menuBorderRadius ?? menuBorderRadius,
       menuShadows: other.menuShadows ?? menuShadows,
       menuMaxHeight: other.menuMaxHeight ?? menuMaxHeight,
@@ -71,7 +98,7 @@ class LegendDropdownTheme {
   }
 
   LegendDropdownTheme copyWith({
-    LegendStates<Color>? menuBackground,
+    InteractiveColors? menuBackground,
     BorderRadius? menuBorderRadius,
     List<BoxShadow>? menuShadows,
     double? menuMaxHeight,
@@ -113,7 +140,7 @@ class LegendDropdownThemeNullable {
     this.textStyle,
   });
 
-  final LegendStates<Color>? menuBackground;
+  final InteractiveColors? menuBackground;
   final BorderRadius? menuBorderRadius;
   final List<BoxShadow>? menuShadows;
   final double? menuMaxHeight;
@@ -123,7 +150,8 @@ class LegendDropdownThemeNullable {
   LegendDropdownThemeNullable merge(LegendDropdownThemeNullable? other) {
     if (other == null) return this;
     return LegendDropdownThemeNullable(
-      menuBackground: LegendStates.merge(menuBackground, other.menuBackground),
+      menuBackground:
+          menuBackground?.merge(other.menuBackground) ?? other.menuBackground,
       menuBorderRadius: other.menuBorderRadius ?? menuBorderRadius,
       menuShadows: other.menuShadows ?? menuShadows,
       menuMaxHeight: other.menuMaxHeight ?? menuMaxHeight,
@@ -173,6 +201,174 @@ class LegendDropdownThemeOverride extends StatelessWidget {
       );
 }
 
+/// Resolves [LegendDropdown.menuBackground] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+InteractiveColors _$LegendDropdownSelectMenuBackground(LegendThemeData data) =>
+    _menuBackground(data.tokens).merge(
+      data
+          .componentOf<LegendDropdownThemeNullable>(LegendDropdown)
+          ?.menuBackground,
+    );
+const _$LegendDropdownAspectMenuBackground = LegendThemeAspect(
+  _$LegendDropdownSelectMenuBackground,
+);
+Object? _$LegendDropdownOverrideSelectMenuBackground(
+  LegendDropdownThemeNullable data,
+) => data.menuBackground;
+const _$LegendDropdownOverrideAspectMenuBackground =
+    LegendOverrideAspect<LegendDropdownThemeNullable>(
+      _$LegendDropdownOverrideSelectMenuBackground,
+    );
+
+/// Resolves [LegendDropdown.menuBorderRadius] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+BorderRadius _$LegendDropdownSelectMenuBorderRadius(LegendThemeData data) =>
+    data
+        .componentOf<LegendDropdownThemeNullable>(LegendDropdown)
+        ?.menuBorderRadius ??
+    _menuBorderRadius(data.tokens);
+const _$LegendDropdownAspectMenuBorderRadius = LegendThemeAspect(
+  _$LegendDropdownSelectMenuBorderRadius,
+);
+Object? _$LegendDropdownOverrideSelectMenuBorderRadius(
+  LegendDropdownThemeNullable data,
+) => data.menuBorderRadius;
+const _$LegendDropdownOverrideAspectMenuBorderRadius =
+    LegendOverrideAspect<LegendDropdownThemeNullable>(
+      _$LegendDropdownOverrideSelectMenuBorderRadius,
+    );
+
+/// Resolves [LegendDropdown.menuShadows] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+List<BoxShadow> _$LegendDropdownSelectMenuShadows(LegendThemeData data) =>
+    data
+        .componentOf<LegendDropdownThemeNullable>(LegendDropdown)
+        ?.menuShadows ??
+    ShadowRef.medium(data.tokens);
+const _$LegendDropdownAspectMenuShadows = LegendThemeAspect(
+  _$LegendDropdownSelectMenuShadows,
+);
+Object? _$LegendDropdownOverrideSelectMenuShadows(
+  LegendDropdownThemeNullable data,
+) => data.menuShadows;
+const _$LegendDropdownOverrideAspectMenuShadows =
+    LegendOverrideAspect<LegendDropdownThemeNullable>(
+      _$LegendDropdownOverrideSelectMenuShadows,
+    );
+
+/// Resolves [LegendDropdown.menuMaxHeight] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+double _$LegendDropdownSelectMenuMaxHeight(LegendThemeData data) =>
+    data
+        .componentOf<LegendDropdownThemeNullable>(LegendDropdown)
+        ?.menuMaxHeight ??
+    320;
+const _$LegendDropdownAspectMenuMaxHeight = LegendThemeAspect(
+  _$LegendDropdownSelectMenuMaxHeight,
+);
+Object? _$LegendDropdownOverrideSelectMenuMaxHeight(
+  LegendDropdownThemeNullable data,
+) => data.menuMaxHeight;
+const _$LegendDropdownOverrideAspectMenuMaxHeight =
+    LegendOverrideAspect<LegendDropdownThemeNullable>(
+      _$LegendDropdownOverrideSelectMenuMaxHeight,
+    );
+
+/// Resolves [LegendDropdown.itemPadding] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+EdgeInsetsGeometry _$LegendDropdownSelectItemPadding(LegendThemeData data) =>
+    data
+        .componentOf<LegendDropdownThemeNullable>(LegendDropdown)
+        ?.itemPadding ??
+    _itemPadding(data.tokens);
+const _$LegendDropdownAspectItemPadding = LegendThemeAspect(
+  _$LegendDropdownSelectItemPadding,
+);
+Object? _$LegendDropdownOverrideSelectItemPadding(
+  LegendDropdownThemeNullable data,
+) => data.itemPadding;
+const _$LegendDropdownOverrideAspectItemPadding =
+    LegendOverrideAspect<LegendDropdownThemeNullable>(
+      _$LegendDropdownOverrideSelectItemPadding,
+    );
+
+/// Resolves [LegendDropdown.textStyle] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+TextStyle _$LegendDropdownSelectTextStyle(LegendThemeData data) =>
+    data.componentOf<LegendDropdownThemeNullable>(LegendDropdown)?.textStyle ??
+    TextRef.b2(data.tokens);
+const _$LegendDropdownAspectTextStyle = LegendThemeAspect(
+  _$LegendDropdownSelectTextStyle,
+);
+Object? _$LegendDropdownOverrideSelectTextStyle(
+  LegendDropdownThemeNullable data,
+) => data.textStyle;
+const _$LegendDropdownOverrideAspectTextStyle =
+    LegendOverrideAspect<LegendDropdownThemeNullable>(
+      _$LegendDropdownOverrideSelectTextStyle,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class LegendDropdownThemeListenables {
+  /// Change stream of the resolved [LegendDropdownTheme.menuBackground].
+  static ValueListenable<InteractiveColors> menuBackground(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendDropdownSelectMenuBackground);
+
+  /// Change stream of the resolved [LegendDropdownTheme.menuBorderRadius].
+  static ValueListenable<BorderRadius> menuBorderRadius(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) =>
+      LegendThemeSelector(source, data, _$LegendDropdownSelectMenuBorderRadius);
+
+  /// Change stream of the resolved [LegendDropdownTheme.menuShadows].
+  static ValueListenable<List<BoxShadow>> menuShadows(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendDropdownSelectMenuShadows);
+
+  /// Change stream of the resolved [LegendDropdownTheme.menuMaxHeight].
+  static ValueListenable<double> menuMaxHeight(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendDropdownSelectMenuMaxHeight);
+
+  /// Change stream of the resolved [LegendDropdownTheme.itemPadding].
+  static ValueListenable<EdgeInsetsGeometry> itemPadding(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendDropdownSelectItemPadding);
+
+  /// Change stream of the resolved [LegendDropdownTheme.textStyle].
+  static ValueListenable<TextStyle> textStyle(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendDropdownSelectTextStyle);
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -190,4 +386,180 @@ extension _$LegendDropdownThemeResolve on LegendDropdown {
       textStyle: textStyle,
     ),
   );
+
+  /// Resolves ONLY [LegendDropdown.menuBackground] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._menuBackground(context)`).
+  InteractiveColors _menuBackground(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendDropdownThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendDropdownAspectMenuBackground);
+    LegendThemeOverride.depend<LegendDropdownThemeNullable>(
+      context,
+      _$LegendDropdownOverrideAspectMenuBackground,
+    );
+    return _$LegendDropdownSelectMenuBackground(
+      data,
+    ).merge(override?.menuBackground).merge(menuBackground);
+  }
+
+  /// Resolves ONLY [LegendDropdown.menuBorderRadius] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._menuBorderRadius(context)`).
+  BorderRadius _menuBorderRadius(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendDropdownThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendDropdownAspectMenuBorderRadius);
+    LegendThemeOverride.depend<LegendDropdownThemeNullable>(
+      context,
+      _$LegendDropdownOverrideAspectMenuBorderRadius,
+    );
+    return menuBorderRadius ??
+        override?.menuBorderRadius ??
+        _$LegendDropdownSelectMenuBorderRadius(data);
+  }
+
+  /// Resolves ONLY [LegendDropdown.menuShadows] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._menuShadows(context)`).
+  List<BoxShadow> _menuShadows(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendDropdownThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendDropdownAspectMenuShadows);
+    LegendThemeOverride.depend<LegendDropdownThemeNullable>(
+      context,
+      _$LegendDropdownOverrideAspectMenuShadows,
+    );
+    return menuShadows ??
+        override?.menuShadows ??
+        _$LegendDropdownSelectMenuShadows(data);
+  }
+
+  /// Resolves ONLY [LegendDropdown.menuMaxHeight] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._menuMaxHeight(context)`).
+  double _menuMaxHeight(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendDropdownThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendDropdownAspectMenuMaxHeight);
+    LegendThemeOverride.depend<LegendDropdownThemeNullable>(
+      context,
+      _$LegendDropdownOverrideAspectMenuMaxHeight,
+    );
+    return menuMaxHeight ??
+        override?.menuMaxHeight ??
+        _$LegendDropdownSelectMenuMaxHeight(data);
+  }
+
+  /// Resolves ONLY [LegendDropdown.itemPadding] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._itemPadding(context)`).
+  EdgeInsetsGeometry _itemPadding(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendDropdownThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendDropdownAspectItemPadding);
+    LegendThemeOverride.depend<LegendDropdownThemeNullable>(
+      context,
+      _$LegendDropdownOverrideAspectItemPadding,
+    );
+    return itemPadding ??
+        override?.itemPadding ??
+        _$LegendDropdownSelectItemPadding(data);
+  }
+
+  /// Resolves ONLY [LegendDropdown.textStyle] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._textStyle(context)`).
+  TextStyle _textStyle(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendDropdownThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendDropdownAspectTextStyle);
+    LegendThemeOverride.depend<LegendDropdownThemeNullable>(
+      context,
+      _$LegendDropdownOverrideAspectTextStyle,
+    );
+    return textStyle ??
+        override?.textStyle ??
+        _$LegendDropdownSelectTextStyle(data);
+  }
+}
+
+/// Auto-detected State wiring (RFC-002 R13): [_LegendDropdownState]
+/// is this file's `State<LegendDropdown>`, so its
+/// build reads the resolved theme as a plain `theme`
+/// getter — zero visible wiring. A same-named instance
+/// member (e.g. from [_$LegendDropdownThemeState])
+/// wins over this extension.
+extension _$LegendDropdownThemeOn_LegendDropdownState<T>
+    on _LegendDropdownState<T> {
+  LegendDropdownTheme get theme => widget._theme(context);
+}
+
+/// Explicit State wiring (RFC-002 R13): mix onto any
+/// `State<LegendDropdown>` for the `theme` getter as a
+/// real, overridable inherited member — no State-class
+/// detection involved.
+mixin _$LegendDropdownThemeState on State<LegendDropdown> {
+  LegendDropdownTheme get theme => widget._theme(context);
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class LegendDropdown extends
+/// _$LegendDropdownBase` receives the resolved
+/// [LegendDropdownTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$LegendDropdownBase
+    extends LegendStatelessWidget<LegendDropdownTheme> {
+  const _$LegendDropdownBase({super.key});
+
+  InteractiveColors? get menuBackground;
+  BorderRadius? get menuBorderRadius;
+  List<BoxShadow>? get menuShadows;
+  double? get menuMaxHeight;
+  EdgeInsetsGeometry? get itemPadding;
+  TextStyle? get textStyle;
+
+  @override
+  LegendDropdownTheme resolveThemeOf(BuildContext context) =>
+      LegendDropdownTheme.of(
+        context,
+        LegendDropdownThemeNullable(
+          menuBackground: menuBackground,
+          menuBorderRadius: menuBorderRadius,
+          menuShadows: menuShadows,
+          menuMaxHeight: menuMaxHeight,
+          itemPadding: itemPadding,
+          textStyle: textStyle,
+        ),
+      );
 }

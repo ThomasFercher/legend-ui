@@ -33,16 +33,46 @@ class FancyBoxTheme {
   /// [FancyBox] first, [FancyBoxThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static FancyBoxTheme of(
     BuildContext context, [
     FancyBoxThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
-    final resolved = FancyBoxTheme.defaults(data.tokens)
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<FancyBoxThemeNullable>(context);
+    LegendTheme.depend(context, _$FancyBoxAspectBackground);
+    LegendThemeOverride.depend<FancyBoxThemeNullable>(
+      context,
+      _$FancyBoxOverrideAspectBackground,
+    );
+    LegendTheme.depend(context, _$FancyBoxAspectGap);
+    LegendThemeOverride.depend<FancyBoxThemeNullable>(
+      context,
+      _$FancyBoxOverrideAspectGap,
+    );
+    LegendTheme.depend(context, _$FancyBoxAspectPadding);
+    LegendThemeOverride.depend<FancyBoxThemeNullable>(
+      context,
+      _$FancyBoxOverrideAspectPadding,
+    );
+    LegendTheme.depend(context, _$FancyBoxAspectStripeWidth);
+    LegendThemeOverride.depend<FancyBoxThemeNullable>(
+      context,
+      _$FancyBoxOverrideAspectStripeWidth,
+    );
+    LegendTheme.depend(context, _$FancyBoxAspectOutline);
+    LegendThemeOverride.depend<FancyBoxThemeNullable>(
+      context,
+      _$FancyBoxOverrideAspectOutline,
+    );
+    return FancyBoxTheme.defaults(data.tokens)
         .merge(data.componentOf<FancyBoxThemeNullable>(FancyBox))
-        .merge(LegendThemeOverride.maybeOf<FancyBoxThemeNullable>(context))
+        .merge(override)
         .merge(local);
-    return resolved;
   }
 
   FancyBoxTheme merge(FancyBoxThemeNullable? other) {
@@ -140,6 +170,123 @@ class FancyBoxThemeOverride extends StatelessWidget {
       LegendThemeOverride<FancyBoxThemeNullable>(data: data, child: child);
 }
 
+/// Resolves [FancyBox.background] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$FancyBoxSelectBackground(LegendThemeData data) =>
+    data.componentOf<FancyBoxThemeNullable>(FancyBox)?.background ??
+    LegendColorsRef.surface(data.tokens);
+const _$FancyBoxAspectBackground = LegendThemeAspect(
+  _$FancyBoxSelectBackground,
+);
+Object? _$FancyBoxOverrideSelectBackground(FancyBoxThemeNullable data) =>
+    data.background;
+const _$FancyBoxOverrideAspectBackground =
+    LegendOverrideAspect<FancyBoxThemeNullable>(
+      _$FancyBoxOverrideSelectBackground,
+    );
+
+/// Resolves [FancyBox.gap] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+double _$FancyBoxSelectGap(LegendThemeData data) =>
+    data.componentOf<FancyBoxThemeNullable>(FancyBox)?.gap ?? 8.0;
+const _$FancyBoxAspectGap = LegendThemeAspect(_$FancyBoxSelectGap);
+Object? _$FancyBoxOverrideSelectGap(FancyBoxThemeNullable data) => data.gap;
+const _$FancyBoxOverrideAspectGap = LegendOverrideAspect<FancyBoxThemeNullable>(
+  _$FancyBoxOverrideSelectGap,
+);
+
+/// Resolves [FancyBox.padding] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+EdgeInsetsGeometry _$FancyBoxSelectPadding(LegendThemeData data) =>
+    data.componentOf<FancyBoxThemeNullable>(FancyBox)?.padding ??
+    FancyBox._padding(data.tokens);
+const _$FancyBoxAspectPadding = LegendThemeAspect(_$FancyBoxSelectPadding);
+Object? _$FancyBoxOverrideSelectPadding(FancyBoxThemeNullable data) =>
+    data.padding;
+const _$FancyBoxOverrideAspectPadding =
+    LegendOverrideAspect<FancyBoxThemeNullable>(
+      _$FancyBoxOverrideSelectPadding,
+    );
+
+/// Resolves [FancyBox.stripeWidth] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+double _$FancyBoxSelectStripeWidth(LegendThemeData data) =>
+    data.componentOf<FancyBoxThemeNullable>(FancyBox)?.stripeWidth ??
+    _stripeWidth(data.tokens);
+const _$FancyBoxAspectStripeWidth = LegendThemeAspect(
+  _$FancyBoxSelectStripeWidth,
+);
+Object? _$FancyBoxOverrideSelectStripeWidth(FancyBoxThemeNullable data) =>
+    data.stripeWidth;
+const _$FancyBoxOverrideAspectStripeWidth =
+    LegendOverrideAspect<FancyBoxThemeNullable>(
+      _$FancyBoxOverrideSelectStripeWidth,
+    );
+
+/// Resolves [FancyBox.outline] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color? _$FancyBoxSelectOutline(LegendThemeData data) =>
+    data.componentOf<FancyBoxThemeNullable>(FancyBox)?.outline;
+const _$FancyBoxAspectOutline = LegendThemeAspect(_$FancyBoxSelectOutline);
+Object? _$FancyBoxOverrideSelectOutline(FancyBoxThemeNullable data) =>
+    data.outline;
+const _$FancyBoxOverrideAspectOutline =
+    LegendOverrideAspect<FancyBoxThemeNullable>(
+      _$FancyBoxOverrideSelectOutline,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class FancyBoxThemeListenables {
+  /// Change stream of the resolved [FancyBoxTheme.background].
+  static ValueListenable<Color> background(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$FancyBoxSelectBackground);
+
+  /// Change stream of the resolved [FancyBoxTheme.gap].
+  static ValueListenable<double> gap(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$FancyBoxSelectGap);
+
+  /// Change stream of the resolved [FancyBoxTheme.padding].
+  static ValueListenable<EdgeInsetsGeometry> padding(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$FancyBoxSelectPadding);
+
+  /// Change stream of the resolved [FancyBoxTheme.stripeWidth].
+  static ValueListenable<double> stripeWidth(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$FancyBoxSelectStripeWidth);
+
+  /// Change stream of the resolved [FancyBoxTheme.outline].
+  static ValueListenable<Color?> outline(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$FancyBoxSelectOutline);
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -147,6 +294,122 @@ extension _$FancyBoxThemeResolve on FancyBox {
   /// [FancyBoxTheme.of] with this widget's constructor params as
   /// level 1.
   FancyBoxTheme _theme(BuildContext context) => FancyBoxTheme.of(
+    context,
+    FancyBoxThemeNullable(
+      background: background,
+      gap: gap,
+      padding: padding,
+      stripeWidth: stripeWidth,
+      outline: outline,
+    ),
+  );
+
+  /// Resolves ONLY [FancyBox.background] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._background(context)`).
+  Color _background(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<FancyBoxThemeNullable>(context);
+    LegendTheme.depend(context, _$FancyBoxAspectBackground);
+    LegendThemeOverride.depend<FancyBoxThemeNullable>(
+      context,
+      _$FancyBoxOverrideAspectBackground,
+    );
+    return background ??
+        override?.background ??
+        _$FancyBoxSelectBackground(data);
+  }
+
+  /// Resolves ONLY [FancyBox.gap] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._gap(context)`).
+  double _gap(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<FancyBoxThemeNullable>(context);
+    LegendTheme.depend(context, _$FancyBoxAspectGap);
+    LegendThemeOverride.depend<FancyBoxThemeNullable>(
+      context,
+      _$FancyBoxOverrideAspectGap,
+    );
+    return gap ?? override?.gap ?? _$FancyBoxSelectGap(data);
+  }
+
+  /// Resolves ONLY [FancyBox.padding] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._padding(context)`).
+  EdgeInsetsGeometry _padding(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<FancyBoxThemeNullable>(context);
+    LegendTheme.depend(context, _$FancyBoxAspectPadding);
+    LegendThemeOverride.depend<FancyBoxThemeNullable>(
+      context,
+      _$FancyBoxOverrideAspectPadding,
+    );
+    return padding ?? override?.padding ?? _$FancyBoxSelectPadding(data);
+  }
+
+  /// Resolves ONLY [FancyBox.stripeWidth] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._stripeWidth(context)`).
+  double _stripeWidth(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<FancyBoxThemeNullable>(context);
+    LegendTheme.depend(context, _$FancyBoxAspectStripeWidth);
+    LegendThemeOverride.depend<FancyBoxThemeNullable>(
+      context,
+      _$FancyBoxOverrideAspectStripeWidth,
+    );
+    return stripeWidth ??
+        override?.stripeWidth ??
+        _$FancyBoxSelectStripeWidth(data);
+  }
+
+  /// Resolves ONLY [FancyBox.outline] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._outline(context)`).
+  Color? _outline(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<FancyBoxThemeNullable>(context);
+    LegendTheme.depend(context, _$FancyBoxAspectOutline);
+    LegendThemeOverride.depend<FancyBoxThemeNullable>(
+      context,
+      _$FancyBoxOverrideAspectOutline,
+    );
+    return outline ?? override?.outline ?? _$FancyBoxSelectOutline(data);
+  }
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class FancyBox extends
+/// _$FancyBoxBase` receives the resolved
+/// [FancyBoxTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$FancyBoxBase extends LegendStatelessWidget<FancyBoxTheme> {
+  const _$FancyBoxBase({super.key});
+
+  Color? get background;
+  double? get gap;
+  EdgeInsetsGeometry? get padding;
+  double? get stripeWidth;
+  Color? get outline;
+
+  @override
+  FancyBoxTheme resolveThemeOf(BuildContext context) => FancyBoxTheme.of(
     context,
     FancyBoxThemeNullable(
       background: background,

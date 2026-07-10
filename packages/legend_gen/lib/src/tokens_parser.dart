@@ -20,8 +20,9 @@ import 'package:path/path.dart' as p;
 /// - every instance field is `final`, explicitly typed and non-nullable,
 /// - `List<…>` fields are `List<BoxShadow>` (the one list lerper),
 /// - the class applies the generated mixin (`with _$ClassName`),
-/// - `mountedAt:` (the Ref-catalog mount, RFC-002 R10 amendment) is a
-///   plain string literal when given,
+/// - `mountedAt:` (the Ref-catalog mount, RFC-002 R10 amendment) and
+///   `refName:` (the catalog's class name) are plain string literals
+///   when given,
 /// - the file carries `part '<file>.tokens.g.dart';`.
 List<TokenClass> parseTokenClasses(String path, String content) {
   final unit = parseString(
@@ -46,8 +47,9 @@ List<TokenClass> parseTokenClasses(String path, String content) {
     if (marker == null) continue;
 
     final className = declaration.name.lexeme;
+    final markerArguments = marker.arguments?.arguments ?? <Expression>[];
     String? mountedAt;
-    final mountArgument = (marker.arguments?.arguments ?? <Expression>[])
+    final mountArgument = markerArguments
         .whereType<NamedExpression>()
         .where((a) => a.name.label.name == 'mountedAt')
         .firstOrNull;
@@ -62,6 +64,25 @@ List<TokenClass> parseTokenClasses(String path, String content) {
           "LegendTokens getter the class sits behind, e.g. 'sizes') — the "
           'Ref catalog is generated from it (RFC-002 R10 amendment); '
           'write the literal directly.',
+        );
+        continue;
+      }
+    }
+    String? refName;
+    final refNameArgument = markerArguments
+        .whereType<NamedExpression>()
+        .where((a) => a.name.label.name == 'refName')
+        .firstOrNull;
+    if (refNameArgument != null) {
+      final value = refNameArgument.expression;
+      if (value is SimpleStringLiteral) {
+        refName = value.value;
+      } else if (value is! NullLiteral) {
+        report(
+          refNameArgument,
+          'refName on "$className" must be a plain string literal (the '
+          "emitted Ref catalog's class name, e.g. 'ColorRef') — write the "
+          'literal directly, or drop it to default to <ClassName>Ref.',
         );
         continue;
       }
@@ -160,6 +181,7 @@ List<TokenClass> parseTokenClasses(String path, String content) {
         fields: fields,
         sourceBasename: p.basename(path),
         mountedAt: mountedAt,
+        refName: refName,
         line: lineOf(declaration.name),
       ),
     );

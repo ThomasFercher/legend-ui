@@ -15,7 +15,7 @@ class LegendDialogTheme {
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendDialogTheme.defaults(LegendTokens t) => LegendDialogTheme(
-    background: LegendColorsRef.surface(t),
+    background: ColorRef.surface(t),
     borderRadius: _borderRadius(t),
     padding: _padding(t),
     maxWidth: 420,
@@ -30,16 +30,43 @@ class LegendDialogTheme {
   /// [LegendDialog] first, [LegendDialogThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static LegendDialogTheme of(
     BuildContext context, [
     LegendDialogThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
-    final resolved = LegendDialogTheme.defaults(data.tokens)
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendDialogThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendDialogAspectBackground);
+    LegendThemeOverride.depend<LegendDialogThemeNullable>(
+      context,
+      _$LegendDialogOverrideAspectBackground,
+    );
+    LegendTheme.depend(context, _$LegendDialogAspectBorderRadius);
+    LegendThemeOverride.depend<LegendDialogThemeNullable>(
+      context,
+      _$LegendDialogOverrideAspectBorderRadius,
+    );
+    LegendTheme.depend(context, _$LegendDialogAspectPadding);
+    LegendThemeOverride.depend<LegendDialogThemeNullable>(
+      context,
+      _$LegendDialogOverrideAspectPadding,
+    );
+    LegendTheme.depend(context, _$LegendDialogAspectMaxWidth);
+    LegendThemeOverride.depend<LegendDialogThemeNullable>(
+      context,
+      _$LegendDialogOverrideAspectMaxWidth,
+    );
+    return LegendDialogTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendDialogThemeNullable>(LegendDialog))
-        .merge(LegendThemeOverride.maybeOf<LegendDialogThemeNullable>(context))
+        .merge(override)
         .merge(local);
-    return resolved;
   }
 
   LegendDialogTheme merge(LegendDialogThemeNullable? other) {
@@ -132,6 +159,111 @@ class LegendDialogThemeOverride extends StatelessWidget {
       LegendThemeOverride<LegendDialogThemeNullable>(data: data, child: child);
 }
 
+/// Resolves [LegendDialog.background] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendDialogSelectBackground(LegendThemeData data) =>
+    data.componentOf<LegendDialogThemeNullable>(LegendDialog)?.background ??
+    ColorRef.surface(data.tokens);
+const _$LegendDialogAspectBackground = LegendThemeAspect(
+  _$LegendDialogSelectBackground,
+);
+Object? _$LegendDialogOverrideSelectBackground(
+  LegendDialogThemeNullable data,
+) => data.background;
+const _$LegendDialogOverrideAspectBackground =
+    LegendOverrideAspect<LegendDialogThemeNullable>(
+      _$LegendDialogOverrideSelectBackground,
+    );
+
+/// Resolves [LegendDialog.borderRadius] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+BorderRadius _$LegendDialogSelectBorderRadius(LegendThemeData data) =>
+    data.componentOf<LegendDialogThemeNullable>(LegendDialog)?.borderRadius ??
+    _borderRadius(data.tokens);
+const _$LegendDialogAspectBorderRadius = LegendThemeAspect(
+  _$LegendDialogSelectBorderRadius,
+);
+Object? _$LegendDialogOverrideSelectBorderRadius(
+  LegendDialogThemeNullable data,
+) => data.borderRadius;
+const _$LegendDialogOverrideAspectBorderRadius =
+    LegendOverrideAspect<LegendDialogThemeNullable>(
+      _$LegendDialogOverrideSelectBorderRadius,
+    );
+
+/// Resolves [LegendDialog.padding] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+EdgeInsetsGeometry _$LegendDialogSelectPadding(LegendThemeData data) =>
+    data.componentOf<LegendDialogThemeNullable>(LegendDialog)?.padding ??
+    _padding(data.tokens);
+const _$LegendDialogAspectPadding = LegendThemeAspect(
+  _$LegendDialogSelectPadding,
+);
+Object? _$LegendDialogOverrideSelectPadding(LegendDialogThemeNullable data) =>
+    data.padding;
+const _$LegendDialogOverrideAspectPadding =
+    LegendOverrideAspect<LegendDialogThemeNullable>(
+      _$LegendDialogOverrideSelectPadding,
+    );
+
+/// Resolves [LegendDialog.maxWidth] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+double _$LegendDialogSelectMaxWidth(LegendThemeData data) =>
+    data.componentOf<LegendDialogThemeNullable>(LegendDialog)?.maxWidth ?? 420;
+const _$LegendDialogAspectMaxWidth = LegendThemeAspect(
+  _$LegendDialogSelectMaxWidth,
+);
+Object? _$LegendDialogOverrideSelectMaxWidth(LegendDialogThemeNullable data) =>
+    data.maxWidth;
+const _$LegendDialogOverrideAspectMaxWidth =
+    LegendOverrideAspect<LegendDialogThemeNullable>(
+      _$LegendDialogOverrideSelectMaxWidth,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class LegendDialogThemeListenables {
+  /// Change stream of the resolved [LegendDialogTheme.background].
+  static ValueListenable<Color> background(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendDialogSelectBackground);
+
+  /// Change stream of the resolved [LegendDialogTheme.borderRadius].
+  static ValueListenable<BorderRadius> borderRadius(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendDialogSelectBorderRadius);
+
+  /// Change stream of the resolved [LegendDialogTheme.padding].
+  static ValueListenable<EdgeInsetsGeometry> padding(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendDialogSelectPadding);
+
+  /// Change stream of the resolved [LegendDialogTheme.maxWidth].
+  static ValueListenable<double> maxWidth(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendDialogSelectMaxWidth);
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -147,4 +279,111 @@ extension _$LegendDialogThemeResolve on LegendDialog {
       maxWidth: maxWidth,
     ),
   );
+
+  /// Resolves ONLY [LegendDialog.background] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._background(context)`).
+  Color _background(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendDialogThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendDialogAspectBackground);
+    LegendThemeOverride.depend<LegendDialogThemeNullable>(
+      context,
+      _$LegendDialogOverrideAspectBackground,
+    );
+    return background ??
+        override?.background ??
+        _$LegendDialogSelectBackground(data);
+  }
+
+  /// Resolves ONLY [LegendDialog.borderRadius] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._borderRadius(context)`).
+  BorderRadius _borderRadius(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendDialogThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendDialogAspectBorderRadius);
+    LegendThemeOverride.depend<LegendDialogThemeNullable>(
+      context,
+      _$LegendDialogOverrideAspectBorderRadius,
+    );
+    return borderRadius ??
+        override?.borderRadius ??
+        _$LegendDialogSelectBorderRadius(data);
+  }
+
+  /// Resolves ONLY [LegendDialog.padding] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._padding(context)`).
+  EdgeInsetsGeometry _padding(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendDialogThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendDialogAspectPadding);
+    LegendThemeOverride.depend<LegendDialogThemeNullable>(
+      context,
+      _$LegendDialogOverrideAspectPadding,
+    );
+    return padding ?? override?.padding ?? _$LegendDialogSelectPadding(data);
+  }
+
+  /// Resolves ONLY [LegendDialog.maxWidth] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._maxWidth(context)`).
+  double _maxWidth(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendDialogThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendDialogAspectMaxWidth);
+    LegendThemeOverride.depend<LegendDialogThemeNullable>(
+      context,
+      _$LegendDialogOverrideAspectMaxWidth,
+    );
+    return maxWidth ?? override?.maxWidth ?? _$LegendDialogSelectMaxWidth(data);
+  }
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class LegendDialog extends
+/// _$LegendDialogBase` receives the resolved
+/// [LegendDialogTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$LegendDialogBase
+    extends LegendStatelessWidget<LegendDialogTheme> {
+  const _$LegendDialogBase({super.key});
+
+  Color? get background;
+  BorderRadius? get borderRadius;
+  EdgeInsetsGeometry? get padding;
+  double? get maxWidth;
+
+  @override
+  LegendDialogTheme resolveThemeOf(BuildContext context) =>
+      LegendDialogTheme.of(
+        context,
+        LegendDialogThemeNullable(
+          background: background,
+          borderRadius: borderRadius,
+          padding: padding,
+          maxWidth: maxWidth,
+        ),
+      );
 }

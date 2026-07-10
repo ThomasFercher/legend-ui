@@ -22,8 +22,15 @@ part 'legend_divider.theme.g.dart';
 ///
 /// A vertical divider needs a bounded height from its parent (same
 /// contract as Flutter's `VerticalDivider`).
+///
+/// This is the kit's living documentation of the R13 **opt-in base**
+/// (RFC-002 R13): it extends the generated `_$LegendDividerBase` for the
+/// two-argument `build(context, theme)` instead of the default
+/// `_theme(context)` hook — themed fields carry `@override` because they
+/// implement the base's abstract getters. Every other stateless component
+/// stays on the hook.
 @LegendThemeable()
-class LegendDivider extends StatelessWidget {
+class LegendDivider extends _$LegendDividerBase {
   const LegendDivider({
     super.key,
     this.axis = Axis.horizontal,
@@ -36,20 +43,22 @@ class LegendDivider extends StatelessWidget {
   final Axis axis;
 
   /// Color of the line.
-  @Style<Color>.resolve(LegendColorsRef.background3)
+  @override
+  @Style<Color>.resolve(ColorRef.background3)
   final Color? color;
 
   /// Stroke width of the line.
-  @Style<double>.resolve(LegendSizesRef.borderWidth)
+  @override
+  @Style<double>.resolve(SizeRef.borderWidth)
   final double? thickness;
 
   /// Outer margin on both sides of the line.
-  @Style<double>.resolve(LegendSizesRef.md)
+  @override
+  @Style<double>.resolve(SizeRef.md)
   final double? spacing;
 
   @override
-  Widget build(BuildContext context) {
-    final theme = _theme(context);
+  Widget build(BuildContext context, LegendDividerTheme theme) {
     final horizontal = axis == Axis.horizontal;
     return Padding(
       padding: horizontal

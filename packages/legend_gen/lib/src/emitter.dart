@@ -37,9 +37,6 @@ void _emitWidget(StringBuffer b, ThemableWidget widget) {
   final nullable = '${widget.className}ThemeNullable';
   final override = '${widget.className}ThemeOverride';
   final fields = widget.fields;
-  final derivedColorStates = fields
-      .where((f) => f.statesInnerType == 'Color')
-      .toList();
 
   // ── Resolved theme ────────────────────────────────────────────────
   b
@@ -58,45 +55,42 @@ void _emitWidget(StringBuffer b, ThemableWidget widget) {
     ..writeln()
     ..writeln(fields.map((f) => 'final ${f.themeType} ${f.name};').join());
 
-  // of(): the four-level resolution chain (DESIGN.md §1 goal 3).
+  // of(): the four-level resolution chain (DESIGN.md §1 goal 3), with
+  // per-field rebuild aspects (RFC-002 R12).
+  final listened = fields.where((f) => f.listen).toList();
   b
     ..writeln()
     ..writeln('/// Resolves the theme: defaults <- app registry (keyed by')
     ..writeln('/// [${widget.className}] first, [$nullable] as the legacy')
     ..writeln('/// fallback — RFC-002 R3) <- subtree override <- constructor')
-    ..writeln('/// params ([local]).');
-  if (derivedColorStates.isNotEmpty) {
-    b
-      ..writeln('///')
-      ..writeln('/// Post-merge, unset `LegendStates<Color>` members fill')
-      ..writeln('/// from the resolved `normal` via `tokens.states`')
-      ..writeln('/// (RFC-002 R6) — named members at any level always win.');
+    ..writeln('/// params ([local]).')
+    ..writeln('///')
+    ..writeln('/// Registers one rebuild aspect per `listen: true` field')
+    ..writeln('/// (RFC-002 R12): the caller rebuilds only when a listened')
+    ..writeln("/// field's resolved value changes; `listen: false` fields")
+    ..writeln('/// resolve fresh but never cause a rebuild by themselves.')
+    ..writeln('static $theme of(BuildContext context, [$nullable? local]) {')
+    ..writeln('final data = LegendTheme.read(context);')
+    ..writeln('final override = LegendThemeOverride.read<$nullable>(context);');
+  if (listened.isNotEmpty) {
+    b.writeln(
+      listened
+          .map(
+            (f) =>
+                'LegendTheme.depend(context, '
+                '_\$${widget.className}Aspect${_pascal(f.name)});'
+                'LegendThemeOverride.depend<$nullable>(context, '
+                '_\$${widget.className}OverrideAspect${_pascal(f.name)});',
+          )
+          .join(),
+    );
   }
   b
-    ..writeln('static $theme of(BuildContext context, [$nullable? local]) {')
-    ..writeln('final data = LegendTheme.of(context);')
-    ..writeln('final resolved = $theme.defaults(data.tokens)')
+    ..writeln('return $theme.defaults(data.tokens)')
     ..writeln('.merge(data.componentOf<$nullable>(${widget.className}))')
-    ..writeln('.merge(LegendThemeOverride.maybeOf<$nullable>(context))')
-    ..writeln('.merge(local);');
-  if (derivedColorStates.isEmpty) {
-    b.writeln('return resolved;');
-  } else {
-    b
-      ..writeln('return resolved.copyWith(')
-      ..writeln(
-        derivedColorStates
-            .map(
-              (f) =>
-                  '${f.name}: resolved.${f.name}'
-                  '${f.kind == StyleDefaultKind.none ? '?' : ''}'
-                  '.withDerived(data.tokens.states),',
-            )
-            .join(),
-      )
-      ..writeln(');');
-  }
-  b.writeln('}');
+    ..writeln('.merge(override)')
+    ..writeln('.merge(local);')
+    ..writeln('}');
 
   b
     ..writeln()
@@ -182,7 +176,63 @@ void _emitWidget(StringBuffer b, ThemableWidget widget) {
     ..writeln('LegendThemeOverride<$nullable>(data: data, child: child);')
     ..writeln('}');
 
-  // ── Private in-library resolver (RFC-002 R1) ──────────────────────
+  // ── Per-field selectors + rebuild aspects (RFC-002 R12) ───────────
+  for (final f in fields) {
+    final pascal = _pascal(f.name);
+    b
+      ..writeln()
+      ..writeln('/// Resolves [${widget.className}.${f.name}] through the')
+      ..writeln('/// registry and the token defaults (levels 4+3) — the')
+      ..writeln('/// comparator behind its rebuild aspect and listenable')
+      ..writeln('/// (RFC-002 R12).')
+      ..writeln(
+        '${f.themeType} _\$${widget.className}Select$pascal'
+        '(LegendThemeData data) => ${_selectExpression(widget, f)};',
+      )
+      ..writeln(
+        'const _\$${widget.className}Aspect$pascal = '
+        'LegendThemeAspect(_\$${widget.className}Select$pascal);',
+      )
+      ..writeln(
+        'Object? _\$${widget.className}OverrideSelect$pascal('
+        '$nullable data) => data.${f.name};',
+      )
+      ..writeln(
+        'const _\$${widget.className}OverrideAspect$pascal = '
+        'LegendOverrideAspect<$nullable>('
+        '_\$${widget.className}OverrideSelect$pascal);',
+      );
+  }
+
+  // ── Per-field ValueListenable selectors (RFC-002 R12.4) ───────────
+  b
+    ..writeln()
+    ..writeln('/// Distinct-until-changed per-field change streams over a')
+    ..writeln('/// theme source (RFC-002 R12.4) — for animation and')
+    ..writeln('/// imperative consumers that want theme changes without any')
+    ..writeln('/// widget rebuild. Bind `source` to the app theme')
+    ..writeln('/// controller (any [Listenable]) and `data` to its')
+    ..writeln('/// [LegendThemeData] getter; dispose the returned selector')
+    ..writeln('/// when done. Values resolve through registry + token')
+    ..writeln('/// defaults (constructor params and subtree overrides are')
+    ..writeln('/// element-tree concerns and have no controller-level')
+    ..writeln('/// equivalent).')
+    ..writeln('abstract final class ${theme}Listenables {');
+  for (final f in fields) {
+    b
+      ..writeln('/// Change stream of the resolved [$theme.${f.name}].')
+      ..writeln(
+        'static ValueListenable<${f.themeType}> ${f.name}'
+        '(Listenable source, LegendThemeData Function() data) =>',
+      )
+      ..writeln(
+        'LegendThemeSelector(source, data, '
+        '_\$${widget.className}Select${_pascal(f.name)});',
+      );
+  }
+  b.writeln('}');
+
+  // ── Private in-library resolver (RFC-002 R1) + accessors (R12.3) ──
   b
     ..writeln()
     ..writeln('/// In-library resolver (RFC-002 R1): re-lists the themed')
@@ -199,8 +249,168 @@ void _emitWidget(StringBuffer b, ThemableWidget widget) {
     ..writeln('$nullable(')
     ..writeln(fields.map((f) => '${f.name}: ${f.name},').join())
     ..writeln('),')
+    ..writeln(');');
+  for (final f in fields) {
+    final pascal = _pascal(f.name);
+    b
+      ..writeln()
+      ..writeln('/// Resolves ONLY [${widget.className}.${f.name}] (full')
+      ..writeln("/// four-level chain), registering just this field's")
+      ..writeln('/// rebuild aspect (RFC-002 R12.3) — for widgets consuming')
+      ..writeln('/// one property. When a top-level tear-off shares the')
+      ..writeln('/// name, call it receiver-qualified')
+      ..writeln('/// (`this._${f.name}(context)`).')
+      ..writeln('${f.themeType} _${f.name}(BuildContext context) {')
+      ..writeln('final data = LegendTheme.read(context);')
+      ..writeln(
+        'final override = LegendThemeOverride.read<$nullable>(context);',
+      );
+    if (f.listen) {
+      b
+        ..writeln(
+          'LegendTheme.depend(context, '
+          '_\$${widget.className}Aspect$pascal);',
+        )
+        ..writeln(
+          'LegendThemeOverride.depend<$nullable>(context, '
+          '_\$${widget.className}OverrideAspect$pascal);',
+        );
+    }
+    b
+      ..writeln('return ${_accessorExpression(widget, f)};')
+      ..writeln('}');
+  }
+  b.writeln('}');
+
+  _emitWiringForms(b, widget);
+}
+
+/// The R13 wiring forms: the auto-detected State getter extension, the
+/// explicit `_\$XThemeState` mixin, and the opt-in `_\$XBase` two-argument
+/// build base (RFC-002 R13 revision 2 + opt-in base).
+void _emitWiringForms(StringBuffer b, ThemableWidget widget) {
+  final theme = '${widget.className}Theme';
+  final nullable = '${widget.className}ThemeNullable';
+  final fields = widget.fields;
+
+  final stateClass = widget.stateClassName;
+  if (stateClass != null) {
+    final parameters = widget.stateTypeParameters;
+    final arguments = _typeParameterNames(parameters);
+    b
+      ..writeln()
+      ..writeln('/// Auto-detected State wiring (RFC-002 R13): [$stateClass]')
+      ..writeln("/// is this file's `State<${widget.className}>`, so its")
+      ..writeln('/// build reads the resolved theme as a plain `theme`')
+      ..writeln('/// getter — zero visible wiring. A same-named instance')
+      ..writeln('/// member (e.g. from [_\$${widget.className}ThemeState])')
+      ..writeln('/// wins over this extension.')
+      ..writeln(
+        'extension _\$${widget.className}ThemeOn$stateClass$parameters '
+        'on $stateClass$arguments {',
+      )
+      ..writeln('$theme get theme => widget._theme(context);')
+      ..writeln('}');
+  }
+
+  // `on State<X>` only satisfies State's bound when X is a
+  // StatefulWidget — stateless widgets get the hook and the opt-in base.
+  if (widget.isStateful) {
+    b
+      ..writeln()
+      ..writeln('/// Explicit State wiring (RFC-002 R13): mix onto any')
+      ..writeln('/// `State<${widget.className}>` for the `theme` getter as a')
+      ..writeln('/// real, overridable inherited member — no State-class')
+      ..writeln('/// detection involved.')
+      ..writeln(
+        'mixin _\$${widget.className}ThemeState '
+        'on State<${widget.className}> {',
+      )
+      ..writeln('$theme get theme => widget._theme(context);')
+      ..writeln('}');
+  }
+
+  b
+    ..writeln()
+    ..writeln('/// Opt-in two-argument build base (RFC-002 R13, opt-in')
+    ..writeln('/// base): `class ${widget.className} extends')
+    ..writeln('/// _\$${widget.className}Base` receives the resolved')
+    ..writeln('/// [$theme] as a build parameter. Plain-widget forms stay')
+    ..writeln('/// the default; there is no stateful two-argument variant.')
+    ..writeln(
+      'abstract class _\$${widget.className}Base '
+      'extends LegendStatelessWidget<$theme> {',
+    )
+    ..writeln('const _\$${widget.className}Base({super.key});')
+    ..writeln();
+  for (final f in fields) {
+    b.writeln('${f.type} get ${f.name};');
+  }
+  b
+    ..writeln()
+    ..writeln('@override')
+    ..writeln('$theme resolveThemeOf(BuildContext context) => $theme.of(')
+    ..writeln('context,')
+    ..writeln('$nullable(')
+    ..writeln(fields.map((f) => '${f.name}: ${f.name},').join())
+    ..writeln('),')
     ..writeln(');')
     ..writeln('}');
+}
+
+/// Levels 4+3 resolution of [f] over the theme data — the aspect
+/// comparator and listenable selector body.
+String _selectExpression(ThemableWidget widget, StyledField f) {
+  final registry =
+      'data.componentOf<${widget.className}ThemeNullable>'
+      '(${widget.className})?.${f.name}';
+  if (f.kind == StyleDefaultKind.none) return registry;
+  final defaults = switch (f.kind) {
+    StyleDefaultKind.value => f.defaultCode,
+    StyleDefaultKind.resolve => '${f.defaultCode}(data.tokens)',
+    StyleDefaultKind.none => 'null',
+  };
+  if (f.styleClass != null) return '$defaults.merge($registry)';
+  return '$registry ?? $defaults';
+}
+
+/// Full four-level resolution of [f] inside its per-field accessor
+/// (constructor param > override member > select over registry+defaults).
+String _accessorExpression(ThemableWidget widget, StyledField f) {
+  final select = '_\$${widget.className}Select${_pascal(f.name)}(data)';
+  final overrideMember = 'override?.${f.name}';
+  if (f.styleClass == null) {
+    return '${f.name} ?? $overrideMember ?? $select';
+  }
+  if (f.kind == StyleDefaultKind.none) {
+    final upper = '($select?.merge($overrideMember) ?? $overrideMember)';
+    return '$upper?.merge(${f.name}) ?? ${f.name}';
+  }
+  return '$select.merge($overrideMember).merge(${f.name})';
+}
+
+String _pascal(String name) => name[0].toUpperCase() + name.substring(1);
+
+/// `<T extends num, S>` → `<T, S>` — re-applies a declaration's type
+/// parameters as type arguments on the extension's `on` type.
+String _typeParameterNames(String parameters) {
+  if (parameters.isEmpty) return '';
+  final inner = parameters.substring(1, parameters.length - 1);
+  final names = <String>[];
+  var depth = 0;
+  var start = 0;
+  for (var i = 0; i <= inner.length; i++) {
+    if (i == inner.length || (inner[i] == ',' && depth == 0)) {
+      final part = inner.substring(start, i).trim();
+      names.add(part.split(RegExp(r'[\s<]')).first);
+      start = i + 1;
+    } else if (inner[i] == '<') {
+      depth++;
+    } else if (inner[i] == '>') {
+      depth--;
+    }
+  }
+  return '<${names.join(', ')}>';
 }
 
 String _defaultExpression(StyledField f) {
@@ -213,12 +423,14 @@ String _defaultExpression(StyledField f) {
 
 String _mergeExpression(StyledField f, {required bool sparse}) {
   final n = f.name;
-  if (!f.isStates) return 'other.$n ?? $n';
-  // LegendStates<T> merges member-wise sparse (RFC-002 R6): a level that
-  // names only one state variant never clobbers another level's members.
-  final merged = 'LegendStates.merge($n, other.$n)';
-  if (sparse || f.kind == StyleDefaultKind.none) return merged;
-  return '$merged ?? $n';
+  if (f.styleClass == null) return 'other.$n ?? $n';
+  // Style value classes merge member-wise sparse (RFC-002 R6 amendment 7)
+  // through their generated instance merge: a level that names only one
+  // member never clobbers another level's members.
+  if (sparse || f.kind == StyleDefaultKind.none) {
+    return '$n?.merge(other.$n) ?? other.$n';
+  }
+  return '$n.merge(other.$n)';
 }
 
 String _lerpExpression(StyledField f) {
@@ -226,19 +438,11 @@ String _lerpExpression(StyledField f) {
   if (!f.lerp) return 't < 0.5 ? a.$n : b.$n';
   final nullable = f.kind == StyleDefaultKind.none;
 
-  final inner = f.statesInnerType;
-  if (inner != null) {
-    final lerper = switch (inner) {
-      'Color' => 'Color.lerp',
-      _ =>
-        '(x, y, u) => '
-            'x == null || y == null ? (u < 0.5 ? x : y) : x + (y - x) * u',
-    };
-    final call =
-        'LegendStates.lerpWith(a.$n${nullable ? '!' : ''}, '
-        'b.$n${nullable ? '!' : ''}, t, $lerper)';
-    if (!nullable) return call;
-    return 'a.$n == null || b.$n == null ? (t < 0.5 ? a.$n : b.$n) : $call';
+  final styleClass = f.styleClass;
+  if (styleClass != null) {
+    // Member-wise via the class's own lerp static (RFC-002 R6 amendment 7).
+    return '${styleClass.className}.lerp(a.$n, b.$n, t)'
+        '${nullable ? '' : '!'}';
   }
 
   return switch (f.resolvedType) {
@@ -263,66 +467,262 @@ String _lerpExpression(StyledField f) {
 
 // ── legend_gen docs (RFC-002 R9) ──────────────────────────────────────
 
-/// Emits the docs manifest for all themable widgets of one source file:
-/// one `const List<LegendDocEntry>` per widget, one entry per themed
-/// variable (plus one per named state member of a `LegendStates` field),
-/// each carrying the field's dartdoc and default source text.
+/// Emits the docs manifest for all annotated declarations of one source
+/// file — [ThemableWidget]s and `@Style()` [StyleClass]es: one
+/// `const List<LegendDocEntry>` per declaration. Widgets get one entry per
+/// themed variable — plus, for fields typed with a style value class, one
+/// dot-path entry per member (`background.hovered`, RFC-002 R6 amendment
+/// 7) — each carrying the dartdoc and default source text; style classes
+/// get one `group: 'style'` entry per member.
 ///
 /// Unlike the theme artifact this is a separate importable library — apps
 /// aggregate manifests by importing the ones they care about.
-String emitDocsFile(List<ThemableWidget> widgets) {
-  assert(widgets.isNotEmpty, 'emitDocsFile needs at least one widget');
+String emitDocsFile(List<Object> declarations) {
+  assert(declarations.isNotEmpty, 'emitDocsFile needs at least one source');
+  final sourceBasename = switch (declarations.first) {
+    ThemableWidget(:final sourceBasename) => sourceBasename,
+    StyleClass(:final sourceBasename) => sourceBasename,
+    _ => throw ArgumentError(
+      'emitDocsFile takes ThemableWidget and StyleClass declarations, '
+      'got ${declarations.first.runtimeType}',
+    ),
+  };
   final buffer = StringBuffer()
-    ..writeln(_header(widgets.first.sourceBasename))
+    ..writeln(_header(sourceBasename))
     ..writeln()
     ..writeln("import 'package:legend_ui/legend_ui.dart';");
 
-  for (final widget in widgets) {
-    final listName = '${_lowerCamel(widget.className)}DocEntries';
-    buffer
-      ..writeln()
-      ..writeln('/// Theme docs manifest for `${widget.className}`')
-      ..writeln('/// (RFC-002 R9): one entry per themed variable, extracted')
-      ..writeln('/// from the dartdoc in ${widget.sourceBasename}.')
-      ..writeln('const List<LegendDocEntry> $listName = [');
-    for (final field in widget.fields) {
-      _emitDocEntry(buffer, widget, field, field.name, field.type);
-      final inner = field.statesInnerType;
-      if (inner != null) {
-        for (final member in _statesMembers) {
-          _emitDocEntry(
-            buffer,
-            widget,
-            field,
-            '${field.name}.$member',
-            '$inner?',
-          );
-        }
-      }
+  for (final declaration in declarations) {
+    switch (declaration) {
+      case final ThemableWidget widget:
+        _emitWidgetDocs(buffer, widget);
+      case final StyleClass styleClass:
+        _emitStyleClassDocs(buffer, styleClass);
+      default:
+        throw ArgumentError(
+          'emitDocsFile takes ThemableWidget and StyleClass declarations, '
+          'got ${declaration.runtimeType}',
+        );
     }
-    buffer.writeln('];');
   }
   return _format(buffer.toString());
 }
 
-const _statesMembers = ['normal', 'hovered', 'pressed', 'focused', 'disabled'];
+void _emitWidgetDocs(StringBuffer buffer, ThemableWidget widget) {
+  final listName = '${_lowerCamel(widget.className)}DocEntries';
+  buffer
+    ..writeln()
+    ..writeln('/// Theme docs manifest for `${widget.className}`')
+    ..writeln('/// (RFC-002 R9): one entry per themed variable, extracted')
+    ..writeln('/// from the dartdoc in ${widget.sourceBasename}.')
+    ..writeln('const List<LegendDocEntry> $listName = [');
+  for (final field in widget.fields) {
+    _emitDocEntry(
+      buffer,
+      owner: widget.className,
+      name: field.name,
+      type: field.type,
+      doc: field.doc,
+      defaultDescription: field.defaultDescription,
+      group: 'component',
+    );
+    final styleClass = field.styleClass;
+    if (styleClass != null) {
+      for (final member in styleClass.fields) {
+        _emitDocEntry(
+          buffer,
+          owner: widget.className,
+          name: '${field.name}.${member.name}',
+          type: member.type,
+          doc: member.doc.isNotEmpty ? member.doc : field.doc,
+          defaultDescription: field.defaultDescription,
+          group: 'component',
+        );
+      }
+    }
+  }
+  buffer.writeln('];');
+}
+
+void _emitStyleClassDocs(StringBuffer buffer, StyleClass styleClass) {
+  final listName = '${_lowerCamel(styleClass.className)}DocEntries';
+  buffer
+    ..writeln()
+    ..writeln('/// Docs manifest for the `@Style()` value class')
+    ..writeln('/// `${styleClass.className}` (RFC-002 R6 amendment 7): one')
+    ..writeln('/// entry per member, extracted from the dartdoc in')
+    ..writeln('/// ${styleClass.sourceBasename}.')
+    ..writeln('const List<LegendDocEntry> $listName = [');
+  for (final member in styleClass.fields) {
+    _emitDocEntry(
+      buffer,
+      owner: styleClass.className,
+      name: member.name,
+      type: member.type,
+      doc: member.doc,
+      // Members carry no defaults of their own — defaults live on the
+      // widget fields typed with the class.
+      defaultDescription: 'null',
+      group: 'style',
+    );
+  }
+  buffer.writeln('];');
+}
 
 void _emitDocEntry(
-  StringBuffer b,
-  ThemableWidget widget,
-  StyledField field,
-  String name,
-  String type,
-) {
+  StringBuffer b, {
+  required String owner,
+  required String name,
+  required String type,
+  required String doc,
+  required String defaultDescription,
+  required String group,
+}) {
   b
     ..writeln('LegendDocEntry(')
-    ..writeln("owner: '${_escape(widget.className)}',")
+    ..writeln("owner: '${_escape(owner)}',")
     ..writeln("name: '${_escape(name)}',")
     ..writeln("type: '${_escape(type)}',")
-    ..writeln("doc: '${_escape(field.doc)}',")
-    ..writeln("defaultDescription: '${_escape(field.defaultDescription)}',")
-    ..writeln("group: 'component',")
+    ..writeln("doc: '${_escape(doc)}',")
+    ..writeln("defaultDescription: '${_escape(defaultDescription)}',")
+    ..writeln("group: '${_escape(group)}',")
     ..writeln('),');
+}
+
+// ── @Style() style value classes (RFC-002 R6 amendment 7) ─────────────
+
+/// Emits the generated style part for all `@Style()` classes of one source
+/// file: per class a `_$X` mixin (member-wise sparse `merge`, value
+/// `==`/`hashCode`) the class applies, and the member-wise `_$XLerp`
+/// function its hand-written one-line `static lerp` redirects to. Member
+/// lerpers follow the type: colors/doubles/insets/radii/text styles
+/// interpolate, nested style classes (looked up in [styleClasses]) lerp
+/// via their own `lerp` static, anything else steps at t=0.5.
+///
+/// Like the theme artifact, the output is `part of` the declaring library.
+String emitStyleFile(
+  List<StyleClass> classes, {
+  Map<String, StyleClass> styleClasses = const {},
+}) {
+  assert(classes.isNotEmpty, 'emitStyleFile needs at least one class');
+  final buffer = StringBuffer()
+    ..writeln(_header(classes.first.sourceBasename))
+    ..writeln("part of '${classes.first.sourceBasename}';");
+
+  for (final styleClass in classes) {
+    _emitStyleClass(buffer, styleClass, styleClasses);
+  }
+  return _format(buffer.toString());
+}
+
+void _emitStyleClass(
+  StringBuffer b,
+  StyleClass styleClass,
+  Map<String, StyleClass> styleClasses,
+) {
+  final name = styleClass.className;
+  final fields = styleClass.fields;
+
+  b
+    ..writeln()
+    ..writeln('/// Generated mechanical members for [$name] (RFC-002 R6')
+    ..writeln('/// amendment 7): member-wise sparse [merge] and value')
+    ..writeln('/// `==`/`hashCode`. Applied via `with _\$$name`; fields are')
+    ..writeln('/// read through a private cast (no abstract getters, so the')
+    ..writeln('/// class declares no overrides).')
+    ..writeln('mixin _\$$name {')
+    ..writeln('$name get _self => this as $name;')
+    ..writeln()
+    ..writeln("/// Member-wise sparse merge: [other]'s set members win,")
+    ..writeln('/// unset members inherit — a theme level that names only')
+    ..writeln("/// one member never clobbers another level's members. Null")
+    ..writeln('/// passes this instance through unchanged.')
+    ..writeln('$name merge($name? other) {')
+    ..writeln('if (other == null) return _self;')
+    ..writeln('return $name(')
+    ..writeln(
+      fields
+          .map((f) => '${f.name}: other.${f.name} ?? _self.${f.name},')
+          .join(),
+    )
+    ..writeln(');')
+    ..writeln('}')
+    ..writeln()
+    ..writeln('@override')
+    ..writeln('bool operator ==(Object other) =>')
+    ..writeln('identical(this, other) ||')
+    ..writeln('other is $name')
+    ..writeln(fields.map((f) => '&& other.${f.name} == _self.${f.name}').join())
+    ..writeln(';')
+    ..writeln()
+    ..writeln('@override')
+    ..writeln('int get hashCode => Object.hashAll([')
+    ..writeln(fields.map((f) => '_self.${f.name},').join())
+    ..writeln(']);')
+    ..writeln('}');
+
+  b
+    ..writeln()
+    ..writeln('/// Member-wise lerp for [$name] with the type-appropriate')
+    ..writeln('/// lerper per member (nested style classes via their own')
+    ..writeln('/// `lerp` static, members without a lerper step at t=0.5);')
+    ..writeln('/// the public [$name.lerp] redirects here.')
+    ..writeln('$name? _\$${name}Lerp($name? a, $name? b, double t) {')
+    // Identical endpoints (including both-null) short-circuit to the same
+    // instance — keeps unchanged values identity-stable through a theme
+    // animation so R12 comparators never re-diff them (R12 amendment).
+    ..writeln('if (identical(a, b)) return a;')
+    ..writeln('return $name(')
+    ..writeln(
+      fields
+          .map(
+            (f) =>
+                '${f.name}: '
+                '${_styleMemberLerpExpression(name, f, styleClasses)},',
+          )
+          .join(),
+    )
+    ..writeln(');')
+    ..writeln('}');
+
+  final needsDoubleLerper = fields.any((f) => f.resolvedType == 'double');
+  if (needsDoubleLerper) {
+    b
+      ..writeln()
+      ..writeln('/// Null-aware double lerp for [_\$${name}Lerp] — steps')
+      ..writeln('/// when either side is unset (fading a length against')
+      ..writeln('/// null has no meaning).')
+      ..writeln(
+        'double? _\$${name}LerpDouble(double? a, double? b, '
+        'double t) =>',
+      )
+      ..writeln(
+        'a == null || b == null ? (t < 0.5 ? a : b) '
+        ': a + (b - a) * t;',
+      );
+  }
+}
+
+String _styleMemberLerpExpression(
+  String className,
+  StyleClassField field,
+  Map<String, StyleClass> styleClasses,
+) {
+  final n = field.name;
+  final type = field.resolvedType;
+  if (styleClasses.containsKey(type)) {
+    return '$type.lerp(a?.$n, b?.$n, t)';
+  }
+  return switch (type) {
+    'Color' => 'Color.lerp(a?.$n, b?.$n, t)',
+    // No `lerpDouble` — dart:ui isn't importable from a part file.
+    'double' => '_\$${className}LerpDouble(a?.$n, b?.$n, t)',
+    'EdgeInsets' => 'EdgeInsetsGeometry.lerp(a?.$n, b?.$n, t) as EdgeInsets?',
+    'EdgeInsetsGeometry' => 'EdgeInsetsGeometry.lerp(a?.$n, b?.$n, t)',
+    'BorderRadius' => 'BorderRadius.lerp(a?.$n, b?.$n, t)',
+    'TextStyle' => 'TextStyle.lerp(a?.$n, b?.$n, t)',
+    _ => 't < 0.5 ? a?.$n : b?.$n',
+  };
 }
 
 String _lowerCamel(String name) => name[0].toLowerCase() + name.substring(1);

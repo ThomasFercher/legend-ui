@@ -11,121 +11,111 @@ const List<LegendDocEntry> primaryLegendButtonDocEntries = [
   LegendDocEntry(
     owner: 'PrimaryLegendButton',
     name: 'background',
-    type: 'LegendStates<Color>?',
+    type: 'InteractiveColors?',
     doc:
         'Fill behind the label, per interaction state — hover/press blend the\nforeground over the fill (8%/16%), disabled swaps to the token\ndisabled fill.',
     defaultDescription:
-        'LegendStates(normal: t.colors.primary, hovered: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), pressed: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.16), t.colors.primary), focused: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), disabled: t.colors.disabled)',
+        'InteractiveColors(normal: t.colors.primary, hovered: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), pressed: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.16), t.colors.primary), focused: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), disabled: t.colors.disabled)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'PrimaryLegendButton',
     name: 'background.normal',
     type: 'Color?',
-    doc:
-        'Fill behind the label, per interaction state — hover/press blend the\nforeground over the fill (8%/16%), disabled swaps to the token\ndisabled fill.',
+    doc: 'Fill at rest (and the base unset members fall back to).',
     defaultDescription:
-        'LegendStates(normal: t.colors.primary, hovered: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), pressed: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.16), t.colors.primary), focused: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), disabled: t.colors.disabled)',
+        'InteractiveColors(normal: t.colors.primary, hovered: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), pressed: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.16), t.colors.primary), focused: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), disabled: t.colors.disabled)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'PrimaryLegendButton',
     name: 'background.hovered',
     type: 'Color?',
-    doc:
-        'Fill behind the label, per interaction state — hover/press blend the\nforeground over the fill (8%/16%), disabled swaps to the token\ndisabled fill.',
+    doc: 'Fill while a pointer hovers the widget.',
     defaultDescription:
-        'LegendStates(normal: t.colors.primary, hovered: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), pressed: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.16), t.colors.primary), focused: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), disabled: t.colors.disabled)',
+        'InteractiveColors(normal: t.colors.primary, hovered: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), pressed: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.16), t.colors.primary), focused: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), disabled: t.colors.disabled)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'PrimaryLegendButton',
     name: 'background.pressed',
     type: 'Color?',
-    doc:
-        'Fill behind the label, per interaction state — hover/press blend the\nforeground over the fill (8%/16%), disabled swaps to the token\ndisabled fill.',
+    doc: 'Fill while the widget is actively pressed.',
     defaultDescription:
-        'LegendStates(normal: t.colors.primary, hovered: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), pressed: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.16), t.colors.primary), focused: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), disabled: t.colors.disabled)',
+        'InteractiveColors(normal: t.colors.primary, hovered: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), pressed: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.16), t.colors.primary), focused: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), disabled: t.colors.disabled)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'PrimaryLegendButton',
     name: 'background.focused',
     type: 'Color?',
-    doc:
-        'Fill behind the label, per interaction state — hover/press blend the\nforeground over the fill (8%/16%), disabled swaps to the token\ndisabled fill.',
+    doc: 'Fill while the widget holds keyboard focus.',
     defaultDescription:
-        'LegendStates(normal: t.colors.primary, hovered: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), pressed: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.16), t.colors.primary), focused: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), disabled: t.colors.disabled)',
+        'InteractiveColors(normal: t.colors.primary, hovered: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), pressed: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.16), t.colors.primary), focused: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), disabled: t.colors.disabled)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'PrimaryLegendButton',
     name: 'background.disabled',
     type: 'Color?',
-    doc:
-        'Fill behind the label, per interaction state — hover/press blend the\nforeground over the fill (8%/16%), disabled swaps to the token\ndisabled fill.',
+    doc: 'Fill while the widget is disabled.',
     defaultDescription:
-        'LegendStates(normal: t.colors.primary, hovered: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), pressed: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.16), t.colors.primary), focused: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), disabled: t.colors.disabled)',
+        'InteractiveColors(normal: t.colors.primary, hovered: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), pressed: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.16), t.colors.primary), focused: Color.alphaBlend(t.colors.onPrimary.withValues(alpha: 0.08), t.colors.primary), disabled: t.colors.disabled)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'PrimaryLegendButton',
     name: 'foreground',
-    type: 'LegendStates<Color>?',
+    type: 'InteractiveColors?',
     doc:
         'Color of the label and icon, per interaction state (steady except\nwhile disabled).',
     defaultDescription:
-        'LegendStates(normal: t.colors.onPrimary, hovered: t.colors.onPrimary, pressed: t.colors.onPrimary, focused: t.colors.onPrimary, disabled: t.colors.onDisabled)',
+        'InteractiveColors(normal: t.colors.onPrimary, hovered: t.colors.onPrimary, pressed: t.colors.onPrimary, focused: t.colors.onPrimary, disabled: t.colors.onDisabled)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'PrimaryLegendButton',
     name: 'foreground.normal',
     type: 'Color?',
-    doc:
-        'Color of the label and icon, per interaction state (steady except\nwhile disabled).',
+    doc: 'Fill at rest (and the base unset members fall back to).',
     defaultDescription:
-        'LegendStates(normal: t.colors.onPrimary, hovered: t.colors.onPrimary, pressed: t.colors.onPrimary, focused: t.colors.onPrimary, disabled: t.colors.onDisabled)',
+        'InteractiveColors(normal: t.colors.onPrimary, hovered: t.colors.onPrimary, pressed: t.colors.onPrimary, focused: t.colors.onPrimary, disabled: t.colors.onDisabled)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'PrimaryLegendButton',
     name: 'foreground.hovered',
     type: 'Color?',
-    doc:
-        'Color of the label and icon, per interaction state (steady except\nwhile disabled).',
+    doc: 'Fill while a pointer hovers the widget.',
     defaultDescription:
-        'LegendStates(normal: t.colors.onPrimary, hovered: t.colors.onPrimary, pressed: t.colors.onPrimary, focused: t.colors.onPrimary, disabled: t.colors.onDisabled)',
+        'InteractiveColors(normal: t.colors.onPrimary, hovered: t.colors.onPrimary, pressed: t.colors.onPrimary, focused: t.colors.onPrimary, disabled: t.colors.onDisabled)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'PrimaryLegendButton',
     name: 'foreground.pressed',
     type: 'Color?',
-    doc:
-        'Color of the label and icon, per interaction state (steady except\nwhile disabled).',
+    doc: 'Fill while the widget is actively pressed.',
     defaultDescription:
-        'LegendStates(normal: t.colors.onPrimary, hovered: t.colors.onPrimary, pressed: t.colors.onPrimary, focused: t.colors.onPrimary, disabled: t.colors.onDisabled)',
+        'InteractiveColors(normal: t.colors.onPrimary, hovered: t.colors.onPrimary, pressed: t.colors.onPrimary, focused: t.colors.onPrimary, disabled: t.colors.onDisabled)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'PrimaryLegendButton',
     name: 'foreground.focused',
     type: 'Color?',
-    doc:
-        'Color of the label and icon, per interaction state (steady except\nwhile disabled).',
+    doc: 'Fill while the widget holds keyboard focus.',
     defaultDescription:
-        'LegendStates(normal: t.colors.onPrimary, hovered: t.colors.onPrimary, pressed: t.colors.onPrimary, focused: t.colors.onPrimary, disabled: t.colors.onDisabled)',
+        'InteractiveColors(normal: t.colors.onPrimary, hovered: t.colors.onPrimary, pressed: t.colors.onPrimary, focused: t.colors.onPrimary, disabled: t.colors.onDisabled)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'PrimaryLegendButton',
     name: 'foreground.disabled',
     type: 'Color?',
-    doc:
-        'Color of the label and icon, per interaction state (steady except\nwhile disabled).',
+    doc: 'Fill while the widget is disabled.',
     defaultDescription:
-        'LegendStates(normal: t.colors.onPrimary, hovered: t.colors.onPrimary, pressed: t.colors.onPrimary, focused: t.colors.onPrimary, disabled: t.colors.onDisabled)',
+        'InteractiveColors(normal: t.colors.onPrimary, hovered: t.colors.onPrimary, pressed: t.colors.onPrimary, focused: t.colors.onPrimary, disabled: t.colors.onDisabled)',
     group: 'component',
   ),
   LegendDocEntry(
@@ -133,7 +123,7 @@ const List<LegendDocEntry> primaryLegendButtonDocEntries = [
     name: 'textStyle',
     type: 'TextStyle?',
     doc: 'Text style of the [text] label (its color comes from [foreground]).',
-    defaultDescription: 'LegendTypographyRef.b2',
+    defaultDescription: 'TextRef.b2',
     group: 'component',
   ),
   LegendDocEntry(
@@ -141,7 +131,7 @@ const List<LegendDocEntry> primaryLegendButtonDocEntries = [
     name: 'shadows',
     type: 'List<BoxShadow>?',
     doc: 'Drop shadow under the button (flat by default).',
-    defaultDescription: 'LegendShadowsRef.none',
+    defaultDescription: 'ShadowRef.none',
     group: 'component',
   ),
 ];

@@ -5,7 +5,7 @@ import 'package:legend_ui/src/tokens/legend_tokens.dart';
 part 'legend_sizes.tokens.g.dart';
 
 /// Spacing, radii, border and icon scales.
-@LegendTokenData(mountedAt: 'sizes')
+@LegendTokenData(mountedAt: 'sizes', refName: 'SizeRef')
 class LegendSizes with _$LegendSizes {
   const LegendSizes({
     this.xs = 4,

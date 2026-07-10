@@ -81,7 +81,7 @@ LegendThemeData(
   tokens: tokens,
   components: {
     PrimaryLegendButtonThemeNullable: PrimaryLegendButtonThemeNullable(
-      background: ${controller.buttonBackground == null ? '/* unset */' : 'LegendStates(normal: ${_hex(controller.buttonBackground)})'},
+      background: ${controller.buttonBackground == null ? '/* unset */' : 'InteractiveColors(normal: ${_hex(controller.buttonBackground)})'},
     ),
     // shared button surface (RFC-002 R7.2)
     LegendButtonCore: LegendButtonCoreThemeNullable(

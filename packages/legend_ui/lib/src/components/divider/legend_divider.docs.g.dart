@@ -13,7 +13,7 @@ const List<LegendDocEntry> legendDividerDocEntries = [
     name: 'color',
     type: 'Color?',
     doc: 'Color of the line.',
-    defaultDescription: 'LegendColorsRef.background3',
+    defaultDescription: 'ColorRef.background3',
     group: 'component',
   ),
   LegendDocEntry(
@@ -21,7 +21,7 @@ const List<LegendDocEntry> legendDividerDocEntries = [
     name: 'thickness',
     type: 'double?',
     doc: 'Stroke width of the line.',
-    defaultDescription: 'LegendSizesRef.borderWidth',
+    defaultDescription: 'SizeRef.borderWidth',
     group: 'component',
   ),
   LegendDocEntry(
@@ -29,7 +29,7 @@ const List<LegendDocEntry> legendDividerDocEntries = [
     name: 'spacing',
     type: 'double?',
     doc: 'Outer margin on both sides of the line.',
-    defaultDescription: 'LegendSizesRef.md',
+    defaultDescription: 'SizeRef.md',
     group: 'component',
   ),
 ];

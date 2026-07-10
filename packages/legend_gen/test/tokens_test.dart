@@ -105,6 +105,53 @@ class Plain with _$Plain {
       );
     });
 
+    test('refName renames the emitted Ref catalog (RFC-002 R13, '
+        'annotation ubiquity earns terseness)', () {
+      final source = _tokenFile(r'''
+@LegendTokenData(mountedAt: 'colors', refName: 'ColorRef')
+class Renamed with _$Renamed {
+  const Renamed({this.accent = const Color(1)});
+
+  /// Accent color.
+  final Color accent;
+}
+''').replaceFirst("part 'bad.tokens.g.dart';", "part 'renamed.tokens.g.dart';");
+      final classes = parseTokenClasses('renamed.dart', source);
+      expect(classes.single.refName, 'ColorRef');
+      expect(classes.single.effectiveRefName, 'ColorRef');
+      final output = emitTokensFile(classes);
+      expect(output, contains('abstract final class ColorRef {'));
+      expect(output, isNot(contains('RenamedRef')));
+      expect(
+        output,
+        contains('static Color accent(LegendTokens t) => t.colors.accent;'),
+      );
+    });
+
+    test('refName defaults to <ClassName>Ref', () {
+      final classes = parseTokenClasses(
+        'mini_tokens.dart',
+        File('test/fixtures/mini_tokens.dart').readAsStringSync(),
+      );
+      expect(classes.first.refName, isNull);
+      expect(classes.first.effectiveRefName, 'MiniTokensRef');
+    });
+
+    test('rejects a non-literal refName with the fix named', () {
+      _expectSingleDiagnostic(
+        _tokenFile(r'''
+const _name = 'ColorRef';
+
+@LegendTokenData(mountedAt: 'colors', refName: _name)
+class Bad with _$Bad {
+  const Bad({this.amount = 1});
+  final double amount;
+}
+'''),
+        allOf(contains('refName on "Bad"'), contains('plain string literal')),
+      );
+    });
+
     test('rejects a non-literal mountedAt with the fix named', () {
       _expectSingleDiagnostic(
         _tokenFile(r'''

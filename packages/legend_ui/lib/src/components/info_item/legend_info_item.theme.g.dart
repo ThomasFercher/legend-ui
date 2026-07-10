@@ -27,18 +27,38 @@ class LegendInfoItemTheme {
   /// [LegendInfoItem] first, [LegendInfoItemThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static LegendInfoItemTheme of(
     BuildContext context, [
     LegendInfoItemThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
-    final resolved = LegendInfoItemTheme.defaults(data.tokens)
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendInfoItemThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendInfoItemAspectLabelStyle);
+    LegendThemeOverride.depend<LegendInfoItemThemeNullable>(
+      context,
+      _$LegendInfoItemOverrideAspectLabelStyle,
+    );
+    LegendTheme.depend(context, _$LegendInfoItemAspectValueStyle);
+    LegendThemeOverride.depend<LegendInfoItemThemeNullable>(
+      context,
+      _$LegendInfoItemOverrideAspectValueStyle,
+    );
+    LegendTheme.depend(context, _$LegendInfoItemAspectPadding);
+    LegendThemeOverride.depend<LegendInfoItemThemeNullable>(
+      context,
+      _$LegendInfoItemOverrideAspectPadding,
+    );
+    return LegendInfoItemTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendInfoItemThemeNullable>(LegendInfoItem))
-        .merge(
-          LegendThemeOverride.maybeOf<LegendInfoItemThemeNullable>(context),
-        )
+        .merge(override)
         .merge(local);
-    return resolved;
   }
 
   LegendInfoItemTheme merge(LegendInfoItemThemeNullable? other) {
@@ -125,6 +145,90 @@ class LegendInfoItemThemeOverride extends StatelessWidget {
       );
 }
 
+/// Resolves [LegendInfoItem.labelStyle] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+TextStyle _$LegendInfoItemSelectLabelStyle(LegendThemeData data) =>
+    data.componentOf<LegendInfoItemThemeNullable>(LegendInfoItem)?.labelStyle ??
+    _labelStyle(data.tokens);
+const _$LegendInfoItemAspectLabelStyle = LegendThemeAspect(
+  _$LegendInfoItemSelectLabelStyle,
+);
+Object? _$LegendInfoItemOverrideSelectLabelStyle(
+  LegendInfoItemThemeNullable data,
+) => data.labelStyle;
+const _$LegendInfoItemOverrideAspectLabelStyle =
+    LegendOverrideAspect<LegendInfoItemThemeNullable>(
+      _$LegendInfoItemOverrideSelectLabelStyle,
+    );
+
+/// Resolves [LegendInfoItem.valueStyle] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+TextStyle _$LegendInfoItemSelectValueStyle(LegendThemeData data) =>
+    data.componentOf<LegendInfoItemThemeNullable>(LegendInfoItem)?.valueStyle ??
+    _valueStyle(data.tokens);
+const _$LegendInfoItemAspectValueStyle = LegendThemeAspect(
+  _$LegendInfoItemSelectValueStyle,
+);
+Object? _$LegendInfoItemOverrideSelectValueStyle(
+  LegendInfoItemThemeNullable data,
+) => data.valueStyle;
+const _$LegendInfoItemOverrideAspectValueStyle =
+    LegendOverrideAspect<LegendInfoItemThemeNullable>(
+      _$LegendInfoItemOverrideSelectValueStyle,
+    );
+
+/// Resolves [LegendInfoItem.padding] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+EdgeInsetsGeometry _$LegendInfoItemSelectPadding(LegendThemeData data) =>
+    data.componentOf<LegendInfoItemThemeNullable>(LegendInfoItem)?.padding ??
+    _padding(data.tokens);
+const _$LegendInfoItemAspectPadding = LegendThemeAspect(
+  _$LegendInfoItemSelectPadding,
+);
+Object? _$LegendInfoItemOverrideSelectPadding(
+  LegendInfoItemThemeNullable data,
+) => data.padding;
+const _$LegendInfoItemOverrideAspectPadding =
+    LegendOverrideAspect<LegendInfoItemThemeNullable>(
+      _$LegendInfoItemOverrideSelectPadding,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class LegendInfoItemThemeListenables {
+  /// Change stream of the resolved [LegendInfoItemTheme.labelStyle].
+  static ValueListenable<TextStyle> labelStyle(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendInfoItemSelectLabelStyle);
+
+  /// Change stream of the resolved [LegendInfoItemTheme.valueStyle].
+  static ValueListenable<TextStyle> valueStyle(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendInfoItemSelectValueStyle);
+
+  /// Change stream of the resolved [LegendInfoItemTheme.padding].
+  static ValueListenable<EdgeInsetsGeometry> padding(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendInfoItemSelectPadding);
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -139,4 +243,90 @@ extension _$LegendInfoItemThemeResolve on LegendInfoItem {
       padding: padding,
     ),
   );
+
+  /// Resolves ONLY [LegendInfoItem.labelStyle] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._labelStyle(context)`).
+  TextStyle _labelStyle(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendInfoItemThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendInfoItemAspectLabelStyle);
+    LegendThemeOverride.depend<LegendInfoItemThemeNullable>(
+      context,
+      _$LegendInfoItemOverrideAspectLabelStyle,
+    );
+    return labelStyle ??
+        override?.labelStyle ??
+        _$LegendInfoItemSelectLabelStyle(data);
+  }
+
+  /// Resolves ONLY [LegendInfoItem.valueStyle] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._valueStyle(context)`).
+  TextStyle _valueStyle(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendInfoItemThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendInfoItemAspectValueStyle);
+    LegendThemeOverride.depend<LegendInfoItemThemeNullable>(
+      context,
+      _$LegendInfoItemOverrideAspectValueStyle,
+    );
+    return valueStyle ??
+        override?.valueStyle ??
+        _$LegendInfoItemSelectValueStyle(data);
+  }
+
+  /// Resolves ONLY [LegendInfoItem.padding] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._padding(context)`).
+  EdgeInsetsGeometry _padding(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendInfoItemThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendInfoItemAspectPadding);
+    LegendThemeOverride.depend<LegendInfoItemThemeNullable>(
+      context,
+      _$LegendInfoItemOverrideAspectPadding,
+    );
+    return padding ?? override?.padding ?? _$LegendInfoItemSelectPadding(data);
+  }
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class LegendInfoItem extends
+/// _$LegendInfoItemBase` receives the resolved
+/// [LegendInfoItemTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$LegendInfoItemBase
+    extends LegendStatelessWidget<LegendInfoItemTheme> {
+  const _$LegendInfoItemBase({super.key});
+
+  TextStyle? get labelStyle;
+  TextStyle? get valueStyle;
+  EdgeInsetsGeometry? get padding;
+
+  @override
+  LegendInfoItemTheme resolveThemeOf(BuildContext context) =>
+      LegendInfoItemTheme.of(
+        context,
+        LegendInfoItemThemeNullable(
+          labelStyle: labelStyle,
+          valueStyle: valueStyle,
+          padding: padding,
+        ),
+      );
 }

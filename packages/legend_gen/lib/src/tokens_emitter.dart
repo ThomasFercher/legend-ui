@@ -103,10 +103,17 @@ void _emitTokenClass(StringBuffer b, TokenClass tokenClass) {
     ..writeln()
     ..writeln('/// Member-wise lerp for [$name]; the public [$name.lerp]')
     ..writeln('/// redirects here (part of the one token lerp a theme switch')
-    ..writeln('/// pays, DESIGN.md §2.4).')
-    ..writeln('$name ${mixinName}Lerp($name a, $name b, double t) => $name(')
+    ..writeln('/// pays, DESIGN.md §2.4). Identical endpoints short-circuit')
+    ..writeln('/// to the same instance (RFC-002 R12 amendment): sub-objects')
+    ..writeln('/// shared between theme poles stay identity-stable through')
+    ..writeln('/// an animation, so per-field rebuild comparators never')
+    ..writeln('/// re-diff unchanged token groups.')
+    ..writeln('$name ${mixinName}Lerp($name a, $name b, double t) {')
+    ..writeln('if (identical(a, b)) return a;')
+    ..writeln('return $name(')
     ..writeln(fields.map((f) => '${f.name}: ${_lerpExpression(f)},').join())
-    ..writeln(');');
+    ..writeln(');')
+    ..writeln('}');
 
   final mount = tokenClass.mountedAt;
   if (mount == null) return;
@@ -115,15 +122,16 @@ void _emitTokenClass(StringBuffer b, TokenClass tokenClass) {
   // closed over the whole base theme; `mountedAt: ''` is the root
   // sentinel (fields read as `t.<field>` directly).
   final prefix = mount.isEmpty ? 't' : 't.$mount';
+  final refName = tokenClass.effectiveRefName;
   final example =
-      '@Style<${fields.first.type}>.resolve(${name}Ref.${fields.first.name})';
+      '@Style<${fields.first.type}>.resolve($refName.${fields.first.name})';
   b
     ..writeln()
     ..writeln('/// Const tear-off catalog for [$name] (RFC-002 R10')
     ..writeln('/// amendment): one static per token field, usable directly')
     ..writeln('/// inside `@Style<T>.resolve` annotations —')
     ..writeln('/// `$example`.')
-    ..writeln('abstract final class ${name}Ref {');
+    ..writeln('abstract final class $refName {');
   for (final field in fields) {
     if (field.doc.isNotEmpty) {
       for (final line in field.doc.split('\n')) {

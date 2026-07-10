@@ -15,9 +15,9 @@ class LegendBottomBarTheme {
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendBottomBarTheme.defaults(LegendTokens t) => LegendBottomBarTheme(
-    background: LegendColorsRef.surface(t),
-    selectedColor: LegendColorsRef.primary(t),
-    unselectedColor: LegendColorsRef.foreground3(t),
+    background: ColorRef.surface(t),
+    selectedColor: ColorRef.primary(t),
+    unselectedColor: ColorRef.foreground3(t),
     height: 64,
   );
 
@@ -30,18 +30,43 @@ class LegendBottomBarTheme {
   /// [LegendBottomBar] first, [LegendBottomBarThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static LegendBottomBarTheme of(
     BuildContext context, [
     LegendBottomBarThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
-    final resolved = LegendBottomBarTheme.defaults(data.tokens)
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendBottomBarThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendBottomBarAspectBackground);
+    LegendThemeOverride.depend<LegendBottomBarThemeNullable>(
+      context,
+      _$LegendBottomBarOverrideAspectBackground,
+    );
+    LegendTheme.depend(context, _$LegendBottomBarAspectSelectedColor);
+    LegendThemeOverride.depend<LegendBottomBarThemeNullable>(
+      context,
+      _$LegendBottomBarOverrideAspectSelectedColor,
+    );
+    LegendTheme.depend(context, _$LegendBottomBarAspectUnselectedColor);
+    LegendThemeOverride.depend<LegendBottomBarThemeNullable>(
+      context,
+      _$LegendBottomBarOverrideAspectUnselectedColor,
+    );
+    LegendTheme.depend(context, _$LegendBottomBarAspectHeight);
+    LegendThemeOverride.depend<LegendBottomBarThemeNullable>(
+      context,
+      _$LegendBottomBarOverrideAspectHeight,
+    );
+    return LegendBottomBarTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendBottomBarThemeNullable>(LegendBottomBar))
-        .merge(
-          LegendThemeOverride.maybeOf<LegendBottomBarThemeNullable>(context),
-        )
+        .merge(override)
         .merge(local);
-    return resolved;
   }
 
   LegendBottomBarTheme merge(LegendBottomBarThemeNullable? other) {
@@ -137,6 +162,121 @@ class LegendBottomBarThemeOverride extends StatelessWidget {
       );
 }
 
+/// Resolves [LegendBottomBar.background] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendBottomBarSelectBackground(LegendThemeData data) =>
+    data
+        .componentOf<LegendBottomBarThemeNullable>(LegendBottomBar)
+        ?.background ??
+    ColorRef.surface(data.tokens);
+const _$LegendBottomBarAspectBackground = LegendThemeAspect(
+  _$LegendBottomBarSelectBackground,
+);
+Object? _$LegendBottomBarOverrideSelectBackground(
+  LegendBottomBarThemeNullable data,
+) => data.background;
+const _$LegendBottomBarOverrideAspectBackground =
+    LegendOverrideAspect<LegendBottomBarThemeNullable>(
+      _$LegendBottomBarOverrideSelectBackground,
+    );
+
+/// Resolves [LegendBottomBar.selectedColor] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendBottomBarSelectSelectedColor(LegendThemeData data) =>
+    data
+        .componentOf<LegendBottomBarThemeNullable>(LegendBottomBar)
+        ?.selectedColor ??
+    ColorRef.primary(data.tokens);
+const _$LegendBottomBarAspectSelectedColor = LegendThemeAspect(
+  _$LegendBottomBarSelectSelectedColor,
+);
+Object? _$LegendBottomBarOverrideSelectSelectedColor(
+  LegendBottomBarThemeNullable data,
+) => data.selectedColor;
+const _$LegendBottomBarOverrideAspectSelectedColor =
+    LegendOverrideAspect<LegendBottomBarThemeNullable>(
+      _$LegendBottomBarOverrideSelectSelectedColor,
+    );
+
+/// Resolves [LegendBottomBar.unselectedColor] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendBottomBarSelectUnselectedColor(LegendThemeData data) =>
+    data
+        .componentOf<LegendBottomBarThemeNullable>(LegendBottomBar)
+        ?.unselectedColor ??
+    ColorRef.foreground3(data.tokens);
+const _$LegendBottomBarAspectUnselectedColor = LegendThemeAspect(
+  _$LegendBottomBarSelectUnselectedColor,
+);
+Object? _$LegendBottomBarOverrideSelectUnselectedColor(
+  LegendBottomBarThemeNullable data,
+) => data.unselectedColor;
+const _$LegendBottomBarOverrideAspectUnselectedColor =
+    LegendOverrideAspect<LegendBottomBarThemeNullable>(
+      _$LegendBottomBarOverrideSelectUnselectedColor,
+    );
+
+/// Resolves [LegendBottomBar.height] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+double _$LegendBottomBarSelectHeight(LegendThemeData data) =>
+    data.componentOf<LegendBottomBarThemeNullable>(LegendBottomBar)?.height ??
+    64;
+const _$LegendBottomBarAspectHeight = LegendThemeAspect(
+  _$LegendBottomBarSelectHeight,
+);
+Object? _$LegendBottomBarOverrideSelectHeight(
+  LegendBottomBarThemeNullable data,
+) => data.height;
+const _$LegendBottomBarOverrideAspectHeight =
+    LegendOverrideAspect<LegendBottomBarThemeNullable>(
+      _$LegendBottomBarOverrideSelectHeight,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class LegendBottomBarThemeListenables {
+  /// Change stream of the resolved [LegendBottomBarTheme.background].
+  static ValueListenable<Color> background(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendBottomBarSelectBackground);
+
+  /// Change stream of the resolved [LegendBottomBarTheme.selectedColor].
+  static ValueListenable<Color> selectedColor(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendBottomBarSelectSelectedColor);
+
+  /// Change stream of the resolved [LegendBottomBarTheme.unselectedColor].
+  static ValueListenable<Color> unselectedColor(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) =>
+      LegendThemeSelector(source, data, _$LegendBottomBarSelectUnselectedColor);
+
+  /// Change stream of the resolved [LegendBottomBarTheme.height].
+  static ValueListenable<double> height(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendBottomBarSelectHeight);
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -152,4 +292,113 @@ extension _$LegendBottomBarThemeResolve on LegendBottomBar {
       height: height,
     ),
   );
+
+  /// Resolves ONLY [LegendBottomBar.background] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._background(context)`).
+  Color _background(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendBottomBarThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendBottomBarAspectBackground);
+    LegendThemeOverride.depend<LegendBottomBarThemeNullable>(
+      context,
+      _$LegendBottomBarOverrideAspectBackground,
+    );
+    return background ??
+        override?.background ??
+        _$LegendBottomBarSelectBackground(data);
+  }
+
+  /// Resolves ONLY [LegendBottomBar.selectedColor] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._selectedColor(context)`).
+  Color _selectedColor(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendBottomBarThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendBottomBarAspectSelectedColor);
+    LegendThemeOverride.depend<LegendBottomBarThemeNullable>(
+      context,
+      _$LegendBottomBarOverrideAspectSelectedColor,
+    );
+    return selectedColor ??
+        override?.selectedColor ??
+        _$LegendBottomBarSelectSelectedColor(data);
+  }
+
+  /// Resolves ONLY [LegendBottomBar.unselectedColor] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._unselectedColor(context)`).
+  Color _unselectedColor(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendBottomBarThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendBottomBarAspectUnselectedColor);
+    LegendThemeOverride.depend<LegendBottomBarThemeNullable>(
+      context,
+      _$LegendBottomBarOverrideAspectUnselectedColor,
+    );
+    return unselectedColor ??
+        override?.unselectedColor ??
+        _$LegendBottomBarSelectUnselectedColor(data);
+  }
+
+  /// Resolves ONLY [LegendBottomBar.height] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._height(context)`).
+  double _height(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendBottomBarThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendBottomBarAspectHeight);
+    LegendThemeOverride.depend<LegendBottomBarThemeNullable>(
+      context,
+      _$LegendBottomBarOverrideAspectHeight,
+    );
+    return height ?? override?.height ?? _$LegendBottomBarSelectHeight(data);
+  }
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class LegendBottomBar extends
+/// _$LegendBottomBarBase` receives the resolved
+/// [LegendBottomBarTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$LegendBottomBarBase
+    extends LegendStatelessWidget<LegendBottomBarTheme> {
+  const _$LegendBottomBarBase({super.key});
+
+  Color? get background;
+  Color? get selectedColor;
+  Color? get unselectedColor;
+  double? get height;
+
+  @override
+  LegendBottomBarTheme resolveThemeOf(BuildContext context) =>
+      LegendBottomBarTheme.of(
+        context,
+        LegendBottomBarThemeNullable(
+          background: background,
+          selectedColor: selectedColor,
+          unselectedColor: unselectedColor,
+          height: height,
+        ),
+      );
 }

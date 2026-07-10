@@ -33,7 +33,7 @@ class LegendScaffold extends StatelessWidget {
   final Widget? bottomBar;
 
   /// Fill color behind the page body.
-  @Style<Color>.resolve(LegendColorsRef.background1, lerp: true)
+  @Style<Color>.resolve(ColorRef.background1, lerp: true)
   final Color? background;
 
   @override

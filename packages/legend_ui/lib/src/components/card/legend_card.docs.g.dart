@@ -13,7 +13,7 @@ const List<LegendDocEntry> legendCardDocEntries = [
     name: 'background',
     type: 'Color?',
     doc: 'Fill color of the card surface.',
-    defaultDescription: 'LegendColorsRef.surface',
+    defaultDescription: 'ColorRef.surface',
     group: 'component',
   ),
   LegendDocEntry(
@@ -37,7 +37,7 @@ const List<LegendDocEntry> legendCardDocEntries = [
     name: 'shadows',
     type: 'List<BoxShadow>?',
     doc: 'Drop shadow lifting the card off the background.',
-    defaultDescription: 'LegendShadowsRef.low',
+    defaultDescription: 'ShadowRef.low',
     group: 'component',
   ),
 ];

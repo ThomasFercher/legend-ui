@@ -102,7 +102,7 @@ PrimaryLegendButton(
           title: 'PrimaryLegendButton theme surface',
           description:
               'Overridable per constructor, subtree, or the app components '
-              'map. Colors are per-state LegendStates containers (RFC-002 '
+              'map. Colors are per-state InteractiveColors bundles (RFC-002 '
               'R6): name only the state you restyle. The shared surface '
               '(padding, borderRadius) is themed once on LegendButtonCore '
               '(RFC-002 R7.2) — variant-level values win over core-level '
@@ -112,12 +112,12 @@ PrimaryLegendButton(
             rows: [
               (
                 name: 'background',
-                type: 'LegendStates<Color>',
+                type: 'InteractiveColors',
                 defaultsTo: 'per-state: primary; hover/press blend onPrimary',
               ),
               (
                 name: 'foreground',
-                type: 'LegendStates<Color>',
+                type: 'InteractiveColors',
                 defaultsTo: 'per-state: onPrimary; onDisabled when disabled',
               ),
               (
@@ -154,8 +154,8 @@ PrimaryLegendButton(
 LegendButtonCore(
   onPressed: onPressed,
   // per-state containers: unset members derive from `normal`
-  background: myTheme.background,   // LegendStates<Color>
-  foreground: dangerText.states,    // lift a single Color
+  background: myTheme.background,   // InteractiveColors
+  foreground: InteractiveColors(normal: dangerText),
   textStyle: myTheme.textStyle,
   // padding/borderRadius omitted: the shared core surface applies
   text: 'Danger',

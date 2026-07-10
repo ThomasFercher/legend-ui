@@ -36,15 +36,15 @@ class LegendBottomBar extends StatelessWidget {
   final ValueChanged<int> onSelected;
 
   /// Fill color of the bar.
-  @Style<Color>.resolve(LegendColorsRef.surface)
+  @Style<Color>.resolve(ColorRef.surface)
   final Color? background;
 
   /// Label/icon color of the selected item.
-  @Style<Color>.resolve(LegendColorsRef.primary, lerp: true)
+  @Style<Color>.resolve(ColorRef.primary, lerp: true)
   final Color? selectedColor;
 
   /// Label/icon color of unselected items.
-  @Style<Color>.resolve(LegendColorsRef.foreground3, lerp: true)
+  @Style<Color>.resolve(ColorRef.foreground3, lerp: true)
   final Color? unselectedColor;
 
   /// Height of the bar content (excluding any safe-area inset).

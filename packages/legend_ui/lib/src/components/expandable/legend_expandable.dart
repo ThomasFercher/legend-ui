@@ -3,7 +3,7 @@ import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/primitives/legend_caret.dart';
 import 'package:legend_ui/src/primitives/legend_interactive.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
-import 'package:legend_ui/src/theme/legend_states.dart';
+import 'package:legend_ui/src/theme/interactive_colors.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
@@ -41,7 +41,9 @@ class LegendExpandable extends StatefulWidget {
     this.headerPadding,
     Color? backgroundColor,
     this.borderRadius,
-  }) : backgroundColor = backgroundColor?.states,
+  }) : backgroundColor = backgroundColor == null
+           ? null
+           : InteractiveColors(normal: backgroundColor),
        assert(
          title != null || header != null,
          'Provide a title or a custom header.',
@@ -75,8 +77,8 @@ class LegendExpandable extends StatefulWidget {
   /// Fill of the container and its header, per interaction state —
   /// `normal` paints the whole surface, `hovered`/`pressed`/`focused`
   /// tint the header while the pointer is on it.
-  @Style<LegendStates<Color>>.resolve(_backgroundColor)
-  final LegendStates<Color>? backgroundColor;
+  @Style<InteractiveColors>.resolve(_backgroundColor)
+  final InteractiveColors? backgroundColor;
 
   /// Corner rounding of the container surface.
   @Style<BorderRadius>.resolve(_borderRadius)
@@ -99,7 +101,7 @@ class _LegendExpandableState extends State<LegendExpandable> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = widget._theme(context);
+    final theme = this.theme;
     final tokens = LegendTheme.of(context).tokens;
     final expanded = _isExpanded;
 
@@ -116,7 +118,10 @@ class _LegendExpandableState extends State<LegendExpandable> {
             onTap: _toggle,
             builder: (context, states) {
               return LegendSurface(
-                color: theme.backgroundColor.pick(states.effective),
+                color: theme.backgroundColor.resolve(
+                  states.effective,
+                  tokens.states,
+                ),
                 padding: theme.headerPadding,
                 duration: widget.duration,
                 child: Row(
@@ -158,7 +163,7 @@ class _LegendExpandableState extends State<LegendExpandable> {
 
 EdgeInsetsGeometry _headerPadding(LegendTokens t) => EdgeInsets.all(t.sizes.md);
 
-LegendStates<Color> _backgroundColor(LegendTokens t) => LegendStates(
+InteractiveColors _backgroundColor(LegendTokens t) => InteractiveColors(
   normal: t.colors.surface,
   hovered: t.colors.background2,
   pressed: t.colors.background2,

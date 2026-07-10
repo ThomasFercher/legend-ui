@@ -99,38 +99,44 @@ mixin _$LegendColors {
 
 /// Member-wise lerp for [LegendColors]; the public [LegendColors.lerp]
 /// redirects here (part of the one token lerp a theme switch
-/// pays, DESIGN.md §2.4).
-LegendColors _$LegendColorsLerp(LegendColors a, LegendColors b, double t) =>
-    LegendColors(
-      primary: Color.lerp(a.primary, b.primary, t)!,
-      onPrimary: Color.lerp(a.onPrimary, b.onPrimary, t)!,
-      primaryContainer: Color.lerp(a.primaryContainer, b.primaryContainer, t)!,
-      onPrimaryContainer: Color.lerp(
-        a.onPrimaryContainer,
-        b.onPrimaryContainer,
-        t,
-      )!,
-      secondary: Color.lerp(a.secondary, b.secondary, t)!,
-      onSecondary: Color.lerp(a.onSecondary, b.onSecondary, t)!,
-      background1: Color.lerp(a.background1, b.background1, t)!,
-      background2: Color.lerp(a.background2, b.background2, t)!,
-      background3: Color.lerp(a.background3, b.background3, t)!,
-      surface: Color.lerp(a.surface, b.surface, t)!,
-      onSurface: Color.lerp(a.onSurface, b.onSurface, t)!,
-      error: Color.lerp(a.error, b.error, t)!,
-      onError: Color.lerp(a.onError, b.onError, t)!,
-      disabled: Color.lerp(a.disabled, b.disabled, t)!,
-      onDisabled: Color.lerp(a.onDisabled, b.onDisabled, t)!,
-      foreground1: Color.lerp(a.foreground1, b.foreground1, t)!,
-      foreground2: Color.lerp(a.foreground2, b.foreground2, t)!,
-      foreground3: Color.lerp(a.foreground3, b.foreground3, t)!,
-    );
+/// pays, DESIGN.md §2.4). Identical endpoints short-circuit
+/// to the same instance (RFC-002 R12 amendment): sub-objects
+/// shared between theme poles stay identity-stable through
+/// an animation, so per-field rebuild comparators never
+/// re-diff unchanged token groups.
+LegendColors _$LegendColorsLerp(LegendColors a, LegendColors b, double t) {
+  if (identical(a, b)) return a;
+  return LegendColors(
+    primary: Color.lerp(a.primary, b.primary, t)!,
+    onPrimary: Color.lerp(a.onPrimary, b.onPrimary, t)!,
+    primaryContainer: Color.lerp(a.primaryContainer, b.primaryContainer, t)!,
+    onPrimaryContainer: Color.lerp(
+      a.onPrimaryContainer,
+      b.onPrimaryContainer,
+      t,
+    )!,
+    secondary: Color.lerp(a.secondary, b.secondary, t)!,
+    onSecondary: Color.lerp(a.onSecondary, b.onSecondary, t)!,
+    background1: Color.lerp(a.background1, b.background1, t)!,
+    background2: Color.lerp(a.background2, b.background2, t)!,
+    background3: Color.lerp(a.background3, b.background3, t)!,
+    surface: Color.lerp(a.surface, b.surface, t)!,
+    onSurface: Color.lerp(a.onSurface, b.onSurface, t)!,
+    error: Color.lerp(a.error, b.error, t)!,
+    onError: Color.lerp(a.onError, b.onError, t)!,
+    disabled: Color.lerp(a.disabled, b.disabled, t)!,
+    onDisabled: Color.lerp(a.onDisabled, b.onDisabled, t)!,
+    foreground1: Color.lerp(a.foreground1, b.foreground1, t)!,
+    foreground2: Color.lerp(a.foreground2, b.foreground2, t)!,
+    foreground3: Color.lerp(a.foreground3, b.foreground3, t)!,
+  );
+}
 
 /// Const tear-off catalog for [LegendColors] (RFC-002 R10
 /// amendment): one static per token field, usable directly
 /// inside `@Style<T>.resolve` annotations —
-/// `@Style<Color>.resolve(LegendColorsRef.primary)`.
-abstract final class LegendColorsRef {
+/// `@Style<Color>.resolve(ColorRef.primary)`.
+abstract final class ColorRef {
   /// The brand color — filled buttons, active states, focus accents.
   static Color primary(LegendTokens t) => t.colors.primary;
 

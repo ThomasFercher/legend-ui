@@ -42,15 +42,15 @@ class LegendSwitch extends StatelessWidget {
   final String? semanticLabel;
 
   /// Track color while the switch is on.
-  @Style<Color>.resolve(LegendColorsRef.primary, lerp: true)
+  @Style<Color>.resolve(ColorRef.primary, lerp: true)
   final Color? activeTrack;
 
   /// Track color while the switch is off.
-  @Style<Color>.resolve(LegendColorsRef.background3, lerp: true)
+  @Style<Color>.resolve(ColorRef.background3, lerp: true)
   final Color? inactiveTrack;
 
   /// Color of the sliding thumb.
-  @Style<Color>.resolve(LegendColorsRef.surface)
+  @Style<Color>.resolve(ColorRef.surface)
   final Color? thumb;
 
   /// Overall width of the track.

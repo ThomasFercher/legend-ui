@@ -19,12 +19,12 @@ class LegendContextMenuTheme {
       LegendContextMenuTheme(
         menuBackground: _menuBackground(t),
         menuBorderRadius: _menuBorderRadius(t),
-        menuShadows: LegendShadowsRef.medium(t),
+        menuShadows: ShadowRef.medium(t),
         itemPadding: _itemPadding(t),
-        textStyle: LegendTypographyRef.b2(t),
+        textStyle: TextRef.b2(t),
       );
 
-  final LegendStates<Color> menuBackground;
+  final InteractiveColors menuBackground;
   final BorderRadius menuBorderRadius;
   final List<BoxShadow> menuShadows;
   final EdgeInsetsGeometry itemPadding;
@@ -35,33 +35,55 @@ class LegendContextMenuTheme {
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
   ///
-  /// Post-merge, unset `LegendStates<Color>` members fill
-  /// from the resolved `normal` via `tokens.states`
-  /// (RFC-002 R6) — named members at any level always win.
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static LegendContextMenuTheme of(
     BuildContext context, [
     LegendContextMenuThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
-    final resolved = LegendContextMenuTheme.defaults(data.tokens)
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendContextMenuThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendContextMenuAspectMenuBackground);
+    LegendThemeOverride.depend<LegendContextMenuThemeNullable>(
+      context,
+      _$LegendContextMenuOverrideAspectMenuBackground,
+    );
+    LegendTheme.depend(context, _$LegendContextMenuAspectMenuBorderRadius);
+    LegendThemeOverride.depend<LegendContextMenuThemeNullable>(
+      context,
+      _$LegendContextMenuOverrideAspectMenuBorderRadius,
+    );
+    LegendTheme.depend(context, _$LegendContextMenuAspectMenuShadows);
+    LegendThemeOverride.depend<LegendContextMenuThemeNullable>(
+      context,
+      _$LegendContextMenuOverrideAspectMenuShadows,
+    );
+    LegendTheme.depend(context, _$LegendContextMenuAspectItemPadding);
+    LegendThemeOverride.depend<LegendContextMenuThemeNullable>(
+      context,
+      _$LegendContextMenuOverrideAspectItemPadding,
+    );
+    LegendTheme.depend(context, _$LegendContextMenuAspectTextStyle);
+    LegendThemeOverride.depend<LegendContextMenuThemeNullable>(
+      context,
+      _$LegendContextMenuOverrideAspectTextStyle,
+    );
+    return LegendContextMenuTheme.defaults(data.tokens)
         .merge(
           data.componentOf<LegendContextMenuThemeNullable>(LegendContextMenu),
         )
-        .merge(
-          LegendThemeOverride.maybeOf<LegendContextMenuThemeNullable>(context),
-        )
+        .merge(override)
         .merge(local);
-    return resolved.copyWith(
-      menuBackground: resolved.menuBackground.withDerived(data.tokens.states),
-    );
   }
 
   LegendContextMenuTheme merge(LegendContextMenuThemeNullable? other) {
     if (other == null) return this;
     return LegendContextMenuTheme(
-      menuBackground:
-          LegendStates.merge(menuBackground, other.menuBackground) ??
-          menuBackground,
+      menuBackground: menuBackground.merge(other.menuBackground),
       menuBorderRadius: other.menuBorderRadius ?? menuBorderRadius,
       menuShadows: other.menuShadows ?? menuShadows,
       itemPadding: other.itemPadding ?? itemPadding,
@@ -70,7 +92,7 @@ class LegendContextMenuTheme {
   }
 
   LegendContextMenuTheme copyWith({
-    LegendStates<Color>? menuBackground,
+    InteractiveColors? menuBackground,
     BorderRadius? menuBorderRadius,
     List<BoxShadow>? menuShadows,
     EdgeInsetsGeometry? itemPadding,
@@ -108,7 +130,7 @@ class LegendContextMenuThemeNullable {
     this.textStyle,
   });
 
-  final LegendStates<Color>? menuBackground;
+  final InteractiveColors? menuBackground;
   final BorderRadius? menuBorderRadius;
   final List<BoxShadow>? menuShadows;
   final EdgeInsetsGeometry? itemPadding;
@@ -117,7 +139,8 @@ class LegendContextMenuThemeNullable {
   LegendContextMenuThemeNullable merge(LegendContextMenuThemeNullable? other) {
     if (other == null) return this;
     return LegendContextMenuThemeNullable(
-      menuBackground: LegendStates.merge(menuBackground, other.menuBackground),
+      menuBackground:
+          menuBackground?.merge(other.menuBackground) ?? other.menuBackground,
       menuBorderRadius: other.menuBorderRadius ?? menuBorderRadius,
       menuShadows: other.menuShadows ?? menuShadows,
       itemPadding: other.itemPadding ?? itemPadding,
@@ -164,6 +187,158 @@ class LegendContextMenuThemeOverride extends StatelessWidget {
       );
 }
 
+/// Resolves [LegendContextMenu.menuBackground] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+InteractiveColors _$LegendContextMenuSelectMenuBackground(
+  LegendThemeData data,
+) => _menuBackground(data.tokens).merge(
+  data
+      .componentOf<LegendContextMenuThemeNullable>(LegendContextMenu)
+      ?.menuBackground,
+);
+const _$LegendContextMenuAspectMenuBackground = LegendThemeAspect(
+  _$LegendContextMenuSelectMenuBackground,
+);
+Object? _$LegendContextMenuOverrideSelectMenuBackground(
+  LegendContextMenuThemeNullable data,
+) => data.menuBackground;
+const _$LegendContextMenuOverrideAspectMenuBackground =
+    LegendOverrideAspect<LegendContextMenuThemeNullable>(
+      _$LegendContextMenuOverrideSelectMenuBackground,
+    );
+
+/// Resolves [LegendContextMenu.menuBorderRadius] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+BorderRadius _$LegendContextMenuSelectMenuBorderRadius(LegendThemeData data) =>
+    data
+        .componentOf<LegendContextMenuThemeNullable>(LegendContextMenu)
+        ?.menuBorderRadius ??
+    _menuBorderRadius(data.tokens);
+const _$LegendContextMenuAspectMenuBorderRadius = LegendThemeAspect(
+  _$LegendContextMenuSelectMenuBorderRadius,
+);
+Object? _$LegendContextMenuOverrideSelectMenuBorderRadius(
+  LegendContextMenuThemeNullable data,
+) => data.menuBorderRadius;
+const _$LegendContextMenuOverrideAspectMenuBorderRadius =
+    LegendOverrideAspect<LegendContextMenuThemeNullable>(
+      _$LegendContextMenuOverrideSelectMenuBorderRadius,
+    );
+
+/// Resolves [LegendContextMenu.menuShadows] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+List<BoxShadow> _$LegendContextMenuSelectMenuShadows(LegendThemeData data) =>
+    data
+        .componentOf<LegendContextMenuThemeNullable>(LegendContextMenu)
+        ?.menuShadows ??
+    ShadowRef.medium(data.tokens);
+const _$LegendContextMenuAspectMenuShadows = LegendThemeAspect(
+  _$LegendContextMenuSelectMenuShadows,
+);
+Object? _$LegendContextMenuOverrideSelectMenuShadows(
+  LegendContextMenuThemeNullable data,
+) => data.menuShadows;
+const _$LegendContextMenuOverrideAspectMenuShadows =
+    LegendOverrideAspect<LegendContextMenuThemeNullable>(
+      _$LegendContextMenuOverrideSelectMenuShadows,
+    );
+
+/// Resolves [LegendContextMenu.itemPadding] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+EdgeInsetsGeometry _$LegendContextMenuSelectItemPadding(LegendThemeData data) =>
+    data
+        .componentOf<LegendContextMenuThemeNullable>(LegendContextMenu)
+        ?.itemPadding ??
+    _itemPadding(data.tokens);
+const _$LegendContextMenuAspectItemPadding = LegendThemeAspect(
+  _$LegendContextMenuSelectItemPadding,
+);
+Object? _$LegendContextMenuOverrideSelectItemPadding(
+  LegendContextMenuThemeNullable data,
+) => data.itemPadding;
+const _$LegendContextMenuOverrideAspectItemPadding =
+    LegendOverrideAspect<LegendContextMenuThemeNullable>(
+      _$LegendContextMenuOverrideSelectItemPadding,
+    );
+
+/// Resolves [LegendContextMenu.textStyle] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+TextStyle _$LegendContextMenuSelectTextStyle(LegendThemeData data) =>
+    data
+        .componentOf<LegendContextMenuThemeNullable>(LegendContextMenu)
+        ?.textStyle ??
+    TextRef.b2(data.tokens);
+const _$LegendContextMenuAspectTextStyle = LegendThemeAspect(
+  _$LegendContextMenuSelectTextStyle,
+);
+Object? _$LegendContextMenuOverrideSelectTextStyle(
+  LegendContextMenuThemeNullable data,
+) => data.textStyle;
+const _$LegendContextMenuOverrideAspectTextStyle =
+    LegendOverrideAspect<LegendContextMenuThemeNullable>(
+      _$LegendContextMenuOverrideSelectTextStyle,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class LegendContextMenuThemeListenables {
+  /// Change stream of the resolved [LegendContextMenuTheme.menuBackground].
+  static ValueListenable<InteractiveColors> menuBackground(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(
+    source,
+    data,
+    _$LegendContextMenuSelectMenuBackground,
+  );
+
+  /// Change stream of the resolved [LegendContextMenuTheme.menuBorderRadius].
+  static ValueListenable<BorderRadius> menuBorderRadius(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(
+    source,
+    data,
+    _$LegendContextMenuSelectMenuBorderRadius,
+  );
+
+  /// Change stream of the resolved [LegendContextMenuTheme.menuShadows].
+  static ValueListenable<List<BoxShadow>> menuShadows(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendContextMenuSelectMenuShadows);
+
+  /// Change stream of the resolved [LegendContextMenuTheme.itemPadding].
+  static ValueListenable<EdgeInsetsGeometry> itemPadding(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendContextMenuSelectItemPadding);
+
+  /// Change stream of the resolved [LegendContextMenuTheme.textStyle].
+  static ValueListenable<TextStyle> textStyle(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendContextMenuSelectTextStyle);
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -171,6 +346,159 @@ extension _$LegendContextMenuThemeResolve on LegendContextMenu {
   /// [LegendContextMenuTheme.of] with this widget's constructor params as
   /// level 1.
   LegendContextMenuTheme _theme(BuildContext context) =>
+      LegendContextMenuTheme.of(
+        context,
+        LegendContextMenuThemeNullable(
+          menuBackground: menuBackground,
+          menuBorderRadius: menuBorderRadius,
+          menuShadows: menuShadows,
+          itemPadding: itemPadding,
+          textStyle: textStyle,
+        ),
+      );
+
+  /// Resolves ONLY [LegendContextMenu.menuBackground] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._menuBackground(context)`).
+  InteractiveColors _menuBackground(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendContextMenuThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendContextMenuAspectMenuBackground);
+    LegendThemeOverride.depend<LegendContextMenuThemeNullable>(
+      context,
+      _$LegendContextMenuOverrideAspectMenuBackground,
+    );
+    return _$LegendContextMenuSelectMenuBackground(
+      data,
+    ).merge(override?.menuBackground).merge(menuBackground);
+  }
+
+  /// Resolves ONLY [LegendContextMenu.menuBorderRadius] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._menuBorderRadius(context)`).
+  BorderRadius _menuBorderRadius(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendContextMenuThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendContextMenuAspectMenuBorderRadius);
+    LegendThemeOverride.depend<LegendContextMenuThemeNullable>(
+      context,
+      _$LegendContextMenuOverrideAspectMenuBorderRadius,
+    );
+    return menuBorderRadius ??
+        override?.menuBorderRadius ??
+        _$LegendContextMenuSelectMenuBorderRadius(data);
+  }
+
+  /// Resolves ONLY [LegendContextMenu.menuShadows] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._menuShadows(context)`).
+  List<BoxShadow> _menuShadows(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendContextMenuThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendContextMenuAspectMenuShadows);
+    LegendThemeOverride.depend<LegendContextMenuThemeNullable>(
+      context,
+      _$LegendContextMenuOverrideAspectMenuShadows,
+    );
+    return menuShadows ??
+        override?.menuShadows ??
+        _$LegendContextMenuSelectMenuShadows(data);
+  }
+
+  /// Resolves ONLY [LegendContextMenu.itemPadding] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._itemPadding(context)`).
+  EdgeInsetsGeometry _itemPadding(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendContextMenuThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendContextMenuAspectItemPadding);
+    LegendThemeOverride.depend<LegendContextMenuThemeNullable>(
+      context,
+      _$LegendContextMenuOverrideAspectItemPadding,
+    );
+    return itemPadding ??
+        override?.itemPadding ??
+        _$LegendContextMenuSelectItemPadding(data);
+  }
+
+  /// Resolves ONLY [LegendContextMenu.textStyle] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._textStyle(context)`).
+  TextStyle _textStyle(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendContextMenuThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendContextMenuAspectTextStyle);
+    LegendThemeOverride.depend<LegendContextMenuThemeNullable>(
+      context,
+      _$LegendContextMenuOverrideAspectTextStyle,
+    );
+    return textStyle ??
+        override?.textStyle ??
+        _$LegendContextMenuSelectTextStyle(data);
+  }
+}
+
+/// Auto-detected State wiring (RFC-002 R13): [_LegendContextMenuState]
+/// is this file's `State<LegendContextMenu>`, so its
+/// build reads the resolved theme as a plain `theme`
+/// getter — zero visible wiring. A same-named instance
+/// member (e.g. from [_$LegendContextMenuThemeState])
+/// wins over this extension.
+extension _$LegendContextMenuThemeOn_LegendContextMenuState
+    on _LegendContextMenuState {
+  LegendContextMenuTheme get theme => widget._theme(context);
+}
+
+/// Explicit State wiring (RFC-002 R13): mix onto any
+/// `State<LegendContextMenu>` for the `theme` getter as a
+/// real, overridable inherited member — no State-class
+/// detection involved.
+mixin _$LegendContextMenuThemeState on State<LegendContextMenu> {
+  LegendContextMenuTheme get theme => widget._theme(context);
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class LegendContextMenu extends
+/// _$LegendContextMenuBase` receives the resolved
+/// [LegendContextMenuTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$LegendContextMenuBase
+    extends LegendStatelessWidget<LegendContextMenuTheme> {
+  const _$LegendContextMenuBase({super.key});
+
+  InteractiveColors? get menuBackground;
+  BorderRadius? get menuBorderRadius;
+  List<BoxShadow>? get menuShadows;
+  EdgeInsetsGeometry? get itemPadding;
+  TextStyle? get textStyle;
+
+  @override
+  LegendContextMenuTheme resolveThemeOf(BuildContext context) =>
       LegendContextMenuTheme.of(
         context,
         LegendContextMenuThemeNullable(

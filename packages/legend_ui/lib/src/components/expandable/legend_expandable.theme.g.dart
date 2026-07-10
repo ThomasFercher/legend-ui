@@ -21,7 +21,7 @@ class LegendExpandableTheme {
       );
 
   final EdgeInsetsGeometry headerPadding;
-  final LegendStates<Color> backgroundColor;
+  final InteractiveColors backgroundColor;
   final BorderRadius borderRadius;
 
   /// Resolves the theme: defaults <- app registry (keyed by
@@ -29,41 +29,53 @@ class LegendExpandableTheme {
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
   ///
-  /// Post-merge, unset `LegendStates<Color>` members fill
-  /// from the resolved `normal` via `tokens.states`
-  /// (RFC-002 R6) — named members at any level always win.
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static LegendExpandableTheme of(
     BuildContext context, [
     LegendExpandableThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
-    final resolved = LegendExpandableTheme.defaults(data.tokens)
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendExpandableThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendExpandableAspectHeaderPadding);
+    LegendThemeOverride.depend<LegendExpandableThemeNullable>(
+      context,
+      _$LegendExpandableOverrideAspectHeaderPadding,
+    );
+    LegendTheme.depend(context, _$LegendExpandableAspectBackgroundColor);
+    LegendThemeOverride.depend<LegendExpandableThemeNullable>(
+      context,
+      _$LegendExpandableOverrideAspectBackgroundColor,
+    );
+    LegendTheme.depend(context, _$LegendExpandableAspectBorderRadius);
+    LegendThemeOverride.depend<LegendExpandableThemeNullable>(
+      context,
+      _$LegendExpandableOverrideAspectBorderRadius,
+    );
+    return LegendExpandableTheme.defaults(data.tokens)
         .merge(
           data.componentOf<LegendExpandableThemeNullable>(LegendExpandable),
         )
-        .merge(
-          LegendThemeOverride.maybeOf<LegendExpandableThemeNullable>(context),
-        )
+        .merge(override)
         .merge(local);
-    return resolved.copyWith(
-      backgroundColor: resolved.backgroundColor.withDerived(data.tokens.states),
-    );
   }
 
   LegendExpandableTheme merge(LegendExpandableThemeNullable? other) {
     if (other == null) return this;
     return LegendExpandableTheme(
       headerPadding: other.headerPadding ?? headerPadding,
-      backgroundColor:
-          LegendStates.merge(backgroundColor, other.backgroundColor) ??
-          backgroundColor,
+      backgroundColor: backgroundColor.merge(other.backgroundColor),
       borderRadius: other.borderRadius ?? borderRadius,
     );
   }
 
   LegendExpandableTheme copyWith({
     EdgeInsetsGeometry? headerPadding,
-    LegendStates<Color>? backgroundColor,
+    InteractiveColors? backgroundColor,
     BorderRadius? borderRadius,
   }) => LegendExpandableTheme(
     headerPadding: headerPadding ?? this.headerPadding,
@@ -93,17 +105,16 @@ class LegendExpandableThemeNullable {
   });
 
   final EdgeInsetsGeometry? headerPadding;
-  final LegendStates<Color>? backgroundColor;
+  final InteractiveColors? backgroundColor;
   final BorderRadius? borderRadius;
 
   LegendExpandableThemeNullable merge(LegendExpandableThemeNullable? other) {
     if (other == null) return this;
     return LegendExpandableThemeNullable(
       headerPadding: other.headerPadding ?? headerPadding,
-      backgroundColor: LegendStates.merge(
-        backgroundColor,
-        other.backgroundColor,
-      ),
+      backgroundColor:
+          backgroundColor?.merge(other.backgroundColor) ??
+          other.backgroundColor,
       borderRadius: other.borderRadius ?? borderRadius,
     );
   }
@@ -140,6 +151,104 @@ class LegendExpandableThemeOverride extends StatelessWidget {
       );
 }
 
+/// Resolves [LegendExpandable.headerPadding] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+EdgeInsetsGeometry _$LegendExpandableSelectHeaderPadding(
+  LegendThemeData data,
+) =>
+    data
+        .componentOf<LegendExpandableThemeNullable>(LegendExpandable)
+        ?.headerPadding ??
+    _headerPadding(data.tokens);
+const _$LegendExpandableAspectHeaderPadding = LegendThemeAspect(
+  _$LegendExpandableSelectHeaderPadding,
+);
+Object? _$LegendExpandableOverrideSelectHeaderPadding(
+  LegendExpandableThemeNullable data,
+) => data.headerPadding;
+const _$LegendExpandableOverrideAspectHeaderPadding =
+    LegendOverrideAspect<LegendExpandableThemeNullable>(
+      _$LegendExpandableOverrideSelectHeaderPadding,
+    );
+
+/// Resolves [LegendExpandable.backgroundColor] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+InteractiveColors _$LegendExpandableSelectBackgroundColor(
+  LegendThemeData data,
+) => _backgroundColor(data.tokens).merge(
+  data
+      .componentOf<LegendExpandableThemeNullable>(LegendExpandable)
+      ?.backgroundColor,
+);
+const _$LegendExpandableAspectBackgroundColor = LegendThemeAspect(
+  _$LegendExpandableSelectBackgroundColor,
+);
+Object? _$LegendExpandableOverrideSelectBackgroundColor(
+  LegendExpandableThemeNullable data,
+) => data.backgroundColor;
+const _$LegendExpandableOverrideAspectBackgroundColor =
+    LegendOverrideAspect<LegendExpandableThemeNullable>(
+      _$LegendExpandableOverrideSelectBackgroundColor,
+    );
+
+/// Resolves [LegendExpandable.borderRadius] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+BorderRadius _$LegendExpandableSelectBorderRadius(LegendThemeData data) =>
+    data
+        .componentOf<LegendExpandableThemeNullable>(LegendExpandable)
+        ?.borderRadius ??
+    _borderRadius(data.tokens);
+const _$LegendExpandableAspectBorderRadius = LegendThemeAspect(
+  _$LegendExpandableSelectBorderRadius,
+);
+Object? _$LegendExpandableOverrideSelectBorderRadius(
+  LegendExpandableThemeNullable data,
+) => data.borderRadius;
+const _$LegendExpandableOverrideAspectBorderRadius =
+    LegendOverrideAspect<LegendExpandableThemeNullable>(
+      _$LegendExpandableOverrideSelectBorderRadius,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class LegendExpandableThemeListenables {
+  /// Change stream of the resolved [LegendExpandableTheme.headerPadding].
+  static ValueListenable<EdgeInsetsGeometry> headerPadding(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendExpandableSelectHeaderPadding);
+
+  /// Change stream of the resolved [LegendExpandableTheme.backgroundColor].
+  static ValueListenable<InteractiveColors> backgroundColor(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(
+    source,
+    data,
+    _$LegendExpandableSelectBackgroundColor,
+  );
+
+  /// Change stream of the resolved [LegendExpandableTheme.borderRadius].
+  static ValueListenable<BorderRadius> borderRadius(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendExpandableSelectBorderRadius);
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -147,6 +256,113 @@ extension _$LegendExpandableThemeResolve on LegendExpandable {
   /// [LegendExpandableTheme.of] with this widget's constructor params as
   /// level 1.
   LegendExpandableTheme _theme(BuildContext context) =>
+      LegendExpandableTheme.of(
+        context,
+        LegendExpandableThemeNullable(
+          headerPadding: headerPadding,
+          backgroundColor: backgroundColor,
+          borderRadius: borderRadius,
+        ),
+      );
+
+  /// Resolves ONLY [LegendExpandable.headerPadding] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._headerPadding(context)`).
+  EdgeInsetsGeometry _headerPadding(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendExpandableThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendExpandableAspectHeaderPadding);
+    LegendThemeOverride.depend<LegendExpandableThemeNullable>(
+      context,
+      _$LegendExpandableOverrideAspectHeaderPadding,
+    );
+    return headerPadding ??
+        override?.headerPadding ??
+        _$LegendExpandableSelectHeaderPadding(data);
+  }
+
+  /// Resolves ONLY [LegendExpandable.backgroundColor] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._backgroundColor(context)`).
+  InteractiveColors _backgroundColor(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendExpandableThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendExpandableAspectBackgroundColor);
+    LegendThemeOverride.depend<LegendExpandableThemeNullable>(
+      context,
+      _$LegendExpandableOverrideAspectBackgroundColor,
+    );
+    return _$LegendExpandableSelectBackgroundColor(
+      data,
+    ).merge(override?.backgroundColor).merge(backgroundColor);
+  }
+
+  /// Resolves ONLY [LegendExpandable.borderRadius] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._borderRadius(context)`).
+  BorderRadius _borderRadius(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendExpandableThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendExpandableAspectBorderRadius);
+    LegendThemeOverride.depend<LegendExpandableThemeNullable>(
+      context,
+      _$LegendExpandableOverrideAspectBorderRadius,
+    );
+    return borderRadius ??
+        override?.borderRadius ??
+        _$LegendExpandableSelectBorderRadius(data);
+  }
+}
+
+/// Auto-detected State wiring (RFC-002 R13): [_LegendExpandableState]
+/// is this file's `State<LegendExpandable>`, so its
+/// build reads the resolved theme as a plain `theme`
+/// getter — zero visible wiring. A same-named instance
+/// member (e.g. from [_$LegendExpandableThemeState])
+/// wins over this extension.
+extension _$LegendExpandableThemeOn_LegendExpandableState
+    on _LegendExpandableState {
+  LegendExpandableTheme get theme => widget._theme(context);
+}
+
+/// Explicit State wiring (RFC-002 R13): mix onto any
+/// `State<LegendExpandable>` for the `theme` getter as a
+/// real, overridable inherited member — no State-class
+/// detection involved.
+mixin _$LegendExpandableThemeState on State<LegendExpandable> {
+  LegendExpandableTheme get theme => widget._theme(context);
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class LegendExpandable extends
+/// _$LegendExpandableBase` receives the resolved
+/// [LegendExpandableTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$LegendExpandableBase
+    extends LegendStatelessWidget<LegendExpandableTheme> {
+  const _$LegendExpandableBase({super.key});
+
+  EdgeInsetsGeometry? get headerPadding;
+  InteractiveColors? get backgroundColor;
+  BorderRadius? get borderRadius;
+
+  @override
+  LegendExpandableTheme resolveThemeOf(BuildContext context) =>
       LegendExpandableTheme.of(
         context,
         LegendExpandableThemeNullable(

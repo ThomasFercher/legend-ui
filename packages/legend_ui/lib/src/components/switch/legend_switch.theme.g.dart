@@ -16,9 +16,9 @@ class LegendSwitchTheme {
   /// Token-derived defaults (level 4) — the annotation
   /// defaults ARE the kit defaults (DESIGN.md §9.9).
   factory LegendSwitchTheme.defaults(LegendTokens t) => LegendSwitchTheme(
-    activeTrack: LegendColorsRef.primary(t),
-    inactiveTrack: LegendColorsRef.background3(t),
-    thumb: LegendColorsRef.surface(t),
+    activeTrack: ColorRef.primary(t),
+    inactiveTrack: ColorRef.background3(t),
+    thumb: ColorRef.surface(t),
     width: 44,
     height: 24,
   );
@@ -33,16 +33,48 @@ class LegendSwitchTheme {
   /// [LegendSwitch] first, [LegendSwitchThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
+  ///
+  /// Registers one rebuild aspect per `listen: true` field
+  /// (RFC-002 R12): the caller rebuilds only when a listened
+  /// field's resolved value changes; `listen: false` fields
+  /// resolve fresh but never cause a rebuild by themselves.
   static LegendSwitchTheme of(
     BuildContext context, [
     LegendSwitchThemeNullable? local,
   ]) {
-    final data = LegendTheme.of(context);
-    final resolved = LegendSwitchTheme.defaults(data.tokens)
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendSwitchThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendSwitchAspectActiveTrack);
+    LegendThemeOverride.depend<LegendSwitchThemeNullable>(
+      context,
+      _$LegendSwitchOverrideAspectActiveTrack,
+    );
+    LegendTheme.depend(context, _$LegendSwitchAspectInactiveTrack);
+    LegendThemeOverride.depend<LegendSwitchThemeNullable>(
+      context,
+      _$LegendSwitchOverrideAspectInactiveTrack,
+    );
+    LegendTheme.depend(context, _$LegendSwitchAspectThumb);
+    LegendThemeOverride.depend<LegendSwitchThemeNullable>(
+      context,
+      _$LegendSwitchOverrideAspectThumb,
+    );
+    LegendTheme.depend(context, _$LegendSwitchAspectWidth);
+    LegendThemeOverride.depend<LegendSwitchThemeNullable>(
+      context,
+      _$LegendSwitchOverrideAspectWidth,
+    );
+    LegendTheme.depend(context, _$LegendSwitchAspectHeight);
+    LegendThemeOverride.depend<LegendSwitchThemeNullable>(
+      context,
+      _$LegendSwitchOverrideAspectHeight,
+    );
+    return LegendSwitchTheme.defaults(data.tokens)
         .merge(data.componentOf<LegendSwitchThemeNullable>(LegendSwitch))
-        .merge(LegendThemeOverride.maybeOf<LegendSwitchThemeNullable>(context))
+        .merge(override)
         .merge(local);
-    return resolved;
   }
 
   LegendSwitchTheme merge(LegendSwitchThemeNullable? other) {
@@ -143,6 +175,129 @@ class LegendSwitchThemeOverride extends StatelessWidget {
       LegendThemeOverride<LegendSwitchThemeNullable>(data: data, child: child);
 }
 
+/// Resolves [LegendSwitch.activeTrack] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendSwitchSelectActiveTrack(LegendThemeData data) =>
+    data.componentOf<LegendSwitchThemeNullable>(LegendSwitch)?.activeTrack ??
+    ColorRef.primary(data.tokens);
+const _$LegendSwitchAspectActiveTrack = LegendThemeAspect(
+  _$LegendSwitchSelectActiveTrack,
+);
+Object? _$LegendSwitchOverrideSelectActiveTrack(
+  LegendSwitchThemeNullable data,
+) => data.activeTrack;
+const _$LegendSwitchOverrideAspectActiveTrack =
+    LegendOverrideAspect<LegendSwitchThemeNullable>(
+      _$LegendSwitchOverrideSelectActiveTrack,
+    );
+
+/// Resolves [LegendSwitch.inactiveTrack] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendSwitchSelectInactiveTrack(LegendThemeData data) =>
+    data.componentOf<LegendSwitchThemeNullable>(LegendSwitch)?.inactiveTrack ??
+    ColorRef.background3(data.tokens);
+const _$LegendSwitchAspectInactiveTrack = LegendThemeAspect(
+  _$LegendSwitchSelectInactiveTrack,
+);
+Object? _$LegendSwitchOverrideSelectInactiveTrack(
+  LegendSwitchThemeNullable data,
+) => data.inactiveTrack;
+const _$LegendSwitchOverrideAspectInactiveTrack =
+    LegendOverrideAspect<LegendSwitchThemeNullable>(
+      _$LegendSwitchOverrideSelectInactiveTrack,
+    );
+
+/// Resolves [LegendSwitch.thumb] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendSwitchSelectThumb(LegendThemeData data) =>
+    data.componentOf<LegendSwitchThemeNullable>(LegendSwitch)?.thumb ??
+    ColorRef.surface(data.tokens);
+const _$LegendSwitchAspectThumb = LegendThemeAspect(_$LegendSwitchSelectThumb);
+Object? _$LegendSwitchOverrideSelectThumb(LegendSwitchThemeNullable data) =>
+    data.thumb;
+const _$LegendSwitchOverrideAspectThumb =
+    LegendOverrideAspect<LegendSwitchThemeNullable>(
+      _$LegendSwitchOverrideSelectThumb,
+    );
+
+/// Resolves [LegendSwitch.width] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+double _$LegendSwitchSelectWidth(LegendThemeData data) =>
+    data.componentOf<LegendSwitchThemeNullable>(LegendSwitch)?.width ?? 44;
+const _$LegendSwitchAspectWidth = LegendThemeAspect(_$LegendSwitchSelectWidth);
+Object? _$LegendSwitchOverrideSelectWidth(LegendSwitchThemeNullable data) =>
+    data.width;
+const _$LegendSwitchOverrideAspectWidth =
+    LegendOverrideAspect<LegendSwitchThemeNullable>(
+      _$LegendSwitchOverrideSelectWidth,
+    );
+
+/// Resolves [LegendSwitch.height] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+double _$LegendSwitchSelectHeight(LegendThemeData data) =>
+    data.componentOf<LegendSwitchThemeNullable>(LegendSwitch)?.height ?? 24;
+const _$LegendSwitchAspectHeight = LegendThemeAspect(
+  _$LegendSwitchSelectHeight,
+);
+Object? _$LegendSwitchOverrideSelectHeight(LegendSwitchThemeNullable data) =>
+    data.height;
+const _$LegendSwitchOverrideAspectHeight =
+    LegendOverrideAspect<LegendSwitchThemeNullable>(
+      _$LegendSwitchOverrideSelectHeight,
+    );
+
+/// Distinct-until-changed per-field change streams over a
+/// theme source (RFC-002 R12.4) — for animation and
+/// imperative consumers that want theme changes without any
+/// widget rebuild. Bind `source` to the app theme
+/// controller (any [Listenable]) and `data` to its
+/// [LegendThemeData] getter; dispose the returned selector
+/// when done. Values resolve through registry + token
+/// defaults (constructor params and subtree overrides are
+/// element-tree concerns and have no controller-level
+/// equivalent).
+abstract final class LegendSwitchThemeListenables {
+  /// Change stream of the resolved [LegendSwitchTheme.activeTrack].
+  static ValueListenable<Color> activeTrack(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendSwitchSelectActiveTrack);
+
+  /// Change stream of the resolved [LegendSwitchTheme.inactiveTrack].
+  static ValueListenable<Color> inactiveTrack(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendSwitchSelectInactiveTrack);
+
+  /// Change stream of the resolved [LegendSwitchTheme.thumb].
+  static ValueListenable<Color> thumb(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendSwitchSelectThumb);
+
+  /// Change stream of the resolved [LegendSwitchTheme.width].
+  static ValueListenable<double> width(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendSwitchSelectWidth);
+
+  /// Change stream of the resolved [LegendSwitchTheme.height].
+  static ValueListenable<double> height(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendSwitchSelectHeight);
+}
+
 /// In-library resolver (RFC-002 R1): re-lists the themed
 /// fields so the widget author never does — build calls
 /// `_theme(context)` (`widget._theme(context)` from a State).
@@ -159,4 +314,132 @@ extension _$LegendSwitchThemeResolve on LegendSwitch {
       height: height,
     ),
   );
+
+  /// Resolves ONLY [LegendSwitch.activeTrack] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._activeTrack(context)`).
+  Color _activeTrack(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendSwitchThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendSwitchAspectActiveTrack);
+    LegendThemeOverride.depend<LegendSwitchThemeNullable>(
+      context,
+      _$LegendSwitchOverrideAspectActiveTrack,
+    );
+    return activeTrack ??
+        override?.activeTrack ??
+        _$LegendSwitchSelectActiveTrack(data);
+  }
+
+  /// Resolves ONLY [LegendSwitch.inactiveTrack] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._inactiveTrack(context)`).
+  Color _inactiveTrack(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendSwitchThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendSwitchAspectInactiveTrack);
+    LegendThemeOverride.depend<LegendSwitchThemeNullable>(
+      context,
+      _$LegendSwitchOverrideAspectInactiveTrack,
+    );
+    return inactiveTrack ??
+        override?.inactiveTrack ??
+        _$LegendSwitchSelectInactiveTrack(data);
+  }
+
+  /// Resolves ONLY [LegendSwitch.thumb] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._thumb(context)`).
+  Color _thumb(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendSwitchThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendSwitchAspectThumb);
+    LegendThemeOverride.depend<LegendSwitchThemeNullable>(
+      context,
+      _$LegendSwitchOverrideAspectThumb,
+    );
+    return thumb ?? override?.thumb ?? _$LegendSwitchSelectThumb(data);
+  }
+
+  /// Resolves ONLY [LegendSwitch.width] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._width(context)`).
+  double _width(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendSwitchThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendSwitchAspectWidth);
+    LegendThemeOverride.depend<LegendSwitchThemeNullable>(
+      context,
+      _$LegendSwitchOverrideAspectWidth,
+    );
+    return width ?? override?.width ?? _$LegendSwitchSelectWidth(data);
+  }
+
+  /// Resolves ONLY [LegendSwitch.height] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._height(context)`).
+  double _height(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendSwitchThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendSwitchAspectHeight);
+    LegendThemeOverride.depend<LegendSwitchThemeNullable>(
+      context,
+      _$LegendSwitchOverrideAspectHeight,
+    );
+    return height ?? override?.height ?? _$LegendSwitchSelectHeight(data);
+  }
+}
+
+/// Opt-in two-argument build base (RFC-002 R13, opt-in
+/// base): `class LegendSwitch extends
+/// _$LegendSwitchBase` receives the resolved
+/// [LegendSwitchTheme] as a build parameter. Plain-widget forms stay
+/// the default; there is no stateful two-argument variant.
+abstract class _$LegendSwitchBase
+    extends LegendStatelessWidget<LegendSwitchTheme> {
+  const _$LegendSwitchBase({super.key});
+
+  Color? get activeTrack;
+  Color? get inactiveTrack;
+  Color? get thumb;
+  double? get width;
+  double? get height;
+
+  @override
+  LegendSwitchTheme resolveThemeOf(BuildContext context) =>
+      LegendSwitchTheme.of(
+        context,
+        LegendSwitchThemeNullable(
+          activeTrack: activeTrack,
+          inactiveTrack: inactiveTrack,
+          thumb: thumb,
+          width: width,
+          height: height,
+        ),
+      );
 }

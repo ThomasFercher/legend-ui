@@ -12,22 +12,19 @@ void main() {
     test('every mounted catalog reads exactly its token field', () {
       // One spot-check per catalog — a wrong mount would misroute all of
       // its members the same way.
-      expect(LegendColorsRef.primary(tokens), tokens.colors.primary);
-      expect(LegendSizesRef.md(tokens), tokens.sizes.md);
-      expect(LegendTypographyRef.b2(tokens), tokens.typography.b2);
-      expect(LegendShadowsRef.medium(tokens), tokens.shadows.medium);
-      expect(
-        LegendStateOverlaysRef.hoverAmount(tokens),
-        tokens.states.hoverAmount,
-      );
+      expect(ColorRef.primary(tokens), tokens.colors.primary);
+      expect(SizeRef.md(tokens), tokens.sizes.md);
+      expect(TextRef.b2(tokens), tokens.typography.b2);
+      expect(ShadowRef.medium(tokens), tokens.shadows.medium);
+      expect(StateRef.hoverAmount(tokens), tokens.states.hoverAmount);
     });
 
     test('the root sentinel catalog reads directly off the tokens', () {
-      expect(LegendTokensRef.colors(tokens), tokens.colors);
-      expect(LegendTokensRef.sizes(tokens), tokens.sizes);
-      expect(LegendTokensRef.typography(tokens), tokens.typography);
-      expect(LegendTokensRef.shadows(tokens), tokens.shadows);
-      expect(LegendTokensRef.states(tokens), tokens.states);
+      expect(TokenRef.colors(tokens), tokens.colors);
+      expect(TokenRef.sizes(tokens), tokens.sizes);
+      expect(TokenRef.typography(tokens), tokens.typography);
+      expect(TokenRef.shadows(tokens), tokens.shadows);
+      expect(TokenRef.states(tokens), tokens.states);
     });
 
     test('a @Style default from a Ref tear-off resolves identically to '
@@ -38,7 +35,7 @@ void main() {
       Color localColor(LegendTokens t) => t.colors.background3;
 
       // The annotation is const with the Ref member as its tear-off…
-      const style = Style<double>.resolve(LegendSizesRef.md);
+      const style = Style<double>.resolve(SizeRef.md);
       expect(style.resolve!(tokens), localSpacing(tokens));
 
       // …and the generated defaults() built from Ref tear-offs
