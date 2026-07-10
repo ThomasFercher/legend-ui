@@ -87,9 +87,10 @@ Each numbered item (or bracketed family) = one worktree agent running `legend-wi
 3. Every agent runs the same spec, so the kit stays coherent. That spec is also the seed for the MCP's consistency layer.
 
 ## 5. Open decisions for the maintainer
-- **Dependency additions**: `LegendQrCode` (#24) and any chart work need third-party packages — approve per-case.
-- **`LegendInfoItem` future**: keep as the static label/value row, or fold it into `LegendListItem` variants? (Proposed: keep both.)
-- **First-wave scope**: Wave 0 only, or Wave 0 + Wave 1 in one push?
+- **Dependency additions**: `LegendQrCode` (#24) and any chart work need third-party packages — *resolved 2026-07-10: per-case approval; QR deferred to Wave 3.*
+- **`LegendInfoItem` future**: *resolved 2026-07-10: keep both — static label/value row stays, `LegendListItem` is the new tappable tile.*
+- **First-wave scope**: *resolved 2026-07-10: full march authorized (Wave 0 → 3, gate+merge per widget, check in at wave boundaries).*
+- **Rich text / markdown EDITOR** (new 2026-07-10, AI-workspace requirement) — distinct from the read-only `LegendMarkdown` renderer (#21). A cross-platform (incl. web) editable surface with markdown syntax + selection. Two forks under decision: **scope** (markdown *source* editor on `LegendFieldCore` + syntax highlight + live preview, vs *WYSIWYG* inline formatting) and **build-vs-wrap** (scratch on primitives = kit-native/low-dep vs wrapping an editor engine = dependency + token-theming adapter, web-viability risk). Landscape research in flight; decision pending before it enters a wave.
 
 ## Sources
 Industry: [Ant Design](https://ant.design/components/overview/), [MUI](https://mui.com/material-ui/all-components/), [Fluent 2](https://fluent2.microsoft.design/components/web/react/), [shadcn/ui](https://ui.shadcn.com/docs/components), [Radix](https://www.radix-ui.com/primitives/docs/components), [Chakra](https://chakra-ui.com/docs/components/concepts/overview), [Ant Design Mobile](https://mobile.ant.design/), [React Native Paper](https://callstack.github.io/react-native-paper/). App studies: session research 2026-07-10 (wallet: MetaMask/Rainbow/Phantom/Trust/Rabby/Ledger/WalletConnect; workspace: NotebookLM/ChatGPT/Claude/Perplexity/Notion AI).
