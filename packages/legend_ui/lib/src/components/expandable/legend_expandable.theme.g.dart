@@ -21,7 +21,7 @@ class LegendExpandableTheme {
       );
 
   final EdgeInsetsGeometry headerPadding;
-  final LegendStates<Color> backgroundColor;
+  final InteractiveColors backgroundColor;
   final BorderRadius borderRadius;
 
   /// Resolves the theme: defaults <- app registry (keyed by
@@ -47,14 +47,14 @@ class LegendExpandableTheme {
     if (other == null) return this;
     return LegendExpandableTheme(
       headerPadding: other.headerPadding ?? headerPadding,
-      backgroundColor: other.backgroundColor ?? backgroundColor,
+      backgroundColor: backgroundColor.merge(other.backgroundColor),
       borderRadius: other.borderRadius ?? borderRadius,
     );
   }
 
   LegendExpandableTheme copyWith({
     EdgeInsetsGeometry? headerPadding,
-    LegendStates<Color>? backgroundColor,
+    InteractiveColors? backgroundColor,
     BorderRadius? borderRadius,
   }) => LegendExpandableTheme(
     headerPadding: headerPadding ?? this.headerPadding,
@@ -84,14 +84,16 @@ class LegendExpandableThemeNullable {
   });
 
   final EdgeInsetsGeometry? headerPadding;
-  final LegendStates<Color>? backgroundColor;
+  final InteractiveColors? backgroundColor;
   final BorderRadius? borderRadius;
 
   LegendExpandableThemeNullable merge(LegendExpandableThemeNullable? other) {
     if (other == null) return this;
     return LegendExpandableThemeNullable(
       headerPadding: other.headerPadding ?? headerPadding,
-      backgroundColor: other.backgroundColor ?? backgroundColor,
+      backgroundColor:
+          backgroundColor?.merge(other.backgroundColor) ??
+          other.backgroundColor,
       borderRadius: other.borderRadius ?? borderRadius,
     );
   }

@@ -19,7 +19,7 @@ Widget _app({
   if (subtreeOverride != null) {
     button = PrimaryLegendButtonThemeOverride(
       data: PrimaryLegendButtonThemeNullable(
-        background: LegendStates(normal: subtreeOverride),
+        background: InteractiveColors(normal: subtreeOverride),
       ),
       child: button,
     );
@@ -56,7 +56,7 @@ void main() {
           components: {
             PrimaryLegendButtonThemeNullable:
                 const PrimaryLegendButtonThemeNullable(
-                  background: LegendStates(normal: _appTheme),
+                  background: InteractiveColors(normal: _appTheme),
                 ),
           },
         ),
@@ -70,7 +70,7 @@ void main() {
           components: {
             PrimaryLegendButtonThemeNullable:
                 const PrimaryLegendButtonThemeNullable(
-                  background: LegendStates(normal: _appTheme),
+                  background: InteractiveColors(normal: _appTheme),
                 ),
           },
           subtreeOverride: _subtree,
@@ -85,7 +85,7 @@ void main() {
           components: {
             PrimaryLegendButtonThemeNullable:
                 const PrimaryLegendButtonThemeNullable(
-                  background: LegendStates(normal: _appTheme),
+                  background: InteractiveColors(normal: _appTheme),
                 ),
           },
           subtreeOverride: _subtree,
@@ -102,7 +102,7 @@ void main() {
         _app(
           components: {
             PrimaryLegendButton: const PrimaryLegendButtonThemeNullable(
-              background: LegendStates(normal: _appTheme),
+              background: InteractiveColors(normal: _appTheme),
             ),
           },
         ),
@@ -118,11 +118,11 @@ void main() {
         _app(
           components: {
             PrimaryLegendButton: const PrimaryLegendButtonThemeNullable(
-              background: LegendStates(normal: _appTheme),
+              background: InteractiveColors(normal: _appTheme),
             ),
             PrimaryLegendButtonThemeNullable:
                 const PrimaryLegendButtonThemeNullable(
-                  background: LegendStates(normal: byNullable),
+                  background: InteractiveColors(normal: byNullable),
                 ),
           },
         ),

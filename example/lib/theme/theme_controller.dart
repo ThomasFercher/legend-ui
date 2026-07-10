@@ -143,7 +143,9 @@ class ThemeController extends ChangeNotifier {
         // unset properties keep resolving through the lower levels.
         if (buttonBackground != null)
           PrimaryLegendButtonThemeNullable: PrimaryLegendButtonThemeNullable(
-            background: buttonBackground?.states,
+            background: buttonBackground == null
+                ? null
+                : InteractiveColors(normal: buttonBackground),
           ),
         // The shared button surface (RFC-002 R7.2): one core-level entry
         // restyles the radius of every variant that doesn't opt out.

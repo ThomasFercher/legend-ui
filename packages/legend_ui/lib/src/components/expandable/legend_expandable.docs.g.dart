@@ -19,61 +19,56 @@ const List<LegendDocEntry> legendExpandableDocEntries = [
   LegendDocEntry(
     owner: 'LegendExpandable',
     name: 'backgroundColor',
-    type: 'LegendStates<Color>?',
+    type: 'InteractiveColors?',
     doc:
         'Fill of the container and its header, per interaction state —\n`normal` paints the whole surface, `hovered`/`pressed`/`focused`\ntint the header while the pointer is on it.',
     defaultDescription:
-        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+        'InteractiveColors(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'LegendExpandable',
     name: 'backgroundColor.normal',
     type: 'Color?',
-    doc:
-        'Fill of the container and its header, per interaction state —\n`normal` paints the whole surface, `hovered`/`pressed`/`focused`\ntint the header while the pointer is on it.',
+    doc: 'Fill at rest (and the base unset members fall back to).',
     defaultDescription:
-        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+        'InteractiveColors(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'LegendExpandable',
     name: 'backgroundColor.hovered',
     type: 'Color?',
-    doc:
-        'Fill of the container and its header, per interaction state —\n`normal` paints the whole surface, `hovered`/`pressed`/`focused`\ntint the header while the pointer is on it.',
+    doc: 'Fill while a pointer hovers the widget.',
     defaultDescription:
-        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+        'InteractiveColors(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'LegendExpandable',
     name: 'backgroundColor.pressed',
     type: 'Color?',
-    doc:
-        'Fill of the container and its header, per interaction state —\n`normal` paints the whole surface, `hovered`/`pressed`/`focused`\ntint the header while the pointer is on it.',
+    doc: 'Fill while the widget is actively pressed.',
     defaultDescription:
-        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+        'InteractiveColors(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'LegendExpandable',
     name: 'backgroundColor.focused',
     type: 'Color?',
-    doc:
-        'Fill of the container and its header, per interaction state —\n`normal` paints the whole surface, `hovered`/`pressed`/`focused`\ntint the header while the pointer is on it.',
+    doc: 'Fill while the widget holds keyboard focus.',
     defaultDescription:
-        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+        'InteractiveColors(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'LegendExpandable',
     name: 'backgroundColor.disabled',
     type: 'Color?',
-    doc:
-        'Fill of the container and its header, per interaction state —\n`normal` paints the whole surface, `hovered`/`pressed`/`focused`\ntint the header while the pointer is on it.',
+    doc: 'Fill while the widget is disabled.',
     defaultDescription:
-        'LegendStates(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
+        'InteractiveColors(normal: t.colors.surface, hovered: t.colors.background2, pressed: t.colors.background2, focused: t.colors.background2)',
     group: 'component',
   ),
   LegendDocEntry(

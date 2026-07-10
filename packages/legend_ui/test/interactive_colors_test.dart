@@ -1,3 +1,7 @@
+// Ported from legend_states_test.dart (RFC-002 R6 amendment 7): the
+// generic LegendStates<T> container is deleted; InteractiveColors — an
+// ordinary @Style() value class with GENERATED merge/lerp/== — replaces
+// it one-to-one. Same coverage, new machinery.
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legend_ui/legend_ui.dart';
@@ -57,101 +61,95 @@ void main() {
     });
   });
 
-  group('LegendStates<T>', () {
+  group('InteractiveColors (generated members, RFC-002 R6 amendment 7)', () {
     test('== and hashCode are member-wise', () {
-      const a = LegendStates<Color>(normal: _navy, pressed: _red);
-      const b = LegendStates<Color>(normal: _navy, pressed: _red);
-      const c = LegendStates<Color>(normal: _navy, hovered: _red);
+      const a = InteractiveColors(normal: _navy, pressed: _red);
+      const b = InteractiveColors(normal: _navy, pressed: _red);
+      const c = InteractiveColors(normal: _navy, hovered: _red);
       expect(a, b);
       expect(a.hashCode, b.hashCode);
       expect(a, isNot(c));
     });
 
     test('merge is member-wise sparse — set members win, unset inherit', () {
-      const lower = LegendStates<Color>(normal: _navy, hovered: _red);
-      const upper = LegendStates<Color>(pressed: _green);
-      final merged = LegendStates.merge(lower, upper)!;
+      const lower = InteractiveColors(normal: _navy, hovered: _red);
+      const upper = InteractiveColors(pressed: _green);
+      final merged = lower.merge(upper);
       expect(merged.normal, _navy);
       expect(merged.hovered, _red);
       expect(merged.pressed, _green);
       expect(merged.focused, isNull);
     });
 
-    test('merge passes null containers through', () {
-      const only = LegendStates<double>(normal: 4);
-      expect(LegendStates.merge<double>(only, null), same(only));
-      expect(LegendStates.merge<double>(null, only), same(only));
-      expect(LegendStates.merge<double>(null, null), isNull);
+    test('merge(null) passes the receiver through', () {
+      const only = InteractiveColors(normal: _navy);
+      expect(only.merge(null), same(only));
     });
 
-    test('lerpWith applies the lerper member-wise', () {
-      const a = LegendStates<Color>(normal: _red, hovered: _red);
-      const b = LegendStates<Color>(normal: _green);
-      final mid = LegendStates.lerpWith(a, b, 0.5, Color.lerp);
+    test('lerp is member-wise with Color.lerp', () {
+      const a = InteractiveColors(normal: _red, hovered: _red);
+      const b = InteractiveColors(normal: _green);
+      final mid = InteractiveColors.lerp(a, b, 0.5)!;
       expect(mid.normal, Color.lerp(_red, _green, 0.5));
       // Color.lerp fades against null — member-wise, not whole-value.
       expect(mid.hovered, Color.lerp(_red, null, 0.5));
       expect(mid.pressed, isNull);
     });
 
+    test('lerp handles null sides member-wise and only both-null is null', () {
+      const only = InteractiveColors(normal: _red);
+      final fromNull = InteractiveColors.lerp(null, only, 0.5)!;
+      expect(fromNull.normal, Color.lerp(null, _red, 0.5));
+      expect(InteractiveColors.lerp(null, null, 0.5), isNull);
+    });
+
+    test('lerp short-circuits identical endpoints to the same instance '
+        '(R12 amendment: identity-stable through animations)', () {
+      const a = InteractiveColors(normal: _navy);
+      expect(InteractiveColors.lerp(a, a, 0.37), same(a));
+    });
+
     test('pick returns the member, else normal', () {
-      const states = LegendStates<double>(normal: 1, pressed: 3);
-      expect(states.pick(const LegendStatePressed()), 3);
-      expect(states.pick(const LegendStateHovered()), 1);
-      expect(states.pick(const LegendStateNormal()), 1);
+      const colors = InteractiveColors(normal: _navy, pressed: _red);
+      expect(colors.pick(const LegendStatePressed()), _red);
+      expect(colors.pick(const LegendStateHovered()), _navy);
+      expect(colors.pick(const LegendStateNormal()), _navy);
       expect(
-        const LegendStates<double>().pick(const LegendStatePressed()),
+        const InteractiveColors().pick(const LegendStatePressed()),
         isNull,
       );
     });
-
-    test('.states lifts a raw Color to a normal-only container', () {
-      expect(_navy.states, const LegendStates<Color>(normal: _navy));
-    });
   });
 
-  group('LegendStates<Color>.resolve with overlays', () {
+  group('InteractiveColors.resolve with overlays', () {
     const overlays = LegendStateOverlays();
 
     test('named member always wins over derivation', () {
-      const states = LegendStates<Color>(normal: _navy, hovered: _red);
-      expect(states.resolve(const LegendStateHovered(), overlays), _red);
+      const colors = InteractiveColors(normal: _navy, hovered: _red);
+      expect(colors.resolve(const LegendStateHovered(), overlays), _red);
     });
 
     test('unset members derive from normal via the overlays', () {
-      const states = LegendStates<Color>(normal: _navy);
+      const colors = InteractiveColors(normal: _navy);
       expect(
-        states.resolve(const LegendStateHovered(), overlays),
+        colors.resolve(const LegendStateHovered(), overlays),
         overlays.hovered(_navy),
       );
       expect(
-        states.resolve(const LegendStatePressed(), overlays),
+        colors.resolve(const LegendStatePressed(), overlays),
         overlays.pressed(_navy),
       );
       expect(
-        states.resolve(const LegendStateDisabled(), overlays),
+        colors.resolve(const LegendStateDisabled(), overlays),
         overlays.disabled(_navy),
       );
-      expect(states.resolve(const LegendStateFocused(), overlays), _navy);
-      expect(states.resolve(const LegendStateNormal(), overlays), _navy);
+      expect(colors.resolve(const LegendStateFocused(), overlays), _navy);
+      expect(colors.resolve(const LegendStateNormal(), overlays), _navy);
     });
 
     test('nothing set resolves to null', () {
-      const states = LegendStates<Color>();
-      expect(states.resolve(const LegendStatePressed(), overlays), isNull);
-    });
-
-    test('withDerived fills only the unset members', () {
-      const states = LegendStates<Color>(normal: _navy, pressed: _red);
-      final derived = states.withDerived(overlays);
-      expect(derived.normal, _navy);
-      expect(derived.pressed, _red);
-      expect(derived.hovered, overlays.hovered(_navy));
-      expect(derived.disabled, overlays.disabled(_navy));
-      expect(derived.focused, _navy);
-      // No normal — nothing to derive from.
-      const sparse = LegendStates<Color>(pressed: _red);
-      expect(sparse.withDerived(overlays), same(sparse));
+      const colors = InteractiveColors();
+      expect(colors.resolve(const LegendStatePressed(), overlays), isNull);
     });
   });
 
@@ -210,27 +208,24 @@ void main() {
   });
 
   group('LegendThemeData.componentOf (RFC-002 R3, both keys)', () {
-    const byWidget = LegendStates<Color>(normal: _red);
-    const byNullable = LegendStates<Color>(normal: _green);
+    const byWidget = InteractiveColors(normal: _red);
+    const byNullable = InteractiveColors(normal: _green);
 
     test('widget-type key resolves', () {
       const data = LegendThemeData(
         tokens: LegendTokens.light,
         components: {LegendSwitch: byWidget},
       );
-      expect(
-        data.componentOf<LegendStates<Color>>(LegendSwitch),
-        same(byWidget),
-      );
+      expect(data.componentOf<InteractiveColors>(LegendSwitch), same(byWidget));
     });
 
     test('legacy value-type key still resolves as the fallback', () {
       const data = LegendThemeData(
         tokens: LegendTokens.light,
-        components: {LegendStates<Color>: byNullable},
+        components: {InteractiveColors: byNullable},
       );
       expect(
-        data.componentOf<LegendStates<Color>>(LegendSwitch),
+        data.componentOf<InteractiveColors>(LegendSwitch),
         same(byNullable),
       );
     });
@@ -238,12 +233,9 @@ void main() {
     test('when both keys are registered the widget type wins', () {
       const data = LegendThemeData(
         tokens: LegendTokens.light,
-        components: {LegendSwitch: byWidget, LegendStates<Color>: byNullable},
+        components: {LegendSwitch: byWidget, InteractiveColors: byNullable},
       );
-      expect(
-        data.componentOf<LegendStates<Color>>(LegendSwitch),
-        same(byWidget),
-      );
+      expect(data.componentOf<InteractiveColors>(LegendSwitch), same(byWidget));
     });
 
     test('mismatched value type asserts in debug', () {
@@ -252,7 +244,7 @@ void main() {
         components: {LegendSwitch: 'not a theme'},
       );
       expect(
-        () => data.componentOf<LegendStates<Color>>(LegendSwitch),
+        () => data.componentOf<InteractiveColors>(LegendSwitch),
         throwsAssertionError,
       );
     });

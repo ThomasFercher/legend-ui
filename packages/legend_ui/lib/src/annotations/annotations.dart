@@ -1,4 +1,5 @@
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
+import 'package:meta/meta.dart';
 import 'package:meta/meta_meta.dart';
 
 /// Marks a widget as themable — `legend_gen themes` generates its theme
@@ -124,6 +125,7 @@ class LegendTokenData {
 ///   double t) => _$ClassNameLerp(a, b, t);`,
 /// - the file carries `part '<file>.style.g.dart';`.
 @Target({TargetKind.field, TargetKind.classType})
+@optionalTypeArgs
 class Style<T> {
   /// A const default value (`@Style<T>(v)`), `null` for "genuinely
   /// optional" (`@Style<T>(null)`) — or, with no argument, the CLASS form

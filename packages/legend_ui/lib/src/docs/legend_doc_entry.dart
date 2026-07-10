@@ -25,7 +25,7 @@ class LegendDocEntry {
   final String owner;
 
   /// Variable name, e.g. `background` — or a named state member of a
-  /// `LegendStates` field, e.g. `background.hovered`.
+  /// style-value-class field, e.g. `background.hovered`.
   final String name;
 
   /// Declared type source, e.g. `Color?`.

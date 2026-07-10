@@ -4,7 +4,7 @@ import 'package:legend_ui/src/primitives/legend_anchored_overlay.dart';
 import 'package:legend_ui/src/primitives/legend_caret.dart';
 import 'package:legend_ui/src/primitives/legend_interactive.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
-import 'package:legend_ui/src/theme/legend_states.dart';
+import 'package:legend_ui/src/theme/interactive_colors.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
 import 'package:legend_ui/src/tokens/legend_shadows.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
@@ -46,7 +46,9 @@ class LegendDropdown<T> extends StatefulWidget {
     this.menuMaxHeight,
     this.itemPadding,
     this.textStyle,
-  }) : menuBackground = menuBackground?.states;
+  }) : menuBackground = menuBackground == null
+           ? null
+           : InteractiveColors(normal: menuBackground);
 
   final List<LegendDropdownItem<T>> items;
   final ValueChanged<T> onChanged;
@@ -57,8 +59,8 @@ class LegendDropdown<T> extends StatefulWidget {
   /// Fill of the menu surface and its items, per interaction state —
   /// `normal` paints the whole menu, `hovered`/`pressed`/`focused`
   /// highlight the item under the pointer.
-  @Style<LegendStates<Color>>.resolve(_menuBackground)
-  final LegendStates<Color>? menuBackground;
+  @Style<InteractiveColors>.resolve(_menuBackground)
+  final InteractiveColors? menuBackground;
 
   /// Corner rounding of the menu and the trigger field.
   @Style<BorderRadius>.resolve(_menuBorderRadius)
@@ -176,7 +178,10 @@ class _LegendDropdownState<T> extends State<LegendDropdown<T>> {
                   onTap: () => _select(item.value),
                   builder: (context, states) {
                     return LegendSurface(
-                      color: theme.menuBackground.pick(states.effective),
+                      color: theme.menuBackground.resolve(
+                        states.effective,
+                        tokens.states,
+                      ),
                       padding: theme.itemPadding,
                       child: Text(
                         item.label,
@@ -197,7 +202,7 @@ class _LegendDropdownState<T> extends State<LegendDropdown<T>> {
   }
 }
 
-LegendStates<Color> _menuBackground(LegendTokens t) => LegendStates(
+InteractiveColors _menuBackground(LegendTokens t) => InteractiveColors(
   normal: t.colors.surface,
   hovered: t.colors.background2,
   pressed: t.colors.background2,

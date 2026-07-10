@@ -24,7 +24,7 @@ class LegendContextMenuTheme {
         textStyle: TextRef.b2(t),
       );
 
-  final LegendStates<Color> menuBackground;
+  final InteractiveColors menuBackground;
   final BorderRadius menuBorderRadius;
   final List<BoxShadow> menuShadows;
   final EdgeInsetsGeometry itemPadding;
@@ -52,7 +52,7 @@ class LegendContextMenuTheme {
   LegendContextMenuTheme merge(LegendContextMenuThemeNullable? other) {
     if (other == null) return this;
     return LegendContextMenuTheme(
-      menuBackground: other.menuBackground ?? menuBackground,
+      menuBackground: menuBackground.merge(other.menuBackground),
       menuBorderRadius: other.menuBorderRadius ?? menuBorderRadius,
       menuShadows: other.menuShadows ?? menuShadows,
       itemPadding: other.itemPadding ?? itemPadding,
@@ -61,7 +61,7 @@ class LegendContextMenuTheme {
   }
 
   LegendContextMenuTheme copyWith({
-    LegendStates<Color>? menuBackground,
+    InteractiveColors? menuBackground,
     BorderRadius? menuBorderRadius,
     List<BoxShadow>? menuShadows,
     EdgeInsetsGeometry? itemPadding,
@@ -99,7 +99,7 @@ class LegendContextMenuThemeNullable {
     this.textStyle,
   });
 
-  final LegendStates<Color>? menuBackground;
+  final InteractiveColors? menuBackground;
   final BorderRadius? menuBorderRadius;
   final List<BoxShadow>? menuShadows;
   final EdgeInsetsGeometry? itemPadding;
@@ -108,7 +108,8 @@ class LegendContextMenuThemeNullable {
   LegendContextMenuThemeNullable merge(LegendContextMenuThemeNullable? other) {
     if (other == null) return this;
     return LegendContextMenuThemeNullable(
-      menuBackground: other.menuBackground ?? menuBackground,
+      menuBackground:
+          menuBackground?.merge(other.menuBackground) ?? other.menuBackground,
       menuBorderRadius: other.menuBorderRadius ?? menuBorderRadius,
       menuShadows: other.menuShadows ?? menuShadows,
       itemPadding: other.itemPadding ?? itemPadding,

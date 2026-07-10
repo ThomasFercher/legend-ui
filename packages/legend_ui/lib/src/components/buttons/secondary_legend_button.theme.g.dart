@@ -22,8 +22,8 @@ class SecondaryLegendButtonTheme {
         textStyle: TextRef.b2(t),
       );
 
-  final LegendStates<Color> background;
-  final LegendStates<Color> foreground;
+  final InteractiveColors background;
+  final InteractiveColors foreground;
   final Color borderColor;
   final TextStyle textStyle;
 
@@ -31,16 +31,12 @@ class SecondaryLegendButtonTheme {
   /// [SecondaryLegendButton] first, [SecondaryLegendButtonThemeNullable] as the legacy
   /// fallback — RFC-002 R3) <- subtree override <- constructor
   /// params ([local]).
-  ///
-  /// Post-merge, unset `LegendStates<Color>` members fill
-  /// from the resolved `normal` via `tokens.states`
-  /// (RFC-002 R6) — named members at any level always win.
   static SecondaryLegendButtonTheme of(
     BuildContext context, [
     SecondaryLegendButtonThemeNullable? local,
   ]) {
     final data = LegendTheme.of(context);
-    final resolved = SecondaryLegendButtonTheme.defaults(data.tokens)
+    return SecondaryLegendButtonTheme.defaults(data.tokens)
         .merge(
           data.componentOf<SecondaryLegendButtonThemeNullable>(
             SecondaryLegendButton,
@@ -52,27 +48,21 @@ class SecondaryLegendButtonTheme {
           ),
         )
         .merge(local);
-    return resolved.copyWith(
-      background: resolved.background.withDerived(data.tokens.states),
-      foreground: resolved.foreground.withDerived(data.tokens.states),
-    );
   }
 
   SecondaryLegendButtonTheme merge(SecondaryLegendButtonThemeNullable? other) {
     if (other == null) return this;
     return SecondaryLegendButtonTheme(
-      background:
-          LegendStates.merge(background, other.background) ?? background,
-      foreground:
-          LegendStates.merge(foreground, other.foreground) ?? foreground,
+      background: background.merge(other.background),
+      foreground: foreground.merge(other.foreground),
       borderColor: other.borderColor ?? borderColor,
       textStyle: other.textStyle ?? textStyle,
     );
   }
 
   SecondaryLegendButtonTheme copyWith({
-    LegendStates<Color>? background,
-    LegendStates<Color>? foreground,
+    InteractiveColors? background,
+    InteractiveColors? foreground,
     Color? borderColor,
     TextStyle? textStyle,
   }) => SecondaryLegendButtonTheme(
@@ -87,18 +77,8 @@ class SecondaryLegendButtonTheme {
     SecondaryLegendButtonTheme b,
     double t,
   ) => SecondaryLegendButtonTheme(
-    background: LegendStates.lerpWith(
-      a.background,
-      b.background,
-      t,
-      Color.lerp,
-    ),
-    foreground: LegendStates.lerpWith(
-      a.foreground,
-      b.foreground,
-      t,
-      Color.lerp,
-    ),
+    background: InteractiveColors.lerp(a.background, b.background, t)!,
+    foreground: InteractiveColors.lerp(a.foreground, b.foreground, t)!,
     borderColor: t < 0.5 ? a.borderColor : b.borderColor,
     textStyle: t < 0.5 ? a.textStyle : b.textStyle,
   );
@@ -115,8 +95,8 @@ class SecondaryLegendButtonThemeNullable {
     this.textStyle,
   });
 
-  final LegendStates<Color>? background;
-  final LegendStates<Color>? foreground;
+  final InteractiveColors? background;
+  final InteractiveColors? foreground;
   final Color? borderColor;
   final TextStyle? textStyle;
 
@@ -125,8 +105,8 @@ class SecondaryLegendButtonThemeNullable {
   ) {
     if (other == null) return this;
     return SecondaryLegendButtonThemeNullable(
-      background: LegendStates.merge(background, other.background),
-      foreground: LegendStates.merge(foreground, other.foreground),
+      background: background?.merge(other.background) ?? other.background,
+      foreground: foreground?.merge(other.foreground) ?? other.foreground,
       borderColor: other.borderColor ?? borderColor,
       textStyle: other.textStyle ?? textStyle,
     );

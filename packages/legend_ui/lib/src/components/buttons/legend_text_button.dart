@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/primitives/legend_button_core.dart';
-import 'package:legend_ui/src/theme/legend_states.dart';
+import 'package:legend_ui/src/theme/interactive_colors.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
 import 'package:legend_ui/src/tokens/legend_typography.dart';
@@ -28,7 +28,9 @@ class LegendTextButton extends StatelessWidget {
     this.padding,
     this.borderRadius,
     this.textStyle,
-  }) : foreground = foreground?.states,
+  }) : foreground = foreground == null
+           ? null
+           : InteractiveColors(normal: foreground),
        assert(
          text != null || icon != null || child != null,
          'Provide text, an icon, or a child.',
@@ -48,8 +50,8 @@ class LegendTextButton extends StatelessWidget {
 
   /// Color of the label and icon, per interaction state — also the source
   /// of the hover/press tint (steady except while disabled).
-  @Style<LegendStates<Color>>.resolve(_foreground, lerp: true)
-  final LegendStates<Color>? foreground;
+  @Style<InteractiveColors>.resolve(_foreground, lerp: true)
+  final InteractiveColors? foreground;
 
   /// Inner padding around the button content — tighter than the filled
   /// variants, so this variant keeps its own themed value instead of the
@@ -82,7 +84,7 @@ class LegendTextButton extends StatelessWidget {
       icon: icon,
       textFirst: textFirst,
       enabled: enabled,
-      background: LegendStates(
+      background: InteractiveColors(
         normal: transparent,
         hovered: Color.alphaBlend(tint.withValues(alpha: 0.08), transparent),
         pressed: Color.alphaBlend(tint.withValues(alpha: 0.16), transparent),
@@ -100,7 +102,7 @@ class LegendTextButton extends StatelessWidget {
   }
 }
 
-LegendStates<Color> _foreground(LegendTokens t) => LegendStates(
+InteractiveColors _foreground(LegendTokens t) => InteractiveColors(
   normal: t.colors.primary,
   hovered: t.colors.primary,
   pressed: t.colors.primary,

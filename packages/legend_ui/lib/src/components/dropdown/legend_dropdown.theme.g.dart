@@ -25,7 +25,7 @@ class LegendDropdownTheme {
     textStyle: TextRef.b2(t),
   );
 
-  final LegendStates<Color> menuBackground;
+  final InteractiveColors menuBackground;
   final BorderRadius menuBorderRadius;
   final List<BoxShadow> menuShadows;
   final double menuMaxHeight;
@@ -52,7 +52,7 @@ class LegendDropdownTheme {
   LegendDropdownTheme merge(LegendDropdownThemeNullable? other) {
     if (other == null) return this;
     return LegendDropdownTheme(
-      menuBackground: other.menuBackground ?? menuBackground,
+      menuBackground: menuBackground.merge(other.menuBackground),
       menuBorderRadius: other.menuBorderRadius ?? menuBorderRadius,
       menuShadows: other.menuShadows ?? menuShadows,
       menuMaxHeight: other.menuMaxHeight ?? menuMaxHeight,
@@ -62,7 +62,7 @@ class LegendDropdownTheme {
   }
 
   LegendDropdownTheme copyWith({
-    LegendStates<Color>? menuBackground,
+    InteractiveColors? menuBackground,
     BorderRadius? menuBorderRadius,
     List<BoxShadow>? menuShadows,
     double? menuMaxHeight,
@@ -104,7 +104,7 @@ class LegendDropdownThemeNullable {
     this.textStyle,
   });
 
-  final LegendStates<Color>? menuBackground;
+  final InteractiveColors? menuBackground;
   final BorderRadius? menuBorderRadius;
   final List<BoxShadow>? menuShadows;
   final double? menuMaxHeight;
@@ -114,7 +114,8 @@ class LegendDropdownThemeNullable {
   LegendDropdownThemeNullable merge(LegendDropdownThemeNullable? other) {
     if (other == null) return this;
     return LegendDropdownThemeNullable(
-      menuBackground: other.menuBackground ?? menuBackground,
+      menuBackground:
+          menuBackground?.merge(other.menuBackground) ?? other.menuBackground,
       menuBorderRadius: other.menuBorderRadius ?? menuBorderRadius,
       menuShadows: other.menuShadows ?? menuShadows,
       menuMaxHeight: other.menuMaxHeight ?? menuMaxHeight,

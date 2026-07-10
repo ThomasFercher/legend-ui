@@ -11,61 +11,56 @@ const List<LegendDocEntry> legendTextButtonDocEntries = [
   LegendDocEntry(
     owner: 'LegendTextButton',
     name: 'foreground',
-    type: 'LegendStates<Color>?',
+    type: 'InteractiveColors?',
     doc:
         'Color of the label and icon, per interaction state — also the source\nof the hover/press tint (steady except while disabled).',
     defaultDescription:
-        'LegendStates(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
+        'InteractiveColors(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'LegendTextButton',
     name: 'foreground.normal',
     type: 'Color?',
-    doc:
-        'Color of the label and icon, per interaction state — also the source\nof the hover/press tint (steady except while disabled).',
+    doc: 'Fill at rest (and the base unset members fall back to).',
     defaultDescription:
-        'LegendStates(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
+        'InteractiveColors(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'LegendTextButton',
     name: 'foreground.hovered',
     type: 'Color?',
-    doc:
-        'Color of the label and icon, per interaction state — also the source\nof the hover/press tint (steady except while disabled).',
+    doc: 'Fill while a pointer hovers the widget.',
     defaultDescription:
-        'LegendStates(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
+        'InteractiveColors(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'LegendTextButton',
     name: 'foreground.pressed',
     type: 'Color?',
-    doc:
-        'Color of the label and icon, per interaction state — also the source\nof the hover/press tint (steady except while disabled).',
+    doc: 'Fill while the widget is actively pressed.',
     defaultDescription:
-        'LegendStates(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
+        'InteractiveColors(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'LegendTextButton',
     name: 'foreground.focused',
     type: 'Color?',
-    doc:
-        'Color of the label and icon, per interaction state — also the source\nof the hover/press tint (steady except while disabled).',
+    doc: 'Fill while the widget holds keyboard focus.',
     defaultDescription:
-        'LegendStates(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
+        'InteractiveColors(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
     group: 'component',
   ),
   LegendDocEntry(
     owner: 'LegendTextButton',
     name: 'foreground.disabled',
     type: 'Color?',
-    doc:
-        'Color of the label and icon, per interaction state — also the source\nof the hover/press tint (steady except while disabled).',
+    doc: 'Fill while the widget is disabled.',
     defaultDescription:
-        'LegendStates(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
+        'InteractiveColors(normal: t.colors.primary, hovered: t.colors.primary, pressed: t.colors.primary, focused: t.colors.primary, disabled: t.colors.onDisabled)',
     group: 'component',
   ),
   LegendDocEntry(

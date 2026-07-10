@@ -19,7 +19,7 @@ class LegendInteractionStates {
 
   /// The single effective [LegendWidgetState] this snapshot maps to, by
   /// the fixed priority ladder disabled ≻ pressed ≻ hovered ≻ focused ≻
-  /// normal (RFC-002 R6) — feed it to `LegendStates.pick`/`resolve`.
+  /// normal (RFC-002 R6) — feed it to `InteractiveColors.pick`/`resolve`.
   LegendWidgetState get effective {
     if (disabled) return const LegendStateDisabled();
     if (pressed) return const LegendStatePressed();

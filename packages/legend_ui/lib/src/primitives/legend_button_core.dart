@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:legend_ui/src/annotations/annotations.dart';
 import 'package:legend_ui/src/primitives/legend_interactive.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
-import 'package:legend_ui/src/theme/legend_states.dart';
+import 'package:legend_ui/src/theme/interactive_colors.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
@@ -26,10 +26,10 @@ part 'legend_button_core.theme.g.dart';
 /// override always beat a core-level theme entry. Colors and text style
 /// stay variant-level — the variants ARE the color decisions.
 ///
-/// [background] and [foreground] are per-state [LegendStates] containers
-/// (RFC-002 R6): the core selects the single effective value via
-/// `states.effective` — no color math happens here. Both must carry at
-/// least a `normal` value.
+/// [background] and [foreground] are per-state [InteractiveColors]
+/// bundles (RFC-002 R6 amendment 7): the core selects the single
+/// effective value via `states.effective` — no color math happens here.
+/// Both must carry at least a `normal` value.
 @LegendThemeable()
 class LegendButtonCore extends StatelessWidget {
   const LegendButtonCore({
@@ -60,10 +60,10 @@ class LegendButtonCore extends StatelessWidget {
   final bool enabled;
 
   /// Surface fill per interaction state (`normal` is required).
-  final LegendStates<Color> background;
+  final InteractiveColors background;
 
   /// Label/icon color per interaction state (`normal` is required).
-  final LegendStates<Color> foreground;
+  final InteractiveColors foreground;
 
   /// Inner padding around the button content, shared by every variant
   /// that doesn't set its own.

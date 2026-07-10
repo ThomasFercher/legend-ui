@@ -23,7 +23,7 @@ class LegendSiderTheme {
     itemPadding: _itemPadding(t),
   );
 
-  final LegendStates<Color> background;
+  final InteractiveColors background;
   final double width;
   final Color selectedColor;
   final Color unselectedColor;
@@ -47,7 +47,7 @@ class LegendSiderTheme {
   LegendSiderTheme merge(LegendSiderThemeNullable? other) {
     if (other == null) return this;
     return LegendSiderTheme(
-      background: other.background ?? background,
+      background: background.merge(other.background),
       width: other.width ?? width,
       selectedColor: other.selectedColor ?? selectedColor,
       unselectedColor: other.unselectedColor ?? unselectedColor,
@@ -56,7 +56,7 @@ class LegendSiderTheme {
   }
 
   LegendSiderTheme copyWith({
-    LegendStates<Color>? background,
+    InteractiveColors? background,
     double? width,
     Color? selectedColor,
     Color? unselectedColor,
@@ -94,7 +94,7 @@ class LegendSiderThemeNullable {
     this.itemPadding,
   });
 
-  final LegendStates<Color>? background;
+  final InteractiveColors? background;
   final double? width;
   final Color? selectedColor;
   final Color? unselectedColor;
@@ -103,7 +103,7 @@ class LegendSiderThemeNullable {
   LegendSiderThemeNullable merge(LegendSiderThemeNullable? other) {
     if (other == null) return this;
     return LegendSiderThemeNullable(
-      background: other.background ?? background,
+      background: background?.merge(other.background) ?? other.background,
       width: other.width ?? width,
       selectedColor: other.selectedColor ?? selectedColor,
       unselectedColor: other.unselectedColor ?? unselectedColor,
