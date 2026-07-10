@@ -35,14 +35,52 @@ class DocsApp extends StatefulWidget {
 
 class _DocsAppState extends State<DocsApp> {
   final _theme = ThemeController();
-  var _page = 0;
-  var _panelOpen = false;
+
+  // The reference rebuild pattern (2026-07-10 audit): the home subtree is
+  // built ONCE and reused, so a controller tick rebuilds only LegendApp
+  // and actual theme dependents — not the whole tree. Rebuilding children
+  // inline under the root ListenableBuilder rebuilt every widget 17× per
+  // theme toggle (measured).
+  late final Widget _home = _DocsShell(controller: _theme);
 
   @override
   void dispose() {
     _theme.dispose();
     super.dispose();
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: _theme,
+      builder: (context, _) => LegendApp(
+        title: 'Legend UI',
+        theme: _theme.data,
+        // SelectionArea (Material's selection wrapper) needs
+        // MaterialLocalizations; LegendApp is WidgetsApp-based, so a consumer
+        // supplies the delegate through the localizations passthrough.
+        localizationsDelegates: const [DefaultMaterialLocalizations.delegate],
+        home: _home,
+      ),
+    );
+  }
+}
+
+/// The docs shell: app bar, sider, page switcher, theme side panel. Kept
+/// stable across theme changes (see [_DocsAppState]); it rebuilds only as
+/// a theme/breakpoint dependent.
+class _DocsShell extends StatefulWidget {
+  const _DocsShell({required this.controller});
+
+  final ThemeController controller;
+
+  @override
+  State<_DocsShell> createState() => _DocsShellState();
+}
+
+class _DocsShellState extends State<_DocsShell> {
+  var _page = 0;
+  var _panelOpen = false;
 
   static const _nav = [
     LegendNavItem(label: 'Start', icon: Icons.rocket_launch_outlined),
@@ -69,28 +107,13 @@ class _DocsAppState extends State<DocsApp> {
     7 => const LayoutPage(),
     8 => const FeedbackPage(),
     9 => const ShellPage(),
-    _ => PlaygroundPage(controller: _theme),
+    _ => PlaygroundPage(controller: widget.controller),
   };
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: _theme,
-      builder: (context, _) => LegendApp(
-        title: 'Legend UI',
-        theme: _theme.data,
-        // SelectionArea (Material's selection wrapper) needs
-        // MaterialLocalizations; LegendApp is WidgetsApp-based, so a consumer
-        // supplies the delegate through the localizations passthrough.
-        localizationsDelegates: const [DefaultMaterialLocalizations.delegate],
-        home: Builder(builder: _buildShell),
-      ),
-    );
-  }
-
-  Widget _buildShell(BuildContext context) {
     final tokens = LegendTheme.of(context).tokens;
-    final compact = LegendBreakpoints.of(context).tier == LegendTier.compact;
+    final compact = LegendBreakpoints.tierOf(context) == LegendTier.compact;
     // SelectionArea makes all doc prose selectable on web (CanvasKit paints
     // text to a canvas, so nothing is selectable without it).
     final content = SelectionArea(
@@ -118,10 +141,15 @@ class _DocsAppState extends State<DocsApp> {
             : null,
         actions: [
           const LegendText('Dark', variant: LegendTextVariant.b3),
-          LegendSwitch(
-            value: _theme.dark,
-            semanticLabel: 'Dark mode',
-            onChanged: (v) => _theme.setDark(value: v),
+          // The shell is deliberately not rebuilt per controller tick, so
+          // the switch listens on its own (narrowest-listener pattern).
+          ListenableBuilder(
+            listenable: widget.controller,
+            builder: (context, _) => LegendSwitch(
+              value: widget.controller.dark,
+              semanticLabel: 'Dark mode',
+              onChanged: (v) => widget.controller.setDark(value: v),
+            ),
           ),
           if (!compact)
             LegendTextButton(
@@ -147,7 +175,7 @@ class _DocsAppState extends State<DocsApp> {
                 width: 320,
                 child: SingleChildScrollView(
                   padding: EdgeInsets.all(tokens.sizes.md),
-                  child: ThemePanel(controller: _theme),
+                  child: ThemePanel(controller: widget.controller),
                 ),
               ),
             ),

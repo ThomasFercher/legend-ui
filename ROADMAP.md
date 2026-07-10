@@ -78,10 +78,10 @@ The accepted [RFC-002](docs/RFC-002-DERIVED-DEFAULTS.md) drives this phase; its 
 
 Verdict: `LegendApp` is **current** — zero window-singleton usage, no deprecated WidgetsApp params, multi-window (experimental in 3.38) needs no structural change. The R12-relevant findings (type-scoped registry notification + lerp identity fast-paths) are folded into RFC-002 R12 and Phase E. Remaining maintenance items:
 
-- [ ] `LegendBreakpoints`: switch `MediaQuery.sizeOf(context).width` to `MediaQuery.widthOf` (3.35+) and split tier vs width dependencies (aspects or `tierOf`/`widthOf` statics) — measured: same-tier drag-resize rebuilds every tier consumer
+- [x] `LegendBreakpoints`: switch `MediaQuery.sizeOf(context).width` to `MediaQuery.widthOf` (3.35+) and split tier vs width dependencies (aspects or `tierOf`/`widthOf` statics) — measured: same-tier drag-resize rebuilds every tier consumer *(landed 2026-07-10: `InheritedModel` with `tierOf`/`widthOf`, kit + docs-site call sites migrated, regression tests in `breakpoints_test.dart`)*
 - [ ] `LegendSelectionArea`: widgets-layer `SelectableRegion` + kit-styled `contextMenuBuilder` — drops the `MaterialLocalizations` delegate requirement from consumers and the docs site's last Material import; evaluate 3.38 `OverlayPortal.overlayChildLayoutBuilder` for the anchored-overlay engine in the same pass
-- [ ] `LegendApp` passthroughs: `restorationScopeId`, `shortcuts`/`actions`, `debugShowCheckedModeBanner`; document the Android predictive-back gap for custom routes
-- [ ] Consumer rebuild guidance (docs site as reference): controller above `LegendApp`, stable home child, token reads in the narrowest `Builder` — measured: inline children under a root `ListenableBuilder` rebuild the whole tree 17× per theme toggle vs dependents-only with a stable child; document the (semantically necessary) `DefaultTextStyle` cascade during color animation
+- [x] `LegendApp` passthroughs: `restorationScopeId`, `shortcuts`/`actions`, `debugShowCheckedModeBanner`; document the Android predictive-back gap for custom routes *(landed 2026-07-10, forwarding test in `shell_test.dart`)*
+- [x] Consumer rebuild guidance (docs site as reference): controller above `LegendApp`, stable home child, token reads in the narrowest `Builder` — measured: inline children under a root `ListenableBuilder` rebuild the whole tree 17× per theme toggle vs dependents-only with a stable child; document the (semantically necessary) `DefaultTextStyle` cascade during color animation *(landed 2026-07-10: docs app restructured — stable `_home` + self-listening dark switch; cascade + stable-child guidance on the `LegendApp` doc comment)*
 
 ## Phase 3 — icons & polish
 

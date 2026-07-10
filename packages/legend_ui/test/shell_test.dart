@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legend_ui/legend_ui.dart';
@@ -67,5 +68,33 @@ void main() {
     await tester.pump();
     await tester.tap(find.text('Settings'));
     expect(selected, 1);
+  });
+
+  testWidgets('LegendApp forwards WidgetsApp passthroughs', (tester) async {
+    const scopeId = 'legend-app';
+    final shortcuts = <ShortcutActivator, Intent>{
+      const SingleActivator(LogicalKeyboardKey.keyK, control: true):
+          const ActivateIntent(),
+    };
+    final actions = <Type, Action<Intent>>{
+      ActivateIntent: CallbackAction<ActivateIntent>(onInvoke: (_) => null),
+    };
+
+    await tester.pumpWidget(
+      LegendApp(
+        theme: const LegendThemeData(tokens: LegendTokens.light),
+        restorationScopeId: scopeId,
+        shortcuts: shortcuts,
+        actions: actions,
+        debugShowCheckedModeBanner: false,
+        home: const SizedBox.shrink(),
+      ),
+    );
+
+    final app = tester.widget<WidgetsApp>(find.byType(WidgetsApp));
+    expect(app.restorationScopeId, scopeId);
+    expect(app.shortcuts, same(shortcuts));
+    expect(app.actions, same(actions));
+    expect(app.debugShowCheckedModeBanner, isFalse);
   });
 }
