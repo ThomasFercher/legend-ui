@@ -11,9 +11,11 @@ Run the whole ladder from the repo root before every merge/commit of substance. 
 # 0. Resolve the workspace (once per checkout / after pubspec changes)
 flutter pub get
 
-# 1. Format + lint (CI: dart format --output=none --set-exit-if-changed .)
+# 1. Auto-fix lints FIRST, then format + lint
+#    (CI: dart format --output=none --set-exit-if-changed . ; then flutter analyze)
+dart fix --apply        # resolves most very_good_analysis nits mechanically
 dart format .
-flutter analyze
+flutter analyze         # must be COMPLETELY clean — see note below
 
 # 2. Kit tests
 cd packages/legend_ui && flutter test && cd ../..
@@ -41,6 +43,6 @@ CI additionally builds the docs site (`cd example && flutter build web`); run it
 - **Tests ship with every feature** — behavior is covered by widget tests (`example/test/`, `packages/*/test/`); no feature lands test-less.
 - **Generator changes need golden tests** — `packages/legend_gen/test/` pins emitted output; extend the goldens with any emission change.
 - **Closing a legacy bug** (list: legacy-docs `01-overview.md` §4.2) requires a regression test AND naming the bug in the commit message.
-- **Analyzer must be clean** (very_good_analysis) — the docs-site launch configs are lint-gated and will not start on findings.
+- **Analyzer must be clean** (`very_good_analysis`, a strict ruleset) — **`info`-level findings are failures too**: the docs-site launch configs are lint-gated and won't start on any finding, and CI runs `flutter analyze` with no severity filter. Run `dart fix --apply` BEFORE hand-editing — it mechanically resolves the common nits (`cascade_invocations`, `unnecessary_import`, `directives_ordering`, `prefer_const_constructors`, `require_trailing_commas`, …). Only what `dart fix` can't touch (real logic, naming, judgement calls) needs manual work; justify a genuine exception with a scoped `// ignore: rule_name`, never a hand-written `ignore_for_file`. Generated `*.g.dart` files are analyzer-excluded — a lint in emitted output is a bug in the emitter's template strings, fixed there then regenerated.
 - No public-API typos; doc comments on every public/base widget in the standardized order (they are the docs-CMS content).
 - New/ported components are incomplete without a playground rung (`example/lib/docs/pages/playground_page.dart` + `theme_panel.dart`).
