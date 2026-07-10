@@ -1,4 +1,3 @@
-import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legend_ui/legend_ui.dart';
@@ -153,14 +152,14 @@ void main() {
 
       const probe = SizedBox(key: Key('probe'), height: 10);
       await tester.pumpWidget(
-        LegendTheme(
-          data: const LegendThemeData(
+        const LegendTheme(
+          data: LegendThemeData(
             tokens: LegendTokens.light,
             components: {
               LegendBody: LegendBodyThemeNullable(maxContentWidth: 300),
             },
           ),
-          child: const Directionality(
+          child: Directionality(
             textDirection: TextDirection.ltr,
             child: MediaQuery(
               data: MediaQueryData(),
@@ -187,11 +186,11 @@ void main() {
 
       await tester.pumpWidget(
         _wrap(
-          LegendBody.pinnedFooter(
+          const LegendBody.pinnedFooter(
             safeArea: false,
-            padding: const EdgeInsets.all(16),
-            footer: const SizedBox(key: Key('footer'), height: 40),
-            children: const [SizedBox(height: 100)],
+            padding: EdgeInsets.all(16),
+            footer: SizedBox(key: Key('footer'), height: 40),
+            children: [SizedBox(height: 100)],
           ),
         ),
       );
