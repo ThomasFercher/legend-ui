@@ -65,15 +65,11 @@ dart run legend_gen tokens lib             # regenerate committed *.tokens.g.dar
      return `${n.getAttribute('role') || 'node'} "${n.getAttribute('aria-label') || n.textContent.trim().slice(0, 60)}" @${r.x | 0},${r.y | 0}`;
    }).filter(s => !s.includes('""')).join('\n')
    ```
-   **Reliable interaction recipe** (do NOT use `click` events on semantics nodes — they don't drive Flutter's gesture layer): take the target node's `getBoundingClientRect()` center, multiply by `devicePixelRatio`, and dispatch `pointerdown`+`pointerup` PointerEvents on the `flutter-view` element:
-   ```js
-   const dpr = devicePixelRatio, v = document.querySelector('flutter-view');
-   const r = node.getBoundingClientRect(), x = (r.x+r.width/2)*dpr, y = (r.y+r.height/2)*dpr;
-   const o = {bubbles:true,composed:true,clientX:x,clientY:y,pointerId:1,pointerType:'mouse',isPrimary:true};
-   v.dispatchEvent(new PointerEvent('pointerdown',{...o,button:0,buttons:1}));
-   v.dispatchEvent(new PointerEvent('pointerup',{...o,button:0,buttons:0}));
-   ```
-   When several nodes share a label, prefer one whose `role` is `button`/`switch`/`checkbox`, else the smallest by area. **The nav sider only exists at ≥600px wide** — call `preview_resize` to 1400×900 first, or the sider items won't be in the DOM (compact tier shows a "Navigation" hamburger instead).
+   **Reliable interaction recipe (verified 2026-07-10):** synthetic JS events NEVER work — the engine ignores untrusted `PointerEvent`s and untrusted `.click()`s on `flt-tappable` nodes. What works is the **`preview_click` tool on the semantics node's id selector** (it sends a real, trusted CDP click, which the engine turns into a `SemanticsAction.tap`):
+   1. Find the target via `preview_eval`: filter `flt-semantics` nodes on `role`/`aria-label`/`textContent` and `hasAttribute('flt-tappable')`, take its `id`.
+   2. `preview_click` with selector `#flt-semantic-node-<N>`.
+
+   Caveats: node ids change as pages rebuild — re-query after every navigation; a semantics query straight after a page swap can race the tree update (retry after ~700 ms); screenshots taken right after a theme knob catch `AnimatedLegendTheme` mid-lerp — wait ≥600 ms before asserting colors. When several nodes share a label, prefer the one whose `role` is `button`/`switch`/`checkbox`. **The nav sider only exists at ≥600px wide** — call `preview_resize` to 1400×900 first, or the sider items won't be in the DOM (compact tier shows a "Navigation" hamburger instead).
 3. **Dart MCP server** (registered in `.mcp.json`, needs a session restart to load) — text-based runtime introspection: widget tree, runtime errors, hot reload, expression evaluation against the running VM service.
 4. **Screenshots** — only for genuinely visual questions (colors, layout, animation states); they are the token-expensive tool.
 
