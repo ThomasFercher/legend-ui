@@ -137,6 +137,12 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setMenuSelectedColor,
           ),
 
+          ColorField(
+            label: 'Checkbox fill (LegendCheckbox.box)',
+            value: controller.checkboxFill,
+            onChanged: controller.setCheckboxFill,
+          ),
+
           const LegendText(
             'Popover panel radius (LegendPopover.borderRadius)',
             variant: LegendTextVariant.b3,

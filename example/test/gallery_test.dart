@@ -330,4 +330,55 @@ void main() {
     );
     expect(pill.color, const Color(0xFF2563EB));
   });
+
+  testWidgets('playground: checkbox fill knob restyles the live checkbox', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's checkbox knob.
+    await tester.scrollUntilVisible(
+      find.textContaining('Checkbox fill'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    // scrollUntilVisible stops as soon as the sliver cache builds the
+    // target, which can still be off-screen — align it for the tap.
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('Checkbox fill .*#8B5CF6')),
+    );
+    await settleTheme();
+    await tester.tap(find.bySemanticsLabel(RegExp('Checkbox fill .*#8B5CF6')));
+    await settleTheme();
+
+    // The live checkbox in the preview column picks it up — a sparse
+    // InteractiveColors(normal: …) whose other states keep deriving.
+    await tester.scrollUntilVisible(
+      find.byType(LegendCheckbox),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    final box = tester.widget<LegendSurface>(
+      find.descendant(
+        of: find.byType(LegendCheckbox),
+        matching: find.byType(LegendSurface),
+      ),
+    );
+    expect(box.color, const Color(0xFF8B5CF6));
+  });
 }
