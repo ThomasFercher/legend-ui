@@ -255,4 +255,60 @@ void main() {
     );
     expect(panel.borderRadius, BorderRadius.circular(12));
   });
+
+  testWidgets('playground: list selected-background knob restyles the live '
+      'list', (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's list knob.
+    await tester.scrollUntilVisible(
+      find.textContaining('List-item selected background'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    final swatch = find
+        .bySemanticsLabel(RegExp('List-item selected background #'))
+        .at(3);
+    await tester.ensureVisible(swatch);
+    await settleTheme();
+    await tester.tap(swatch);
+    await settleTheme();
+
+    // The live list's selected row in the preview column picks it up.
+    await tester.scrollUntilVisible(
+      find.text('Ethereum'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('Ethereum'));
+    await settleTheme();
+    final row = tester.widget<AnimatedContainer>(
+      find
+          .ancestor(
+            of: find.text('Ethereum'),
+            matching: find.byType(AnimatedContainer),
+          )
+          .first,
+    );
+    expect(
+      (row.decoration! as BoxDecoration).color,
+      const Color(0xFFDC2626),
+      reason: 'level-3 components map restyles the selected row fill',
+    );
+  });
 }

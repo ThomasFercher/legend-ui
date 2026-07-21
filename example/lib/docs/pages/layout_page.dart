@@ -133,6 +133,85 @@ LegendBody.pinnedFooter(
           ),
           code: "LegendInfoItem(label: 'Fee', value: '0.0021 ETH')",
         ),
+        const DocSection(
+          title: 'List',
+          description:
+              'LegendListItem is the tappable row every list is made of: '
+              'title + optional subtitle between free-form leading/trailing '
+              'slots. Pass selected and it announces selected state through '
+              'LegendSelectionControl instead of a plain button; LegendList '
+              'groups rows under a section header with token spacing or '
+              'divider rules. (LegendInfoItem above stays the static '
+              'label/value row.)',
+          demo: _ListDemo(),
+          code: '''
+LegendList(
+  header: 'Tokens',
+  children: [
+    for (final token in tokens)
+      LegendListItem(
+        title: token.name,
+        subtitle: token.symbol,
+        leading: TokenAvatar(token),
+        trailing: LegendText(token.value),
+        selected: token == selected,
+        onTap: () => select(token),
+      ),
+  ],
+)''',
+        ),
+      ],
+    );
+  }
+}
+
+/// A self-contained selectable token list for the List section: leading
+/// avatar slot, trailing value slot, one selected row owned by this state.
+class _ListDemo extends StatefulWidget {
+  const _ListDemo();
+
+  @override
+  State<_ListDemo> createState() => _ListDemoState();
+}
+
+class _ListDemoState extends State<_ListDemo> {
+  static const _tokens = [
+    ('Ethereum', 'ETH', r'$3,120.55'),
+    ('Bitcoin', 'BTC', r'$67,004.10'),
+    ('Solana', 'SOL', r'$142.87'),
+  ];
+
+  var _selected = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = LegendTheme.of(context).tokens;
+    return LegendList(
+      header: 'Tokens',
+      children: [
+        for (final (index, (title, symbol, value)) in _tokens.indexed)
+          LegendListItem(
+            title: title,
+            subtitle: symbol,
+            leading: LegendSurface(
+              color: tokens.colors.primaryContainer,
+              borderRadius: BorderRadius.circular(999),
+              child: SizedBox.square(
+                dimension: 32,
+                child: Center(
+                  child: Text(
+                    title.substring(0, 1),
+                    style: tokens.typography.b3.copyWith(
+                      color: tokens.colors.primary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            trailing: LegendText(value, variant: LegendTextVariant.b3),
+            selected: index == _selected,
+            onTap: () => setState(() => _selected = index),
+          ),
       ],
     );
   }

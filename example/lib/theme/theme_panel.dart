@@ -152,6 +152,12 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setPopoverRadius,
           ),
 
+          ColorField(
+            label: 'List-item selected background',
+            value: controller.listSelectedBackground,
+            onChanged: controller.setListSelectedBackground,
+          ),
+
           const LegendDivider(),
           SecondaryLegendButton(
             text: 'Reset everything',
