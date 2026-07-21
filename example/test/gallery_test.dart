@@ -255,4 +255,79 @@ void main() {
     );
     expect(panel.borderRadius, BorderRadius.circular(12));
   });
+
+  testWidgets('layout page: badge demo shows label, counts, and overflow', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const DocsApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Layout'));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.text('Mainnet'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Mainnet'), findsOneWidget);
+    expect(find.text('3'), findsOneWidget);
+    // 250 overflows the default max.
+    expect(find.text('99+'), findsOneWidget);
+    // The anchored dot announces its semantic label.
+    expect(find.bySemanticsLabel('Online'), findsOneWidget);
+  });
+
+  testWidgets('playground: badge background knob restyles the live badge', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's badge swatch.
+    await tester.scrollUntilVisible(
+      find.text('Badge background'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(
+      find.bySemanticsLabel('Badge background #2563EB'),
+    );
+    await settleTheme();
+    await tester.tap(find.bySemanticsLabel('Badge background #2563EB'));
+    await settleTheme();
+
+    // The live badges in the preview column pick it up.
+    await tester.scrollUntilVisible(
+      find.text('Mainnet'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    final pill = tester.widget<LegendSurface>(
+      find
+          .ancestor(
+            of: find.text('Mainnet'),
+            matching: find.byType(LegendSurface),
+          )
+          .first,
+    );
+    expect(pill.color, const Color(0xFF2563EB));
+  });
 }

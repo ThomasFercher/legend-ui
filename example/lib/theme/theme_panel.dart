@@ -152,6 +152,12 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setPopoverRadius,
           ),
 
+          ColorField(
+            label: 'Badge background',
+            value: controller.badgeBackground,
+            onChanged: controller.setBadgeBackground,
+          ),
+
           const LegendDivider(),
           SecondaryLegendButton(
             text: 'Reset everything',

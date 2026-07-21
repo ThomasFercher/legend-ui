@@ -11,8 +11,9 @@ class LayoutPage extends StatelessWidget {
     return DocPage(
       title: 'Layout',
       intro:
-          'Structural pieces: cards, dividers, expandables, and info rows — '
-          'all thin compositions over LegendSurface and LegendInteractive.',
+          'Structural pieces: cards, dividers, expandables, info rows, and '
+          'badges — all thin compositions over LegendSurface and '
+          'LegendInteractive.',
       children: [
         DocSection(
           title: 'Card',
@@ -132,6 +133,49 @@ LegendBody.pinnedFooter(
             ],
           ),
           code: "LegendInfoItem(label: 'Fee', value: '0.0021 ETH')",
+        ),
+        DocSection(
+          title: 'Badge',
+          description:
+              'A status dot, count pill, or label — standalone, or anchored '
+              'over a corner of a child with a contrast ring. Counts '
+              'overflow as max+ and hide at zero.',
+          demo: Wrap(
+            spacing: tokens.sizes.md,
+            runSpacing: tokens.sizes.sm,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              const LegendBadge('Mainnet'),
+              const LegendBadge.count(3),
+              const LegendBadge.count(250),
+              LegendBadge.count(
+                12,
+                child: LegendSurface(
+                  color: tokens.colors.background2,
+                  borderRadius: tokens.sizes.borderRadiusMd,
+                  child: const SizedBox(width: 32, height: 32),
+                ),
+              ),
+              LegendBadge.dot(
+                alignment: AlignmentDirectional.bottomEnd,
+                background: tokens.colors.secondary,
+                semanticLabel: 'Online',
+                child: LegendSurface(
+                  color: tokens.colors.background2,
+                  borderRadius: BorderRadius.circular(999),
+                  child: const SizedBox(width: 32, height: 32),
+                ),
+              ),
+            ],
+          ),
+          code: '''
+LegendBadge.count(unread, child: navIcon)   // 99+ overflow, hides at 0
+LegendBadge.dot(
+  alignment: AlignmentDirectional.bottomEnd,
+  background: tokens.colors.secondary,
+  semanticLabel: 'Online',
+  child: avatar,
+)''',
         ),
       ],
     );
