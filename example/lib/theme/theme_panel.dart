@@ -159,6 +159,11 @@ class ThemePanel extends StatelessWidget {
           ),
 
           ColorField(
+            label: 'Chip selected fill',
+            value: controller.chipSelectedBackground,
+            onChanged: controller.setChipSelectedBackground,
+          ),
+          ColorField(
             label: 'Badge background',
             value: controller.badgeBackground,
             onChanged: controller.setBadgeBackground,

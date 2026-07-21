@@ -431,4 +431,53 @@ void main() {
     );
     expect(surface.borderRadius, BorderRadius.circular(8));
   });
+
+  testWidgets('playground: chip selected-fill knob restyles the live chip', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's chip knob.
+    await tester.scrollUntilVisible(
+      find.textContaining('Chip selected fill'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    final swatch = find.bySemanticsLabel(RegExp('Chip selected fill #')).at(3);
+    // scrollUntilVisible stops as soon as the sliver cache builds the
+    // target, which can still be off-screen — align it for the tap.
+    await tester.ensureVisible(swatch);
+    await settleTheme();
+    await tester.tap(swatch);
+    await settleTheme();
+
+    // The live selected chip in the preview column picks it up; the
+    // unselected background is untouched by the sparse override.
+    await tester.scrollUntilVisible(
+      find.text('Filter'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('Filter'));
+    await settleTheme();
+    expect(
+      _primaryButtonColor(tester, 'Filter'),
+      const Color(0xFFDC2626),
+      reason: 'level-3 components map restyles the selected fill',
+    );
+  });
 }

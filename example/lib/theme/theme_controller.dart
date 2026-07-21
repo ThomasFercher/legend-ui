@@ -36,6 +36,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendPopover]'s panel corner radius.
   double? popoverRadius;
 
+  /// Level-3 override for [LegendChip]'s selected fill.
+  Color? chipSelectedBackground;
+
   /// Level-3 override for [LegendBadge]'s fill.
   Color? badgeBackground;
 
@@ -106,6 +109,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setChipSelectedBackground(Color? value) {
+    chipSelectedBackground = value;
+    notifyListeners();
+  }
+
   void setBadgeBackground(Color? value) {
     badgeBackground = value;
     notifyListeners();
@@ -137,6 +145,7 @@ class ThemeController extends ChangeNotifier {
     bodyMaxContentWidth = null;
     menuSelectedColor = null;
     popoverRadius = null;
+    chipSelectedBackground = null;
     badgeBackground = null;
     progressFill = null;
     checkboxFill = null;
@@ -231,6 +240,14 @@ class ThemeController extends ChangeNotifier {
         if (popoverRadius != null)
           LegendPopover: LegendPopoverThemeNullable(
             borderRadius: BorderRadius.circular(popoverRadius!),
+          ),
+        // LegendChip's selected fill — a sparse InteractiveColors: only
+        // `normal` is set, the other states keep resolving downward.
+        if (chipSelectedBackground != null)
+          LegendChip: LegendChipThemeNullable(
+            selectedBackground: InteractiveColors(
+              normal: chipSelectedBackground,
+            ),
           ),
         // LegendBadge's fill.
         if (badgeBackground != null)
