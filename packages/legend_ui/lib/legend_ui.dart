@@ -30,6 +30,8 @@ export 'src/components/form/legend_form_field.dart';
 export 'src/components/form/legend_validators.dart';
 export 'src/components/info_item/legend_info_item.dart';
 export 'src/components/input/legend_text_field.dart';
+export 'src/components/list/legend_list.dart';
+export 'src/components/list/legend_list_item.dart';
 export 'src/components/loading/legend_loading.dart';
 export 'src/components/loading/legend_shimmer.dart';
 export 'src/components/popover/legend_popover.dart';

@@ -179,6 +179,9 @@ class PlaygroundPage extends StatelessWidget {
               // A live LegendVerticalMenu — its selected color follows the
               // theme panel's knob (level-3 override).
               const SizedBox(width: 260, child: _MenuPreview()),
+              // A live LegendList — the selected row's fill follows the
+              // theme panel's knob (level-3 override).
+              const SizedBox(width: 300, child: _ListPreview()),
             ],
           ),
         ),
@@ -336,6 +339,43 @@ class _MenuPreviewState extends State<_MenuPreview> {
       selected: _selected,
       initiallyExpanded: const {_wallet},
       onSelected: (item) => setState(() => _selected = item),
+    );
+  }
+}
+
+/// A self-contained live [LegendList] of selectable [LegendListItem]s, for
+/// the playground preview column. The selected row's fill is themed by the
+/// panel's level-3 override.
+class _ListPreview extends StatefulWidget {
+  const _ListPreview();
+
+  @override
+  State<_ListPreview> createState() => _ListPreviewState();
+}
+
+class _ListPreviewState extends State<_ListPreview> {
+  static const _tokens = [
+    ('Ethereum', 'ETH', r'$3,120.55'),
+    ('Bitcoin', 'BTC', r'$67,004.10'),
+    ('Solana', 'SOL', r'$142.87'),
+  ];
+
+  var _selected = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return LegendList(
+      header: 'Tokens',
+      children: [
+        for (final (index, (title, subtitle, value)) in _tokens.indexed)
+          LegendListItem(
+            title: title,
+            subtitle: subtitle,
+            trailing: LegendText(value, variant: LegendTextVariant.b3),
+            selected: index == _selected,
+            onTap: () => setState(() => _selected = index),
+          ),
+      ],
     );
   }
 }

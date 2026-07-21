@@ -48,6 +48,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendTooltip]'s hover show delay.
   Duration? tooltipShowDelay;
 
+  /// Level-3 override for [LegendListItem]'s selected-row fill.
+  Color? listSelectedBackground;
+
   /// Level-3 override for [LegendBadge]'s fill.
   Color? badgeBackground;
 
@@ -138,6 +141,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setListSelectedBackground(Color? value) {
+    listSelectedBackground = value;
+    notifyListeners();
+  }
+
   void setBadgeBackground(Color? value) {
     badgeBackground = value;
     notifyListeners();
@@ -173,6 +181,7 @@ class ThemeController extends ChangeNotifier {
     tabsIndicator = null;
     bannerBackground = null;
     tooltipShowDelay = null;
+    listSelectedBackground = null;
     badgeBackground = null;
     progressFill = null;
     checkboxFill = null;
@@ -288,6 +297,11 @@ class ThemeController extends ChangeNotifier {
         if (tooltipShowDelay != null)
           LegendTooltip: LegendTooltipThemeNullable(
             showDelay: tooltipShowDelay,
+          ),
+        // LegendListItem's selected-row fill.
+        if (listSelectedBackground != null)
+          LegendListItem: LegendListItemThemeNullable(
+            selectedBackground: listSelectedBackground,
           ),
         // LegendBadge's fill.
         if (badgeBackground != null)
