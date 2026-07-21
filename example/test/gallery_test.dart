@@ -604,4 +604,89 @@ void main() {
     );
     expect(strip.color, const Color(0xFFDC2626));
   });
+
+  testWidgets('overlays page: tooltip shows on hover and hides on exit', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const DocsApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Overlays'));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.text('Hover me'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    // scrollUntilVisible stops as soon as the sliver cache builds the
+    // target, which can still be off-screen — align it for the hover.
+    await tester.ensureVisible(find.text('Hover me'));
+    await tester.pumpAndSettle();
+
+    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await gesture.addPointer(location: Offset.zero);
+    addTearDown(gesture.removePointer);
+    await gesture.moveTo(tester.getCenter(find.text('Hover me')));
+    // Default showDelay is 500 ms.
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(find.textContaining('hovering pointer'), findsOneWidget);
+
+    await gesture.moveTo(Offset.zero);
+    // Default hideDelay grace period is 100 ms.
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(find.textContaining('hovering pointer'), findsNothing);
+  });
+
+  testWidgets('playground: tooltip delay knob retunes the live tooltip', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's tooltip knob.
+    await tester.scrollUntilVisible(
+      find.textContaining('Tooltip show delay'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('Theme default (500 ms)'));
+    await settleTheme();
+    await tester.tap(find.text('Theme default (500 ms)'));
+    await settleTheme();
+    await tester.tap(find.text('Instant (0 ms)'));
+    await settleTheme();
+
+    // The live tooltip in the preview column now shows without the wait.
+    await tester.scrollUntilVisible(
+      find.text('Hover for a tooltip'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('Hover for a tooltip'));
+    await settleTheme();
+    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await gesture.addPointer(location: Offset.zero);
+    addTearDown(gesture.removePointer);
+    await gesture.moveTo(tester.getCenter(find.text('Hover for a tooltip')));
+    // A zero-delay timer still fires asynchronously — elapse one tick.
+    await tester.pump(const Duration(milliseconds: 1));
+    expect(find.textContaining('follows the tooltip knob'), findsOneWidget);
+  });
 }

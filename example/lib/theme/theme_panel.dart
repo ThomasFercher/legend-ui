@@ -169,6 +169,29 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setPopoverRadius,
           ),
 
+          const LegendText(
+            'Tooltip show delay (LegendTooltip.showDelay)',
+            variant: LegendTextVariant.b3,
+          ),
+          LegendDropdown<Duration>(
+            value: controller.tooltipShowDelay,
+            // Distinct from the radius knobs' placeholder — gallery tests
+            // (and users) tell the dropdowns apart by text.
+            placeholder: 'Theme default (500 ms)',
+            items: const [
+              LegendDropdownItem(value: Duration.zero, label: 'Instant (0 ms)'),
+              LegendDropdownItem(
+                value: Duration(milliseconds: 500),
+                label: 'Standard (500 ms)',
+              ),
+              LegendDropdownItem(
+                value: Duration(milliseconds: 1200),
+                label: 'Patient (1200 ms)',
+              ),
+            ],
+            onChanged: controller.setTooltipShowDelay,
+          ),
+
           ColorField(
             label: 'Chip selected fill',
             value: controller.chipSelectedBackground,

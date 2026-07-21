@@ -45,6 +45,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendBanner]'s info-severity strip fill.
   Color? bannerBackground;
 
+  /// Level-3 override for [LegendTooltip]'s hover show delay.
+  Duration? tooltipShowDelay;
+
   /// Level-3 override for [LegendBadge]'s fill.
   Color? badgeBackground;
 
@@ -130,6 +133,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setTooltipShowDelay(Duration? value) {
+    tooltipShowDelay = value;
+    notifyListeners();
+  }
+
   void setBadgeBackground(Color? value) {
     badgeBackground = value;
     notifyListeners();
@@ -164,6 +172,7 @@ class ThemeController extends ChangeNotifier {
     chipSelectedBackground = null;
     tabsIndicator = null;
     bannerBackground = null;
+    tooltipShowDelay = null;
     badgeBackground = null;
     progressFill = null;
     checkboxFill = null;
@@ -274,6 +283,11 @@ class ThemeController extends ChangeNotifier {
         if (bannerBackground != null)
           LegendBanner: LegendBannerThemeNullable(
             infoBackground: bannerBackground,
+          ),
+        // LegendTooltip's hover show delay.
+        if (tooltipShowDelay != null)
+          LegendTooltip: LegendTooltipThemeNullable(
+            showDelay: tooltipShowDelay,
           ),
         // LegendBadge's fill.
         if (badgeBackground != null)

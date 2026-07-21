@@ -38,6 +38,7 @@ export 'src/components/switch/legend_switch.dart';
 export 'src/components/tabs/legend_tabs.dart';
 export 'src/components/text/legend_text.dart';
 export 'src/components/toast/legend_toast.dart';
+export 'src/components/tooltip/legend_tooltip.dart';
 export 'src/docs/legend_doc_entry.dart';
 export 'src/primitives/legend_anchored_overlay.dart';
 export 'src/primitives/legend_button_core.dart';

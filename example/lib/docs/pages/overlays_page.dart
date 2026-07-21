@@ -219,6 +219,52 @@ controller.show();   // controller.isOpen stays in sync with
 controller.hide();   // outside-tap and Escape dismissal''',
         ),
         DocSection(
+          title: 'Tooltip',
+          description:
+              'A manual-trigger popover that owns its own triggering: '
+              'hover (after a themed delay), keyboard focus, and '
+              'long-press on touch. Surface styling follows the popover '
+              'theme; richMessage takes arbitrary content.',
+          demo: Wrap(
+            spacing: tokens.sizes.sm,
+            runSpacing: tokens.sizes.sm,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: const [
+              LegendTooltip(
+                message: 'A concise hint for the hovering pointer.',
+                child: LegendCard(child: LegendText('Hover me')),
+              ),
+              LegendTooltip(
+                placement: LegendPopoverPlacement.bottom,
+                semanticLabel: 'Full wallet address',
+                richMessage: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    LegendText('Full address', variant: LegendTextVariant.h3),
+                    LegendText(
+                      '0x4bbeEB066eD09B7AEd07bF39EEe0460DFa261520',
+                      variant: LegendTextVariant.b3,
+                    ),
+                  ],
+                ),
+                child: LegendCard(child: LegendText('0x4bbe…1520')),
+              ),
+            ],
+          ),
+          code: '''
+const LegendTooltip(
+  message: 'A concise hint.',        // announced as the semantic tooltip
+  child: IconTrigger(...),
+)
+
+LegendTooltip(
+  richMessage: AddressPreview(...),  // arbitrary widget content
+  semanticLabel: 'Full wallet address',
+  placement: LegendPopoverPlacement.bottom,
+  child: TruncatedAddress(...),
+)''',
+        ),
+        DocSection(
           title: 'Context menu',
           description: 'Long-press, or right-click on desktop and web.',
           demo: Wrap(
