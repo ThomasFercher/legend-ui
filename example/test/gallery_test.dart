@@ -1,4 +1,5 @@
 import 'package:example/main.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' show SelectionArea;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
