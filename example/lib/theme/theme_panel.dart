@@ -137,6 +137,12 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setMenuSelectedColor,
           ),
 
+          ColorField(
+            label: 'Tabs indicator color',
+            value: controller.tabsIndicator,
+            onChanged: controller.setTabsIndicator,
+          ),
+
           const LegendText(
             'Popover panel radius (LegendPopover.borderRadius)',
             variant: LegendTextVariant.b3,

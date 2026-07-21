@@ -63,7 +63,7 @@ void main() {
     await tester.tap(find.text('NFTs'));
     await tester.pumpAndSettle();
 
-    final tokens = LegendTokens.light;
+    const tokens = LegendTokens.light;
     expect(
       _tabDecoration(tester, 'Tokens').border!.bottom.color,
       tokens.colors.primary,
@@ -81,7 +81,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final tokens = LegendTokens.light;
+    const tokens = LegendTokens.light;
     expect(
       _tabDecoration(tester, 'NFTs').border!.bottom.color,
       tokens.colors.primary,
@@ -111,9 +111,7 @@ void main() {
         LegendApp(
           theme: const LegendThemeData(
             tokens: LegendTokens.light,
-            components: {
-              LegendTabs: LegendTabsThemeNullable(indicator: navy),
-            },
+            components: {LegendTabs: LegendTabsThemeNullable(indicator: navy)},
           ),
           home: Center(
             child: LegendTabs(
@@ -135,9 +133,7 @@ void main() {
         LegendApp(
           theme: const LegendThemeData(
             tokens: LegendTokens.light,
-            components: {
-              LegendTabs: LegendTabsThemeNullable(indicator: navy),
-            },
+            components: {LegendTabs: LegendTabsThemeNullable(indicator: navy)},
           ),
           home: Center(
             child: LegendTabs(
