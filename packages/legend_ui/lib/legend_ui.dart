@@ -29,6 +29,7 @@ export 'src/components/loading/legend_loading.dart';
 export 'src/components/loading/legend_shimmer.dart';
 export 'src/components/popover/legend_popover.dart';
 export 'src/components/switch/legend_switch.dart';
+export 'src/components/tabs/legend_tabs.dart';
 export 'src/components/text/legend_text.dart';
 export 'src/components/toast/legend_toast.dart';
 export 'src/docs/legend_doc_entry.dart';
