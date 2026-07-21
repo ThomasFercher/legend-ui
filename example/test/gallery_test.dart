@@ -1,5 +1,6 @@
 import 'package:example/main.dart';
 import 'package:flutter/material.dart' show SelectionArea;
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legend_ui/legend_ui.dart';
@@ -168,4 +169,90 @@ void main() {
       );
     },
   );
+
+  testWidgets('overlays page: popover opens and Escape dismisses', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const DocsApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Overlays'));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.text('Below'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    // scrollUntilVisible stops as soon as the sliver cache builds the
+    // target, which can still be off-screen — align it for the tap.
+    await tester.ensureVisible(find.text('Below'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Below'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('same overlay engine'), findsOneWidget);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('same overlay engine'), findsNothing);
+  });
+
+  testWidgets('playground: popover radius knob restyles the live popover', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's popover knob.
+    // (.last: the button-radius dropdown shares the placeholder text.)
+    await tester.scrollUntilVisible(
+      find.textContaining('Popover panel radius'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    // scrollUntilVisible stops as soon as the sliver cache builds the
+    // target, which can still be off-screen — align it for the tap.
+    await tester.ensureVisible(find.text('Theme default').last);
+    await settleTheme();
+    await tester.tap(find.text('Theme default').last);
+    await settleTheme();
+    await tester.tap(find.text('Rounded (12)'));
+    await settleTheme();
+
+    // The live popover in the preview column picks it up.
+    await tester.scrollUntilVisible(
+      find.text('Tap for a popover'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('Tap for a popover'));
+    await settleTheme();
+    await tester.tap(find.text('Tap for a popover'));
+    await settleTheme();
+    final panel = tester.widget<LegendSurface>(
+      find
+          .ancestor(
+            of: find.text('Popover'),
+            matching: find.byType(LegendSurface),
+          )
+          .first,
+    );
+    expect(panel.borderRadius, BorderRadius.circular(12));
+  });
 }

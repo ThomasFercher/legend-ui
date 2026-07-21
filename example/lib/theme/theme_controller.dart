@@ -33,6 +33,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendVerticalMenu]'s selected-item color.
   Color? menuSelectedColor;
 
+  /// Level-3 override for [LegendPopover]'s panel corner radius.
+  double? popoverRadius;
+
   bool get dark => preset == ThemePreset.dark;
 
   void setPreset(ThemePreset value) {
@@ -86,6 +89,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setPopoverRadius(double? value) {
+    popoverRadius = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -96,6 +104,7 @@ class ThemeController extends ChangeNotifier {
     buttonRadius = null;
     bodyMaxContentWidth = null;
     menuSelectedColor = null;
+    popoverRadius = null;
     notifyListeners();
   }
 
@@ -181,6 +190,11 @@ class ThemeController extends ChangeNotifier {
         if (menuSelectedColor != null)
           LegendVerticalMenu: LegendVerticalMenuThemeNullable(
             selectedColor: menuSelectedColor,
+          ),
+        // LegendPopover's floating-panel corner radius.
+        if (popoverRadius != null)
+          LegendPopover: LegendPopoverThemeNullable(
+            borderRadius: BorderRadius.circular(popoverRadius!),
           ),
       },
     );

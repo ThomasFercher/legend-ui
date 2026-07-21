@@ -137,6 +137,21 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setMenuSelectedColor,
           ),
 
+          const LegendText(
+            'Popover panel radius (LegendPopover.borderRadius)',
+            variant: LegendTextVariant.b3,
+          ),
+          LegendDropdown<double>(
+            value: controller.popoverRadius,
+            placeholder: 'Theme default',
+            items: const [
+              LegendDropdownItem(value: 0, label: 'Square (0)'),
+              LegendDropdownItem(value: 12, label: 'Rounded (12)'),
+              LegendDropdownItem(value: 24, label: 'Soft (24)'),
+            ],
+            onChanged: controller.setPopoverRadius,
+          ),
+
           const LegendDivider(),
           SecondaryLegendButton(
             text: 'Reset everything',

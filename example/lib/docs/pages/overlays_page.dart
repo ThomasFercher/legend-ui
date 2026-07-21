@@ -147,6 +147,78 @@ showLegendToast(
 )''',
         ),
         DocSection(
+          title: 'Popover',
+          description:
+              'The reusable anchored-panel foundation (tooltips, action '
+              'menus and combobox panels compose it). Tap to toggle; '
+              'dismisses on an outside tap or Escape. Placement flips '
+              'with text direction.',
+          demo: Wrap(
+            spacing: tokens.sizes.sm,
+            runSpacing: tokens.sizes.sm,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              LegendPopover(
+                semanticLabel: 'Popover below',
+                offset: Offset(0, tokens.sizes.xs),
+                overlay: (context) => const SizedBox(
+                  width: 220,
+                  child: LegendText(
+                    'Anchored below the trigger, on the same overlay '
+                    'engine as dropdowns and context menus.',
+                    variant: LegendTextVariant.b3,
+                  ),
+                ),
+                child: const LegendCard(child: LegendText('Below')),
+              ),
+              LegendPopover(
+                semanticLabel: 'Popover with arrow',
+                placement: LegendPopoverPlacement.top,
+                showArrow: true,
+                overlay: (context) => const SizedBox(
+                  width: 180,
+                  child: LegendText(
+                    'Placed above, with the anchor arrow.',
+                    variant: LegendTextVariant.b3,
+                  ),
+                ),
+                child: const LegendCard(child: LegendText('Above + arrow')),
+              ),
+              LegendPopover(
+                semanticLabel: 'Popover at end',
+                placement: LegendPopoverPlacement.end,
+                offset: Offset(tokens.sizes.xs, 0),
+                overlay: (context) => const SizedBox(
+                  width: 160,
+                  child: LegendText(
+                    'start/end resolve against text direction.',
+                    variant: LegendTextVariant.b3,
+                  ),
+                ),
+                child: const LegendCard(child: LegendText('End')),
+              ),
+            ],
+          ),
+          code: '''
+LegendPopover(
+  placement: LegendPopoverPlacement.top,   // top/bottom/start/end
+  showArrow: true,                         // wedge pointing at the anchor
+  overlay: (context) => const LegendText('Anchored panel'),
+  child: const LegendCard(child: LegendText('Tap me')),
+)
+
+// Programmatic (what Tooltip/Menu/Combobox build on):
+final controller = LegendPopoverController();
+LegendPopover(
+  controller: controller,
+  trigger: LegendPopoverTrigger.manual,
+  overlay: (context) => ...,
+  child: anchor,
+);
+controller.show();   // controller.isOpen stays in sync with
+controller.hide();   // outside-tap and Escape dismissal''',
+        ),
+        DocSection(
           title: 'Context menu',
           description: 'Long-press, or right-click on desktop and web.',
           demo: Wrap(
