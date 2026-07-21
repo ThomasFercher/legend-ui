@@ -105,6 +105,9 @@ class PlaygroundPage extends StatelessWidget {
                   ),
                 ),
               ),
+              // Live LegendChips — the selected fill follows the theme
+              // panel's knob (level-3 override).
+              const _ChipPreview(),
               // A live LegendVerticalMenu — its selected color follows the
               // theme panel's knob (level-3 override).
               const SizedBox(width: 260, child: _MenuPreview()),
@@ -132,6 +135,49 @@ LegendThemeData(
   },
 )''',
         ),
+      ],
+    );
+  }
+}
+
+/// A self-contained row of live [LegendChip]s — a toggling filter chip
+/// (whose selected fill is themed by the panel's level-3 override), a
+/// dismissible tag, and a number-only citation chip.
+class _ChipPreview extends StatefulWidget {
+  const _ChipPreview();
+
+  @override
+  State<_ChipPreview> createState() => _ChipPreviewState();
+}
+
+class _ChipPreviewState extends State<_ChipPreview> {
+  var _selected = true;
+  var _dismissed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = LegendTheme.of(context).tokens;
+    return Wrap(
+      spacing: tokens.sizes.xs,
+      runSpacing: tokens.sizes.xs,
+      children: [
+        LegendChip(
+          label: 'Filter',
+          selected: _selected,
+          onSelected: (value) => setState(() => _selected = value),
+        ),
+        if (!_dismissed)
+          LegendChip(
+            label: 'Dismiss me',
+            dismissLabel: 'Remove Dismiss me',
+            onDismissed: () => setState(() => _dismissed = true),
+          )
+        else
+          LegendChip(
+            label: 'Restore',
+            onTap: () => setState(() => _dismissed = false),
+          ),
+        LegendChip(label: '3', onTap: () {}),
       ],
     );
   }

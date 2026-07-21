@@ -152,6 +152,12 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setPopoverRadius,
           ),
 
+          ColorField(
+            label: 'Chip selected fill',
+            value: controller.chipSelectedBackground,
+            onChanged: controller.setChipSelectedBackground,
+          ),
+
           const LegendDivider(),
           SecondaryLegendButton(
             text: 'Reset everything',

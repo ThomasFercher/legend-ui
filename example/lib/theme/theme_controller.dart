@@ -36,6 +36,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendPopover]'s panel corner radius.
   double? popoverRadius;
 
+  /// Level-3 override for [LegendChip]'s selected fill.
+  Color? chipSelectedBackground;
+
   bool get dark => preset == ThemePreset.dark;
 
   void setPreset(ThemePreset value) {
@@ -94,6 +97,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setChipSelectedBackground(Color? value) {
+    chipSelectedBackground = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -105,6 +113,7 @@ class ThemeController extends ChangeNotifier {
     bodyMaxContentWidth = null;
     menuSelectedColor = null;
     popoverRadius = null;
+    chipSelectedBackground = null;
     notifyListeners();
   }
 
@@ -195,6 +204,14 @@ class ThemeController extends ChangeNotifier {
         if (popoverRadius != null)
           LegendPopover: LegendPopoverThemeNullable(
             borderRadius: BorderRadius.circular(popoverRadius!),
+          ),
+        // LegendChip's selected fill — a sparse InteractiveColors: only
+        // `normal` is set, the other states keep resolving downward.
+        if (chipSelectedBackground != null)
+          LegendChip: LegendChipThemeNullable(
+            selectedBackground: InteractiveColors(
+              normal: chipSelectedBackground,
+            ),
           ),
       },
     );
