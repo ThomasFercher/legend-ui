@@ -550,4 +550,58 @@ void main() {
     await settleTheme();
     expect(indicatorColor('NFTs'), const Color(0xFFDC2626));
   });
+
+  testWidgets('playground: banner knob restyles the live banner', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's banner knob
+    // (swatch 3 is 0xFFDC2626 in ColorField.defaultSwatches).
+    await tester.scrollUntilVisible(
+      find.textContaining('Banner info background'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    // scrollUntilVisible stops as soon as the sliver cache builds the
+    // target, which can still be off-screen — align it for the tap.
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('Banner info background .* #')).at(3),
+    );
+    await settleTheme();
+    await tester.tap(
+      find.bySemanticsLabel(RegExp('Banner info background .* #')).at(3),
+    );
+    await settleTheme();
+
+    // The live banner in the preview column picks it up.
+    await tester.scrollUntilVisible(
+      find.text('LegendBanner'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    final strip = tester.widget<LegendSurface>(
+      find
+          .ancestor(
+            of: find.text('LegendBanner'),
+            matching: find.byType(LegendSurface),
+          )
+          .first,
+    );
+    expect(strip.color, const Color(0xFFDC2626));
+  });
 }

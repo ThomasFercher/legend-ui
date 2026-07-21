@@ -42,6 +42,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendTabs]' active-indicator color.
   Color? tabsIndicator;
 
+  /// Level-3 override for [LegendBanner]'s info-severity strip fill.
+  Color? bannerBackground;
+
   /// Level-3 override for [LegendBadge]'s fill.
   Color? badgeBackground;
 
@@ -122,6 +125,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setBannerBackground(Color? value) {
+    bannerBackground = value;
+    notifyListeners();
+  }
+
   void setBadgeBackground(Color? value) {
     badgeBackground = value;
     notifyListeners();
@@ -155,6 +163,7 @@ class ThemeController extends ChangeNotifier {
     popoverRadius = null;
     chipSelectedBackground = null;
     tabsIndicator = null;
+    bannerBackground = null;
     badgeBackground = null;
     progressFill = null;
     checkboxFill = null;
@@ -261,6 +270,11 @@ class ThemeController extends ChangeNotifier {
         // LegendTabs' active-indicator color.
         if (tabsIndicator != null)
           LegendTabs: LegendTabsThemeNullable(indicator: tabsIndicator),
+        // LegendBanner's info-severity strip fill.
+        if (bannerBackground != null)
+          LegendBanner: LegendBannerThemeNullable(
+            infoBackground: bannerBackground,
+          ),
         // LegendBadge's fill.
         if (badgeBackground != null)
           LegendBadge: LegendBadgeThemeNullable(background: badgeBackground),

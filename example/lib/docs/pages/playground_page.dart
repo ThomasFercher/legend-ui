@@ -129,6 +129,14 @@ class PlaygroundPage extends StatelessWidget {
               // panel's knob (level-3 override).
               const _CheckboxPreview(),
               const LegendLoading(),
+              // A live LegendBanner — its info strip follows the theme
+              // panel's banner knob (level-3 override).
+              const LegendBanner(
+                title: 'LegendBanner',
+                message:
+                    'The strip fill follows the banner knob in the theme '
+                    'panel.',
+              ),
               // A live LegendProgress — its fill color follows the theme
               // panel's knob (level-3 override).
               const LegendProgress.bar(

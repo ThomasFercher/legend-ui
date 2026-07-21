@@ -142,6 +142,11 @@ class ThemePanel extends StatelessWidget {
             value: controller.tabsIndicator,
             onChanged: controller.setTabsIndicator,
           ),
+          ColorField(
+            label: 'Banner info background (LegendBanner.infoBackground)',
+            value: controller.bannerBackground,
+            onChanged: controller.setBannerBackground,
+          ),
 
           ColorField(
             label: 'Checkbox fill (LegendCheckbox.box)',
