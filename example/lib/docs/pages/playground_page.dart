@@ -86,6 +86,12 @@ class PlaygroundPage extends StatelessWidget {
                 child: const LegendCard(child: LegendText('Tap for a popover')),
               ),
               const LegendLoading(),
+              // A live LegendProgress — its fill color follows the theme
+              // panel's knob (level-3 override).
+              const LegendProgress.bar(
+                value: 0.6,
+                semanticLabel: 'Progress preview',
+              ),
               LegendSurface(
                 color: tokens.colors.background1,
                 borderRadius: tokens.sizes.borderRadiusMd,

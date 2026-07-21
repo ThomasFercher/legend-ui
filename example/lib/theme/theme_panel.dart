@@ -152,6 +152,12 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setPopoverRadius,
           ),
 
+          ColorField(
+            label: 'Progress fill color',
+            value: controller.progressFill,
+            onChanged: controller.setProgressFill,
+          ),
+
           const LegendDivider(),
           SecondaryLegendButton(
             text: 'Reset everything',
