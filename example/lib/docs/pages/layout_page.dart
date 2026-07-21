@@ -11,8 +11,10 @@ class LayoutPage extends StatelessWidget {
     return DocPage(
       title: 'Layout',
       intro:
-          'Structural pieces: cards, dividers, expandables, and info rows — '
-          'all thin compositions over LegendSurface and LegendInteractive.',
+          'Structural pieces: cards, dividers, expandables, info rows, and '
+          'badges — all thin compositions over LegendSurface and '
+          'avatars — all thin compositions over LegendSurface and '
+          'LegendInteractive.',
       children: [
         DocSection(
           title: 'Card',
@@ -121,6 +123,42 @@ LegendBody.pinnedFooter(
   ],
 )''',
         ),
+        DocSection(
+          title: 'Avatar',
+          description:
+              'A fallback ladder — image, then initials, then a placeholder, '
+              'then a generic silhouette. A seed string derives a stable '
+              'identity color from the tokens; badge overlays a caller-owned '
+              'widget at a corner (the network-badge-on-token-icon case).',
+          demo: Wrap(
+            spacing: tokens.sizes.sm,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              const LegendAvatar(initials: 'TF'),
+              const LegendAvatar(seed: 'alice', initials: 'AL'),
+              const LegendAvatar(seed: 'bob', initials: 'BO'),
+              const LegendAvatar(seed: 'carol', initials: 'CA'),
+              const LegendAvatar(),
+              LegendAvatar(
+                initials: 'TF',
+                size: 48,
+                badge: LegendSurface(
+                  color: tokens.colors.secondary,
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: tokens.colors.surface),
+                  child: const SizedBox(width: 12, height: 12),
+                ),
+              ),
+            ],
+          ),
+          code: '''
+LegendAvatar(
+  image: NetworkImage(logoUrl),  // falls back to initials on error
+  initials: 'TF',
+  seed: account.address,         // deterministic identity color
+  badge: NetworkDot(),           // overlaid bottom-end
+)''',
+        ),
         const DocSection(
           title: 'Info item',
           description: 'Label/value rows for detail screens.',
@@ -132,6 +170,49 @@ LegendBody.pinnedFooter(
             ],
           ),
           code: "LegendInfoItem(label: 'Fee', value: '0.0021 ETH')",
+        ),
+        DocSection(
+          title: 'Badge',
+          description:
+              'A status dot, count pill, or label — standalone, or anchored '
+              'over a corner of a child with a contrast ring. Counts '
+              'overflow as max+ and hide at zero.',
+          demo: Wrap(
+            spacing: tokens.sizes.md,
+            runSpacing: tokens.sizes.sm,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              const LegendBadge('Mainnet'),
+              const LegendBadge.count(3),
+              const LegendBadge.count(250),
+              LegendBadge.count(
+                12,
+                child: LegendSurface(
+                  color: tokens.colors.background2,
+                  borderRadius: tokens.sizes.borderRadiusMd,
+                  child: const SizedBox(width: 32, height: 32),
+                ),
+              ),
+              LegendBadge.dot(
+                alignment: AlignmentDirectional.bottomEnd,
+                background: tokens.colors.secondary,
+                semanticLabel: 'Online',
+                child: LegendSurface(
+                  color: tokens.colors.background2,
+                  borderRadius: BorderRadius.circular(999),
+                  child: const SizedBox(width: 32, height: 32),
+                ),
+              ),
+            ],
+          ),
+          code: '''
+LegendBadge.count(unread, child: navIcon)   // 99+ overflow, hides at 0
+LegendBadge.dot(
+  alignment: AlignmentDirectional.bottomEnd,
+  background: tokens.colors.secondary,
+  semanticLabel: 'Online',
+  child: avatar,
+)''',
         ),
       ],
     );

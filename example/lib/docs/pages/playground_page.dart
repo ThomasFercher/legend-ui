@@ -93,7 +93,56 @@ class PlaygroundPage extends StatelessWidget {
                     'tooltip knob in the theme panel.',
                 child: LegendCard(child: LegendText('Hover for a tooltip')),
               ),
+              // Live badges — their fill follows the theme panel's badge
+              // knob (level-3 override).
+              Wrap(
+                spacing: tokens.sizes.md,
+                runSpacing: tokens.sizes.sm,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  const LegendBadge('Mainnet'),
+                  const LegendBadge.count(120),
+                  LegendBadge.dot(
+                    semanticLabel: 'Attention',
+                    child: LegendSurface(
+                      color: tokens.colors.background2,
+                      borderRadius: tokens.sizes.borderRadiusMd,
+                      child: const SizedBox(width: 32, height: 32),
+                    ),
+                  ),
+                ],
+              ),
+              // Live LegendAvatars — their shape follows the avatar knob in
+              // the theme panel (level-3 override); the seeded pair keeps
+              // its deterministic identity colors through every preset.
+              Wrap(
+                spacing: tokens.sizes.sm,
+                children: [
+                  const LegendAvatar(initials: 'TF'),
+                  const LegendAvatar(seed: 'alice', initials: 'AL'),
+                  const LegendAvatar(seed: 'dave', initials: 'DA'),
+                  const LegendAvatar(),
+                  LegendAvatar(
+                    initials: 'TF',
+                    badge: LegendSurface(
+                      color: tokens.colors.secondary,
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: tokens.colors.surface),
+                      child: const SizedBox(width: 10, height: 10),
+                    ),
+                  ),
+                ],
+              ),
+              // A live LegendCheckbox — its checked fill follows the theme
+              // panel's knob (level-3 override).
+              const _CheckboxPreview(),
               const LegendLoading(),
+              // A live LegendProgress — its fill color follows the theme
+              // panel's knob (level-3 override).
+              const LegendProgress.bar(
+                value: 0.6,
+                semanticLabel: 'Progress preview',
+              ),
               LegendSurface(
                 color: tokens.colors.background1,
                 borderRadius: tokens.sizes.borderRadiusMd,
@@ -141,6 +190,30 @@ LegendThemeData(
 )''',
         ),
       ],
+    );
+  }
+}
+
+/// A self-contained live tristate [LegendCheckbox] for the playground
+/// preview column. Its checked fill is themed by the panel's level-3
+/// override.
+class _CheckboxPreview extends StatefulWidget {
+  const _CheckboxPreview();
+
+  @override
+  State<_CheckboxPreview> createState() => _CheckboxPreviewState();
+}
+
+class _CheckboxPreviewState extends State<_CheckboxPreview> {
+  bool? _value = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return LegendCheckbox(
+      value: _value,
+      tristate: true,
+      label: 'Checkbox — tap to cycle tristate',
+      onChanged: (value) => setState(() => _value = value),
     );
   }
 }

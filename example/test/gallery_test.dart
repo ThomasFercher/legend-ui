@@ -257,6 +257,182 @@ void main() {
     expect(panel.borderRadius, BorderRadius.circular(12));
   });
 
+  testWidgets('layout page: badge demo shows label, counts, and overflow', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const DocsApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Layout'));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.text('Mainnet'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Mainnet'), findsOneWidget);
+    expect(find.text('3'), findsOneWidget);
+    // 250 overflows the default max.
+    expect(find.text('99+'), findsOneWidget);
+    // The anchored dot announces its semantic label.
+    expect(find.bySemanticsLabel('Online'), findsOneWidget);
+  });
+
+  testWidgets('playground: badge background knob restyles the live badge', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's badge swatch.
+    await tester.scrollUntilVisible(
+      find.text('Badge background'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(
+      find.bySemanticsLabel('Badge background #2563EB'),
+    );
+    await settleTheme();
+    await tester.tap(find.bySemanticsLabel('Badge background #2563EB'));
+    await settleTheme();
+
+    // The live badges in the preview column pick it up.
+    await tester.scrollUntilVisible(
+      find.text('Mainnet'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    final pill = tester.widget<LegendSurface>(
+      find
+          .ancestor(
+            of: find.text('Mainnet'),
+            matching: find.byType(LegendSurface),
+          )
+          .first,
+    );
+    expect(pill.color, const Color(0xFF2563EB));
+  });
+
+  testWidgets('playground: checkbox fill knob restyles the live checkbox', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's checkbox knob.
+    await tester.scrollUntilVisible(
+      find.textContaining('Checkbox fill'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    // scrollUntilVisible stops as soon as the sliver cache builds the
+    // target, which can still be off-screen — align it for the tap.
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('Checkbox fill .*#8B5CF6')),
+    );
+    await settleTheme();
+    await tester.tap(find.bySemanticsLabel(RegExp('Checkbox fill .*#8B5CF6')));
+    await settleTheme();
+
+    // The live checkbox in the preview column picks it up — a sparse
+    // InteractiveColors(normal: …) whose other states keep deriving.
+    await tester.scrollUntilVisible(
+      find.byType(LegendCheckbox),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    final box = tester.widget<LegendSurface>(
+      find.descendant(
+        of: find.byType(LegendCheckbox),
+        matching: find.byType(LegendSurface),
+      ),
+    );
+    expect(box.color, const Color(0xFF8B5CF6));
+  });
+
+  testWidgets('playground: avatar shape knob restyles the live avatars', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's avatar knob.
+    await tester.scrollUntilVisible(
+      find.textContaining('Avatar shape'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('Circle (default)'));
+    await settleTheme();
+    await tester.tap(find.text('Circle (default)'));
+    await settleTheme();
+    await tester.tap(find.text('Squircle (8)'));
+    await settleTheme();
+
+    // Every live avatar in the preview column picks it up.
+    await tester.scrollUntilVisible(
+      find.byType(LegendAvatar).first,
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    final surface = tester.widget<LegendSurface>(
+      find
+          .descendant(
+            of: find.byType(LegendAvatar).first,
+            matching: find.byType(LegendSurface),
+          )
+          .first,
+    );
+    expect(surface.borderRadius, BorderRadius.circular(8));
+  });
+
   testWidgets('overlays page: tooltip shows on hover and hides on exit', (
     tester,
   ) async {
