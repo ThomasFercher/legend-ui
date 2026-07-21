@@ -37,6 +37,7 @@ export 'src/primitives/legend_caret.dart';
 export 'src/primitives/legend_field_core.dart';
 export 'src/primitives/legend_interactive.dart';
 export 'src/primitives/legend_modal.dart';
+export 'src/primitives/legend_selection_control.dart';
 export 'src/primitives/legend_surface.dart';
 export 'src/shell/legend_app.dart';
 export 'src/shell/legend_app_bar.dart';
