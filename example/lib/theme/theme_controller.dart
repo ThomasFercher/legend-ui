@@ -36,6 +36,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendPopover]'s panel corner radius.
   double? popoverRadius;
 
+  /// Level-3 override for [LegendBanner]'s info-severity strip fill.
+  Color? bannerBackground;
+
   bool get dark => preset == ThemePreset.dark;
 
   void setPreset(ThemePreset value) {
@@ -94,6 +97,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setBannerBackground(Color? value) {
+    bannerBackground = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -105,6 +113,7 @@ class ThemeController extends ChangeNotifier {
     bodyMaxContentWidth = null;
     menuSelectedColor = null;
     popoverRadius = null;
+    bannerBackground = null;
     notifyListeners();
   }
 
@@ -195,6 +204,11 @@ class ThemeController extends ChangeNotifier {
         if (popoverRadius != null)
           LegendPopover: LegendPopoverThemeNullable(
             borderRadius: BorderRadius.circular(popoverRadius!),
+          ),
+        // LegendBanner's info-severity strip fill.
+        if (bannerBackground != null)
+          LegendBanner: LegendBannerThemeNullable(
+            infoBackground: bannerBackground,
           ),
       },
     );

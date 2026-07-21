@@ -86,6 +86,14 @@ class PlaygroundPage extends StatelessWidget {
                 child: const LegendCard(child: LegendText('Tap for a popover')),
               ),
               const LegendLoading(),
+              // A live LegendBanner — its info strip follows the theme
+              // panel's banner knob (level-3 override).
+              const LegendBanner(
+                title: 'LegendBanner',
+                message:
+                    'The strip fill follows the banner knob in the theme '
+                    'panel.',
+              ),
               LegendSurface(
                 color: tokens.colors.background1,
                 borderRadius: tokens.sizes.borderRadiusMd,
