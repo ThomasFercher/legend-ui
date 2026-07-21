@@ -39,6 +39,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendChip]'s selected fill.
   Color? chipSelectedBackground;
 
+  /// Level-3 override for [LegendTabs]' active-indicator color.
+  Color? tabsIndicator;
+
   /// Level-3 override for [LegendBadge]'s fill.
   Color? badgeBackground;
 
@@ -114,6 +117,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setTabsIndicator(Color? value) {
+    tabsIndicator = value;
+    notifyListeners();
+  }
+
   void setBadgeBackground(Color? value) {
     badgeBackground = value;
     notifyListeners();
@@ -146,6 +154,7 @@ class ThemeController extends ChangeNotifier {
     menuSelectedColor = null;
     popoverRadius = null;
     chipSelectedBackground = null;
+    tabsIndicator = null;
     badgeBackground = null;
     progressFill = null;
     checkboxFill = null;
@@ -249,6 +258,9 @@ class ThemeController extends ChangeNotifier {
               normal: chipSelectedBackground,
             ),
           ),
+        // LegendTabs' active-indicator color.
+        if (tabsIndicator != null)
+          LegendTabs: LegendTabsThemeNullable(indicator: tabsIndicator),
         // LegendBadge's fill.
         if (badgeBackground != null)
           LegendBadge: LegendBadgeThemeNullable(background: badgeBackground),

@@ -23,11 +23,19 @@ class _ShellPageState extends State<ShellPage> {
     LegendNavItem(label: 'Settings'),
   ];
 
+  static const _tabItems = [
+    LegendNavItem(label: 'Tokens'),
+    LegendNavItem(label: 'NFTs'),
+    LegendNavItem(label: 'Activity'),
+  ];
+
   LegendNavItem _menuSelected = _menuItems.first;
+  var _tabSelected = 0;
 
   @override
   Widget build(BuildContext context) {
     final breakpoints = LegendBreakpoints.of(context);
+    final tokens = LegendTheme.of(context).tokens;
     return DocPage(
       title: 'Shell & breakpoints',
       intro:
@@ -83,6 +91,38 @@ LegendApp(
   compactBelow: 700,
   expandedFrom: 1200,
   ...
+)''',
+        ),
+        DocSection(
+          title: 'Tabs',
+          description:
+              'LegendTabs switches between peer views — a controlled '
+              'component on LegendInteractive + LegendSurface, fed by the '
+              'same LegendNavItem model as the sider and bottom bar. Arrow '
+              'keys rove focus between tabs (Home/End jump, mirrored under '
+              'RTL), Enter/Space activates, and each tab announces proper '
+              'tab semantics with its selected state.',
+          demo: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: tokens.sizes.sm,
+            children: [
+              LegendTabs(
+                items: _tabItems,
+                selectedIndex: _tabSelected,
+                onSelected: (index) => setState(() => _tabSelected = index),
+              ),
+              LegendText('Selected: ${_tabItems[_tabSelected].label}'),
+            ],
+          ),
+          code: '''
+LegendTabs(
+  items: const [
+    LegendNavItem(label: 'Tokens'),
+    LegendNavItem(label: 'NFTs'),
+    LegendNavItem(label: 'Activity'),
+  ],
+  selectedIndex: selected,
+  onSelected: (index) => setState(() => selected = index),
 )''',
         ),
         DocSection(

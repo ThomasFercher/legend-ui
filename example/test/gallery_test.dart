@@ -480,4 +480,74 @@ void main() {
       reason: 'level-3 components map restyles the selected fill',
     );
   });
+
+  testWidgets('playground: tabs indicator knob restyles the live tabs', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    Color indicatorColor(String label) {
+      final container = tester.widget<AnimatedContainer>(
+        find
+            .ancestor(
+              of: find.text(label),
+              matching: find.byType(AnimatedContainer),
+            )
+            .first,
+      );
+      return (container.decoration! as BoxDecoration).border!.bottom.color;
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // The live LegendTabs starts on the token default and tracks taps.
+    await tester.scrollUntilVisible(
+      find.text('NFTs'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('NFTs'));
+    await settleTheme();
+    expect(indicatorColor('Tokens'), LegendTokens.light.colors.primary);
+    await tester.tap(find.text('NFTs'));
+    await settleTheme();
+    expect(indicatorColor('NFTs'), LegendTokens.light.colors.primary);
+
+    // Register the level-3 override through the panel's tabs knob.
+    await tester.scrollUntilVisible(
+      find.textContaining('Tabs indicator color'),
+      -200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('Tabs indicator color #')).at(3),
+    );
+    await settleTheme();
+    await tester.tap(
+      find.bySemanticsLabel(RegExp('Tabs indicator color #')).at(3),
+    );
+    await settleTheme();
+
+    // The live tabs in the preview column pick it up.
+    await tester.scrollUntilVisible(
+      find.text('NFTs'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('NFTs'));
+    await settleTheme();
+    expect(indicatorColor('NFTs'), const Color(0xFFDC2626));
+  });
 }

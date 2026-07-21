@@ -135,6 +135,9 @@ class PlaygroundPage extends StatelessWidget {
                 value: 0.6,
                 semanticLabel: 'Progress preview',
               ),
+              // A live LegendTabs — its active indicator follows the
+              // theme panel's knob (level-3 override).
+              const _TabsPreview(),
               LegendSurface(
                 color: tokens.colors.background1,
                 borderRadius: tokens.sizes.borderRadiusMd,
@@ -252,6 +255,34 @@ class _CheckboxPreviewState extends State<_CheckboxPreview> {
       tristate: true,
       label: 'Checkbox — tap to cycle tristate',
       onChanged: (value) => setState(() => _value = value),
+    );
+  }
+}
+
+/// A self-contained live [LegendTabs] for the playground preview column.
+/// Its indicator color is themed by the panel's level-3 override.
+class _TabsPreview extends StatefulWidget {
+  const _TabsPreview();
+
+  @override
+  State<_TabsPreview> createState() => _TabsPreviewState();
+}
+
+class _TabsPreviewState extends State<_TabsPreview> {
+  static const _items = [
+    LegendNavItem(label: 'Tokens'),
+    LegendNavItem(label: 'NFTs'),
+    LegendNavItem(label: 'Activity'),
+  ];
+
+  var _selected = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return LegendTabs(
+      items: _items,
+      selectedIndex: _selected,
+      onSelected: (index) => setState(() => _selected = index),
     );
   }
 }
