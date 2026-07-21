@@ -39,6 +39,18 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendListItem]'s selected-row fill.
   Color? listSelectedBackground;
 
+  /// Level-3 override for [LegendBadge]'s fill.
+  Color? badgeBackground;
+
+  /// Level-3 override for [LegendProgress]'s completed-fill color.
+  Color? progressFill;
+
+  /// Level-3 override for [LegendCheckbox]'s checked box fill.
+  Color? checkboxFill;
+
+  /// Level-3 override for [LegendAvatar]'s corner radius.
+  double? avatarRadius;
+
   bool get dark => preset == ThemePreset.dark;
 
   void setPreset(ThemePreset value) {
@@ -102,6 +114,26 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setBadgeBackground(Color? value) {
+    badgeBackground = value;
+    notifyListeners();
+  }
+
+  void setProgressFill(Color? value) {
+    progressFill = value;
+    notifyListeners();
+  }
+
+  void setCheckboxFill(Color? value) {
+    checkboxFill = value;
+    notifyListeners();
+  }
+
+  void setAvatarRadius(double? value) {
+    avatarRadius = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -114,6 +146,10 @@ class ThemeController extends ChangeNotifier {
     menuSelectedColor = null;
     popoverRadius = null;
     listSelectedBackground = null;
+    badgeBackground = null;
+    progressFill = null;
+    checkboxFill = null;
+    avatarRadius = null;
     notifyListeners();
   }
 
@@ -209,6 +245,23 @@ class ThemeController extends ChangeNotifier {
         if (listSelectedBackground != null)
           LegendListItem: LegendListItemThemeNullable(
             selectedBackground: listSelectedBackground,
+          ),
+        // LegendBadge's fill.
+        if (badgeBackground != null)
+          LegendBadge: LegendBadgeThemeNullable(background: badgeBackground),
+        // LegendProgress's completed-fill color.
+        if (progressFill != null)
+          LegendProgress: LegendProgressThemeNullable(fill: progressFill),
+        // LegendCheckbox's checked box fill — a sparse InteractiveColors:
+        // hover/press/disabled keep deriving from the lower levels.
+        if (checkboxFill != null)
+          LegendCheckbox: LegendCheckboxThemeNullable(
+            box: InteractiveColors(normal: checkboxFill),
+          ),
+        // LegendAvatar's shape — circle by default, squircle/square here.
+        if (avatarRadius != null)
+          LegendAvatar: LegendAvatarThemeNullable(
+            borderRadius: BorderRadius.circular(avatarRadius!),
           ),
       },
     );
