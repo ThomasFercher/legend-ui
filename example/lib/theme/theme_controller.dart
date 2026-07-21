@@ -45,6 +45,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendCheckbox]'s checked box fill.
   Color? checkboxFill;
 
+  /// Level-3 override for [LegendAvatar]'s corner radius.
+  double? avatarRadius;
+
   bool get dark => preset == ThemePreset.dark;
 
   void setPreset(ThemePreset value) {
@@ -118,6 +121,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setAvatarRadius(double? value) {
+    avatarRadius = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -132,6 +140,7 @@ class ThemeController extends ChangeNotifier {
     badgeBackground = null;
     progressFill = null;
     checkboxFill = null;
+    avatarRadius = null;
     notifyListeners();
   }
 
@@ -234,6 +243,11 @@ class ThemeController extends ChangeNotifier {
         if (checkboxFill != null)
           LegendCheckbox: LegendCheckboxThemeNullable(
             box: InteractiveColors(normal: checkboxFill),
+          ),
+        // LegendAvatar's shape — circle by default, squircle/square here.
+        if (avatarRadius != null)
+          LegendAvatar: LegendAvatarThemeNullable(
+            borderRadius: BorderRadius.circular(avatarRadius!),
           ),
       },
     );

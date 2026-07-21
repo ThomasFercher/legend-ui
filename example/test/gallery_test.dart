@@ -381,4 +381,54 @@ void main() {
     );
     expect(box.color, const Color(0xFF8B5CF6));
   });
+
+  testWidgets('playground: avatar shape knob restyles the live avatars', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's avatar knob.
+    await tester.scrollUntilVisible(
+      find.textContaining('Avatar shape'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('Circle (default)'));
+    await settleTheme();
+    await tester.tap(find.text('Circle (default)'));
+    await settleTheme();
+    await tester.tap(find.text('Squircle (8)'));
+    await settleTheme();
+
+    // Every live avatar in the preview column picks it up.
+    await tester.scrollUntilVisible(
+      find.byType(LegendAvatar).first,
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    final surface = tester.widget<LegendSurface>(
+      find
+          .descendant(
+            of: find.byType(LegendAvatar).first,
+            matching: find.byType(LegendSurface),
+          )
+          .first,
+    );
+    expect(surface.borderRadius, BorderRadius.circular(8));
+  });
 }
