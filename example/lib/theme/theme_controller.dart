@@ -36,6 +36,18 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendPopover]'s panel corner radius.
   double? popoverRadius;
 
+  /// Level-3 override for [LegendBadge]'s fill.
+  Color? badgeBackground;
+
+  /// Level-3 override for [LegendProgress]'s completed-fill color.
+  Color? progressFill;
+
+  /// Level-3 override for [LegendCheckbox]'s checked box fill.
+  Color? checkboxFill;
+
+  /// Level-3 override for [LegendAvatar]'s corner radius.
+  double? avatarRadius;
+
   /// Level-3 override for [LegendSegmented]'s selected-segment thumb color.
   Color? segmentedThumb;
 
@@ -97,6 +109,26 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setBadgeBackground(Color? value) {
+    badgeBackground = value;
+    notifyListeners();
+  }
+
+  void setProgressFill(Color? value) {
+    progressFill = value;
+    notifyListeners();
+  }
+
+  void setCheckboxFill(Color? value) {
+    checkboxFill = value;
+    notifyListeners();
+  }
+
+  void setAvatarRadius(double? value) {
+    avatarRadius = value;
+    notifyListeners();
+  }
+
   void setSegmentedThumb(Color? value) {
     segmentedThumb = value;
     notifyListeners();
@@ -113,6 +145,10 @@ class ThemeController extends ChangeNotifier {
     bodyMaxContentWidth = null;
     menuSelectedColor = null;
     popoverRadius = null;
+    badgeBackground = null;
+    progressFill = null;
+    checkboxFill = null;
+    avatarRadius = null;
     segmentedThumb = null;
     notifyListeners();
   }
@@ -204,6 +240,23 @@ class ThemeController extends ChangeNotifier {
         if (popoverRadius != null)
           LegendPopover: LegendPopoverThemeNullable(
             borderRadius: BorderRadius.circular(popoverRadius!),
+          ),
+        // LegendBadge's fill.
+        if (badgeBackground != null)
+          LegendBadge: LegendBadgeThemeNullable(background: badgeBackground),
+        // LegendProgress's completed-fill color.
+        if (progressFill != null)
+          LegendProgress: LegendProgressThemeNullable(fill: progressFill),
+        // LegendCheckbox's checked box fill — a sparse InteractiveColors:
+        // hover/press/disabled keep deriving from the lower levels.
+        if (checkboxFill != null)
+          LegendCheckbox: LegendCheckboxThemeNullable(
+            box: InteractiveColors(normal: checkboxFill),
+          ),
+        // LegendAvatar's shape — circle by default, squircle/square here.
+        if (avatarRadius != null)
+          LegendAvatar: LegendAvatarThemeNullable(
+            borderRadius: BorderRadius.circular(avatarRadius!),
           ),
         // LegendSegmented's selected-segment thumb (the sparse per-state
         // bundle: unset states keep deriving through the overlays).

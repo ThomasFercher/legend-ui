@@ -121,14 +121,14 @@ void main() {
       await tester.pumpWidget(build('1h'));
       expect(
         tester.widget<AnimatedAlign>(find.byType(AnimatedAlign)).alignment,
-        const AlignmentDirectional(-1, 0),
+        AlignmentDirectional.centerStart,
       );
 
       await tester.pumpWidget(build('1y'));
       await tester.pumpAndSettle();
       expect(
         tester.widget<AnimatedAlign>(find.byType(AnimatedAlign)).alignment,
-        const AlignmentDirectional(1, 0),
+        AlignmentDirectional.centerEnd,
       );
     });
 

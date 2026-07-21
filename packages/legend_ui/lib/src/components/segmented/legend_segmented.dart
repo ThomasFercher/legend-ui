@@ -344,10 +344,8 @@ class _MoveFocusIntent extends Intent {
 /// The thumb's rounding: the track radius deflated by the track padding,
 /// so the inner curve stays concentric with the outer one.
 BorderRadius _deflateRadius(BorderRadius outer, EdgeInsets inset) {
-  Radius shrink(Radius radius, double dx, double dy) => Radius.elliptical(
-    math.max(0, radius.x - dx),
-    math.max(0, radius.y - dy),
-  );
+  Radius shrink(Radius radius, double dx, double dy) =>
+      Radius.elliptical(math.max(0, radius.x - dx), math.max(0, radius.y - dy));
   return BorderRadius.only(
     topLeft: shrink(outer.topLeft, inset.left, inset.top),
     topRight: shrink(outer.topRight, inset.right, inset.top),

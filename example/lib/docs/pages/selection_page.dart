@@ -13,6 +13,8 @@ class _SelectionPageState extends State<SelectionPage> {
   String? _fruit;
   var _notifications = true;
   var _newsletter = false;
+  var _backup = false;
+  bool? _sources = false;
   var _timeframe = '1d';
   var _currency = 'crypto';
 
@@ -22,10 +24,11 @@ class _SelectionPageState extends State<SelectionPage> {
     return DocPage(
       title: 'Selection',
       intro:
-          'One dropdown with one item model, a switch that is honest to '
-          'assistive tech (it announces as a toggle with its state, never as '
-          'a button, and mirrors correctly under right-to-left layouts), and '
-          'a segmented control for exclusive one-of-N choices.',
+          'One dropdown with one item model, a checkbox and a switch that '
+          'are honest to assistive tech (each announces its real role with '
+          'its state — checkbox with the tristate mixed value, toggle with '
+          'on/off — never as a button), and a segmented control for '
+          'exclusive one-of-N choices.',
       children: [
         DocSection(
           title: 'Dropdown',
@@ -51,6 +54,49 @@ LegendDropdown<String>(
     LegendDropdownItem(value: 'banana', label: 'Banana'),
   ],
   onChanged: (value) => setState(() => fruit = value),
+)''',
+        ),
+        DocSection(
+          title: 'Checkbox',
+          description:
+              'An independent on/off choice on the shared selection-control '
+              'base: real checkbox semantics (including the tristate mixed '
+              'state), Enter/Space activation, and an inline label that is '
+              'part of the tap target.',
+          demo: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: tokens.sizes.sm,
+            children: [
+              LegendCheckbox(
+                value: _backup,
+                label: 'I have written down my recovery phrase',
+                onChanged: (v) => setState(() => _backup = v ?? false),
+              ),
+              LegendCheckbox(
+                value: _sources,
+                tristate: true,
+                label: 'Include all sources (tap to cycle tristate)',
+                onChanged: (v) => setState(() => _sources = v),
+              ),
+              const LegendCheckbox(
+                value: true,
+                label: 'Disabled',
+                onChanged: null,
+              ),
+            ],
+          ),
+          code: '''
+LegendCheckbox(
+  value: confirmed,
+  label: 'I have written down my recovery phrase',
+  onChanged: (v) => setState(() => confirmed = v ?? false),
+)
+
+LegendCheckbox(
+  value: includeAll,          // bool? — null is the mixed middle
+  tristate: true,
+  label: 'Include all sources',
+  onChanged: (v) => setState(() => includeAll = v),
 )''',
         ),
         DocSection(
