@@ -85,6 +85,9 @@ class PlaygroundPage extends StatelessWidget {
                 ),
                 child: const LegendCard(child: LegendText('Tap for a popover')),
               ),
+              // A live LegendCheckbox — its checked fill follows the theme
+              // panel's knob (level-3 override).
+              const _CheckboxPreview(),
               const LegendLoading(),
               LegendSurface(
                 color: tokens.colors.background1,
@@ -133,6 +136,30 @@ LegendThemeData(
 )''',
         ),
       ],
+    );
+  }
+}
+
+/// A self-contained live tristate [LegendCheckbox] for the playground
+/// preview column. Its checked fill is themed by the panel's level-3
+/// override.
+class _CheckboxPreview extends StatefulWidget {
+  const _CheckboxPreview();
+
+  @override
+  State<_CheckboxPreview> createState() => _CheckboxPreviewState();
+}
+
+class _CheckboxPreviewState extends State<_CheckboxPreview> {
+  bool? _value = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return LegendCheckbox(
+      value: _value,
+      tristate: true,
+      label: 'Checkbox — tap to cycle tristate',
+      onChanged: (value) => setState(() => _value = value),
     );
   }
 }

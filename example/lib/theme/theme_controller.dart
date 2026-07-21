@@ -36,6 +36,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendPopover]'s panel corner radius.
   double? popoverRadius;
 
+  /// Level-3 override for [LegendCheckbox]'s checked box fill.
+  Color? checkboxFill;
+
   bool get dark => preset == ThemePreset.dark;
 
   void setPreset(ThemePreset value) {
@@ -94,6 +97,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setCheckboxFill(Color? value) {
+    checkboxFill = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -105,6 +113,7 @@ class ThemeController extends ChangeNotifier {
     bodyMaxContentWidth = null;
     menuSelectedColor = null;
     popoverRadius = null;
+    checkboxFill = null;
     notifyListeners();
   }
 
@@ -195,6 +204,12 @@ class ThemeController extends ChangeNotifier {
         if (popoverRadius != null)
           LegendPopover: LegendPopoverThemeNullable(
             borderRadius: BorderRadius.circular(popoverRadius!),
+          ),
+        // LegendCheckbox's checked box fill — a sparse InteractiveColors:
+        // hover/press/disabled keep deriving from the lower levels.
+        if (checkboxFill != null)
+          LegendCheckbox: LegendCheckboxThemeNullable(
+            box: InteractiveColors(normal: checkboxFill),
           ),
       },
     );
