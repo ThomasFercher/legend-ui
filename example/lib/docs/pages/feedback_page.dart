@@ -18,8 +18,8 @@ class _FeedbackPageState extends State<FeedbackPage> {
     return DocPage(
       title: 'Feedback',
       intro:
-          'Loading indicators and shimmer placeholders. Toasts live on the '
-          'Overlays page — same engine.',
+          'Progress, loading indicators and shimmer placeholders. Toasts '
+          'live on the Overlays page — same engine.',
       children: [
         DocSection(
           title: 'Loading',
@@ -32,6 +32,36 @@ class _FeedbackPageState extends State<FeedbackPage> {
             ],
           ),
           code: 'const LegendLoading(size: 40, strokeWidth: 5)',
+        ),
+        DocSection(
+          title: 'Progress',
+          description:
+              'Determinate when value is set, indeterminate when null. '
+              'LegendLoading stays the centered activity spinner; '
+              'LegendProgress is the inline bar or ring that can report a '
+              'known completion fraction.',
+          demo: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: tokens.sizes.md,
+            children: [
+              const LegendProgress.bar(value: 0.35, semanticLabel: 'Download'),
+              const LegendProgress.bar(semanticLabel: 'Working'),
+              Wrap(
+                spacing: tokens.sizes.md,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: const [
+                  LegendProgress.circle(
+                    value: 0.7,
+                    semanticLabel: 'Confirmations',
+                  ),
+                  LegendProgress.circle(semanticLabel: 'Syncing'),
+                ],
+              ),
+            ],
+          ),
+          code: '''
+const LegendProgress.bar(value: 0.35)
+const LegendProgress.circle() // value: null → indeterminate''',
         ),
         DocSection(
           title: 'Shimmer',

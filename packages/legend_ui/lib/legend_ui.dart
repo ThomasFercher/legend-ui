@@ -9,12 +9,15 @@
 library;
 
 export 'src/annotations/annotations.dart';
+export 'src/components/avatar/legend_avatar.dart';
+export 'src/components/badge/legend_badge.dart';
 export 'src/components/body/legend_body.dart';
 export 'src/components/body/legend_slivers.dart';
 export 'src/components/buttons/legend_text_button.dart';
 export 'src/components/buttons/primary_legend_button.dart';
 export 'src/components/buttons/secondary_legend_button.dart';
 export 'src/components/card/legend_card.dart';
+export 'src/components/checkbox/legend_checkbox.dart';
 export 'src/components/context_menu/legend_context_menu.dart';
 export 'src/components/dialog/legend_dialog.dart';
 export 'src/components/divider/legend_divider.dart';
@@ -28,6 +31,7 @@ export 'src/components/input/legend_text_field.dart';
 export 'src/components/loading/legend_loading.dart';
 export 'src/components/loading/legend_shimmer.dart';
 export 'src/components/popover/legend_popover.dart';
+export 'src/components/progress/legend_progress.dart';
 export 'src/components/switch/legend_switch.dart';
 export 'src/components/tabs/legend_tabs.dart';
 export 'src/components/text/legend_text.dart';
