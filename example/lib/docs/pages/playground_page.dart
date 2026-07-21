@@ -85,6 +85,25 @@ class PlaygroundPage extends StatelessWidget {
                 ),
                 child: const LegendCard(child: LegendText('Tap for a popover')),
               ),
+              // Live badges — their fill follows the theme panel's badge
+              // knob (level-3 override).
+              Wrap(
+                spacing: tokens.sizes.md,
+                runSpacing: tokens.sizes.sm,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  const LegendBadge('Mainnet'),
+                  const LegendBadge.count(120),
+                  LegendBadge.dot(
+                    semanticLabel: 'Attention',
+                    child: LegendSurface(
+                      color: tokens.colors.background2,
+                      borderRadius: tokens.sizes.borderRadiusMd,
+                      child: const SizedBox(width: 32, height: 32),
+                    ),
+                  ),
+                ],
+              ),
               const LegendLoading(),
               LegendSurface(
                 color: tokens.colors.background1,

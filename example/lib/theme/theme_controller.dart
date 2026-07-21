@@ -36,6 +36,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendPopover]'s panel corner radius.
   double? popoverRadius;
 
+  /// Level-3 override for [LegendBadge]'s fill.
+  Color? badgeBackground;
+
   bool get dark => preset == ThemePreset.dark;
 
   void setPreset(ThemePreset value) {
@@ -94,6 +97,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setBadgeBackground(Color? value) {
+    badgeBackground = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -105,6 +113,7 @@ class ThemeController extends ChangeNotifier {
     bodyMaxContentWidth = null;
     menuSelectedColor = null;
     popoverRadius = null;
+    badgeBackground = null;
     notifyListeners();
   }
 
@@ -196,6 +205,9 @@ class ThemeController extends ChangeNotifier {
           LegendPopover: LegendPopoverThemeNullable(
             borderRadius: BorderRadius.circular(popoverRadius!),
           ),
+        // LegendBadge's fill.
+        if (badgeBackground != null)
+          LegendBadge: LegendBadgeThemeNullable(background: badgeBackground),
       },
     );
   }
