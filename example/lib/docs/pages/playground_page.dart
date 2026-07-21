@@ -65,6 +65,26 @@ class PlaygroundPage extends StatelessWidget {
                   ],
                 ),
               ),
+              // A live LegendPopover — its panel radius follows the theme
+              // panel's knob (level-3 override).
+              LegendPopover(
+                semanticLabel: 'Open popover',
+                overlay: (context) => const SizedBox(
+                  width: 220,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      LegendText('Popover', variant: LegendTextVariant.h3),
+                      LegendText(
+                        'An anchored floating panel. Its corner radius '
+                        'follows the popover knob in the theme panel.',
+                        variant: LegendTextVariant.b3,
+                      ),
+                    ],
+                  ),
+                ),
+                child: const LegendCard(child: LegendText('Tap for a popover')),
+              ),
               const LegendLoading(),
               LegendSurface(
                 color: tokens.colors.background1,
