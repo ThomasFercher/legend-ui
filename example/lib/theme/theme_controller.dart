@@ -39,6 +39,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendBadge]'s fill.
   Color? badgeBackground;
 
+  /// Level-3 override for [LegendProgress]'s completed-fill color.
+  Color? progressFill;
+
   bool get dark => preset == ThemePreset.dark;
 
   void setPreset(ThemePreset value) {
@@ -102,6 +105,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setProgressFill(Color? value) {
+    progressFill = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -114,6 +122,7 @@ class ThemeController extends ChangeNotifier {
     menuSelectedColor = null;
     popoverRadius = null;
     badgeBackground = null;
+    progressFill = null;
     notifyListeners();
   }
 
@@ -208,6 +217,9 @@ class ThemeController extends ChangeNotifier {
         // LegendBadge's fill.
         if (badgeBackground != null)
           LegendBadge: LegendBadgeThemeNullable(background: badgeBackground),
+        // LegendProgress's completed-fill color.
+        if (progressFill != null)
+          LegendProgress: LegendProgressThemeNullable(fill: progressFill),
       },
     );
   }

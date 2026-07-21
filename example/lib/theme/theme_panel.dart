@@ -157,6 +157,11 @@ class ThemePanel extends StatelessWidget {
             value: controller.badgeBackground,
             onChanged: controller.setBadgeBackground,
           ),
+          ColorField(
+            label: 'Progress fill color',
+            value: controller.progressFill,
+            onChanged: controller.setProgressFill,
+          ),
 
           const LegendDivider(),
           SecondaryLegendButton(
