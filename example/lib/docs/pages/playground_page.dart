@@ -85,6 +85,27 @@ class PlaygroundPage extends StatelessWidget {
                 ),
                 child: const LegendCard(child: LegendText('Tap for a popover')),
               ),
+              // Live LegendAvatars — their shape follows the avatar knob in
+              // the theme panel (level-3 override); the seeded pair keeps
+              // its deterministic identity colors through every preset.
+              Wrap(
+                spacing: tokens.sizes.sm,
+                children: [
+                  const LegendAvatar(initials: 'TF'),
+                  const LegendAvatar(seed: 'alice', initials: 'AL'),
+                  const LegendAvatar(seed: 'dave', initials: 'DA'),
+                  const LegendAvatar(),
+                  LegendAvatar(
+                    initials: 'TF',
+                    badge: LegendSurface(
+                      color: tokens.colors.secondary,
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: tokens.colors.surface),
+                      child: const SizedBox(width: 10, height: 10),
+                    ),
+                  ),
+                ],
+              ),
               const LegendLoading(),
               LegendSurface(
                 color: tokens.colors.background1,

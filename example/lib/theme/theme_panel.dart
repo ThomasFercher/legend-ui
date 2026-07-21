@@ -152,6 +152,20 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setPopoverRadius,
           ),
 
+          const LegendText(
+            'Avatar shape (LegendAvatar.borderRadius)',
+            variant: LegendTextVariant.b3,
+          ),
+          LegendDropdown<double>(
+            value: controller.avatarRadius,
+            placeholder: 'Circle (default)',
+            items: const [
+              LegendDropdownItem(value: 8, label: 'Squircle (8)'),
+              LegendDropdownItem(value: 0, label: 'Square (0)'),
+            ],
+            onChanged: controller.setAvatarRadius,
+          ),
+
           const LegendDivider(),
           SecondaryLegendButton(
             text: 'Reset everything',

@@ -11,8 +11,9 @@ class LayoutPage extends StatelessWidget {
     return DocPage(
       title: 'Layout',
       intro:
-          'Structural pieces: cards, dividers, expandables, and info rows — '
-          'all thin compositions over LegendSurface and LegendInteractive.',
+          'Structural pieces: cards, dividers, expandables, info rows, and '
+          'avatars — all thin compositions over LegendSurface and '
+          'LegendInteractive.',
       children: [
         DocSection(
           title: 'Card',
@@ -119,6 +120,42 @@ LegendBody.pinnedFooter(
     LegendText('Title', variant: LegendTextVariant.h3),
     LegendText('Body copy ...'),
   ],
+)''',
+        ),
+        DocSection(
+          title: 'Avatar',
+          description:
+              'A fallback ladder — image, then initials, then a placeholder, '
+              'then a generic silhouette. A seed string derives a stable '
+              'identity color from the tokens; badge overlays a caller-owned '
+              'widget at a corner (the network-badge-on-token-icon case).',
+          demo: Wrap(
+            spacing: tokens.sizes.sm,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              const LegendAvatar(initials: 'TF'),
+              const LegendAvatar(seed: 'alice', initials: 'AL'),
+              const LegendAvatar(seed: 'bob', initials: 'BO'),
+              const LegendAvatar(seed: 'carol', initials: 'CA'),
+              const LegendAvatar(),
+              LegendAvatar(
+                initials: 'TF',
+                size: 48,
+                badge: LegendSurface(
+                  color: tokens.colors.secondary,
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: tokens.colors.surface),
+                  child: const SizedBox(width: 12, height: 12),
+                ),
+              ),
+            ],
+          ),
+          code: '''
+LegendAvatar(
+  image: NetworkImage(logoUrl),  // falls back to initials on error
+  initials: 'TF',
+  seed: account.address,         // deterministic identity color
+  badge: NetworkDot(),           // overlaid bottom-end
 )''',
         ),
         const DocSection(
