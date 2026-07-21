@@ -143,6 +143,12 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setBannerBackground,
           ),
 
+          ColorField(
+            label: 'Checkbox fill (LegendCheckbox.box)',
+            value: controller.checkboxFill,
+            onChanged: controller.setCheckboxFill,
+          ),
+
           const LegendText(
             'Popover panel radius (LegendPopover.borderRadius)',
             variant: LegendTextVariant.b3,
@@ -156,6 +162,31 @@ class ThemePanel extends StatelessWidget {
               LegendDropdownItem(value: 24, label: 'Soft (24)'),
             ],
             onChanged: controller.setPopoverRadius,
+          ),
+
+          ColorField(
+            label: 'Badge background',
+            value: controller.badgeBackground,
+            onChanged: controller.setBadgeBackground,
+          ),
+          ColorField(
+            label: 'Progress fill color',
+            value: controller.progressFill,
+            onChanged: controller.setProgressFill,
+          ),
+
+          const LegendText(
+            'Avatar shape (LegendAvatar.borderRadius)',
+            variant: LegendTextVariant.b3,
+          ),
+          LegendDropdown<double>(
+            value: controller.avatarRadius,
+            placeholder: 'Circle (default)',
+            items: const [
+              LegendDropdownItem(value: 8, label: 'Squircle (8)'),
+              LegendDropdownItem(value: 0, label: 'Square (0)'),
+            ],
+            onChanged: controller.setAvatarRadius,
           ),
 
           const LegendDivider(),
