@@ -85,6 +85,14 @@ class PlaygroundPage extends StatelessWidget {
                 ),
                 child: const LegendCard(child: LegendText('Tap for a popover')),
               ),
+              // A live LegendTooltip — how long you hover before it shows
+              // follows the theme panel's delay knob (level-3 override).
+              const LegendTooltip(
+                message:
+                    'The wait before this hint appeared follows the '
+                    'tooltip knob in the theme panel.',
+                child: LegendCard(child: LegendText('Hover for a tooltip')),
+              ),
               const LegendLoading(),
               LegendSurface(
                 color: tokens.colors.background1,
