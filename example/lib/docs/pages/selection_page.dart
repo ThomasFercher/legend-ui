@@ -13,6 +13,8 @@ class _SelectionPageState extends State<SelectionPage> {
   String? _fruit;
   var _notifications = true;
   var _newsletter = false;
+  var _timeframe = '1d';
+  var _currency = 'crypto';
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +22,10 @@ class _SelectionPageState extends State<SelectionPage> {
     return DocPage(
       title: 'Selection',
       intro:
-          'One dropdown with one item model, and a switch that is honest to '
-          'assistive tech: it announces as a toggle with its state, never as '
-          'a button, and mirrors correctly under right-to-left layouts.',
+          'One dropdown with one item model, a switch that is honest to '
+          'assistive tech (it announces as a toggle with its state, never as '
+          'a button, and mirrors correctly under right-to-left layouts), and '
+          'a segmented control for exclusive one-of-N choices.',
       children: [
         DocSection(
           title: 'Dropdown',
@@ -92,6 +95,102 @@ LegendSwitch(
   semanticLabel: 'Notifications',   // what the switch controls
   onChanged: (v) => setState(() => enabled = v),
 )''',
+        ),
+        DocSection(
+          title: 'Segmented',
+          description:
+              'An exclusive one-of-N choice as joined equal-width segments '
+              'with a sliding thumb. Each segment announces selected-state '
+              'semantics; arrow keys move focus between segments and '
+              'Enter/Space selects — tapping the selected segment never '
+              'deselects.',
+          demo: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: tokens.sizes.sm,
+            children: [
+              LegendSegmented<String>(
+                segments: const [
+                  LegendSegment(value: '1h', label: '1H'),
+                  LegendSegment(value: '1d', label: '1D'),
+                  LegendSegment(value: '1w', label: '1W'),
+                  LegendSegment(value: '1m', label: '1M'),
+                  LegendSegment(value: '1y', label: '1Y'),
+                ],
+                value: _timeframe,
+                onChanged: (value) => setState(() => _timeframe = value),
+              ),
+              LegendSegmented<String>(
+                segments: const [
+                  LegendSegment(value: 'crypto', label: 'Crypto'),
+                  LegendSegment(value: 'fiat', label: 'Fiat'),
+                ],
+                value: _currency,
+                onChanged: (value) => setState(() => _currency = value),
+              ),
+              LegendSegmented<String>(
+                segments: const [
+                  LegendSegment(value: 'crypto', label: 'Crypto'),
+                  LegendSegment(value: 'fiat', label: 'Fiat'),
+                ],
+                value: _currency,
+                enabled: false,
+                onChanged: (_) {},
+              ),
+            ],
+          ),
+          code: '''
+LegendSegmented<String>(
+  segments: const [
+    LegendSegment(value: '1h', label: '1H'),
+    LegendSegment(value: '1d', label: '1D'),
+    LegendSegment(value: '1w', label: '1W'),
+  ],
+  value: timeframe,
+  onChanged: (value) => setState(() => timeframe = value),
+)''',
+        ),
+        const DocSection(
+          title: 'LegendSegmented theme surface',
+          demo: PropsTable(
+            rows: [
+              (
+                name: 'background',
+                type: 'Color',
+                defaultsTo: 't.colors.background2',
+              ),
+              (
+                name: 'thumb',
+                type: 'InteractiveColors',
+                defaultsTo: 'normal: t.colors.surface',
+              ),
+              (
+                name: 'labelStyle',
+                type: 'TextStyle',
+                defaultsTo: 't.typography.b3 in foreground2',
+              ),
+              (
+                name: 'selectedLabelStyle',
+                type: 'TextStyle',
+                defaultsTo: 't.typography.b3 w600 in foreground1',
+              ),
+              (
+                name: 'borderRadius',
+                type: 'BorderRadius',
+                defaultsTo: 't.sizes.borderRadiusMd',
+              ),
+              (
+                name: 'padding',
+                type: 'EdgeInsetsGeometry',
+                defaultsTo: 'EdgeInsets.all(t.sizes.xs)',
+              ),
+              (
+                name: 'segmentPadding',
+                type: 'EdgeInsetsGeometry',
+                defaultsTo:
+                    'EdgeInsets.symmetric(h: t.sizes.sm, v: t.sizes.xs)',
+              ),
+            ],
+          ),
         ),
         const DocSection(
           title: 'LegendDropdown theme surface',

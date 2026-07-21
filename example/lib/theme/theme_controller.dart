@@ -36,6 +36,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendPopover]'s panel corner radius.
   double? popoverRadius;
 
+  /// Level-3 override for [LegendSegmented]'s selected-segment thumb color.
+  Color? segmentedThumb;
+
   bool get dark => preset == ThemePreset.dark;
 
   void setPreset(ThemePreset value) {
@@ -94,6 +97,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setSegmentedThumb(Color? value) {
+    segmentedThumb = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -105,6 +113,7 @@ class ThemeController extends ChangeNotifier {
     bodyMaxContentWidth = null;
     menuSelectedColor = null;
     popoverRadius = null;
+    segmentedThumb = null;
     notifyListeners();
   }
 
@@ -195,6 +204,12 @@ class ThemeController extends ChangeNotifier {
         if (popoverRadius != null)
           LegendPopover: LegendPopoverThemeNullable(
             borderRadius: BorderRadius.circular(popoverRadius!),
+          ),
+        // LegendSegmented's selected-segment thumb (the sparse per-state
+        // bundle: unset states keep deriving through the overlays).
+        if (segmentedThumb != null)
+          LegendSegmented: LegendSegmentedThemeNullable(
+            thumb: InteractiveColors(normal: segmentedThumb),
           ),
       },
     );

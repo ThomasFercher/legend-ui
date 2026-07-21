@@ -85,6 +85,9 @@ class PlaygroundPage extends StatelessWidget {
                 ),
                 child: const LegendCard(child: LegendText('Tap for a popover')),
               ),
+              // A live LegendSegmented — its thumb color follows the
+              // theme panel's knob (level-3 override).
+              const _SegmentedPreview(),
               const LegendLoading(),
               LegendSurface(
                 color: tokens.colors.background1,
@@ -133,6 +136,35 @@ LegendThemeData(
 )''',
         ),
       ],
+    );
+  }
+}
+
+/// A self-contained live [LegendSegmented] (the wallet chart-timeframe
+/// picker) for the playground preview column. Its thumb color is themed
+/// by the panel's level-3 override.
+class _SegmentedPreview extends StatefulWidget {
+  const _SegmentedPreview();
+
+  @override
+  State<_SegmentedPreview> createState() => _SegmentedPreviewState();
+}
+
+class _SegmentedPreviewState extends State<_SegmentedPreview> {
+  String _timeframe = '1d';
+
+  @override
+  Widget build(BuildContext context) {
+    return LegendSegmented<String>(
+      segments: const [
+        LegendSegment(value: '1h', label: '1H'),
+        LegendSegment(value: '1d', label: '1D'),
+        LegendSegment(value: '1w', label: '1W'),
+        LegendSegment(value: '1m', label: '1M'),
+        LegendSegment(value: '1y', label: '1Y'),
+      ],
+      value: _timeframe,
+      onChanged: (value) => setState(() => _timeframe = value),
     );
   }
 }
