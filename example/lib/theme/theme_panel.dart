@@ -233,6 +233,12 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setSegmentedThumb,
           ),
 
+          ColorField(
+            label: 'Slider active-track color',
+            value: controller.sliderActiveTrack,
+            onChanged: controller.setSliderActiveTrack,
+          ),
+
           const LegendDivider(),
           SecondaryLegendButton(
             text: 'Reset everything',
