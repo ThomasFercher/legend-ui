@@ -1977,7 +1977,8 @@ void main() {
     // semibold, not plain prose.
     bool hasTicket(InlineSpan span) =>
         span is TextSpan &&
-        ((span.text == '#LEG-42' && span.style?.fontWeight == FontWeight.w600) ||
+        ((span.text == '#LEG-42' &&
+                span.style?.fontWeight == FontWeight.w600) ||
             (span.children ?? const []).any(hasTicket));
     final texts = tester.widgetList<Text>(
       find.descendant(
