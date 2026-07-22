@@ -295,6 +295,12 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setMarkdownLinkColor,
           ),
 
+          ColorField(
+            label: 'Code-block panel fill (LegendCodeBlock.background)',
+            value: controller.codeBlockBackground,
+            onChanged: controller.setCodeBlockBackground,
+          ),
+
           const LegendDivider(),
           SecondaryLegendButton(
             text: 'Reset everything',

@@ -90,6 +90,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendCombobox]'s option-highlight color.
   Color? comboboxHighlight;
 
+  /// Level-3 override for [LegendCodeBlock]'s panel fill.
+  Color? codeBlockBackground;
+
   /// Level-3 override for [LegendNumberField]'s stepper-arrow color.
   Color? numberStepperColor;
 
@@ -246,6 +249,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setCodeBlockBackground(Color? value) {
+    codeBlockBackground = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -276,6 +284,7 @@ class ThemeController extends ChangeNotifier {
     drawerWidth = null;
     comboboxHighlight = null;
     numberStepperColor = null;
+    codeBlockBackground = null;
     notifyListeners();
   }
 
@@ -460,6 +469,11 @@ class ThemeController extends ChangeNotifier {
         if (numberStepperColor != null)
           LegendNumberField: LegendNumberFieldThemeNullable(
             stepperForeground: numberStepperColor,
+          ),
+        // LegendCodeBlock's panel fill.
+        if (codeBlockBackground != null)
+          LegendCodeBlock: LegendCodeBlockThemeNullable(
+            background: codeBlockBackground,
           ),
       },
     );
