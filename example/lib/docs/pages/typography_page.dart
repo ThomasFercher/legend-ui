@@ -27,6 +27,50 @@ LegendMarkdown(source, onTapLink: open);
 | Links     | linkColor |
 ''';
 
+/// The RFC-005 editor demo: a live [LegendMarkdownEditor] with the
+/// [LegendMarkdown] renderer composed beside it as the preview.
+class _MarkdownEditorDemo extends StatefulWidget {
+  const _MarkdownEditorDemo();
+
+  @override
+  State<_MarkdownEditorDemo> createState() => _MarkdownEditorDemoState();
+}
+
+class _MarkdownEditorDemoState extends State<_MarkdownEditorDemo> {
+  final _controller = LegendMarkdownEditingController(
+    text:
+        '# Draft\n\nEdit the **source** on the left — the *preview* '
+        'follows.\n\n- lists continue on Enter\n- `Tab` indents\n\n'
+        '```dart\nfinal spans = styleOnly(source);\n```',
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = LegendTheme.of(context).tokens;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: tokens.sizes.md,
+      children: [
+        Expanded(
+          child: LegendMarkdownEditor(
+            controller: _controller,
+            placeholder: 'Write markdown…',
+            minLines: 8,
+            onChanged: (_) => setState(() {}),
+          ),
+        ),
+        Expanded(child: LegendMarkdown(_controller.text)),
+      ],
+    );
+  }
+}
+
 class TypographyPage extends StatelessWidget {
   const TypographyPage({super.key});
 
@@ -127,6 +171,28 @@ LegendMarkdown(
     ),
   ],
 )''',
+        ),
+        const DocSection(
+          title: 'Markdown editor',
+          description:
+              'LegendMarkdownEditor is a plain markdown source editor '
+              '(RFC-005): the value is always the source text, styled in '
+              'place while you type. Enter continues lists, Tab/Shift-Tab '
+              'indent, Cmd/Ctrl+B and +I toggle marks. The preview beside '
+              'it is app-level composition — the same LegendMarkdown '
+              'renderer fed the controller text.',
+          demo: _MarkdownEditorDemo(),
+          code: '''
+final controller = LegendMarkdownEditingController(text: source);
+
+LegendMarkdownEditor(
+  controller: controller,
+  placeholder: 'Write markdown…',
+  onChanged: (source) => setState(() {}),
+)
+
+// The live preview is the renderer, composed beside the editor:
+LegendMarkdown(controller.text)''',
         ),
         const DocSection(
           title: 'Code block',

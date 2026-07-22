@@ -344,6 +344,14 @@ class ThemePanel extends StatelessWidget {
           ),
 
           ColorField(
+            label:
+                'Markdown editor mark color '
+                '(LegendMarkdownEditor.syntaxMarkColor)',
+            value: controller.editorSyntaxMarkColor,
+            onChanged: controller.setEditorSyntaxMarkColor,
+          ),
+
+          ColorField(
             label: 'Code-block panel fill (LegendCodeBlock.background)',
             value: controller.codeBlockBackground,
             onChanged: controller.setCodeBlockBackground,
