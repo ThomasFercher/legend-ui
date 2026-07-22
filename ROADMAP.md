@@ -3,6 +3,8 @@
 Phases per [docs/DESIGN.md](docs/DESIGN.md) §8. Check items off as they land; add regression-test references when closing legacy bugs (DESIGN §1 / legacy-docs 01 §4.2).
 
 > **2026-07-09 — direction set**: the kit is rebranded **Legend UI** (`legend_ui`/`legend_gen`, `Legend*` symbols). Next milestone: the **showcase/playground** (below). Distribution decision deferred; screenshot goldens deferred until visual regressions bite.
+>
+> **2026-07-23 — catalog complete**: RFC-002–005 all landed. RFC-004 widget expansion Waves 0–3 (30+ components) + RFC-005 `LegendMarkdownEditor` shipped, and Phase 2.7 grew the example app to a live instance of every widget plus a manifest-driven Theme Explorer. Suites: kit 690 · generator 115 · example 44. Only `LegendQrCode` is parked (QR-encode dep needs sign-off). Next: the two flagship apps (crypto wallet, AI workspace) and the flagged follow-ups (success/warning token pair, CodeBlock↔CopyButton / Markdown-fence dedups).
 
 ## Phase 0 — validate the theory
 

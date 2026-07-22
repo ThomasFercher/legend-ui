@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.0-dev.6 (unreleased) — widget expansion (RFC-004/005) + full playground
+
+- **RFC-004 widget catalog, Waves 0–3 complete** — 30+ new components, each built by an agent under the committed `legend-widget-author` spec and merged one at a time behind the strict gate:
+  - **Foundations**: `LegendSelectionControl` (shared checked/pressed/focus base), `LegendPopover` (positioned surface over the anchored-overlay engine).
+  - **Selection**: `LegendCheckbox`, `LegendRadio`/`LegendRadioGroup`, `LegendSegmented`, `LegendChip` — all on `LegendSelectionControl`.
+  - **Inputs**: `LegendCombobox` (typeahead), `LegendNumberField` (decimal + stepper), `LegendPinField` (fixed-length code), `LegendSlider`.
+  - **Data display & layout**: `LegendList`/`LegendListItem`, `LegendBadge`, `LegendAvatar`, `LegendStat`, `LegendTabs`, `LegendAccordion`, `LegendSplitPane`, `LegendSteps`, `LegendTimeline`, `LegendBreadcrumb`, `LegendPagination`, `LegendEmpty`, `LegendProgress`.
+  - **Overlays**: `LegendTooltip`, `LegendMenu` (button-anchored), `LegendDrawer` (edge/bottom sheet with drag-dismiss).
+  - **Feedback**: `LegendBanner` (persistent inline alert).
+  - **Wallet/workspace utilities**: `LegendCopyButton`, `LegendAddress` (copy + truncation), `LegendCodeBlock`.
+  - Parked: `LegendQrCode` — awaits maintainer sign-off on a QR-encode dependency.
+- **RFC-005 `LegendMarkdownEditor`** — an in-house editable markdown surface on `LegendFieldCore`: a style-only `buildTextSpan` controller (never mutates source; exact round-trip), an incremental tokenizer, and an **extensible `LegendMarkdownSyntax` registry shared with the `LegendMarkdown` renderer** so domain-specific notations highlight in the editor and render in the reader from one registration. Ships with `LegendMarkdown` (block renderer: lists/tables/headings/code over `LegendText.rich`).
+- **Playground expansion (RFC-002 step-D relaunch)** — every shipped widget now has a live, interactive instance in the example app's preview column, and a new manifest-driven **Theme Explorer** configures all 54 components straight from their generated `*.docs.g.dart` manifests (type-dispatched editors → sparse level-3 overrides in the open `components` map). 48 generated theme-surface tables and a custom-syntax editor demo close the docs gaps.
+- Suites: kit 690 · generator 115 · example 44 tests, `flutter analyze` clean, all `legend_gen --check` fresh.
+
 ## 1.0.0-dev.5 (unreleased) — docs site + playground
 
 - `example/` is now the **Legend UI documentation site**: eleven doc pages (getting started, theming concepts, buttons, typography, inputs & forms, selection, overlays, layout, feedback, shell, playground) with live demos, code snippets, and themed-property tables.
