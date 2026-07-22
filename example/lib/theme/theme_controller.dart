@@ -1,3 +1,4 @@
+import 'package:example/docs/manifest_registry.dart';
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/legend_ui.dart';
 
@@ -122,6 +123,36 @@ class ThemeController extends ChangeNotifier {
 
   /// Level-3 override for [LegendStat]'s positive-delta color.
   Color? statPositiveColor;
+
+  /// Sparse per-member overrides registered by the manifest-driven theme
+  /// explorer, keyed by widget type then manifest dot-path name (e.g.
+  /// `background.hovered`). Compiled into the components map by [data]
+  /// through [compileOverride] — the same level-3 mechanism as the
+  /// hand-written knobs above, with zero per-field code.
+  final Map<Type, Map<String, Object?>> memberOverrides = {};
+
+  /// The explorer's current override for [type]'s manifest entry [name],
+  /// or null when the theme default applies.
+  Object? memberValue(Type type, String name) => memberOverrides[type]?[name];
+
+  /// Writes (or, with null, clears) the explorer override for [type]'s
+  /// manifest entry [name].
+  void setMember(Type type, String name, Object? value) {
+    final members = memberOverrides.putIfAbsent(type, () => {});
+    if (value == null) {
+      members.remove(name);
+      if (members.isEmpty) memberOverrides.remove(type);
+    } else {
+      members[name] = value;
+    }
+    notifyListeners();
+  }
+
+  /// Drops every explorer override registered for [type].
+  void clearMembers(Type type) {
+    memberOverrides.remove(type);
+    notifyListeners();
+  }
 
   bool get dark => preset == ThemePreset.dark;
 
@@ -366,6 +397,7 @@ class ThemeController extends ChangeNotifier {
     splitPaneDivider = null;
     statPositiveColor = null;
     codeBlockBackground = null;
+    memberOverrides.clear();
     notifyListeners();
   }
 
@@ -424,186 +456,191 @@ class ThemeController extends ChangeNotifier {
       ),
     );
 
-    return LegendThemeData(
-      tokens: tokens,
-      components: {
-        // The open Type-keyed registry (level 3): sparse overrides only —
-        // unset properties keep resolving through the lower levels.
-        if (buttonBackground != null)
-          // Keyed by the widget type — the natural key form (RFC-002 R3).
-          PrimaryLegendButton: PrimaryLegendButtonThemeNullable(
-            background: buttonBackground == null
-                ? null
-                : InteractiveColors(normal: buttonBackground),
-          ),
-        // The shared button surface (RFC-002 R7.2): one core-level entry
-        // restyles the radius of every variant that doesn't opt out.
-        if (buttonRadius != null)
-          LegendButtonCore: LegendButtonCoreThemeNullable(
-            borderRadius: BorderRadius.circular(buttonRadius!),
-          ),
-        // LegendBody's centered reading-column width (RFC-003).
-        if (bodyMaxContentWidth != null)
-          LegendBody: LegendBodyThemeNullable(
-            maxContentWidth: bodyMaxContentWidth,
-          ),
-        // LegendVerticalMenu's selected-item color.
-        if (menuSelectedColor != null)
-          LegendVerticalMenu: LegendVerticalMenuThemeNullable(
-            selectedColor: menuSelectedColor,
-          ),
-        // LegendPopover's floating-panel corner radius.
-        if (popoverRadius != null)
-          LegendPopover: LegendPopoverThemeNullable(
-            borderRadius: BorderRadius.circular(popoverRadius!),
-          ),
-        // LegendChip's selected fill — a sparse InteractiveColors: only
-        // `normal` is set, the other states keep resolving downward.
-        if (chipSelectedBackground != null)
-          LegendChip: LegendChipThemeNullable(
-            selectedBackground: InteractiveColors(
-              normal: chipSelectedBackground,
-            ),
-          ),
-        // LegendTabs' active-indicator color.
-        if (tabsIndicator != null)
-          LegendTabs: LegendTabsThemeNullable(indicator: tabsIndicator),
-        // LegendBanner's info-severity strip fill.
-        if (bannerBackground != null)
-          LegendBanner: LegendBannerThemeNullable(
-            infoBackground: bannerBackground,
-          ),
-        // LegendTooltip's hover show delay.
-        if (tooltipShowDelay != null)
-          LegendTooltip: LegendTooltipThemeNullable(
-            showDelay: tooltipShowDelay,
-          ),
-        // LegendListItem's selected-row fill.
-        if (listSelectedBackground != null)
-          LegendListItem: LegendListItemThemeNullable(
-            selectedBackground: listSelectedBackground,
-          ),
-        // LegendBadge's fill.
-        if (badgeBackground != null)
-          LegendBadge: LegendBadgeThemeNullable(background: badgeBackground),
-        // LegendProgress's completed-fill color.
-        if (progressFill != null)
-          LegendProgress: LegendProgressThemeNullable(fill: progressFill),
-        // LegendCheckbox's checked box fill — a sparse InteractiveColors:
-        // hover/press/disabled keep deriving from the lower levels.
-        if (checkboxFill != null)
-          LegendCheckbox: LegendCheckboxThemeNullable(
-            box: InteractiveColors(normal: checkboxFill),
-          ),
-        // LegendRadio's selected circle fill — a sparse InteractiveColors:
-        // hover/press/disabled keep deriving from the lower levels.
-        if (radioFill != null)
-          LegendRadio: LegendRadioThemeNullable(
-            fill: InteractiveColors(normal: radioFill),
-          ),
-        // LegendAvatar's shape — circle by default, squircle/square here.
-        if (avatarRadius != null)
-          LegendAvatar: LegendAvatarThemeNullable(
-            borderRadius: BorderRadius.circular(avatarRadius!),
-          ),
-        // LegendMarkdown's link color (text and underline together).
-        if (markdownLinkColor != null)
-          LegendMarkdown: LegendMarkdownThemeNullable(
-            linkColor: markdownLinkColor,
-          ),
-        // LegendMarkdownEditor's muted syntax-mark color (the #, **, and
-        // backtick characters in the source).
-        if (editorSyntaxMarkColor != null)
-          LegendMarkdownEditor: LegendMarkdownEditorThemeNullable(
-            syntaxMarkColor: editorSyntaxMarkColor,
-          ),
-        // LegendSegmented's selected-segment thumb (the sparse per-state
-        // bundle: unset states keep deriving through the overlays).
-        if (segmentedThumb != null)
-          LegendSegmented: LegendSegmentedThemeNullable(
-            thumb: InteractiveColors(normal: segmentedThumb),
-          ),
-        // LegendSlider's active-track (filled-portion) color.
-        if (sliderActiveTrack != null)
-          LegendSlider: LegendSliderThemeNullable(
-            activeTrack: sliderActiveTrack,
-          ),
-        // LegendMenu's destructive-item label color.
-        if (menuDestructiveColor != null)
-          LegendMenu: LegendMenuThemeNullable(
-            destructiveColor: menuDestructiveColor,
-          ),
-        // LegendAccordion's section background (the sparse per-state
-        // bundle: unset states keep deriving through the overlays).
-        if (accordionBackground != null)
-          LegendAccordion: LegendAccordionThemeNullable(
-            background: InteractiveColors(normal: accordionBackground),
-          ),
-        // LegendEmpty's zero-state glyph color (inherited via IconTheme).
-        if (emptyIconColor != null)
-          LegendEmpty: LegendEmptyThemeNullable(iconColor: emptyIconColor),
-        // LegendDrawer's side-drawer width.
-        if (drawerWidth != null)
-          LegendDrawer: LegendDrawerThemeNullable(width: drawerWidth),
-        // LegendCombobox's option highlight — a sparse InteractiveColors:
-        // only `hovered` is set (the pointer/keyboard highlight), the
-        // panel fill keeps resolving downward.
-        if (comboboxHighlight != null)
-          LegendCombobox: LegendComboboxThemeNullable(
-            menuBackground: InteractiveColors(hovered: comboboxHighlight),
-          ),
-        // LegendNumberField's stepper-arrow color.
-        if (numberStepperColor != null)
-          LegendNumberField: LegendNumberFieldThemeNullable(
-            stepperForeground: numberStepperColor,
-          ),
-        // LegendCopyButton's post-copy check color (LegendAddress's
-        // built-in copy affordance follows it too).
-        if (copyConfirmationColor != null)
-          LegendCopyButton: LegendCopyButtonThemeNullable(
-            confirmationColor: copyConfirmationColor,
-          ),
-        // LegendPinField's active-cell (focused) border color.
-        if (pinActiveBorder != null)
-          LegendPinField: LegendPinFieldThemeNullable(
-            focusedBorderColor: pinActiveBorder,
-          ),
-        // LegendSteps' completed-indicator fill (behind the check).
-        if (stepsCompletedColor != null)
-          LegendSteps: LegendStepsThemeNullable(
-            completedColor: stepsCompletedColor,
-          ),
-        // LegendTimeline's default dot-indicator fill.
-        if (timelineIndicatorColor != null)
-          LegendTimeline: LegendTimelineThemeNullable(
-            indicatorColor: timelineIndicatorColor,
-          ),
-        // LegendBreadcrumb's separator-chevron color.
-        if (breadcrumbSeparatorColor != null)
-          LegendBreadcrumb: LegendBreadcrumbThemeNullable(
-            separatorColor: breadcrumbSeparatorColor,
-          ),
-        // LegendPagination's current-page fill — a sparse
-        // InteractiveColors: only `normal` is set, the other states keep
-        // resolving downward.
-        if (paginationSelectedFill != null)
-          LegendPagination: LegendPaginationThemeNullable(
-            selectedFill: InteractiveColors(normal: paginationSelectedFill),
-          ),
-        // LegendSplitPane's at-rest divider-line color.
-        if (splitPaneDivider != null)
-          LegendSplitPane: LegendSplitPaneThemeNullable(
-            divider: splitPaneDivider,
-          ),
-        // LegendStat's upward-delta color.
-        if (statPositiveColor != null)
-          LegendStat: LegendStatThemeNullable(positiveColor: statPositiveColor),
-        // LegendCodeBlock's panel fill.
-        if (codeBlockBackground != null)
-          LegendCodeBlock: LegendCodeBlockThemeNullable(
-            background: codeBlockBackground,
-          ),
-      },
-    );
+    final components = <Type, Object>{
+      // The open Type-keyed registry (level 3): sparse overrides only —
+      // unset properties keep resolving through the lower levels.
+      if (buttonBackground != null)
+        // Keyed by the widget type — the natural key form (RFC-002 R3).
+        PrimaryLegendButton: PrimaryLegendButtonThemeNullable(
+          background: buttonBackground == null
+              ? null
+              : InteractiveColors(normal: buttonBackground),
+        ),
+      // The shared button surface (RFC-002 R7.2): one core-level entry
+      // restyles the radius of every variant that doesn't opt out.
+      if (buttonRadius != null)
+        LegendButtonCore: LegendButtonCoreThemeNullable(
+          borderRadius: BorderRadius.circular(buttonRadius!),
+        ),
+      // LegendBody's centered reading-column width (RFC-003).
+      if (bodyMaxContentWidth != null)
+        LegendBody: LegendBodyThemeNullable(
+          maxContentWidth: bodyMaxContentWidth,
+        ),
+      // LegendVerticalMenu's selected-item color.
+      if (menuSelectedColor != null)
+        LegendVerticalMenu: LegendVerticalMenuThemeNullable(
+          selectedColor: menuSelectedColor,
+        ),
+      // LegendPopover's floating-panel corner radius.
+      if (popoverRadius != null)
+        LegendPopover: LegendPopoverThemeNullable(
+          borderRadius: BorderRadius.circular(popoverRadius!),
+        ),
+      // LegendChip's selected fill — a sparse InteractiveColors: only
+      // `normal` is set, the other states keep resolving downward.
+      if (chipSelectedBackground != null)
+        LegendChip: LegendChipThemeNullable(
+          selectedBackground: InteractiveColors(normal: chipSelectedBackground),
+        ),
+      // LegendTabs' active-indicator color.
+      if (tabsIndicator != null)
+        LegendTabs: LegendTabsThemeNullable(indicator: tabsIndicator),
+      // LegendBanner's info-severity strip fill.
+      if (bannerBackground != null)
+        LegendBanner: LegendBannerThemeNullable(
+          infoBackground: bannerBackground,
+        ),
+      // LegendTooltip's hover show delay.
+      if (tooltipShowDelay != null)
+        LegendTooltip: LegendTooltipThemeNullable(showDelay: tooltipShowDelay),
+      // LegendListItem's selected-row fill.
+      if (listSelectedBackground != null)
+        LegendListItem: LegendListItemThemeNullable(
+          selectedBackground: listSelectedBackground,
+        ),
+      // LegendBadge's fill.
+      if (badgeBackground != null)
+        LegendBadge: LegendBadgeThemeNullable(background: badgeBackground),
+      // LegendProgress's completed-fill color.
+      if (progressFill != null)
+        LegendProgress: LegendProgressThemeNullable(fill: progressFill),
+      // LegendCheckbox's checked box fill — a sparse InteractiveColors:
+      // hover/press/disabled keep deriving from the lower levels.
+      if (checkboxFill != null)
+        LegendCheckbox: LegendCheckboxThemeNullable(
+          box: InteractiveColors(normal: checkboxFill),
+        ),
+      // LegendRadio's selected circle fill — a sparse InteractiveColors:
+      // hover/press/disabled keep deriving from the lower levels.
+      if (radioFill != null)
+        LegendRadio: LegendRadioThemeNullable(
+          fill: InteractiveColors(normal: radioFill),
+        ),
+      // LegendAvatar's shape — circle by default, squircle/square here.
+      if (avatarRadius != null)
+        LegendAvatar: LegendAvatarThemeNullable(
+          borderRadius: BorderRadius.circular(avatarRadius!),
+        ),
+      // LegendMarkdown's link color (text and underline together).
+      if (markdownLinkColor != null)
+        LegendMarkdown: LegendMarkdownThemeNullable(
+          linkColor: markdownLinkColor,
+        ),
+      // LegendMarkdownEditor's muted syntax-mark color (the #, **, and
+      // backtick characters in the source).
+      if (editorSyntaxMarkColor != null)
+        LegendMarkdownEditor: LegendMarkdownEditorThemeNullable(
+          syntaxMarkColor: editorSyntaxMarkColor,
+        ),
+      // LegendSegmented's selected-segment thumb (the sparse per-state
+      // bundle: unset states keep deriving through the overlays).
+      if (segmentedThumb != null)
+        LegendSegmented: LegendSegmentedThemeNullable(
+          thumb: InteractiveColors(normal: segmentedThumb),
+        ),
+      // LegendSlider's active-track (filled-portion) color.
+      if (sliderActiveTrack != null)
+        LegendSlider: LegendSliderThemeNullable(activeTrack: sliderActiveTrack),
+      // LegendMenu's destructive-item label color.
+      if (menuDestructiveColor != null)
+        LegendMenu: LegendMenuThemeNullable(
+          destructiveColor: menuDestructiveColor,
+        ),
+      // LegendAccordion's section background (the sparse per-state
+      // bundle: unset states keep deriving through the overlays).
+      if (accordionBackground != null)
+        LegendAccordion: LegendAccordionThemeNullable(
+          background: InteractiveColors(normal: accordionBackground),
+        ),
+      // LegendEmpty's zero-state glyph color (inherited via IconTheme).
+      if (emptyIconColor != null)
+        LegendEmpty: LegendEmptyThemeNullable(iconColor: emptyIconColor),
+      // LegendDrawer's side-drawer width.
+      if (drawerWidth != null)
+        LegendDrawer: LegendDrawerThemeNullable(width: drawerWidth),
+      // LegendCombobox's option highlight — a sparse InteractiveColors:
+      // only `hovered` is set (the pointer/keyboard highlight), the
+      // panel fill keeps resolving downward.
+      if (comboboxHighlight != null)
+        LegendCombobox: LegendComboboxThemeNullable(
+          menuBackground: InteractiveColors(hovered: comboboxHighlight),
+        ),
+      // LegendNumberField's stepper-arrow color.
+      if (numberStepperColor != null)
+        LegendNumberField: LegendNumberFieldThemeNullable(
+          stepperForeground: numberStepperColor,
+        ),
+      // LegendCopyButton's post-copy check color (LegendAddress's
+      // built-in copy affordance follows it too).
+      if (copyConfirmationColor != null)
+        LegendCopyButton: LegendCopyButtonThemeNullable(
+          confirmationColor: copyConfirmationColor,
+        ),
+      // LegendPinField's active-cell (focused) border color.
+      if (pinActiveBorder != null)
+        LegendPinField: LegendPinFieldThemeNullable(
+          focusedBorderColor: pinActiveBorder,
+        ),
+      // LegendSteps' completed-indicator fill (behind the check).
+      if (stepsCompletedColor != null)
+        LegendSteps: LegendStepsThemeNullable(
+          completedColor: stepsCompletedColor,
+        ),
+      // LegendTimeline's default dot-indicator fill.
+      if (timelineIndicatorColor != null)
+        LegendTimeline: LegendTimelineThemeNullable(
+          indicatorColor: timelineIndicatorColor,
+        ),
+      // LegendBreadcrumb's separator-chevron color.
+      if (breadcrumbSeparatorColor != null)
+        LegendBreadcrumb: LegendBreadcrumbThemeNullable(
+          separatorColor: breadcrumbSeparatorColor,
+        ),
+      // LegendPagination's current-page fill — a sparse
+      // InteractiveColors: only `normal` is set, the other states keep
+      // resolving downward.
+      if (paginationSelectedFill != null)
+        LegendPagination: LegendPaginationThemeNullable(
+          selectedFill: InteractiveColors(normal: paginationSelectedFill),
+        ),
+      // LegendSplitPane's at-rest divider-line color.
+      if (splitPaneDivider != null)
+        LegendSplitPane: LegendSplitPaneThemeNullable(
+          divider: splitPaneDivider,
+        ),
+      // LegendStat's upward-delta color.
+      if (statPositiveColor != null)
+        LegendStat: LegendStatThemeNullable(positiveColor: statPositiveColor),
+      // LegendCodeBlock's panel fill.
+      if (codeBlockBackground != null)
+        LegendCodeBlock: LegendCodeBlockThemeNullable(
+          background: codeBlockBackground,
+        ),
+    };
+
+    // The theme explorer's manifest-driven overrides compile into the very
+    // same map — a sparse `XThemeNullable` per touched component, built by
+    // parameter name from the docs manifest. On a per-type collision with
+    // a hand-written knob above the explorer wins (it edits the same
+    // fields at finer grain).
+    for (final override in memberOverrides.entries) {
+      final component = playgroundComponentByType[override.key];
+      if (component == null) continue;
+      final compiled = compileOverride(component, override.value);
+      if (compiled != null) components[override.key] = compiled;
+    }
+
+    return LegendThemeData(tokens: tokens, components: components);
   }
 }
