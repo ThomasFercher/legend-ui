@@ -260,29 +260,31 @@ class _LegendSliderState extends State<LegendSlider> {
       value: _format(value),
       increasedValue: _format(_snap(value + _step)),
       decreasedValue: _format(_snap(value - _step)),
-      onIncrease: enabled
-          ? () => _adjust(_SliderAdjustment.increase)
-          : null,
-      onDecrease: enabled
-          ? () => _adjust(_SliderAdjustment.decrease)
-          : null,
+      onIncrease: enabled ? () => _adjust(_SliderAdjustment.increase) : null,
+      onDecrease: enabled ? () => _adjust(_SliderAdjustment.decrease) : null,
       // The slider node above is the whole story for assistive tech; the
       // primitive's inner button node would only misrepresent it.
       child: ExcludeSemantics(
         child: Shortcuts(
           shortcuts: const {
-            SingleActivator(LogicalKeyboardKey.arrowUp):
-                _AdjustSliderIntent(_SliderAdjustment.increase),
-            SingleActivator(LogicalKeyboardKey.arrowDown):
-                _AdjustSliderIntent(_SliderAdjustment.decrease),
-            SingleActivator(LogicalKeyboardKey.arrowLeft):
-                _AdjustSliderIntent(_SliderAdjustment.left),
-            SingleActivator(LogicalKeyboardKey.arrowRight):
-                _AdjustSliderIntent(_SliderAdjustment.right),
-            SingleActivator(LogicalKeyboardKey.home):
-                _AdjustSliderIntent(_SliderAdjustment.minimum),
-            SingleActivator(LogicalKeyboardKey.end):
-                _AdjustSliderIntent(_SliderAdjustment.maximum),
+            SingleActivator(LogicalKeyboardKey.arrowUp): _AdjustSliderIntent(
+              _SliderAdjustment.increase,
+            ),
+            SingleActivator(LogicalKeyboardKey.arrowDown): _AdjustSliderIntent(
+              _SliderAdjustment.decrease,
+            ),
+            SingleActivator(LogicalKeyboardKey.arrowLeft): _AdjustSliderIntent(
+              _SliderAdjustment.left,
+            ),
+            SingleActivator(LogicalKeyboardKey.arrowRight): _AdjustSliderIntent(
+              _SliderAdjustment.right,
+            ),
+            SingleActivator(LogicalKeyboardKey.home): _AdjustSliderIntent(
+              _SliderAdjustment.minimum,
+            ),
+            SingleActivator(LogicalKeyboardKey.end): _AdjustSliderIntent(
+              _SliderAdjustment.maximum,
+            ),
           },
           child: Actions(
             actions: {
@@ -405,12 +407,7 @@ class _SliderPainter extends CustomPainter {
     final center = Offset(radius + travel * visual, size.height / 2);
 
     final trackRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(
-        0,
-        center.dy - trackHeight / 2,
-        size.width,
-        trackHeight,
-      ),
+      Rect.fromLTWH(0, center.dy - trackHeight / 2, size.width, trackHeight),
       Radius.circular(trackHeight / 2),
     );
     canvas.drawRRect(trackRect, Paint()..color = track);

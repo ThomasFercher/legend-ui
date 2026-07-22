@@ -112,7 +112,7 @@ LegendTextField(
               const LegendSlider(value: 0.3, onChanged: null),
             ],
           ),
-          code: '''
+          code: r'''
 LegendSlider(
   value: volume,              // 0..1 by default
   semanticLabel: 'Volume',
@@ -123,7 +123,7 @@ LegendSlider(
   value: quality,
   max: 100,
   divisions: 10,              // snaps every delivered value
-  semanticFormatter: (v) => '\${v.round()} of 100',
+  semanticFormatter: (v) => '${v.round()} of 100',
   onChanged: (v) => setState(() => quality = v),
 )''',
         ),

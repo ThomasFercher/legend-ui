@@ -18,7 +18,9 @@ Widget _wrap(
     data: LegendThemeData(tokens: LegendTokens.light, components: components),
     child: Directionality(
       textDirection: direction,
-      child: Center(child: SizedBox(width: _width, child: child)),
+      child: Center(
+        child: SizedBox(width: _width, child: child),
+      ),
     ),
   );
 }
@@ -138,12 +140,7 @@ void main() {
       double? next;
       await tester.pumpWidget(
         _wrap(
-          LegendSlider(
-            value: 0,
-            min: -50,
-            max: 50,
-            onChanged: (v) => next = v,
-          ),
+          LegendSlider(value: 0, min: -50, max: 50, onChanged: (v) => next = v),
         ),
       );
       await tester.tapAt(_at(tester, 0.75));
@@ -246,19 +243,13 @@ void main() {
       expect(next, 0.75);
     });
 
-    testWidgets('RTL flips the left/right arrows, not up/down', (
-      tester,
-    ) async {
+    testWidgets('RTL flips the left/right arrows, not up/down', (tester) async {
       final node = FocusNode();
       addTearDown(node.dispose);
       double? next;
       await tester.pumpWidget(
         _wrap(
-          LegendSlider(
-            value: 0.4,
-            focusNode: node,
-            onChanged: (v) => next = v,
-          ),
+          LegendSlider(value: 0.4, focusNode: node, onChanged: (v) => next = v),
           direction: TextDirection.rtl,
         ),
       );
