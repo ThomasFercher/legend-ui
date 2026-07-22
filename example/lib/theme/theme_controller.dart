@@ -99,6 +99,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendNumberField]'s stepper-arrow color.
   Color? numberStepperColor;
 
+  /// Level-3 override for [LegendStat]'s positive-delta color.
+  Color? statPositiveColor;
+
   bool get dark => preset == ThemePreset.dark;
 
   void setPreset(ThemePreset value) {
@@ -262,6 +265,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setStatPositiveColor(Color? value) {
+    statPositiveColor = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -294,6 +302,7 @@ class ThemeController extends ChangeNotifier {
     numberStepperColor = null;
     stepsCompletedColor = null;
     timelineIndicatorColor = null;
+    statPositiveColor = null;
     notifyListeners();
   }
 
@@ -489,6 +498,9 @@ class ThemeController extends ChangeNotifier {
           LegendTimeline: LegendTimelineThemeNullable(
             indicatorColor: timelineIndicatorColor,
           ),
+        // LegendStat's upward-delta color.
+        if (statPositiveColor != null)
+          LegendStat: LegendStatThemeNullable(positiveColor: statPositiveColor),
       },
     );
   }

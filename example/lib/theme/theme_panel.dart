@@ -272,6 +272,11 @@ class ThemePanel extends StatelessWidget {
             value: controller.timelineIndicatorColor,
             onChanged: controller.setTimelineIndicatorColor,
           ),
+          ColorField(
+            label: 'Stat positive-delta color (LegendStat.positiveColor)',
+            value: controller.statPositiveColor,
+            onChanged: controller.setStatPositiveColor,
+          ),
 
           ColorField(
             label: 'Slider active-track color',

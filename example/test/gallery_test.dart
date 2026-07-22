@@ -360,6 +360,89 @@ void main() {
     expect(find.bySemanticsLabel('Online'), findsOneWidget);
   });
 
+  testWidgets('layout page: stat demo shows deltas in direction colors', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const DocsApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Layout'));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.text(r'$12,480.30'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    const tokens = LegendTokens.light;
+    final up = tester.widget<Text>(find.text('4.2%'));
+    expect(up.style?.color, tokens.colors.secondary);
+    final down = tester.widget<Text>(find.text('1.8%'));
+    expect(down.style?.color, tokens.colors.error);
+    final flat = tester.widget<Text>(find.text('0.0%'));
+    expect(flat.style?.color, tokens.colors.foreground2);
+    // One merged node per stat, with the arrow spoken as a direction.
+    expect(
+      find.bySemanticsLabel('Balance\n\$12,480.30\nup 4.2%\nvs last week'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('playground: stat positive-color knob restyles the live stat', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's stat swatch.
+    await tester.scrollUntilVisible(
+      find.text('Stat positive-delta color (LegendStat.positiveColor)'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(
+      find.bySemanticsLabel(
+        'Stat positive-delta color (LegendStat.positiveColor) #D97706',
+      ),
+    );
+    await settleTheme();
+    await tester.tap(
+      find.bySemanticsLabel(
+        'Stat positive-delta color (LegendStat.positiveColor) #D97706',
+      ),
+    );
+    await settleTheme();
+
+    // The live stat's upward delta in the preview column picks it up; the
+    // downward one keeps its token color.
+    await tester.scrollUntilVisible(
+      find.text('4.2%'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    final up = tester.widget<Text>(find.text('4.2%'));
+    expect(up.style?.color, const Color(0xFFD97706));
+    final down = tester.widget<Text>(find.text('1.8%'));
+    expect(down.style?.color, LegendTokens.light.colors.error);
+  });
+
   testWidgets('playground: badge background knob restyles the live badge', (
     tester,
   ) async {
