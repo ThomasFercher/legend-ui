@@ -2,6 +2,31 @@ import 'package:example/docs/doc_page.dart';
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/legend_ui.dart';
 
+/// The rich sample document for the LegendMarkdown demo — one instance of
+/// every supported construct.
+const _sampleMarkdown = '''
+## Release notes
+
+Legend UI ships a **markdown renderer** — *token-themed*, ~~Material~~
+Material-free, with `LegendText.rich` spans and a [syntax registry](https://legend.app/docs).
+
+> The renderer is slice 1 of the RFC-005 editor track.
+
+1. Parse with `package:markdown`
+2. Walk the AST
+   - inline nodes become spans
+   - block nodes become widgets
+
+```dart
+LegendMarkdown(source, onTapLink: open);
+```
+
+| Construct | Themed by |
+|-----------|-----------|
+| Headings  | type scale |
+| Links     | linkColor |
+''';
+
 class TypographyPage extends StatelessWidget {
   const TypographyPage({super.key});
 
@@ -79,6 +104,29 @@ LegendText('Body 1 — the default reading size.')''',
                 ),
             ],
           ),
+        ),
+        DocSection(
+          title: 'Markdown',
+          description:
+              'LegendMarkdown renders read-only markdown source as themed '
+              'blocks and LegendText.rich spans — headings map onto the '
+              'token type scale, and everything stays selectable. Custom '
+              'notation (RFC-005) registers through LegendMarkdownSyntax; '
+              'link taps surface through onTapLink.',
+          demo: LegendMarkdown(_sampleMarkdown, onTapLink: (_) {}),
+          code: r'''
+LegendMarkdown(
+  source,
+  onTapLink: (href) => launch(href),
+  syntaxes: [
+    LegendMarkdownSyntax.inline(
+      tag: 'lawRef',
+      parser: LawRefSyntax(),           // a md.InlineSyntax
+      builder: (context, element, style) =>
+          TextSpan(text: '§ ${element.textContent}'),
+    ),
+  ],
+)''',
         ),
         DocSection(
           title: 'Size tokens (live)',

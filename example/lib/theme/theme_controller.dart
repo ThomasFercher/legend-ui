@@ -66,6 +66,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendAvatar]'s corner radius.
   double? avatarRadius;
 
+  /// Level-3 override for [LegendMarkdown]'s link color.
+  Color? markdownLinkColor;
+
   /// Level-3 override for [LegendSegmented]'s selected-segment thumb color.
   Color? segmentedThumb;
 
@@ -198,6 +201,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setMarkdownLinkColor(Color? value) {
+    markdownLinkColor = value;
+    notifyListeners();
+  }
+
   void setSegmentedThumb(Color? value) {
     segmentedThumb = value;
     notifyListeners();
@@ -259,6 +267,7 @@ class ThemeController extends ChangeNotifier {
     checkboxFill = null;
     radioFill = null;
     avatarRadius = null;
+    markdownLinkColor = null;
     segmentedThumb = null;
     sliderActiveTrack = null;
     menuDestructiveColor = null;
@@ -406,6 +415,11 @@ class ThemeController extends ChangeNotifier {
         if (avatarRadius != null)
           LegendAvatar: LegendAvatarThemeNullable(
             borderRadius: BorderRadius.circular(avatarRadius!),
+          ),
+        // LegendMarkdown's link color (text and underline together).
+        if (markdownLinkColor != null)
+          LegendMarkdown: LegendMarkdownThemeNullable(
+            linkColor: markdownLinkColor,
           ),
         // LegendSegmented's selected-segment thumb (the sparse per-state
         // bundle: unset states keep deriving through the overlays).

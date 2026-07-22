@@ -289,6 +289,12 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setDrawerWidth,
           ),
 
+          ColorField(
+            label: 'Markdown link color (LegendMarkdown.linkColor)',
+            value: controller.markdownLinkColor,
+            onChanged: controller.setMarkdownLinkColor,
+          ),
+
           const LegendDivider(),
           SecondaryLegendButton(
             text: 'Reset everything',

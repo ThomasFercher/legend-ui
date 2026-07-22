@@ -210,6 +210,15 @@ class PlaygroundPage extends StatelessWidget {
                   ),
                 ),
               ),
+              // A live LegendMarkdown — its link color follows the theme
+              // panel's knob (level-3 override); headings and code ride
+              // the token scale directly.
+              LegendMarkdown(
+                'A **markdown** document with `code` and '
+                '[a link](https://legend.app) whose color follows the '
+                'markdown knob in the theme panel.',
+                onTapLink: (_) {},
+              ),
               // Live LegendChips — the selected fill follows the theme
               // panel's knob (level-3 override).
               const _ChipPreview(),

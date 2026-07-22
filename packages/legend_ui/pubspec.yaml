@@ -13,6 +13,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  # The one approved parser dependency (RFC-005 §2): pure Dart, BSD-3,
+  # verified publisher tools.dart.dev. Used for the AST only — never for
+  # HTML output.
+  markdown: ^7.3.1
   meta: ^1.15.0
 
 dev_dependencies:
