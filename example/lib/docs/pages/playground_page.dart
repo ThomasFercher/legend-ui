@@ -49,6 +49,9 @@ class PlaygroundPage extends StatelessWidget {
                 title: 'Text field',
                 placeholder: 'Type here',
               ),
+              // A live LegendNumberField — its stepper-arrow color follows
+              // the theme panel's knob (level-3 override).
+              const _NumberFieldPreview(),
               LegendDropdown<int>(
                 placeholder: 'Dropdown',
                 items: const [
@@ -303,6 +306,33 @@ class _ComboboxPreviewState extends State<_ComboboxPreview> {
       value: _token,
       placeholder: 'Combobox — type to filter',
       onChanged: (value) => setState(() => _token = value),
+    );
+  }
+}
+
+/// A self-contained live [LegendNumberField] for the playground preview
+/// column. Its stepper-arrow color is themed by the panel's level-3
+/// override.
+class _NumberFieldPreview extends StatefulWidget {
+  const _NumberFieldPreview();
+
+  @override
+  State<_NumberFieldPreview> createState() => _NumberFieldPreviewState();
+}
+
+class _NumberFieldPreviewState extends State<_NumberFieldPreview> {
+  double? _value = 2.5;
+
+  @override
+  Widget build(BuildContext context) {
+    return LegendNumberField(
+      title: 'Number field',
+      value: _value,
+      min: 0,
+      max: 100,
+      step: 0.5,
+      placeholder: '0',
+      onChanged: (value) => setState(() => _value = value),
     );
   }
 }

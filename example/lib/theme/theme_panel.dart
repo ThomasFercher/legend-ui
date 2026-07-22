@@ -242,6 +242,13 @@ class ThemePanel extends StatelessWidget {
             value: controller.comboboxHighlight,
             onChanged: controller.setComboboxHighlight,
           ),
+          ColorField(
+            label:
+                'Number-field stepper color '
+                '(LegendNumberField.stepperForeground)',
+            value: controller.numberStepperColor,
+            onChanged: controller.setNumberStepperColor,
+          ),
 
           ColorField(
             label: 'Empty-state icon color (LegendEmpty.iconColor)',

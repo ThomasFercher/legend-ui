@@ -1026,4 +1026,58 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('playground: number-field stepper knob recolors the live '
+      'stepper arrows', (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's number-field knob.
+    await tester.scrollUntilVisible(
+      find.textContaining('Number-field stepper color'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('Number-field stepper color .*#8B5CF6')),
+    );
+    await settleTheme();
+    await tester.tap(
+      find.bySemanticsLabel(RegExp('Number-field stepper color .*#8B5CF6')),
+    );
+    await settleTheme();
+
+    // The live number field in the preview column picks it up on both
+    // stepper arrows.
+    await tester.scrollUntilVisible(
+      find.byType(LegendNumberField),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    final carets = tester.widgetList<LegendCaret>(
+      find.descendant(
+        of: find.byType(LegendNumberField),
+        matching: find.byType(LegendCaret),
+      ),
+    );
+    expect(carets, hasLength(2));
+    expect(
+      carets.every((caret) => caret.color == const Color(0xFF8B5CF6)),
+      isTrue,
+    );
+  });
 }
