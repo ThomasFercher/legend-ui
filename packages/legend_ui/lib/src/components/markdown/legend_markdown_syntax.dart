@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:legend_ui/src/components/markdown/legend_markdown_source_style.dart';
 import 'package:markdown/markdown.dart' as md;
 
 /// Builds the [InlineSpan] for a custom inline [md.Element] emitted by a
@@ -17,11 +18,37 @@ typedef LegendMarkdownSpanBuilder =
 typedef LegendMarkdownWidgetBuilder =
     Widget Function(BuildContext context, md.Element element);
 
+/// Computes the editor style of a custom notation's matched source
+/// characters. [base] is the fully resolved style at the match's position
+/// (heading/quote context already applied); [style] is the editor's
+/// resolved [LegendMarkdownSourceStyle], so a notation can reuse the
+/// kit-themed link or mark colors.
+typedef LegendMarkdownHighlightStyle =
+    TextStyle Function(TextStyle base, LegendMarkdownSourceStyle style);
+
+/// The editor-side highlight rule of a [LegendMarkdownSyntax] (RFC-005
+/// §3.3): a line-local pattern the `LegendMarkdownEditingController`
+/// highlighter matches inside prose runs, and the style its matched
+/// characters render in. The pattern never alters the source — the editor
+/// styles the matched characters in place, marks included.
+class LegendMarkdownHighlight {
+  /// [pattern] is a regular-expression source matched within a single
+  /// line (multiline notations highlight per line).
+  LegendMarkdownHighlight({required String pattern, required this.style})
+    : pattern = RegExp(pattern);
+
+  /// The compiled line-local match pattern.
+  final RegExp pattern;
+
+  /// The style of the matched characters.
+  final LegendMarkdownHighlightStyle style;
+}
+
 /// One custom markdown notation — a parse hook plus a render hook,
 /// registered once and consumed by every markdown consumer in the kit
-/// (RFC-005 §3.3): today the read-only `LegendMarkdown` renderer, later the
-/// editor's highlighter, so a notation can never diverge between editing
-/// and rendering.
+/// (RFC-005 §3.3): the read-only `LegendMarkdown` renderer and the
+/// `LegendMarkdownEditor` highlighter, so a notation can never diverge
+/// between editing and rendering.
 ///
 /// The parse hook is a plain `package:markdown` [md.InlineSyntax] /
 /// [md.BlockSyntax] subclass emitting an [md.Element] whose tag is [tag];
@@ -50,25 +77,30 @@ typedef LegendMarkdownWidgetBuilder =
 /// )
 /// ```
 ///
-/// The editor's highlight rule (RFC-005 §3.3) will slot in here as an
-/// additional optional member once the editor lands — registrations written
-/// today stay source-compatible.
+/// The optional [highlight] rule is the editor side of the registry: the
+/// same registration passed to `LegendMarkdownEditor.syntaxes` styles the
+/// notation's raw source characters while editing — registrations without
+/// one stay source-compatible and simply render unhighlighted source.
 class LegendMarkdownSyntax {
   /// A custom inline notation: [parser] emits `<tag>` elements inside a
-  /// text run; [builder] renders each one as an [InlineSpan].
+  /// text run; [builder] renders each one as an [InlineSpan]; [highlight]
+  /// optionally styles the raw notation in the editor.
   const LegendMarkdownSyntax.inline({
     required this.tag,
     required md.InlineSyntax this.parser,
     required LegendMarkdownSpanBuilder this.builder,
+    this.highlight,
   }) : blockParser = null,
        blockBuilder = null;
 
   /// A custom block notation: [blockParser] emits `<tag>` elements at block
-  /// level; [blockBuilder] renders each one as a [Widget].
+  /// level; [blockBuilder] renders each one as a [Widget]; [highlight]
+  /// optionally styles the raw notation in the editor.
   const LegendMarkdownSyntax.block({
     required this.tag,
     required md.BlockSyntax this.blockParser,
     required LegendMarkdownWidgetBuilder this.blockBuilder,
+    this.highlight,
   }) : parser = null,
        builder = null;
 
@@ -87,6 +119,10 @@ class LegendMarkdownSyntax {
 
   /// The block render hook; null for an inline notation.
   final LegendMarkdownWidgetBuilder? blockBuilder;
+
+  /// The editor's highlight rule for this notation; null renders the raw
+  /// source unhighlighted while editing.
+  final LegendMarkdownHighlight? highlight;
 
   /// Whether this is an inline notation ([LegendMarkdownSyntax.inline]).
   bool get isInline => parser != null;

@@ -27,8 +27,12 @@ class LegendFieldCore extends StatelessWidget {
     this.autofocus = false,
     this.readOnly = false,
     this.maxLines = 1,
+    this.minLines,
     this.keyboardType,
+    this.textInputAction,
     this.inputFormatters,
+    this.scrollController,
+    this.scrollPhysics,
     this.onChanged,
     this.onSubmitted,
   });
@@ -59,9 +63,25 @@ class LegendFieldCore extends StatelessWidget {
   /// When true the text can be selected/copied but not edited.
   final bool readOnly;
 
-  final int maxLines;
+  /// Maximum visible lines; null grows without bound (a multiline editor).
+  final int? maxLines;
+
+  /// Minimum visible lines a growing field reserves; null reserves one.
+  final int? minLines;
+
   final TextInputType? keyboardType;
+
+  /// The keyboard's action button; multiline editors pass `newline`.
+  final TextInputAction? textInputAction;
+
   final List<TextInputFormatter>? inputFormatters;
+
+  /// Scroll position of a scrolling (multiline) field; owned by the caller.
+  final ScrollController? scrollController;
+
+  /// Scroll physics of a scrolling (multiline) field.
+  final ScrollPhysics? scrollPhysics;
+
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
 
@@ -78,8 +98,12 @@ class LegendFieldCore extends StatelessWidget {
       autofocus: autofocus,
       readOnly: readOnly,
       maxLines: maxLines,
+      minLines: minLines,
       keyboardType: keyboardType,
+      textInputAction: textInputAction,
       inputFormatters: inputFormatters,
+      scrollController: scrollController,
+      scrollPhysics: scrollPhysics,
       onChanged: onChanged,
       onSubmitted: onSubmitted,
     );
