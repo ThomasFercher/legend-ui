@@ -10,6 +10,7 @@ library;
 
 export 'src/annotations/annotations.dart';
 export 'src/components/accordion/legend_accordion.dart';
+export 'src/components/address/legend_address.dart';
 export 'src/components/avatar/legend_avatar.dart';
 export 'src/components/badge/legend_badge.dart';
 export 'src/components/banner/legend_banner.dart';
@@ -23,6 +24,7 @@ export 'src/components/checkbox/legend_checkbox.dart';
 export 'src/components/chip/legend_chip.dart';
 export 'src/components/combobox/legend_combobox.dart';
 export 'src/components/context_menu/legend_context_menu.dart';
+export 'src/components/copy_button/legend_copy_button.dart';
 export 'src/components/dialog/legend_dialog.dart';
 export 'src/components/divider/legend_divider.dart';
 export 'src/components/drawer/legend_drawer.dart';
