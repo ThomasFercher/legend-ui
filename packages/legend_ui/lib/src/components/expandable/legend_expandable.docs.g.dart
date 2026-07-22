@@ -18,6 +18,14 @@ const List<LegendDocEntry> legendExpandableDocEntries = [
   ),
   LegendDocEntry(
     owner: 'LegendExpandable',
+    name: 'titleStyle',
+    type: 'TextStyle?',
+    doc: 'Style of the [title] text; unused when a custom [header] is set.',
+    defaultDescription: 't.typography.b2.copyWith(color: t.colors.foreground1)',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendExpandable',
     name: 'backgroundColor',
     type: 'InteractiveColors?',
     doc:
@@ -77,6 +85,14 @@ const List<LegendDocEntry> legendExpandableDocEntries = [
     type: 'BorderRadius?',
     doc: 'Corner rounding of the container surface.',
     defaultDescription: 't.sizes.borderRadiusMd',
+    group: 'component',
+  ),
+  LegendDocEntry(
+    owner: 'LegendExpandable',
+    name: 'caretColor',
+    type: 'Color?',
+    doc: 'Color of the rotating caret glyph.',
+    defaultDescription: 'ColorRef.foreground2',
     group: 'component',
   ),
 ];

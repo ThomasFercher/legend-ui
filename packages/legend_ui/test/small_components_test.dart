@@ -1,4 +1,6 @@
+import 'dart:ui' show Tristate;
 import 'package:flutter/gestures.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legend_ui/legend_ui.dart';
@@ -168,6 +170,54 @@ void main() {
       setOuter(() => expanded = false);
       await tester.pumpAndSettle();
       expect(find.text('Body'), findsNothing);
+    });
+
+    testWidgets('themes the title style and caret color', (tester) async {
+      const coral = Color(0xFFFF6B57);
+      const navy = Color(0xFF001F54);
+      await tester.pumpWidget(
+        _wrap(
+          SizedBox(
+            width: 300,
+            child: LegendExpandable(
+              title: 'More',
+              titleStyle: const TextStyle(color: coral),
+              caretColor: navy,
+              child: const Text('Body'),
+            ),
+          ),
+        ),
+      );
+      expect(tester.widget<Text>(find.text('More')).style?.color, coral);
+      expect(tester.widget<LegendCaret>(find.byType(LegendCaret)).color, navy);
+    });
+
+    testWidgets('header announces its expanded state', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _wrap(
+          SizedBox(
+            width: 300,
+            child: LegendExpandable(title: 'More', child: const Text('Body')),
+          ),
+        ),
+      );
+      // The expanded flag lives on the announced button node — the inner
+      // focus node getSemantics finds first merges up into it.
+      SemanticsFlags header() {
+        var node = tester.getSemantics(find.text('More'));
+        while (!node.getSemanticsData().flagsCollection.isButton) {
+          node = node.parent!;
+        }
+        return node.getSemanticsData().flagsCollection;
+      }
+
+      expect(header().isExpanded, Tristate.isFalse);
+
+      await tester.tap(find.text('More'));
+      await tester.pumpAndSettle();
+      expect(header().isExpanded, Tristate.isTrue);
+      handle.dispose();
     });
   });
 

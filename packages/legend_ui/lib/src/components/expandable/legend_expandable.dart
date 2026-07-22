@@ -5,6 +5,7 @@ import 'package:legend_ui/src/primitives/legend_interactive.dart';
 import 'package:legend_ui/src/primitives/legend_surface.dart';
 import 'package:legend_ui/src/theme/interactive_colors.dart';
 import 'package:legend_ui/src/theme/legend_theme.dart';
+import 'package:legend_ui/src/tokens/legend_colors.dart';
 import 'package:legend_ui/src/tokens/legend_tokens.dart';
 
 part 'legend_expandable.theme.g.dart';
@@ -14,7 +15,8 @@ part 'legend_expandable.theme.g.dart';
 ///
 /// Composes [LegendInteractive] (header activation) + [LegendSurface]
 /// (container and hover tint) + [LegendCaret] (rotating disclosure
-/// indicator).
+/// indicator). The header announces its expanded/collapsed state to
+/// assistive tech.
 ///
 /// Works in two modes:
 /// - **Uncontrolled** (default): leave [expanded] null; the widget owns the
@@ -39,8 +41,10 @@ class LegendExpandable extends StatefulWidget {
     this.initiallyExpanded = false,
     this.duration = const Duration(milliseconds: 200),
     this.headerPadding,
+    this.titleStyle,
     Color? backgroundColor,
     this.borderRadius,
+    this.caretColor,
   }) : backgroundColor = backgroundColor == null
            ? null
            : InteractiveColors(normal: backgroundColor),
@@ -74,6 +78,10 @@ class LegendExpandable extends StatefulWidget {
   @Style<EdgeInsetsGeometry>.resolve(_headerPadding)
   final EdgeInsetsGeometry? headerPadding;
 
+  /// Style of the [title] text; unused when a custom [header] is set.
+  @Style<TextStyle>.resolve(_titleStyle)
+  final TextStyle? titleStyle;
+
   /// Fill of the container and its header, per interaction state —
   /// `normal` paints the whole surface, `hovered`/`pressed`/`focused`
   /// tint the header while the pointer is on it.
@@ -83,6 +91,10 @@ class LegendExpandable extends StatefulWidget {
   /// Corner rounding of the container surface.
   @Style<BorderRadius>.resolve(_borderRadius)
   final BorderRadius? borderRadius;
+
+  /// Color of the rotating caret glyph.
+  @Style<Color>.resolve(ColorRef.foreground2)
+  final Color? caretColor;
 
   @override
   State<LegendExpandable> createState() => _LegendExpandableState();
@@ -113,39 +125,39 @@ class _LegendExpandableState extends State<LegendExpandable> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          LegendInteractive(
-            semanticLabel: widget.title,
-            onTap: _toggle,
-            builder: (context, states) {
-              return LegendSurface(
-                color: theme.backgroundColor.resolve(
-                  states.effective,
-                  tokens.states,
-                ),
-                padding: theme.headerPadding,
-                duration: widget.duration,
-                child: Row(
-                  spacing: tokens.sizes.sm,
-                  children: [
-                    Expanded(
-                      child:
-                          widget.header ??
-                          Text(
-                            widget.title!,
-                            style: tokens.typography.b2.copyWith(
-                              color: tokens.colors.foreground1,
-                            ),
-                          ),
-                    ),
-                    LegendCaret(
-                      color: tokens.colors.foreground2,
-                      open: expanded,
-                      duration: widget.duration,
-                    ),
-                  ],
-                ),
-              );
-            },
+          // The expanded flag merges onto the header's button node, so
+          // assistive tech announces the disclosure state it toggles.
+          Semantics(
+            expanded: expanded,
+            child: LegendInteractive(
+              semanticLabel: widget.title,
+              onTap: _toggle,
+              builder: (context, states) {
+                return LegendSurface(
+                  color: theme.backgroundColor.resolve(
+                    states.effective,
+                    tokens.states,
+                  ),
+                  padding: theme.headerPadding,
+                  duration: widget.duration,
+                  child: Row(
+                    spacing: tokens.sizes.sm,
+                    children: [
+                      Expanded(
+                        child:
+                            widget.header ??
+                            Text(widget.title!, style: theme.titleStyle),
+                      ),
+                      LegendCaret(
+                        color: theme.caretColor,
+                        open: expanded,
+                        duration: widget.duration,
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
           AnimatedSize(
             duration: widget.duration,
@@ -162,6 +174,9 @@ class _LegendExpandableState extends State<LegendExpandable> {
 }
 
 EdgeInsetsGeometry _headerPadding(LegendTokens t) => EdgeInsets.all(t.sizes.md);
+
+TextStyle _titleStyle(LegendTokens t) =>
+    t.typography.b2.copyWith(color: t.colors.foreground1);
 
 InteractiveColors _backgroundColor(LegendTokens t) => InteractiveColors(
   normal: t.colors.surface,
