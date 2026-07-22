@@ -1,6 +1,8 @@
 import 'package:example/docs/doc_page.dart';
+import 'package:example/docs/manifest_props_table.dart';
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/legend_ui.dart';
+import 'package:markdown/markdown.dart' as md;
 
 /// The rich sample document for the LegendMarkdown demo — one instance of
 /// every supported construct.
@@ -66,6 +68,89 @@ class _MarkdownEditorDemoState extends State<_MarkdownEditorDemo> {
           ),
         ),
         Expanded(child: LegendMarkdown(_controller.text)),
+      ],
+    );
+  }
+}
+
+/// The parse hook of the custom-syntax demo: a plain `package:markdown`
+/// inline syntax matching `#LEG-123` ticket references and emitting a
+/// `ticketRef` element for the render hook.
+class _TicketRefSyntax extends md.InlineSyntax {
+  _TicketRefSyntax() : super(r'#LEG-(\d+)');
+
+  @override
+  bool onMatch(md.InlineParser parser, Match match) {
+    parser.addNode(md.Element.text('ticketRef', match[1]!));
+    return true;
+  }
+}
+
+/// The RFC-005 shared-registry flagship: ONE [LegendMarkdownSyntax]
+/// registration consumed by both markdown consumers — the editor
+/// highlights the raw `#LEG-…` source while typing, and the renderer
+/// builds the styled span for the same tag — so the notation can never
+/// diverge between editing and rendering.
+class _CustomSyntaxDemo extends StatefulWidget {
+  const _CustomSyntaxDemo();
+
+  @override
+  State<_CustomSyntaxDemo> createState() => _CustomSyntaxDemoState();
+}
+
+class _CustomSyntaxDemoState extends State<_CustomSyntaxDemo> {
+  late final _syntaxes = [
+    LegendMarkdownSyntax.inline(
+      tag: 'ticketRef',
+      parser: _TicketRefSyntax(),
+      builder: (context, element, style) {
+        final tokens = LegendTheme.of(context).tokens;
+        return TextSpan(
+          text: '#LEG-${element.textContent}',
+          style: style.copyWith(
+            color: tokens.colors.secondary,
+            fontWeight: FontWeight.w600,
+          ),
+        );
+      },
+      // The editor side of the same registration: the raw source
+      // characters style in place while typing, marks included.
+      highlight: LegendMarkdownHighlight(
+        pattern: r'#LEG-\d+',
+        style: (base, style) =>
+            base.copyWith(color: style.linkColor, fontWeight: FontWeight.w600),
+      ),
+    ),
+  ];
+
+  late final _controller = LegendMarkdownEditingController(
+    text:
+        'Ticket #LEG-42 tracks this demo — edit the source and the '
+        'reference restyles **live** on both sides.',
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = LegendTheme.of(context).tokens;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: tokens.sizes.md,
+      children: [
+        Expanded(
+          child: LegendMarkdownEditor(
+            controller: _controller,
+            syntaxes: _syntaxes,
+            minLines: 4,
+            onChanged: (_) => setState(() {}),
+          ),
+        ),
+        Expanded(child: LegendMarkdown(_controller.text, syntaxes: _syntaxes)),
       ],
     );
   }
@@ -195,6 +280,44 @@ LegendMarkdownEditor(
 LegendMarkdown(controller.text)''',
         ),
         const DocSection(
+          title: 'Custom syntax — one registration, both consumers',
+          description:
+              'The shared registry (RFC-005 §3.3): a LegendMarkdownSyntax '
+              'pairs a package:markdown parse hook with a render hook and '
+              'an optional editor highlight rule. Register it once and '
+              'pass the same instance to LegendMarkdownEditor AND '
+              'LegendMarkdown — here a #LEG-123 ticket reference '
+              'highlights in the source while you type and renders as a '
+              'styled span in the preview, with no way to diverge.',
+          demo: _CustomSyntaxDemo(),
+          code: r'''
+class TicketRefSyntax extends md.InlineSyntax {
+  TicketRefSyntax() : super(r'#LEG-(\d+)');
+
+  @override
+  bool onMatch(md.InlineParser parser, Match match) {
+    parser.addNode(md.Element.text('ticketRef', match[1]!));
+    return true;
+  }
+}
+
+final ticketRef = LegendMarkdownSyntax.inline(
+  tag: 'ticketRef',
+  parser: TicketRefSyntax(),
+  builder: (context, element, style) => TextSpan(
+    text: '#LEG-${element.textContent}',
+    style: style.copyWith(color: tokens.colors.secondary),
+  ),
+  highlight: LegendMarkdownHighlight(
+    pattern: r'#LEG-\d+',
+    style: (base, style) => base.copyWith(color: style.linkColor),
+  ),
+);
+
+LegendMarkdownEditor(controller: controller, syntaxes: [ticketRef]);
+LegendMarkdown(controller.text, syntaxes: [ticketRef]);''',
+        ),
+        const DocSection(
           title: 'Code block',
           description:
               'LegendCodeBlock is the standalone monospace panel — long '
@@ -305,6 +428,11 @@ LegendCopyButton(
             ],
           ),
         ),
+        const ThemeSurfaceSection(component: LegendMarkdown),
+        const ThemeSurfaceSection(component: LegendMarkdownEditor),
+        const ThemeSurfaceSection(component: LegendCodeBlock),
+        const ThemeSurfaceSection(component: LegendAddress),
+        const ThemeSurfaceSection(component: LegendCopyButton),
       ],
     );
   }

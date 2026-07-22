@@ -7,6 +7,7 @@ import 'package:example/docs/pages/overlays_page.dart';
 import 'package:example/docs/pages/playground_page.dart';
 import 'package:example/docs/pages/selection_page.dart';
 import 'package:example/docs/pages/shell_page.dart';
+import 'package:example/docs/pages/theme_explorer_page.dart';
 import 'package:example/docs/pages/theming_page.dart';
 import 'package:example/docs/pages/typography_page.dart';
 import 'package:example/theme/theme_controller.dart';
@@ -94,6 +95,7 @@ class _DocsShellState extends State<_DocsShell> {
     LegendNavItem(label: 'Feedback', icon: Icons.hourglass_empty),
     LegendNavItem(label: 'Shell', icon: Icons.web_asset),
     LegendNavItem(label: 'Playground', icon: Icons.tune),
+    LegendNavItem(label: 'Explorer', icon: Icons.explore_outlined),
   ];
 
   Widget _buildPage(int index) => switch (index) {
@@ -107,7 +109,8 @@ class _DocsShellState extends State<_DocsShell> {
     7 => const LayoutPage(),
     8 => const FeedbackPage(),
     9 => const ShellPage(),
-    _ => PlaygroundPage(controller: widget.controller),
+    10 => PlaygroundPage(controller: widget.controller),
+    _ => ThemeExplorerPage(controller: widget.controller),
   };
 
   @override

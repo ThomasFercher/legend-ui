@@ -1,4 +1,5 @@
 import 'package:example/docs/doc_page.dart';
+import 'package:example/docs/manifest_props_table.dart';
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/legend_ui.dart';
 
@@ -431,6 +432,19 @@ LegendBadge.dot(
   child: avatar,
 )''',
         ),
+        const ThemeSurfaceSection(component: LegendCard),
+        const ThemeSurfaceSection(component: LegendDivider),
+        const ThemeSurfaceSection(component: LegendSplitPane),
+        const ThemeSurfaceSection(component: LegendExpandable),
+        const ThemeSurfaceSection(component: LegendAccordion),
+        const ThemeSurfaceSection(component: LegendBody),
+        const ThemeSurfaceSection(component: LegendAvatar),
+        const ThemeSurfaceSection(component: LegendInfoItem),
+        const ThemeSurfaceSection(component: LegendStat),
+        const ThemeSurfaceSection(component: LegendList),
+        const ThemeSurfaceSection(component: LegendListItem),
+        const ThemeSurfaceSection(component: LegendTimeline),
+        const ThemeSurfaceSection(component: LegendBadge),
       ],
     );
   }

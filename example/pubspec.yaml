@@ -11,6 +11,9 @@ dependencies:
   flutter:
     sdk: flutter
   legend_ui: any # resolved from the workspace
+  # Only for the custom-syntax docs demo (a md.InlineSyntax subclass) —
+  # already in the workspace as legend_ui's markdown engine.
+  markdown: ^7.3.1
 
 dev_dependencies:
   flutter_test:

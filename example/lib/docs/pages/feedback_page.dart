@@ -1,4 +1,5 @@
 import 'package:example/docs/doc_page.dart';
+import 'package:example/docs/manifest_props_table.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/legend_ui.dart';
@@ -263,6 +264,12 @@ loading
     ? const LegendShimmer.box(width: 220, height: 20)
     : const LegendText('Loaded headline')''',
         ),
+        const ThemeSurfaceSection(component: LegendBanner),
+        const ThemeSurfaceSection(component: LegendEmpty),
+        const ThemeSurfaceSection(component: LegendLoading),
+        const ThemeSurfaceSection(component: LegendProgress),
+        const ThemeSurfaceSection(component: LegendSteps),
+        const ThemeSurfaceSection(component: LegendShimmer),
       ],
     );
   }

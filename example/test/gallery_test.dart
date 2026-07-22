@@ -1775,6 +1775,237 @@ void main() {
     );
   });
 
+  testWidgets('playground: preview sections render every new live demo', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading and LegendShimmer
+    // (unbounded animations), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    Future<void> reach(Finder finder) async {
+      await tester.scrollUntilVisible(
+        finder.first,
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(finder.first);
+      await settleTheme();
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Buttons & actions: the standalone copy button.
+    await reach(find.text('Copy a value with the standalone button'));
+    expect(find.byType(LegendCopyButton), findsWidgets);
+
+    // Inputs & forms: the live two-field form gates submit on validity.
+    await reach(find.text('Submit form'));
+    final submit = tester.widget<PrimaryLegendButton>(
+      find.ancestor(
+        of: find.text('Submit form'),
+        matching: find.byType(PrimaryLegendButton),
+      ),
+    );
+    expect(submit.enabled, isFalse, reason: 'empty form is invalid');
+
+    // Selection controls: the local switch flips independently.
+    await reach(find.text('Switch — on'));
+    await tester.tap(find.bySemanticsLabel('Playground switch'));
+    await settleTheme();
+    expect(find.text('Switch — off'), findsOneWidget);
+
+    // Overlay surfaces: the context-menu target renders.
+    await reach(find.textContaining('Right-click or long-press'));
+
+    // The dialog opener runs the real modal route.
+    await reach(find.text('Open dialog'));
+    await tester.tap(find.text('Open dialog'));
+    await settleTheme();
+    expect(find.text('Playground dialog'), findsOneWidget);
+    await tester.tap(find.text('Close dialog'));
+    await settleTheme();
+    expect(find.text('Playground dialog'), findsNothing);
+
+    // The toast trigger fires the site-wide host.
+    await tester.tap(find.text('Show a toast'));
+    await settleTheme();
+    expect(find.text('Toast from the playground'), findsOneWidget);
+    // Elapse the toast's auto-dismiss timer before moving on.
+    await tester.pump(const Duration(seconds: 6));
+
+    // Navigation & shell: the embedded bottom bar tracks taps.
+    await reach(find.text('Feed'));
+    await tester.tap(find.text('Feed'));
+    await settleTheme();
+
+    // Layout & data display: info items, the divider demo, and the
+    // expandable's tap-to-toggle reveal.
+    await reach(find.text('Chain'));
+    expect(find.text('Polygon'), findsOneWidget);
+    await reach(find.text('Above the divider rule'));
+    await reach(find.text('Expandable — tap to toggle'));
+    await tester.tap(find.text('Expandable — tap to toggle'));
+    await settleTheme();
+    expect(find.textContaining('revealed content animates'), findsOneWidget);
+
+    // Feedback & status: shimmer placeholders are live.
+    await reach(find.byType(LegendShimmer));
+
+    // Content & typography closes the column.
+    await reach(find.text('Content & typography'));
+  });
+
+  testWidgets('docs pages: every shipped widget exposes a theme-surface '
+      'table', (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // Feedback (LegendLoading/LegendShimmer) animates unbounded, so pump
+    // explicitly instead of pumpAndSettle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    // Nav label -> theme-surface sections that page must carry (the
+    // buttons/selection pages keep their older hand-written tables for
+    // Primary/Radio/Chip/Dropdown/Segmented on top of these).
+    const expectations = {
+      'Buttons': ['SecondaryLegendButton', 'LegendTextButton'],
+      'Typography': [
+        'LegendMarkdown',
+        'LegendMarkdownEditor',
+        'LegendCodeBlock',
+        'LegendAddress',
+        'LegendCopyButton',
+      ],
+      'Inputs': [
+        'LegendTextField',
+        'LegendCombobox',
+        'LegendNumberField',
+        'LegendPinField',
+        'LegendSlider',
+      ],
+      'Selection': ['LegendCheckbox', 'LegendSwitch'],
+      'Overlays': [
+        'LegendDialog',
+        'LegendDrawer',
+        'LegendToast',
+        'LegendPopover',
+        'LegendTooltip',
+        'LegendMenu',
+        'LegendContextMenu',
+      ],
+      'Layout': [
+        'LegendCard',
+        'LegendDivider',
+        'LegendSplitPane',
+        'LegendExpandable',
+        'LegendAccordion',
+        'LegendBody',
+        'LegendAvatar',
+        'LegendInfoItem',
+        'LegendStat',
+        'LegendList',
+        'LegendListItem',
+        'LegendTimeline',
+        'LegendBadge',
+      ],
+      'Feedback': [
+        'LegendBanner',
+        'LegendEmpty',
+        'LegendLoading',
+        'LegendProgress',
+        'LegendSteps',
+        'LegendShimmer',
+      ],
+      'Shell': [
+        'LegendScaffold',
+        'LegendAppBar',
+        'LegendSider',
+        'LegendBottomBar',
+        'LegendTabs',
+        'LegendBreadcrumb',
+        'LegendPagination',
+        'LegendVerticalMenu',
+      ],
+    };
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    for (final page in expectations.entries) {
+      await tester.tap(find.text(page.key).first);
+      await settleTheme();
+      for (final component in page.value) {
+        expect(
+          find.text('$component theme surface'),
+          findsOneWidget,
+          reason: '${page.key} page must document $component',
+        );
+      }
+    }
+  });
+
+  testWidgets('typography page: one custom syntax registration feeds the '
+      'editor and the renderer', (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Typography'));
+    await settleTheme();
+
+    // Renderer side: the #LEG-42 reference renders as the custom span —
+    // semibold, not plain prose.
+    bool hasTicket(InlineSpan span) =>
+        span is TextSpan &&
+        ((span.text == '#LEG-42' &&
+                span.style?.fontWeight == FontWeight.w600) ||
+            (span.children ?? const []).any(hasTicket));
+    final texts = tester.widgetList<Text>(
+      find.descendant(
+        of: find.byType(LegendMarkdown),
+        matching: find.byType(Text),
+      ),
+    );
+    expect(
+      texts.any((text) {
+        final span = text.textSpan;
+        return span != null && hasTicket(span);
+      }),
+      isTrue,
+      reason: 'the renderer must build the ticketRef span',
+    );
+
+    // Editor side: the very same registration is wired into the editing
+    // controller, so the raw source highlights while typing.
+    final controller = tester
+        .widgetList<EditableText>(find.byType(EditableText))
+        .map((editable) => editable.controller)
+        .whereType<LegendMarkdownEditingController>()
+        .firstWhere((candidate) => candidate.text.contains('#LEG-42'));
+    expect(controller.syntaxes.single.tag, 'ticketRef');
+    expect(controller.syntaxes.single.highlight, isNotNull);
+  });
+
   testWidgets('playground: steps completed knob restyles the live steps', (
     tester,
   ) async {
