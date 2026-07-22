@@ -10,7 +10,17 @@ class InputsPage extends StatefulWidget {
 }
 
 class _InputsPageState extends State<InputsPage> {
+  static const _tokens = [
+    LegendComboboxItem(value: 'eth', label: 'Ethereum'),
+    LegendComboboxItem(value: 'btc', label: 'Bitcoin'),
+    LegendComboboxItem(value: 'sol', label: 'Solana'),
+    LegendComboboxItem(value: 'ada', label: 'Cardano'),
+    LegendComboboxItem(value: 'dot', label: 'Polkadot'),
+    LegendComboboxItem(value: 'avax', label: 'Avalanche'),
+  ];
+
   String? _emailError;
+  String? _token;
   final _form = LegendFormController();
   var _submitted = '—';
 
@@ -70,6 +80,42 @@ LegendTextField(
   placeholder: 'jane@example.com',
   errorText: _error,          // shown below the field
   onChanged: validate,
+)''',
+        ),
+        DocSection(
+          title: 'Combobox (typeahead)',
+          description:
+              'LegendCombobox is the searchable sibling of LegendDropdown: '
+              'an editable field whose option panel filters as you type. '
+              'Up/Down move the highlight, Enter commits it, Escape closes; '
+              'losing focus without a selection reverts the text.',
+          demo: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: tokens.sizes.sm,
+            children: [
+              LegendCombobox<String>(
+                items: _tokens,
+                value: _token,
+                placeholder: 'Search a token…',
+                onChanged: (value) => setState(() => _token = value),
+              ),
+              LegendText(
+                'Selected: ${_token ?? '—'}',
+                variant: LegendTextVariant.b3,
+              ),
+            ],
+          ),
+          code: '''
+LegendCombobox<String>(
+  items: const [
+    LegendComboboxItem(value: 'eth', label: 'Ethereum'),
+    LegendComboboxItem(value: 'btc', label: 'Bitcoin'),
+  ],
+  value: _token,
+  placeholder: 'Search a token…',
+  // Default: case-insensitive substring on the label.
+  filter: (item, query) => item.label.startsWith(query),
+  onChanged: (value) => setState(() => _token = value),
 )''',
         ),
         DocSection(

@@ -153,6 +153,11 @@ class ThemePanel extends StatelessWidget {
             value: controller.checkboxFill,
             onChanged: controller.setCheckboxFill,
           ),
+          ColorField(
+            label: 'Radio fill (LegendRadio.fill)',
+            value: controller.radioFill,
+            onChanged: controller.setRadioFill,
+          ),
 
           const LegendText(
             'Popover panel radius (LegendPopover.borderRadius)',
@@ -236,6 +241,33 @@ class ThemePanel extends StatelessWidget {
             label: 'Menu destructive color (LegendMenu.destructiveColor)',
             value: controller.menuDestructiveColor,
             onChanged: controller.setMenuDestructiveColor,
+          ),
+
+          ColorField(
+            label: 'Combobox option highlight (LegendCombobox.menuBackground)',
+            value: controller.comboboxHighlight,
+            onChanged: controller.setComboboxHighlight,
+          ),
+
+          ColorField(
+            label: 'Empty-state icon color (LegendEmpty.iconColor)',
+            value: controller.emptyIconColor,
+            onChanged: controller.setEmptyIconColor,
+          ),
+
+          const LegendText(
+            'Side-drawer width (LegendDrawer.width)',
+            variant: LegendTextVariant.b3,
+          ),
+          LegendDropdown<double>(
+            value: controller.drawerWidth,
+            placeholder: 'Standard (320)',
+            items: const [
+              LegendDropdownItem(value: 280, label: 'Narrow (280)'),
+              LegendDropdownItem(value: 360, label: 'Wide (360)'),
+              LegendDropdownItem(value: 440, label: 'Extra wide (440)'),
+            ],
+            onChanged: controller.setDrawerWidth,
           ),
 
           const LegendDivider(),

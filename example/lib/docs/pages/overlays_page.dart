@@ -114,6 +114,63 @@ showLegendModal<void>(
 )''',
         ),
         DocSection(
+          title: 'Drawer',
+          description:
+              'An edge-anchored sheet on the same modal engine. Side '
+              'drawers keep a themed fixed width and resolve start/end '
+              'against text direction; the bottom sheet adds a drag '
+              'handle and drag-to-dismiss. Scrim tap and Escape dismiss.',
+          demo: Wrap(
+            spacing: tokens.sizes.sm,
+            runSpacing: tokens.sizes.sm,
+            children: [
+              PrimaryLegendButton(
+                text: 'Start drawer',
+                onPressed: () => LegendDrawer.show<void>(
+                  context,
+                  builder: (context) => const _DrawerBody(
+                    title: 'Start drawer',
+                    message:
+                        'Anchored to the leading edge — the right side '
+                        'under RTL.',
+                  ),
+                ),
+              ),
+              SecondaryLegendButton(
+                text: 'End drawer',
+                onPressed: () => LegendDrawer.show<void>(
+                  context,
+                  edge: LegendDrawerEdge.end,
+                  builder: (context) => const _DrawerBody(
+                    title: 'End drawer',
+                    message: 'Anchored to the trailing edge.',
+                  ),
+                ),
+              ),
+              SecondaryLegendButton(
+                text: 'Bottom sheet',
+                onPressed: () => LegendDrawer.show<void>(
+                  context,
+                  edge: LegendDrawerEdge.bottom,
+                  builder: (context) => const _DrawerBody(
+                    title: 'Bottom sheet',
+                    message:
+                        'Drag the handle (or the sheet) down past a third '
+                        'of its height to dismiss; shorter drags spring '
+                        'back.',
+                  ),
+                ),
+              ),
+            ],
+          ),
+          code: '''
+await LegendDrawer.show<void>(
+  context,
+  edge: LegendDrawerEdge.bottom,   // start / end / bottom
+  builder: (context) => const SheetContent(...),
+)''',
+        ),
+        DocSection(
           title: 'Toast',
           description:
               'Queued — rapid calls display one after another instead of '
@@ -354,6 +411,33 @@ LegendContextMenu(
   ],
   child: const FileTile(...),
 )''',
+        ),
+      ],
+    );
+  }
+}
+
+/// Shared demo content for the drawer section — a heading, a body line
+/// and a close button.
+class _DrawerBody extends StatelessWidget {
+  const _DrawerBody({required this.title, required this.message});
+
+  final String title;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = LegendTheme.of(context).tokens;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: tokens.sizes.md,
+      children: [
+        LegendText(title, variant: LegendTextVariant.h3),
+        LegendText(message, variant: LegendTextVariant.b2),
+        PrimaryLegendButton(
+          text: 'Close',
+          onPressed: () => Navigator.pop(context),
         ),
       ],
     );

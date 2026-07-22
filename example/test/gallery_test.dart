@@ -1,6 +1,6 @@
 import 'package:example/main.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart' show SelectionArea;
+import 'package:flutter/material.dart' show Icons, SelectionArea;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -461,6 +461,60 @@ void main() {
     expect(box.color, const Color(0xFF8B5CF6));
   });
 
+  testWidgets('playground: radio fill knob restyles the live radio group', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's radio knob.
+    await tester.scrollUntilVisible(
+      find.textContaining('Radio fill'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    // scrollUntilVisible stops as soon as the sliver cache builds the
+    // target, which can still be off-screen — align it for the tap.
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('Radio fill .*#8B5CF6')),
+    );
+    await settleTheme();
+    await tester.tap(find.bySemanticsLabel(RegExp('Radio fill .*#8B5CF6')));
+    await settleTheme();
+
+    // The selected radio in the preview column picks it up — a sparse
+    // InteractiveColors(normal: …) whose other states keep deriving.
+    await tester.scrollUntilVisible(
+      find.text('Monthly'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    final circle = tester.widget<LegendSurface>(
+      find.descendant(
+        of: find.ancestor(
+          of: find.text('Monthly'),
+          matching: find.byType(LegendSelectionControl),
+        ),
+        matching: find.byType(LegendSurface),
+      ),
+    );
+    expect(circle.color, const Color(0xFF8B5CF6));
+  });
+
   testWidgets('playground: avatar shape knob restyles the live avatars', (
     tester,
   ) async {
@@ -684,6 +738,61 @@ void main() {
     expect(strip.color, const Color(0xFFDC2626));
   });
 
+  testWidgets('playground: empty-state icon knob recolors the live glyph', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's empty-state knob
+    // (swatch 3 is 0xFFDC2626 in ColorField.defaultSwatches).
+    await tester.scrollUntilVisible(
+      find.textContaining('Empty-state icon color'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    // scrollUntilVisible stops as soon as the sliver cache builds the
+    // target, which can still be off-screen — align it for the tap.
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('Empty-state icon color .* #')).at(3),
+    );
+    await settleTheme();
+    await tester.tap(
+      find.bySemanticsLabel(RegExp('Empty-state icon color .* #')).at(3),
+    );
+    await settleTheme();
+
+    // The live empty state in the preview column picks it up through the
+    // IconTheme its icon slot inherits.
+    await tester.scrollUntilVisible(
+      find.text('LegendEmpty'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    final iconTheme = tester.widget<IconTheme>(
+      find
+          .ancestor(
+            of: find.byIcon(Icons.inbox_outlined),
+            matching: find.byType(IconTheme),
+          )
+          .first,
+    );
+    expect(iconTheme.data.color, const Color(0xFFDC2626));
+  });
+
   testWidgets('overlays page: tooltip shows on hover and hides on exit', (
     tester,
   ) async {
@@ -872,6 +981,120 @@ void main() {
     expect(
       find.descendant(
         of: find.byType(LegendSegmented<String>),
+        matching: find.byWidgetPredicate(
+          (widget) =>
+              widget is LegendSurface &&
+              widget.color == const Color(0xFF8B5CF6),
+        ),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('playground: drawer width knob restyles the live drawer', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's drawer knob.
+    await tester.scrollUntilVisible(
+      find.text('Standard (320)'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('Standard (320)'));
+    await settleTheme();
+    await tester.tap(find.text('Standard (320)'));
+    await settleTheme();
+    await tester.tap(find.text('Narrow (280)'));
+    await settleTheme();
+
+    // The live drawer opener in the preview column picks it up.
+    await tester.scrollUntilVisible(
+      find.text('Open side drawer'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('Open side drawer'));
+    await settleTheme();
+    await tester.tap(find.text('Open side drawer'));
+    await settleTheme();
+    expect(
+      tester.getRect(find.byType(LegendDrawer)).width,
+      280,
+      reason: 'level-3 components map restyles the side-drawer width',
+    );
+
+    // Escape closes it again (the modal engine's dismissal).
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await settleTheme();
+    expect(find.byType(LegendDrawer), findsNothing);
+  });
+
+  testWidgets('playground: combobox highlight knob restyles the live panel', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's combobox knob
+    // (swatch 4 is the violet, unused by any active preset).
+    await tester.scrollUntilVisible(
+      find.textContaining('Combobox option highlight'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('Combobox option highlight.* #')).at(4),
+    );
+    await settleTheme();
+    await tester.tap(
+      find.bySemanticsLabel(RegExp('Combobox option highlight.* #')).at(4),
+    );
+    await settleTheme();
+
+    // Open the live combobox; its highlighted option paints the override.
+    await tester.scrollUntilVisible(
+      find.text('Combobox — type to filter'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    await tester.tap(find.byType(LegendCombobox<String>));
+    await settleTheme();
+
+    // (Scoped to the combobox — the ColorField swatches paint the same
+    // violet on their own LegendSurfaces.)
+    expect(
+      find.descendant(
+        of: find.byType(LegendCombobox<String>),
         matching: find.byWidgetPredicate(
           (widget) =>
               widget is LegendSurface &&
