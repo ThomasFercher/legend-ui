@@ -75,6 +75,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendMenu]'s destructive-item label color.
   Color? menuDestructiveColor;
 
+  /// Level-3 override for [LegendAccordion]'s section background.
+  Color? accordionBackground;
+
   /// Level-3 override for [LegendEmpty]'s inherited icon color.
   Color? emptyIconColor;
 
@@ -210,6 +213,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setAccordionBackground(Color? value) {
+    accordionBackground = value;
+    notifyListeners();
+  }
+
   void setEmptyIconColor(Color? value) {
     emptyIconColor = value;
     notifyListeners();
@@ -254,6 +262,7 @@ class ThemeController extends ChangeNotifier {
     segmentedThumb = null;
     sliderActiveTrack = null;
     menuDestructiveColor = null;
+    accordionBackground = null;
     emptyIconColor = null;
     drawerWidth = null;
     comboboxHighlight = null;
@@ -413,6 +422,12 @@ class ThemeController extends ChangeNotifier {
         if (menuDestructiveColor != null)
           LegendMenu: LegendMenuThemeNullable(
             destructiveColor: menuDestructiveColor,
+          ),
+        // LegendAccordion's section background (the sparse per-state
+        // bundle: unset states keep deriving through the overlays).
+        if (accordionBackground != null)
+          LegendAccordion: LegendAccordionThemeNullable(
+            background: InteractiveColors(normal: accordionBackground),
           ),
         // LegendEmpty's zero-state glyph color (inherited via IconTheme).
         if (emptyIconColor != null)

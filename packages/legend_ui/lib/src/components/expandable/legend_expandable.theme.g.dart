@@ -7,8 +7,10 @@ part of 'legend_expandable.dart';
 class LegendExpandableTheme {
   const LegendExpandableTheme({
     required this.headerPadding,
+    required this.titleStyle,
     required this.backgroundColor,
     required this.borderRadius,
+    required this.caretColor,
   });
 
   /// Token-derived defaults (level 4) — the annotation
@@ -16,13 +18,17 @@ class LegendExpandableTheme {
   factory LegendExpandableTheme.defaults(LegendTokens t) =>
       LegendExpandableTheme(
         headerPadding: _headerPadding(t),
+        titleStyle: _titleStyle(t),
         backgroundColor: _backgroundColor(t),
         borderRadius: _borderRadius(t),
+        caretColor: ColorRef.foreground2(t),
       );
 
   final EdgeInsetsGeometry headerPadding;
+  final TextStyle titleStyle;
   final InteractiveColors backgroundColor;
   final BorderRadius borderRadius;
+  final Color caretColor;
 
   /// Resolves the theme: defaults <- app registry (keyed by
   /// [LegendExpandable] first, [LegendExpandableThemeNullable] as the legacy
@@ -46,6 +52,11 @@ class LegendExpandableTheme {
       context,
       _$LegendExpandableOverrideAspectHeaderPadding,
     );
+    LegendTheme.depend(context, _$LegendExpandableAspectTitleStyle);
+    LegendThemeOverride.depend<LegendExpandableThemeNullable>(
+      context,
+      _$LegendExpandableOverrideAspectTitleStyle,
+    );
     LegendTheme.depend(context, _$LegendExpandableAspectBackgroundColor);
     LegendThemeOverride.depend<LegendExpandableThemeNullable>(
       context,
@@ -55,6 +66,11 @@ class LegendExpandableTheme {
     LegendThemeOverride.depend<LegendExpandableThemeNullable>(
       context,
       _$LegendExpandableOverrideAspectBorderRadius,
+    );
+    LegendTheme.depend(context, _$LegendExpandableAspectCaretColor);
+    LegendThemeOverride.depend<LegendExpandableThemeNullable>(
+      context,
+      _$LegendExpandableOverrideAspectCaretColor,
     );
     return LegendExpandableTheme.defaults(data.tokens)
         .merge(
@@ -68,19 +84,25 @@ class LegendExpandableTheme {
     if (other == null) return this;
     return LegendExpandableTheme(
       headerPadding: other.headerPadding ?? headerPadding,
+      titleStyle: other.titleStyle ?? titleStyle,
       backgroundColor: backgroundColor.merge(other.backgroundColor),
       borderRadius: other.borderRadius ?? borderRadius,
+      caretColor: other.caretColor ?? caretColor,
     );
   }
 
   LegendExpandableTheme copyWith({
     EdgeInsetsGeometry? headerPadding,
+    TextStyle? titleStyle,
     InteractiveColors? backgroundColor,
     BorderRadius? borderRadius,
+    Color? caretColor,
   }) => LegendExpandableTheme(
     headerPadding: headerPadding ?? this.headerPadding,
+    titleStyle: titleStyle ?? this.titleStyle,
     backgroundColor: backgroundColor ?? this.backgroundColor,
     borderRadius: borderRadius ?? this.borderRadius,
+    caretColor: caretColor ?? this.caretColor,
   );
 
   static LegendExpandableTheme lerp(
@@ -89,8 +111,10 @@ class LegendExpandableTheme {
     double t,
   ) => LegendExpandableTheme(
     headerPadding: t < 0.5 ? a.headerPadding : b.headerPadding,
+    titleStyle: t < 0.5 ? a.titleStyle : b.titleStyle,
     backgroundColor: t < 0.5 ? a.backgroundColor : b.backgroundColor,
     borderRadius: t < 0.5 ? a.borderRadius : b.borderRadius,
+    caretColor: t < 0.5 ? a.caretColor : b.caretColor,
   );
 }
 
@@ -100,22 +124,28 @@ class LegendExpandableTheme {
 class LegendExpandableThemeNullable {
   const LegendExpandableThemeNullable({
     this.headerPadding,
+    this.titleStyle,
     this.backgroundColor,
     this.borderRadius,
+    this.caretColor,
   });
 
   final EdgeInsetsGeometry? headerPadding;
+  final TextStyle? titleStyle;
   final InteractiveColors? backgroundColor;
   final BorderRadius? borderRadius;
+  final Color? caretColor;
 
   LegendExpandableThemeNullable merge(LegendExpandableThemeNullable? other) {
     if (other == null) return this;
     return LegendExpandableThemeNullable(
       headerPadding: other.headerPadding ?? headerPadding,
+      titleStyle: other.titleStyle ?? titleStyle,
       backgroundColor:
           backgroundColor?.merge(other.backgroundColor) ??
           other.backgroundColor,
       borderRadius: other.borderRadius ?? borderRadius,
+      caretColor: other.caretColor ?? caretColor,
     );
   }
 
@@ -124,12 +154,19 @@ class LegendExpandableThemeNullable {
       identical(this, other) ||
       other is LegendExpandableThemeNullable &&
           other.headerPadding == headerPadding &&
+          other.titleStyle == titleStyle &&
           other.backgroundColor == backgroundColor &&
-          other.borderRadius == borderRadius;
+          other.borderRadius == borderRadius &&
+          other.caretColor == caretColor;
 
   @override
-  int get hashCode =>
-      Object.hashAll([headerPadding, backgroundColor, borderRadius]);
+  int get hashCode => Object.hashAll([
+    headerPadding,
+    titleStyle,
+    backgroundColor,
+    borderRadius,
+    caretColor,
+  ]);
 }
 
 /// Overrides [LegendExpandableTheme] for a subtree (level 2).
@@ -171,6 +208,26 @@ Object? _$LegendExpandableOverrideSelectHeaderPadding(
 const _$LegendExpandableOverrideAspectHeaderPadding =
     LegendOverrideAspect<LegendExpandableThemeNullable>(
       _$LegendExpandableOverrideSelectHeaderPadding,
+    );
+
+/// Resolves [LegendExpandable.titleStyle] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+TextStyle _$LegendExpandableSelectTitleStyle(LegendThemeData data) =>
+    data
+        .componentOf<LegendExpandableThemeNullable>(LegendExpandable)
+        ?.titleStyle ??
+    _titleStyle(data.tokens);
+const _$LegendExpandableAspectTitleStyle = LegendThemeAspect(
+  _$LegendExpandableSelectTitleStyle,
+);
+Object? _$LegendExpandableOverrideSelectTitleStyle(
+  LegendExpandableThemeNullable data,
+) => data.titleStyle;
+const _$LegendExpandableOverrideAspectTitleStyle =
+    LegendOverrideAspect<LegendExpandableThemeNullable>(
+      _$LegendExpandableOverrideSelectTitleStyle,
     );
 
 /// Resolves [LegendExpandable.backgroundColor] through the
@@ -215,6 +272,26 @@ const _$LegendExpandableOverrideAspectBorderRadius =
       _$LegendExpandableOverrideSelectBorderRadius,
     );
 
+/// Resolves [LegendExpandable.caretColor] through the
+/// registry and the token defaults (levels 4+3) — the
+/// comparator behind its rebuild aspect and listenable
+/// (RFC-002 R12).
+Color _$LegendExpandableSelectCaretColor(LegendThemeData data) =>
+    data
+        .componentOf<LegendExpandableThemeNullable>(LegendExpandable)
+        ?.caretColor ??
+    ColorRef.foreground2(data.tokens);
+const _$LegendExpandableAspectCaretColor = LegendThemeAspect(
+  _$LegendExpandableSelectCaretColor,
+);
+Object? _$LegendExpandableOverrideSelectCaretColor(
+  LegendExpandableThemeNullable data,
+) => data.caretColor;
+const _$LegendExpandableOverrideAspectCaretColor =
+    LegendOverrideAspect<LegendExpandableThemeNullable>(
+      _$LegendExpandableOverrideSelectCaretColor,
+    );
+
 /// Distinct-until-changed per-field change streams over a
 /// theme source (RFC-002 R12.4) — for animation and
 /// imperative consumers that want theme changes without any
@@ -232,6 +309,12 @@ abstract final class LegendExpandableThemeListenables {
     LegendThemeData Function() data,
   ) => LegendThemeSelector(source, data, _$LegendExpandableSelectHeaderPadding);
 
+  /// Change stream of the resolved [LegendExpandableTheme.titleStyle].
+  static ValueListenable<TextStyle> titleStyle(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendExpandableSelectTitleStyle);
+
   /// Change stream of the resolved [LegendExpandableTheme.backgroundColor].
   static ValueListenable<InteractiveColors> backgroundColor(
     Listenable source,
@@ -247,6 +330,12 @@ abstract final class LegendExpandableThemeListenables {
     Listenable source,
     LegendThemeData Function() data,
   ) => LegendThemeSelector(source, data, _$LegendExpandableSelectBorderRadius);
+
+  /// Change stream of the resolved [LegendExpandableTheme.caretColor].
+  static ValueListenable<Color> caretColor(
+    Listenable source,
+    LegendThemeData Function() data,
+  ) => LegendThemeSelector(source, data, _$LegendExpandableSelectCaretColor);
 }
 
 /// In-library resolver (RFC-002 R1): re-lists the themed
@@ -260,8 +349,10 @@ extension _$LegendExpandableThemeResolve on LegendExpandable {
         context,
         LegendExpandableThemeNullable(
           headerPadding: headerPadding,
+          titleStyle: titleStyle,
           backgroundColor: backgroundColor,
           borderRadius: borderRadius,
+          caretColor: caretColor,
         ),
       );
 
@@ -284,6 +375,27 @@ extension _$LegendExpandableThemeResolve on LegendExpandable {
     return headerPadding ??
         override?.headerPadding ??
         _$LegendExpandableSelectHeaderPadding(data);
+  }
+
+  /// Resolves ONLY [LegendExpandable.titleStyle] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._titleStyle(context)`).
+  TextStyle _titleStyle(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendExpandableThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendExpandableAspectTitleStyle);
+    LegendThemeOverride.depend<LegendExpandableThemeNullable>(
+      context,
+      _$LegendExpandableOverrideAspectTitleStyle,
+    );
+    return titleStyle ??
+        override?.titleStyle ??
+        _$LegendExpandableSelectTitleStyle(data);
   }
 
   /// Resolves ONLY [LegendExpandable.backgroundColor] (full
@@ -327,6 +439,27 @@ extension _$LegendExpandableThemeResolve on LegendExpandable {
         override?.borderRadius ??
         _$LegendExpandableSelectBorderRadius(data);
   }
+
+  /// Resolves ONLY [LegendExpandable.caretColor] (full
+  /// four-level chain), registering just this field's
+  /// rebuild aspect (RFC-002 R12.3) — for widgets consuming
+  /// one property. When a top-level tear-off shares the
+  /// name, call it receiver-qualified
+  /// (`this._caretColor(context)`).
+  Color _caretColor(BuildContext context) {
+    final data = LegendTheme.read(context);
+    final override = LegendThemeOverride.read<LegendExpandableThemeNullable>(
+      context,
+    );
+    LegendTheme.depend(context, _$LegendExpandableAspectCaretColor);
+    LegendThemeOverride.depend<LegendExpandableThemeNullable>(
+      context,
+      _$LegendExpandableOverrideAspectCaretColor,
+    );
+    return caretColor ??
+        override?.caretColor ??
+        _$LegendExpandableSelectCaretColor(data);
+  }
 }
 
 /// Auto-detected State wiring (RFC-002 R13): [_LegendExpandableState]
@@ -358,8 +491,10 @@ abstract class _$LegendExpandableBase
   const _$LegendExpandableBase({super.key});
 
   EdgeInsetsGeometry? get headerPadding;
+  TextStyle? get titleStyle;
   InteractiveColors? get backgroundColor;
   BorderRadius? get borderRadius;
+  Color? get caretColor;
 
   @override
   LegendExpandableTheme resolveThemeOf(BuildContext context) =>
@@ -367,8 +502,10 @@ abstract class _$LegendExpandableBase
         context,
         LegendExpandableThemeNullable(
           headerPadding: headerPadding,
+          titleStyle: titleStyle,
           backgroundColor: backgroundColor,
           borderRadius: borderRadius,
+          caretColor: caretColor,
         ),
       );
 }

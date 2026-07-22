@@ -244,6 +244,12 @@ class ThemePanel extends StatelessWidget {
           ),
 
           ColorField(
+            label: 'Accordion section background (LegendAccordion.background)',
+            value: controller.accordionBackground,
+            onChanged: controller.setAccordionBackground,
+          ),
+
+          ColorField(
             label: 'Combobox option highlight (LegendCombobox.menuBackground)',
             value: controller.comboboxHighlight,
             onChanged: controller.setComboboxHighlight,

@@ -9,6 +9,7 @@
 library;
 
 export 'src/annotations/annotations.dart';
+export 'src/components/accordion/legend_accordion.dart';
 export 'src/components/avatar/legend_avatar.dart';
 export 'src/components/badge/legend_badge.dart';
 export 'src/components/banner/legend_banner.dart';
