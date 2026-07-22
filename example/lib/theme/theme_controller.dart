@@ -66,6 +66,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendSegmented]'s selected-segment thumb color.
   Color? segmentedThumb;
 
+  /// Level-3 override for [LegendCombobox]'s option-highlight color.
+  Color? comboboxHighlight;
+
   bool get dark => preset == ThemePreset.dark;
 
   void setPreset(ThemePreset value) {
@@ -174,6 +177,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setComboboxHighlight(Color? value) {
+    comboboxHighlight = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -195,6 +203,7 @@ class ThemeController extends ChangeNotifier {
     checkboxFill = null;
     avatarRadius = null;
     segmentedThumb = null;
+    comboboxHighlight = null;
     notifyListeners();
   }
 
@@ -334,6 +343,13 @@ class ThemeController extends ChangeNotifier {
         if (segmentedThumb != null)
           LegendSegmented: LegendSegmentedThemeNullable(
             thumb: InteractiveColors(normal: segmentedThumb),
+          ),
+        // LegendCombobox's option highlight — a sparse InteractiveColors:
+        // only `hovered` is set (the pointer/keyboard highlight), the
+        // panel fill keeps resolving downward.
+        if (comboboxHighlight != null)
+          LegendCombobox: LegendComboboxThemeNullable(
+            menuBackground: InteractiveColors(hovered: comboboxHighlight),
           ),
       },
     );

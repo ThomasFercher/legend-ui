@@ -232,6 +232,11 @@ class ThemePanel extends StatelessWidget {
             value: controller.segmentedThumb,
             onChanged: controller.setSegmentedThumb,
           ),
+          ColorField(
+            label: 'Combobox option highlight (LegendCombobox.menuBackground)',
+            value: controller.comboboxHighlight,
+            onChanged: controller.setComboboxHighlight,
+          ),
 
           const LegendDivider(),
           SecondaryLegendButton(
