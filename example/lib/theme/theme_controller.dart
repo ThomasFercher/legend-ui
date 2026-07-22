@@ -66,6 +66,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendSegmented]'s selected-segment thumb color.
   Color? segmentedThumb;
 
+  /// Level-3 override for [LegendEmpty]'s inherited icon color.
+  Color? emptyIconColor;
+
   bool get dark => preset == ThemePreset.dark;
 
   void setPreset(ThemePreset value) {
@@ -174,6 +177,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setEmptyIconColor(Color? value) {
+    emptyIconColor = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -195,6 +203,7 @@ class ThemeController extends ChangeNotifier {
     checkboxFill = null;
     avatarRadius = null;
     segmentedThumb = null;
+    emptyIconColor = null;
     notifyListeners();
   }
 
@@ -335,6 +344,9 @@ class ThemeController extends ChangeNotifier {
           LegendSegmented: LegendSegmentedThemeNullable(
             thumb: InteractiveColors(normal: segmentedThumb),
           ),
+        // LegendEmpty's zero-state glyph color (inherited via IconTheme).
+        if (emptyIconColor != null)
+          LegendEmpty: LegendEmptyThemeNullable(iconColor: emptyIconColor),
       },
     );
   }

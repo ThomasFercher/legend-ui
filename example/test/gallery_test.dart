@@ -1,6 +1,6 @@
 import 'package:example/main.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart' show SelectionArea;
+import 'package:flutter/material.dart' show Icons, SelectionArea;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -604,6 +604,61 @@ void main() {
           .first,
     );
     expect(strip.color, const Color(0xFFDC2626));
+  });
+
+  testWidgets('playground: empty-state icon knob recolors the live glyph', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's empty-state knob
+    // (swatch 3 is 0xFFDC2626 in ColorField.defaultSwatches).
+    await tester.scrollUntilVisible(
+      find.textContaining('Empty-state icon color'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    // scrollUntilVisible stops as soon as the sliver cache builds the
+    // target, which can still be off-screen — align it for the tap.
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('Empty-state icon color .* #')).at(3),
+    );
+    await settleTheme();
+    await tester.tap(
+      find.bySemanticsLabel(RegExp('Empty-state icon color .* #')).at(3),
+    );
+    await settleTheme();
+
+    // The live empty state in the preview column picks it up through the
+    // IconTheme its icon slot inherits.
+    await tester.scrollUntilVisible(
+      find.text('LegendEmpty'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    final iconTheme = tester.widget<IconTheme>(
+      find
+          .ancestor(
+            of: find.byIcon(Icons.inbox_outlined),
+            matching: find.byType(IconTheme),
+          )
+          .first,
+    );
+    expect(iconTheme.data.color, const Color(0xFFDC2626));
   });
 
   testWidgets('overlays page: tooltip shows on hover and hides on exit', (

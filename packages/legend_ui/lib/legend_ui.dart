@@ -24,6 +24,7 @@ export 'src/components/context_menu/legend_context_menu.dart';
 export 'src/components/dialog/legend_dialog.dart';
 export 'src/components/divider/legend_divider.dart';
 export 'src/components/dropdown/legend_dropdown.dart';
+export 'src/components/empty/legend_empty.dart';
 export 'src/components/expandable/legend_expandable.dart';
 export 'src/components/form/legend_form.dart';
 export 'src/components/form/legend_form_field.dart';

@@ -233,6 +233,12 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setSegmentedThumb,
           ),
 
+          ColorField(
+            label: 'Empty-state icon color (LegendEmpty.iconColor)',
+            value: controller.emptyIconColor,
+            onChanged: controller.setEmptyIconColor,
+          ),
+
           const LegendDivider(),
           SecondaryLegendButton(
             text: 'Reset everything',
