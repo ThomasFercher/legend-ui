@@ -36,6 +36,7 @@ class PlaygroundPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: tokens.sizes.md,
             children: [
+              const _PreviewHeader('Buttons & actions'),
               Wrap(
                 spacing: tokens.sizes.sm,
                 runSpacing: tokens.sizes.sm,
@@ -45,6 +46,25 @@ class PlaygroundPage extends StatelessWidget {
                   LegendTextButton(text: 'Text', onPressed: noop),
                 ],
               ),
+              // A live standalone LegendCopyButton — its post-copy check
+              // color follows the theme panel's copy knob (level-3
+              // override), the same one LegendAddress's built-in copy
+              // affordance resolves.
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: tokens.sizes.xs,
+                children: const [
+                  LegendText(
+                    'Copy a value with the standalone button',
+                    variant: LegendTextVariant.b2,
+                  ),
+                  LegendCopyButton(
+                    value: 'legend-ui',
+                    semanticLabel: 'Copy the playground value',
+                  ),
+                ],
+              ),
+              const _PreviewHeader('Inputs & forms'),
               const LegendTextField(
                 title: 'Text field',
                 placeholder: 'Type here',
@@ -66,6 +86,29 @@ class PlaygroundPage extends StatelessWidget {
               // A live LegendCombobox — its option highlight follows the
               // theme panel's knob (level-3 override).
               const _ComboboxPreview(),
+              // A live LegendSlider — its active-track color follows the
+              // theme panel's knob (level-3 override).
+              const _SliderPreview(),
+              // A live two-field LegendForm — validity updates as you type
+              // and the submit button follows controller.isValid.
+              const _FormPreview(),
+              const _PreviewHeader('Selection controls'),
+              // A live LegendCheckbox — its checked fill follows the theme
+              // panel's knob (level-3 override).
+              const _CheckboxPreview(),
+              // A live LegendRadioGroup — the selected circle's fill
+              // follows the theme panel's radio knob (level-3 override).
+              const _RadioPreview(),
+              // A live LegendSwitch — the same control as the app bar's
+              // dark toggle, kept local here so it can be flipped freely.
+              const _SwitchPreview(),
+              // Live LegendChips — the selected fill follows the theme
+              // panel's knob (level-3 override).
+              const _ChipPreview(),
+              // A live LegendSegmented — its thumb color follows the
+              // theme panel's knob (level-3 override).
+              const _SegmentedPreview(),
+              const _PreviewHeader('Overlay surfaces'),
               const LegendCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,6 +164,35 @@ class PlaygroundPage extends StatelessWidget {
                     'tooltip knob in the theme panel.',
                 child: LegendCard(child: LegendText('Hover for a tooltip')),
               ),
+              // A live LegendContextMenu — right-click (or long-press) the
+              // outlined area to open it.
+              const _ContextMenuPreview(),
+              // A button opening a live LegendDialog through the real
+              // modal route — surface, radius, and padding are themed.
+              const _DialogPreview(),
+              // A button firing a live LegendToast through the site-wide
+              // toast host.
+              const _ToastPreview(),
+              // Live LegendDrawer openers — the side drawer's width
+              // follows the theme panel's knob (level-3 override).
+              const _DrawerPreview(),
+              const _PreviewHeader('Navigation & shell'),
+              // A live LegendTabs — its active indicator follows the
+              // theme panel's knob (level-3 override).
+              const _TabsPreview(),
+              // A live LegendBreadcrumb — its separator chevrons follow
+              // the theme panel's knob (level-3 override).
+              const _BreadcrumbPreview(),
+              // A live LegendPagination — its current-page fill follows
+              // the theme panel's knob (level-3 override).
+              const _PaginationPreview(),
+              // A live LegendVerticalMenu — its selected color follows the
+              // theme panel's knob (level-3 override).
+              const SizedBox(width: 260, child: _MenuPreview()),
+              // An embedded LegendBottomBar — the compact-tier shell
+              // piece, selectable right here on any tier.
+              const _BottomBarPreview(),
+              const _PreviewHeader('Layout & data display'),
               // Live badges — their fill follows the theme panel's badge
               // knob (level-3 override).
               Wrap(
@@ -183,100 +255,40 @@ class PlaygroundPage extends StatelessWidget {
                   ),
                 ],
               ),
-              // A live LegendCheckbox — its checked fill follows the theme
-              // panel's knob (level-3 override).
-              const _CheckboxPreview(),
-              // A live LegendRadioGroup — the selected circle's fill
-              // follows the theme panel's radio knob (level-3 override).
-              const _RadioPreview(),
-              const LegendLoading(),
-              // A live LegendBanner — its info strip follows the theme
-              // panel's banner knob (level-3 override).
-              const LegendBanner(
-                title: 'LegendBanner',
-                message:
-                    'The strip fill follows the banner knob in the theme '
-                    'panel.',
+              // Live LegendInfoItems — the label/value rows every detail
+              // sheet is made of.
+              const Column(
+                children: [
+                  LegendInfoItem(label: 'Chain', value: 'Polygon'),
+                  LegendInfoItem(label: 'Gas fee', value: '0.0007 ETH'),
+                ],
               ),
-              // A live LegendEmpty — its zero-state glyph follows the theme
-              // panel's empty-state icon knob (level-3 override).
-              const LegendEmpty(
-                title: 'LegendEmpty',
-                description:
-                    'The glyph color follows the empty-state icon knob in '
-                    'the theme panel.',
-                icon: Icon(Icons.inbox_outlined),
-              ),
-              // A live LegendProgress — its fill color follows the theme
-              // panel's knob (level-3 override).
-              const LegendProgress.bar(
-                value: 0.6,
-                semanticLabel: 'Progress preview',
-              ),
-              // A live LegendTabs — its active indicator follows the
-              // theme panel's knob (level-3 override).
-              const _TabsPreview(),
-              // A live LegendBreadcrumb — its separator chevrons follow
-              // the theme panel's knob (level-3 override).
-              const _BreadcrumbPreview(),
-              // A live LegendPagination — its current-page fill follows
-              // the theme panel's knob (level-3 override).
-              const _PaginationPreview(),
-              LegendSurface(
-                color: tokens.colors.background1,
-                borderRadius: tokens.sizes.borderRadiusMd,
-                // A live LegendBody — its centered reading column follows
-                // the panel's maxContentWidth knob (level-3 override).
-                child: const SizedBox(
-                  height: 180,
-                  child: LegendBody(
-                    children: [
-                      LegendText('LegendBody', variant: LegendTextVariant.h3),
-                      LegendText(
-                        'The reading column narrows and widens with the '
-                        'maxContentWidth knob in the theme panel.',
-                        variant: LegendTextVariant.b2,
-                      ),
-                    ],
+              // A live LegendDivider — the same rule separating these
+              // preview sections.
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  LegendText(
+                    'Above the divider rule',
+                    variant: LegendTextVariant.b3,
                   ),
+                  LegendDivider(),
+                  LegendText(
+                    'Below the divider rule',
+                    variant: LegendTextVariant.b3,
+                  ),
+                ],
+              ),
+              // A live uncontrolled LegendExpandable — tap the header to
+              // toggle the reveal.
+              LegendExpandable(
+                title: 'Expandable — tap to toggle',
+                child: const LegendText(
+                  'The revealed content animates open and closed and '
+                  'follows the theme like everything else here.',
+                  variant: LegendTextVariant.b3,
                 ),
               ),
-              // A live LegendMarkdown — its link color follows the theme
-              // panel's knob (level-3 override); headings and code ride
-              // the token scale directly.
-              LegendMarkdown(
-                'A **markdown** document with `code` and '
-                '[a link](https://legend.app) whose color follows the '
-                'markdown knob in the theme panel.',
-                onTapLink: (_) {},
-              ),
-              // A live LegendMarkdownEditor — the muted `#`/`**`/backtick
-              // marks follow the editor knob in the theme panel (level-3
-              // override).
-              const SizedBox(width: 360, child: _MarkdownEditorPreview()),
-              // A live LegendCodeBlock — its panel fill follows the theme
-              // panel's knob (level-3 override).
-              const LegendCodeBlock(
-                '// The panel fill follows the code-block knob.\n'
-                'final theme = _theme(context);',
-                language: 'dart',
-              ),
-              // A live LegendAddress — its built-in copy button's post-copy
-              // check color follows the theme panel's knob (level-3
-              // override).
-              const LegendAddress('0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'),
-              // Live LegendChips — the selected fill follows the theme
-              // panel's knob (level-3 override).
-              const _ChipPreview(),
-              // A live LegendSegmented — its thumb color follows the
-              // theme panel's knob (level-3 override).
-              const _SegmentedPreview(),
-              // A live LegendSlider — its active-track color follows the
-              // theme panel's knob (level-3 override).
-              const _SliderPreview(),
-              // A live LegendVerticalMenu — its selected color follows the
-              // theme panel's knob (level-3 override).
-              const SizedBox(width: 260, child: _MenuPreview()),
               // A live LegendList — the selected row's fill follows the
               // theme panel's knob (level-3 override).
               const SizedBox(width: 300, child: _ListPreview()),
@@ -303,6 +315,63 @@ class PlaygroundPage extends StatelessWidget {
                     ),
                   ],
                 ),
+              ),
+              // A live LegendSplitPane — its divider color follows the
+              // theme panel's knob (level-3 override).
+              const SizedBox(height: 120, child: _SplitPanePreview()),
+              LegendSurface(
+                color: tokens.colors.background1,
+                borderRadius: tokens.sizes.borderRadiusMd,
+                // A live LegendBody — its centered reading column follows
+                // the panel's maxContentWidth knob (level-3 override).
+                child: const SizedBox(
+                  height: 180,
+                  child: LegendBody(
+                    children: [
+                      LegendText('LegendBody', variant: LegendTextVariant.h3),
+                      LegendText(
+                        'The reading column narrows and widens with the '
+                        'maxContentWidth knob in the theme panel.',
+                        variant: LegendTextVariant.b2,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const _PreviewHeader('Feedback & status'),
+              const LegendLoading(),
+              // Live LegendShimmer placeholders — the loading skeleton
+              // for content that has not arrived yet.
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 8,
+                children: [
+                  LegendShimmer.box(width: 220, height: 16),
+                  LegendShimmer.box(width: 160, height: 12),
+                ],
+              ),
+              // A live LegendBanner — its info strip follows the theme
+              // panel's banner knob (level-3 override).
+              const LegendBanner(
+                title: 'LegendBanner',
+                message:
+                    'The strip fill follows the banner knob in the theme '
+                    'panel.',
+              ),
+              // A live LegendEmpty — its zero-state glyph follows the theme
+              // panel's empty-state icon knob (level-3 override).
+              const LegendEmpty(
+                title: 'LegendEmpty',
+                description:
+                    'The glyph color follows the empty-state icon knob in '
+                    'the theme panel.',
+                icon: Icon(Icons.inbox_outlined),
+              ),
+              // A live LegendProgress — its fill color follows the theme
+              // panel's knob (level-3 override).
+              const LegendProgress.bar(
+                value: 0.6,
+                semanticLabel: 'Progress preview',
               ),
               // A live LegendSteps — its completed-indicator fill follows
               // the theme panel's knob (level-3 override).
@@ -332,12 +401,31 @@ class PlaygroundPage extends StatelessWidget {
                   ),
                 ],
               ),
-              // A live LegendSplitPane — its divider color follows the
-              // theme panel's knob (level-3 override).
-              const SizedBox(height: 120, child: _SplitPanePreview()),
-              // Live LegendDrawer openers — the side drawer's width
-              // follows the theme panel's knob (level-3 override).
-              const _DrawerPreview(),
+              const _PreviewHeader('Content & typography'),
+              // A live LegendMarkdown — its link color follows the theme
+              // panel's knob (level-3 override); headings and code ride
+              // the token scale directly.
+              LegendMarkdown(
+                'A **markdown** document with `code` and '
+                '[a link](https://legend.app) whose color follows the '
+                'markdown knob in the theme panel.',
+                onTapLink: (_) {},
+              ),
+              // A live LegendMarkdownEditor — the muted `#`/`**`/backtick
+              // marks follow the editor knob in the theme panel (level-3
+              // override).
+              const SizedBox(width: 360, child: _MarkdownEditorPreview()),
+              // A live LegendCodeBlock — its panel fill follows the theme
+              // panel's knob (level-3 override).
+              const LegendCodeBlock(
+                '// The panel fill follows the code-block knob.\n'
+                'final theme = _theme(context);',
+                language: 'dart',
+              ),
+              // A live LegendAddress — its built-in copy button's post-copy
+              // check color follows the theme panel's knob (level-3
+              // override).
+              const LegendAddress('0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'),
             ],
           ),
         ),
@@ -814,6 +902,234 @@ class _SegmentedPreviewState extends State<_SegmentedPreview> {
       ],
       value: _timeframe,
       onChanged: (value) => setState(() => _timeframe = value),
+    );
+  }
+}
+
+/// A small in-column section header — an h3 over a [LegendDivider] — that
+/// keeps the long preview column scannable.
+class _PreviewHeader extends StatelessWidget {
+  const _PreviewHeader(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        LegendText(label, variant: LegendTextVariant.h3),
+        const LegendDivider(),
+      ],
+    );
+  }
+}
+
+/// A self-contained live [LegendSwitch] for the playground preview column,
+/// flippable independently of the app bar's dark toggle.
+class _SwitchPreview extends StatefulWidget {
+  const _SwitchPreview();
+
+  @override
+  State<_SwitchPreview> createState() => _SwitchPreviewState();
+}
+
+class _SwitchPreviewState extends State<_SwitchPreview> {
+  var _on = true;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = LegendTheme.of(context).tokens;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      spacing: tokens.sizes.sm,
+      children: [
+        LegendSwitch(
+          value: _on,
+          semanticLabel: 'Playground switch',
+          onChanged: (value) => setState(() => _on = value),
+        ),
+        LegendText(
+          _on ? 'Switch — on' : 'Switch — off',
+          variant: LegendTextVariant.b3,
+        ),
+      ],
+    );
+  }
+}
+
+/// A self-contained live two-field [LegendForm] — fields register by name,
+/// validity updates as you type, and the submit button follows
+/// `controller.isValid`.
+class _FormPreview extends StatefulWidget {
+  const _FormPreview();
+
+  @override
+  State<_FormPreview> createState() => _FormPreviewState();
+}
+
+class _FormPreviewState extends State<_FormPreview> {
+  final _form = LegendFormController();
+
+  @override
+  void dispose() {
+    _form.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = LegendTheme.of(context).tokens;
+    return LegendForm(
+      controller: _form,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: tokens.sizes.sm,
+        children: [
+          LegendTextField(
+            title: 'Form — username',
+            placeholder: 'At least 3 characters',
+            formField: 'username',
+            validator: LegendValidator.compose([
+              LegendValidator.required,
+              LegendValidator.minLength(3),
+            ]),
+          ),
+          const LegendTextField(
+            title: 'Form — email',
+            placeholder: 'you@example.com',
+            formField: 'email',
+            validator: LegendValidator.email,
+          ),
+          Wrap(
+            spacing: tokens.sizes.sm,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              ValueListenableBuilder(
+                valueListenable: _form.isValid,
+                builder: (context, valid, _) => PrimaryLegendButton(
+                  text: 'Submit form',
+                  enabled: valid,
+                  onPressed: () =>
+                      showLegendToast(context, 'Form submitted — valid'),
+                ),
+              ),
+              LegendTextButton(text: 'Reset form', onPressed: _form.reset),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A live [LegendContextMenu] target for the playground preview column —
+/// right-click (or long-press) the outlined area to open it.
+class _ContextMenuPreview extends StatefulWidget {
+  const _ContextMenuPreview();
+
+  @override
+  State<_ContextMenuPreview> createState() => _ContextMenuPreviewState();
+}
+
+class _ContextMenuPreviewState extends State<_ContextMenuPreview> {
+  var _choice = 'nothing yet';
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = LegendTheme.of(context).tokens;
+    return LegendContextMenu(
+      entries: [
+        LegendContextMenuEntry(
+          label: 'Copy',
+          onSelected: () => setState(() => _choice = 'Copy'),
+        ),
+        LegendContextMenuEntry(
+          label: 'Paste',
+          onSelected: () => setState(() => _choice = 'Paste'),
+        ),
+      ],
+      child: LegendSurface(
+        border: Border.all(color: tokens.colors.background3),
+        borderRadius: tokens.sizes.borderRadiusSm,
+        padding: EdgeInsets.all(tokens.sizes.md),
+        child: LegendText(
+          'Right-click or long-press for a context menu — chose: $_choice',
+          variant: LegendTextVariant.b3,
+        ),
+      ),
+    );
+  }
+}
+
+/// A button opening a live [LegendDialog] through the real modal route.
+class _DialogPreview extends StatelessWidget {
+  const _DialogPreview();
+
+  @override
+  Widget build(BuildContext context) {
+    return SecondaryLegendButton(
+      text: 'Open dialog',
+      onPressed: () => showLegendDialog<void>(
+        context: context,
+        builder: (dialogContext) => LegendDialog(
+          title: 'Playground dialog',
+          content: const LegendText(
+            'Opened through the real modal route — Escape, the barrier, '
+            'or the action below closes it.',
+            variant: LegendTextVariant.b2,
+          ),
+          actions: [
+            LegendTextButton(
+              text: 'Close dialog',
+              onPressed: () => Navigator.pop(dialogContext),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A button firing a live [LegendToast] through the site-wide toast host.
+class _ToastPreview extends StatelessWidget {
+  const _ToastPreview();
+
+  @override
+  Widget build(BuildContext context) {
+    return SecondaryLegendButton(
+      text: 'Show a toast',
+      onPressed: () => showLegendToast(
+        context,
+        'Toast from the playground',
+        severity: LegendToastSeverity.success,
+      ),
+    );
+  }
+}
+
+/// An embedded live [LegendBottomBar] — the compact-tier shell piece,
+/// selectable right here on any tier.
+class _BottomBarPreview extends StatefulWidget {
+  const _BottomBarPreview();
+
+  @override
+  State<_BottomBarPreview> createState() => _BottomBarPreviewState();
+}
+
+class _BottomBarPreviewState extends State<_BottomBarPreview> {
+  var _selected = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return LegendBottomBar(
+      items: const [
+        LegendNavItem(label: 'Home', icon: Icons.home_outlined),
+        LegendNavItem(label: 'Feed', icon: Icons.receipt_long_outlined),
+        LegendNavItem(label: 'Config', icon: Icons.settings_outlined),
+      ],
+      selectedIndex: _selected,
+      onSelected: (index) => setState(() => _selected = index),
     );
   }
 }

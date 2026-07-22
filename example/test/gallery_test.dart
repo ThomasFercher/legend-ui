@@ -1775,6 +1775,99 @@ void main() {
     );
   });
 
+  testWidgets('playground: preview sections render every new live demo', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading and LegendShimmer
+    // (unbounded animations), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    Future<void> reach(Finder finder) async {
+      await tester.scrollUntilVisible(
+        finder.first,
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(finder.first);
+      await settleTheme();
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Buttons & actions: the standalone copy button.
+    await reach(find.text('Copy a value with the standalone button'));
+    expect(find.byType(LegendCopyButton), findsWidgets);
+
+    // Inputs & forms: the live two-field form gates submit on validity.
+    await reach(find.text('Submit form'));
+    final submit = tester.widget<PrimaryLegendButton>(
+      find.ancestor(
+        of: find.text('Submit form'),
+        matching: find.byType(PrimaryLegendButton),
+      ),
+    );
+    expect(submit.enabled, isFalse, reason: 'empty form is invalid');
+
+    // Selection controls: the local switch flips independently.
+    await reach(find.text('Switch — on'));
+    await tester.tap(find.bySemanticsLabel('Playground switch'));
+    await settleTheme();
+    expect(find.text('Switch — off'), findsOneWidget);
+
+    // Overlay surfaces: the context-menu target renders.
+    await reach(find.textContaining('Right-click or long-press'));
+
+    // The dialog opener runs the real modal route.
+    await reach(find.text('Open dialog'));
+    await tester.tap(find.text('Open dialog'));
+    await settleTheme();
+    expect(find.text('Playground dialog'), findsOneWidget);
+    await tester.tap(find.text('Close dialog'));
+    await settleTheme();
+    expect(find.text('Playground dialog'), findsNothing);
+
+    // The toast trigger fires the site-wide host.
+    await tester.tap(find.text('Show a toast'));
+    await settleTheme();
+    expect(find.text('Toast from the playground'), findsOneWidget);
+    // Elapse the toast's auto-dismiss timer before moving on.
+    await tester.pump(const Duration(seconds: 6));
+
+    // Navigation & shell: the embedded bottom bar tracks taps.
+    await reach(find.text('Feed'));
+    await tester.tap(find.text('Feed'));
+    await settleTheme();
+
+    // Layout & data display: info items, the divider demo, and the
+    // expandable's tap-to-toggle reveal.
+    await reach(find.text('Chain'));
+    expect(find.text('Polygon'), findsOneWidget);
+    await reach(find.text('Above the divider rule'));
+    await reach(find.text('Expandable — tap to toggle'));
+    await tester.tap(find.text('Expandable — tap to toggle'));
+    await settleTheme();
+    expect(
+      find.textContaining('revealed content animates'),
+      findsOneWidget,
+    );
+
+    // Feedback & status: shimmer placeholders are live.
+    await reach(find.byType(LegendShimmer));
+
+    // Content & typography closes the column.
+    await reach(find.text('Content & typography'));
+  });
+
   testWidgets('playground: steps completed knob restyles the live steps', (
     tester,
   ) async {
