@@ -49,7 +49,7 @@ The three lenses converged sharply: **the tappable list item/tile is the #1 gap 
 | 11 | `LegendProgress` | [L] | 8/8 | W+A | Surface paint (`variant: bar/circle`, determinate + indeterminate) |
 | 12 | `LegendSegmented` | [L] | 7/8 | W+A | on #1 (exclusive segmented choice) |
 
-### Wave 2 — high-frequency + structural
+### Wave 2 — high-frequency + structural — **LANDED 2026-07-22** (8/8, plus #21 pulled forward)
 | # | Name | Kind | Freq | Demand | Composes |
 |---|---|---|---|---|---|
 | 13 | `LegendRadioGroup` + `LegendRadio` | [L] | 8/8 | W | on #1 |
