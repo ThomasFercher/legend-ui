@@ -52,9 +52,7 @@ void main() {
       final written = _mockClipboard(tester);
       var copied = 0;
       await tester.pumpWidget(
-        _wrap(
-          LegendCopyButton(value: '0xDEADBEEF', onCopied: () => copied++),
-        ),
+        _wrap(LegendCopyButton(value: '0xDEADBEEF', onCopied: () => copied++)),
       );
       await tester.tap(find.byType(LegendCopyButton));
       await tester.pump();

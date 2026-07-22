@@ -219,6 +219,10 @@ class PlaygroundPage extends StatelessWidget {
                 'markdown knob in the theme panel.',
                 onTapLink: (_) {},
               ),
+              // A live LegendAddress — its built-in copy button's post-copy
+              // check color follows the theme panel's knob (level-3
+              // override).
+              const LegendAddress('0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'),
               // Live LegendChips — the selected fill follows the theme
               // panel's knob (level-3 override).
               const _ChipPreview(),

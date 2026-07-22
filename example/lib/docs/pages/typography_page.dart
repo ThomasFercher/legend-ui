@@ -129,6 +129,57 @@ LegendMarkdown(
 )''',
         ),
         DocSection(
+          title: 'Address & copy',
+          description:
+              'LegendAddress middle-truncates long identifiers with fixed '
+              'character counts — deterministic, no layout measuring — in a '
+              'mono style; hover, focus, or long-press for the full address, '
+              'which is also what assistive tech reads and what the built-in '
+              'LegendCopyButton copies. The standalone button confirms with '
+              'a transient check mark and announces the copy.',
+          demo: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: tokens.sizes.sm,
+            children: [
+              // The wallet receive-address idiom: caption, truncated
+              // address, built-in copy affordance.
+              const LegendText(
+                'Receive address',
+                variant: LegendTextVariant.b3,
+              ),
+              const LegendAddress('0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'),
+              const LegendAddress(
+                '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
+                prefixChars: 10,
+                suffixChars: 8,
+                copyable: false,
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: tokens.sizes.xs,
+                children: const [
+                  LegendText(
+                    'A standalone copy button for any value',
+                    variant: LegendTextVariant.b2,
+                  ),
+                  LegendCopyButton(
+                    value: 'legend hoist genius vault ordinary lecture',
+                    semanticLabel: 'Copy recovery phrase',
+                  ),
+                ],
+              ),
+            ],
+          ),
+          code: '''
+const LegendAddress('0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063')
+
+LegendCopyButton(
+  value: address,               // always the full value
+  semanticLabel: 'Copy address',
+  onCopied: () => log('copied'),
+)''',
+        ),
+        DocSection(
           title: 'Size tokens (live)',
           description:
               'Spacing scale, radii, and icon sizes — the density and '
