@@ -803,4 +803,67 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('playground: markdown link knob restyles the live markdown', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's markdown knob
+    // (swatch 4 is the violet, unused by any active preset).
+    await tester.scrollUntilVisible(
+      find.textContaining('Markdown link color'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('Markdown link color .* #')).at(4),
+    );
+    await settleTheme();
+    await tester.tap(
+      find.bySemanticsLabel(RegExp('Markdown link color .* #')).at(4),
+    );
+    await settleTheme();
+
+    // The live markdown in the preview column recolors its link span.
+    await tester.scrollUntilVisible(
+      find.byType(LegendMarkdown),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    // visitChildren skips text-less wrapper spans (the link wrapper that
+    // carries the color), so walk the span tree by hand.
+    bool hasViolet(InlineSpan span) =>
+        span is TextSpan &&
+        (span.style?.color == const Color(0xFF8B5CF6) ||
+            (span.children ?? const []).any(hasViolet));
+    final texts = tester.widgetList<Text>(
+      find.descendant(
+        of: find.byType(LegendMarkdown),
+        matching: find.byType(Text),
+      ),
+    );
+    expect(
+      texts.any((text) {
+        final span = text.textSpan;
+        return span != null && hasViolet(span);
+      }),
+      isTrue,
+    );
+  });
 }
