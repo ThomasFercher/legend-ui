@@ -11,6 +11,7 @@ class SelectionPage extends StatefulWidget {
 
 class _SelectionPageState extends State<SelectionPage> {
   String? _fruit;
+  String? _plan = 'monthly';
   var _notifications = true;
   var _newsletter = false;
   final _networks = {'Ethereum'};
@@ -26,10 +27,11 @@ class _SelectionPageState extends State<SelectionPage> {
     return DocPage(
       title: 'Selection',
       intro:
-          'One dropdown with one item model, plus a checkbox and a switch '
-          'that are honest to assistive tech: each announces its real role '
-          'with its state — checkbox with the tristate mixed value, toggle '
-          'with on/off — never as a button.',
+          'One dropdown with one item model, plus a checkbox, a radio group '
+          'and a switch that are honest to assistive tech: each announces '
+          'its real role with its state — checkbox with the tristate mixed '
+          'value, radio as checked within a mutually exclusive group, '
+          'toggle with on/off — never as a button.',
       children: [
         DocSection(
           title: 'Dropdown',
@@ -99,6 +101,80 @@ LegendCheckbox(
   label: 'Include all sources',
   onChanged: (v) => setState(() => includeAll = v),
 )''',
+        ),
+        DocSection(
+          title: 'Radio',
+          description:
+              'An exclusive one-of-N choice on the shared selection-control '
+              'base: real radio semantics (checked, in a mutually exclusive '
+              'group), a group scope that carries value and onChanged to '
+              'every radio, arrow keys that move selection with roving '
+              'focus, and Enter/Space to select — tapping the selected '
+              'radio never deselects.',
+          demo: LegendRadioGroup<String>(
+            value: _plan,
+            onChanged: (value) => setState(() => _plan = value),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: tokens.sizes.sm,
+              children: const [
+                LegendRadio(value: 'monthly', label: 'Monthly billing'),
+                LegendRadio(value: 'yearly', label: 'Yearly billing'),
+                LegendRadio(
+                  value: 'lifetime',
+                  label: 'Lifetime (disabled)',
+                  enabled: false,
+                ),
+              ],
+            ),
+          ),
+          code: '''
+LegendRadioGroup<String>(
+  value: plan,
+  onChanged: (value) => setState(() => plan = value),
+  child: Column(
+    children: const [
+      LegendRadio(value: 'monthly', label: 'Monthly billing'),
+      LegendRadio(value: 'yearly', label: 'Yearly billing'),
+    ],
+  ),
+)
+
+// Standalone, without a group:
+LegendRadio<String>(
+  value: 'monthly',
+  groupValue: plan,
+  onChanged: (value) => setState(() => plan = value),
+)''',
+        ),
+        const DocSection(
+          title: 'LegendRadio theme surface',
+          demo: PropsTable(
+            rows: [
+              (
+                name: 'fill',
+                type: 'InteractiveColors',
+                defaultsTo: 't.colors.primary (+ overlays)',
+              ),
+              (
+                name: 'dotColor',
+                type: 'Color',
+                defaultsTo: 't.colors.onPrimary',
+              ),
+              (
+                name: 'borderColor',
+                type: 'Color',
+                defaultsTo: 't.colors.background3',
+              ),
+              (
+                name: 'focusedBorderColor',
+                type: 'Color',
+                defaultsTo: 't.colors.primary',
+              ),
+              (name: 'size', type: 'double', defaultsTo: 't.sizes.iconMd'),
+              (name: 'borderWidth', type: 'double', defaultsTo: '1.5'),
+            ],
+          ),
         ),
         DocSection(
           title: 'Switch',

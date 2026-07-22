@@ -60,6 +60,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendCheckbox]'s checked box fill.
   Color? checkboxFill;
 
+  /// Level-3 override for [LegendRadio]'s selected circle fill.
+  Color? radioFill;
+
   /// Level-3 override for [LegendAvatar]'s corner radius.
   double? avatarRadius;
 
@@ -68,6 +71,12 @@ class ThemeController extends ChangeNotifier {
 
   /// Level-3 override for [LegendSlider]'s active-track color.
   Color? sliderActiveTrack;
+
+  /// Level-3 override for [LegendEmpty]'s inherited icon color.
+  Color? emptyIconColor;
+
+  /// Level-3 override for [LegendDrawer]'s side-drawer width.
+  double? drawerWidth;
 
   bool get dark => preset == ThemePreset.dark;
 
@@ -167,6 +176,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setRadioFill(Color? value) {
+    radioFill = value;
+    notifyListeners();
+  }
+
   void setAvatarRadius(double? value) {
     avatarRadius = value;
     notifyListeners();
@@ -179,6 +193,16 @@ class ThemeController extends ChangeNotifier {
 
   void setSliderActiveTrack(Color? value) {
     sliderActiveTrack = value;
+    notifyListeners();
+  }
+
+  void setEmptyIconColor(Color? value) {
+    emptyIconColor = value;
+    notifyListeners();
+  }
+
+  void setDrawerWidth(double? value) {
+    drawerWidth = value;
     notifyListeners();
   }
 
@@ -201,9 +225,12 @@ class ThemeController extends ChangeNotifier {
     badgeBackground = null;
     progressFill = null;
     checkboxFill = null;
+    radioFill = null;
     avatarRadius = null;
     segmentedThumb = null;
     sliderActiveTrack = null;
+    emptyIconColor = null;
+    drawerWidth = null;
     notifyListeners();
   }
 
@@ -333,6 +360,12 @@ class ThemeController extends ChangeNotifier {
           LegendCheckbox: LegendCheckboxThemeNullable(
             box: InteractiveColors(normal: checkboxFill),
           ),
+        // LegendRadio's selected circle fill — a sparse InteractiveColors:
+        // hover/press/disabled keep deriving from the lower levels.
+        if (radioFill != null)
+          LegendRadio: LegendRadioThemeNullable(
+            fill: InteractiveColors(normal: radioFill),
+          ),
         // LegendAvatar's shape — circle by default, squircle/square here.
         if (avatarRadius != null)
           LegendAvatar: LegendAvatarThemeNullable(
@@ -349,6 +382,12 @@ class ThemeController extends ChangeNotifier {
           LegendSlider: LegendSliderThemeNullable(
             activeTrack: sliderActiveTrack,
           ),
+        // LegendEmpty's zero-state glyph color (inherited via IconTheme).
+        if (emptyIconColor != null)
+          LegendEmpty: LegendEmptyThemeNullable(iconColor: emptyIconColor),
+        // LegendDrawer's side-drawer width.
+        if (drawerWidth != null)
+          LegendDrawer: LegendDrawerThemeNullable(width: drawerWidth),
       },
     );
   }
