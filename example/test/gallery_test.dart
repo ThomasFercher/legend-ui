@@ -1052,6 +1052,62 @@ void main() {
     expect(after!.shouldRepaint(before!), isTrue);
   });
 
+  testWidgets('playground: split-pane divider knob restyles the live '
+      'split pane', (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's split-pane knob
+    // (swatch 4 is the violet, unused by any active preset).
+    await tester.scrollUntilVisible(
+      find.textContaining('Split-pane divider color'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('Split-pane divider color .* #')).at(4),
+    );
+    await settleTheme();
+    await tester.tap(
+      find.bySemanticsLabel(RegExp('Split-pane divider color .* #')).at(4),
+    );
+    await settleTheme();
+
+    // The live split pane's divider line picks it up. (Scoped to the
+    // split pane — the ColorField swatches paint the same violet on
+    // their own LegendSurfaces; the preview's panes stay background1.)
+    await tester.scrollUntilVisible(
+      find.byType(LegendSplitPane),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    expect(
+      find.descendant(
+        of: find.byType(LegendSplitPane),
+        matching: find.byWidgetPredicate(
+          (widget) =>
+              widget is LegendSurface &&
+              widget.color == const Color(0xFF8B5CF6),
+        ),
+      ),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('playground: drawer width knob restyles the live drawer', (
     tester,
   ) async {

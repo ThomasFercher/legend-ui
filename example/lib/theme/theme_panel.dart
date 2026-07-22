@@ -269,6 +269,12 @@ class ThemePanel extends StatelessWidget {
           ),
 
           ColorField(
+            label: 'Split-pane divider color (LegendSplitPane.divider)',
+            value: controller.splitPaneDivider,
+            onChanged: controller.setSplitPaneDivider,
+          ),
+
+          ColorField(
             label: 'Empty-state icon color (LegendEmpty.iconColor)',
             value: controller.emptyIconColor,
             onChanged: controller.setEmptyIconColor,

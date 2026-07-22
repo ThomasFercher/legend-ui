@@ -59,6 +59,54 @@ LegendCard(
           code: 'const LegendDivider()  //  or axis: Axis.vertical',
         ),
         DocSection(
+          title: 'Split pane',
+          description:
+              'A resizable two-pane workspace layout: drag the divider '
+              '(or focus it and use the arrow keys) to adjust the split; '
+              'minFirst/minSecond bound the panes in pixels. Uncontrolled '
+              'by default — pass fraction/onFractionChanged to control it '
+              'yourself — and pass collapsed (e.g. from '
+              'LegendBreakpoints.tierOf) to show only the first pane on '
+              'small screens.',
+          demo: SizedBox(
+            height: 160,
+            child: LegendSplitPane(
+              semanticLabel: 'Docs split pane',
+              minFirst: 80,
+              minSecond: 80,
+              first: LegendSurface(
+                color: tokens.colors.background1,
+                borderRadius: tokens.sizes.borderRadiusMd,
+                padding: EdgeInsets.all(tokens.sizes.sm),
+                child: const LegendText(
+                  'Sources',
+                  variant: LegendTextVariant.b3,
+                ),
+              ),
+              second: LegendSurface(
+                color: tokens.colors.background1,
+                borderRadius: tokens.sizes.borderRadiusMd,
+                padding: EdgeInsets.all(tokens.sizes.sm),
+                child: const LegendText(
+                  'Editor — drag the divider between us.',
+                  variant: LegendTextVariant.b3,
+                ),
+              ),
+            ),
+          ),
+          code: '''
+LegendSplitPane(
+  // axis: Axis.vertical,          // stack the panes instead
+  // fraction: f,                  // controlled mode
+  // onFractionChanged: (f) => ...,
+  // collapsed: tier == LegendTier.compact,
+  minFirst: 80,
+  minSecond: 80,
+  first: SourcesPanel(),
+  second: Editor(),
+)''',
+        ),
+        DocSection(
           title: 'Expandable',
           description:
               'Uncontrolled by default; pass expanded/onToggle to control '

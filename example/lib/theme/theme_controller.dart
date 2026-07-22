@@ -90,6 +90,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendCombobox]'s option-highlight color.
   Color? comboboxHighlight;
 
+  /// Level-3 override for [LegendSplitPane]'s divider-line color.
+  Color? splitPaneDivider;
+
   /// Level-3 override for [LegendNumberField]'s stepper-arrow color.
   Color? numberStepperColor;
 
@@ -241,6 +244,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setSplitPaneDivider(Color? value) {
+    splitPaneDivider = value;
+    notifyListeners();
+  }
+
   void setNumberStepperColor(Color? value) {
     numberStepperColor = value;
     notifyListeners();
@@ -276,6 +284,7 @@ class ThemeController extends ChangeNotifier {
     drawerWidth = null;
     comboboxHighlight = null;
     numberStepperColor = null;
+    splitPaneDivider = null;
     notifyListeners();
   }
 
@@ -460,6 +469,11 @@ class ThemeController extends ChangeNotifier {
         if (numberStepperColor != null)
           LegendNumberField: LegendNumberFieldThemeNullable(
             stepperForeground: numberStepperColor,
+          ),
+        // LegendSplitPane's at-rest divider-line color.
+        if (splitPaneDivider != null)
+          LegendSplitPane: LegendSplitPaneThemeNullable(
+            divider: splitPaneDivider,
           ),
       },
     );

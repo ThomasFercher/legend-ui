@@ -258,6 +258,9 @@ class PlaygroundPage extends StatelessWidget {
                   ],
                 ),
               ),
+              // A live LegendSplitPane — its divider color follows the
+              // theme panel's knob (level-3 override).
+              const SizedBox(height: 120, child: _SplitPanePreview()),
               // Live LegendDrawer openers — the side drawer's width
               // follows the theme panel's knob (level-3 override).
               const _DrawerPreview(),
@@ -568,6 +571,30 @@ class _SliderPreviewState extends State<_SliderPreview> {
       value: _value,
       semanticLabel: 'Slider preview',
       onChanged: (value) => setState(() => _value = value),
+    );
+  }
+}
+
+/// A self-contained live [LegendSplitPane] for the playground preview
+/// column. Its divider color is themed by the panel's level-3 override.
+class _SplitPanePreview extends StatelessWidget {
+  const _SplitPanePreview();
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = LegendTheme.of(context).tokens;
+    Widget pane(String label) => LegendSurface(
+      color: tokens.colors.background1,
+      borderRadius: tokens.sizes.borderRadiusMd,
+      padding: EdgeInsets.all(tokens.sizes.sm),
+      child: LegendText(label, variant: LegendTextVariant.b3),
+    );
+    return LegendSplitPane(
+      semanticLabel: 'Split pane preview',
+      minFirst: 64,
+      minSecond: 64,
+      first: pane('Drag the divider —'),
+      second: pane('— its color follows the split-pane knob.'),
     );
   }
 }
