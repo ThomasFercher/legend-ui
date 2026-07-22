@@ -1303,6 +1303,59 @@ void main() {
     );
   });
 
+  testWidgets('playground: PIN-field knob recolors the live active-cell '
+      'border', (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's PIN-field knob.
+    await tester.scrollUntilVisible(
+      find.textContaining('PIN-field active-cell border'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('PIN-field active-cell border .*#8B5CF6')),
+    );
+    await settleTheme();
+    await tester.tap(
+      find.bySemanticsLabel(RegExp('PIN-field active-cell border .*#8B5CF6')),
+    );
+    await settleTheme();
+
+    // Focus the live pin field; its active cell shows the override.
+    await tester.scrollUntilVisible(
+      find.byType(LegendPinField),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    await tester.tap(find.byType(LegendPinField));
+    await settleTheme();
+    final firstCell = tester
+        .widgetList<LegendSurface>(
+          find.descendant(
+            of: find.byType(LegendPinField),
+            matching: find.byType(LegendSurface),
+          ),
+        )
+        .first;
+    expect((firstCell.border! as Border).top.color, const Color(0xFF8B5CF6));
+  });
+
   testWidgets('playground: markdown link knob restyles the live markdown', (
     tester,
   ) async {

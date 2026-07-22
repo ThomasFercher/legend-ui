@@ -268,6 +268,13 @@ class ThemePanel extends StatelessWidget {
             value: controller.copyConfirmationColor,
             onChanged: controller.setCopyConfirmationColor,
           ),
+          ColorField(
+            label:
+                'PIN-field active-cell border '
+                '(LegendPinField.focusedBorderColor)',
+            value: controller.pinActiveBorder,
+            onChanged: controller.setPinActiveBorder,
+          ),
 
           ColorField(
             label: 'Stat positive-delta color (LegendStat.positiveColor)',

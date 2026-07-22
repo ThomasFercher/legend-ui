@@ -99,6 +99,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendCopyButton]'s post-copy check color.
   Color? copyConfirmationColor;
 
+  /// Level-3 override for [LegendPinField]'s active-cell border color.
+  Color? pinActiveBorder;
+
   /// Level-3 override for [LegendStat]'s positive-delta color.
   Color? statPositiveColor;
 
@@ -260,6 +263,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setPinActiveBorder(Color? value) {
+    pinActiveBorder = value;
+    notifyListeners();
+  }
+
   void setStatPositiveColor(Color? value) {
     statPositiveColor = value;
     notifyListeners();
@@ -301,6 +309,7 @@ class ThemeController extends ChangeNotifier {
     comboboxHighlight = null;
     numberStepperColor = null;
     copyConfirmationColor = null;
+    pinActiveBorder = null;
     statPositiveColor = null;
     codeBlockBackground = null;
     notifyListeners();
@@ -493,6 +502,11 @@ class ThemeController extends ChangeNotifier {
         if (copyConfirmationColor != null)
           LegendCopyButton: LegendCopyButtonThemeNullable(
             confirmationColor: copyConfirmationColor,
+          ),
+        // LegendPinField's active-cell (focused) border color.
+        if (pinActiveBorder != null)
+          LegendPinField: LegendPinFieldThemeNullable(
+            focusedBorderColor: pinActiveBorder,
           ),
         // LegendStat's upward-delta color.
         if (statPositiveColor != null)
