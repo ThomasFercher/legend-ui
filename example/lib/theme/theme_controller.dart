@@ -72,6 +72,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendSlider]'s active-track color.
   Color? sliderActiveTrack;
 
+  /// Level-3 override for [LegendMenu]'s destructive-item label color.
+  Color? menuDestructiveColor;
+
   /// Level-3 override for [LegendEmpty]'s inherited icon color.
   Color? emptyIconColor;
 
@@ -202,6 +205,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setMenuDestructiveColor(Color? value) {
+    menuDestructiveColor = value;
+    notifyListeners();
+  }
+
   void setEmptyIconColor(Color? value) {
     emptyIconColor = value;
     notifyListeners();
@@ -245,6 +253,7 @@ class ThemeController extends ChangeNotifier {
     avatarRadius = null;
     segmentedThumb = null;
     sliderActiveTrack = null;
+    menuDestructiveColor = null;
     emptyIconColor = null;
     drawerWidth = null;
     comboboxHighlight = null;
@@ -399,6 +408,11 @@ class ThemeController extends ChangeNotifier {
         if (sliderActiveTrack != null)
           LegendSlider: LegendSliderThemeNullable(
             activeTrack: sliderActiveTrack,
+          ),
+        // LegendMenu's destructive-item label color.
+        if (menuDestructiveColor != null)
+          LegendMenu: LegendMenuThemeNullable(
+            destructiveColor: menuDestructiveColor,
           ),
         // LegendEmpty's zero-state glyph color (inherited via IconTheme).
         if (emptyIconColor != null)

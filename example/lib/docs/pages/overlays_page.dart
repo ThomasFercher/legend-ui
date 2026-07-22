@@ -11,6 +11,7 @@ class OverlaysPage extends StatefulWidget {
 
 class _OverlaysPageState extends State<OverlaysPage> {
   String _lastResult = '—';
+  var _menuAction = '—';
   var _menuChoice = '—';
 
   @override
@@ -319,6 +320,58 @@ LegendTooltip(
   semanticLabel: 'Full wallet address',
   placement: LegendPopoverPlacement.bottom,
   child: TruncatedAddress(...),
+)''',
+        ),
+        DocSection(
+          title: 'Menu',
+          description:
+              'A button-anchored action menu on the popover: opens from '
+              'its trigger, closes on selection, outside tap, or Escape. '
+              'Arrow keys move the highlight, Enter/Space activates, and '
+              'Escape returns focus to the trigger. Destructive items '
+              'render in the error color.',
+          demo: Wrap(
+            spacing: tokens.sizes.sm,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              LegendMenu(
+                semanticLabel: 'File actions',
+                offset: Offset(0, tokens.sizes.xs),
+                trigger: const LegendCard(child: LegendText('File actions')),
+                items: [
+                  LegendMenuItem(
+                    label: 'Rename',
+                    onSelected: () => setState(() => _menuAction = 'Rename'),
+                  ),
+                  LegendMenuItem(
+                    label: 'Duplicate',
+                    onSelected: () => setState(() => _menuAction = 'Duplicate'),
+                  ),
+                  LegendMenuItem(
+                    label: 'Share (soon)',
+                    enabled: false,
+                    onSelected: () {},
+                  ),
+                  const LegendMenuDivider(),
+                  LegendMenuItem(
+                    label: 'Delete',
+                    destructive: true,
+                    onSelected: () => setState(() => _menuAction = 'Delete'),
+                  ),
+                ],
+              ),
+              LegendText('Ran: $_menuAction', variant: LegendTextVariant.b3),
+            ],
+          ),
+          code: '''
+LegendMenu(
+  trigger: const IconTrigger(...),   // any widget; wrapped as a button
+  items: [
+    LegendMenuItem(label: 'Rename', onSelected: rename),
+    LegendMenuItem(label: 'Share', enabled: false, onSelected: share),
+    const LegendMenuDivider(),
+    LegendMenuItem(label: 'Delete', destructive: true, onSelected: delete),
+  ],
 )''',
         ),
         DocSection(

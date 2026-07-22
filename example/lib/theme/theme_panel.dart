@@ -238,6 +238,12 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setSegmentedThumb,
           ),
           ColorField(
+            label: 'Menu destructive color (LegendMenu.destructiveColor)',
+            value: controller.menuDestructiveColor,
+            onChanged: controller.setMenuDestructiveColor,
+          ),
+
+          ColorField(
             label: 'Combobox option highlight (LegendCombobox.menuBackground)',
             value: controller.comboboxHighlight,
             onChanged: controller.setComboboxHighlight,
