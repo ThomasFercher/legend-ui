@@ -1,6 +1,7 @@
 import 'package:example/docs/doc_page.dart';
 import 'package:example/theme/theme_controller.dart';
 import 'package:example/theme/theme_panel.dart';
+import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/legend_ui.dart';
 
@@ -139,6 +140,9 @@ class PlaygroundPage extends StatelessWidget {
               // A live LegendCheckbox — its checked fill follows the theme
               // panel's knob (level-3 override).
               const _CheckboxPreview(),
+              // A live LegendRadioGroup — the selected circle's fill
+              // follows the theme panel's radio knob (level-3 override).
+              const _RadioPreview(),
               const LegendLoading(),
               // A live LegendBanner — its info strip follows the theme
               // panel's banner knob (level-3 override).
@@ -147,6 +151,15 @@ class PlaygroundPage extends StatelessWidget {
                 message:
                     'The strip fill follows the banner knob in the theme '
                     'panel.',
+              ),
+              // A live LegendEmpty — its zero-state glyph follows the theme
+              // panel's empty-state icon knob (level-3 override).
+              const LegendEmpty(
+                title: 'LegendEmpty',
+                description:
+                    'The glyph color follows the empty-state icon knob in '
+                    'the theme panel.',
+                icon: Icon(Icons.inbox_outlined),
               ),
               // A live LegendProgress — its fill color follows the theme
               // panel's knob (level-3 override).
@@ -188,6 +201,9 @@ class PlaygroundPage extends StatelessWidget {
               // A live LegendList — the selected row's fill follows the
               // theme panel's knob (level-3 override).
               const SizedBox(width: 300, child: _ListPreview()),
+              // Live LegendDrawer openers — the side drawer's width
+              // follows the theme panel's knob (level-3 override).
+              const _DrawerPreview(),
             ],
           ),
         ),
@@ -311,6 +327,38 @@ class _CheckboxPreviewState extends State<_CheckboxPreview> {
   }
 }
 
+/// A self-contained live [LegendRadioGroup] for the playground preview
+/// column. Its selected circle's fill is themed by the panel's level-3
+/// override.
+class _RadioPreview extends StatefulWidget {
+  const _RadioPreview();
+
+  @override
+  State<_RadioPreview> createState() => _RadioPreviewState();
+}
+
+class _RadioPreviewState extends State<_RadioPreview> {
+  String? _plan = 'monthly';
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = LegendTheme.of(context).tokens;
+    return LegendRadioGroup<String>(
+      value: _plan,
+      onChanged: (value) => setState(() => _plan = value),
+      child: Wrap(
+        spacing: tokens.sizes.md,
+        runSpacing: tokens.sizes.xs,
+        children: const [
+          LegendRadio(value: 'monthly', label: 'Monthly'),
+          LegendRadio(value: 'yearly', label: 'Yearly'),
+          LegendRadio(value: 'lifetime', label: 'Lifetime'),
+        ],
+      ),
+    );
+  }
+}
+
 /// A self-contained live [LegendTabs] for the playground preview column.
 /// Its indicator color is themed by the panel's level-3 override.
 class _TabsPreview extends StatefulWidget {
@@ -408,6 +456,53 @@ class _ListPreviewState extends State<_ListPreview> {
             selected: index == _selected,
             onTap: () => setState(() => _selected = index),
           ),
+      ],
+    );
+  }
+}
+
+/// Buttons opening a live [LegendDrawer] from the start edge and the
+/// bottom, for the playground preview column. The side drawer's width is
+/// themed by the panel's level-3 override.
+class _DrawerPreview extends StatelessWidget {
+  const _DrawerPreview();
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = LegendTheme.of(context).tokens;
+    return Wrap(
+      spacing: tokens.sizes.sm,
+      runSpacing: tokens.sizes.sm,
+      children: [
+        SecondaryLegendButton(
+          text: 'Open side drawer',
+          onPressed: () => LegendDrawer.show<void>(
+            context,
+            builder: (context) => const Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                LegendText('Drawer', variant: LegendTextVariant.h3),
+                LegendText(
+                  "This side drawer's width follows the drawer knob in "
+                  'the theme panel.',
+                  variant: LegendTextVariant.b2,
+                ),
+              ],
+            ),
+          ),
+        ),
+        SecondaryLegendButton(
+          text: 'Open bottom sheet',
+          onPressed: () => LegendDrawer.show<void>(
+            context,
+            edge: LegendDrawerEdge.bottom,
+            builder: (context) => const LegendText(
+              'Drag down past a third of the height to dismiss.',
+              variant: LegendTextVariant.b2,
+            ),
+          ),
+        ),
       ],
     );
   }

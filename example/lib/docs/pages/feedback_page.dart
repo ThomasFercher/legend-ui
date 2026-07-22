@@ -79,6 +79,48 @@ LegendBanner(
 )''',
         ),
         DocSection(
+          title: 'Empty',
+          description:
+              'The zero-state placeholder a list or panel shows instead of '
+              'content. Purely presentational: icon and action are consumer '
+              'slots, the muted styles come from the theme, and long '
+              'descriptions wrap inside a centered column.',
+          demo: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: tokens.sizes.md,
+            children: [
+              LegendEmpty(
+                title: 'No transactions yet',
+                description:
+                    'Activity shows up here after your first transfer. '
+                    'Receive funds to get started.',
+                icon: const Icon(Icons.inbox_outlined),
+                action: SecondaryLegendButton(text: 'Receive', onPressed: noop),
+              ),
+              const LegendDivider(),
+              LegendEmpty(
+                title: 'No sources',
+                description:
+                    'Connect a document, site or note and its content '
+                    'becomes searchable in this workspace.',
+                icon: const Icon(Icons.folder_open_outlined),
+                action: PrimaryLegendButton(
+                  text: 'Add source',
+                  onPressed: noop,
+                ),
+              ),
+            ],
+          ),
+          code: '''
+LegendEmpty(
+  title: 'No sources',
+  description: 'Connect a document, site or note and its '
+      'content becomes searchable in this workspace.',
+  icon: const Icon(Icons.folder_open_outlined), // inherits color + size
+  action: PrimaryLegendButton(text: 'Add source', onPressed: add),
+)''',
+        ),
+        DocSection(
           title: 'Loading',
           demo: Wrap(
             spacing: tokens.sizes.md,
