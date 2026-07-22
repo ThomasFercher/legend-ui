@@ -913,6 +913,67 @@ void main() {
     );
   });
 
+  testWidgets('playground: slider active-track knob restyles the live '
+      'slider', (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // The slider paints privately, so the assertion goes through the
+    // painter's own shouldRepaint: capture it before the knob, compare
+    // after.
+    Finder paint() => find.descendant(
+      of: find.byType(LegendSlider),
+      matching: find.byType(CustomPaint),
+    );
+    await tester.scrollUntilVisible(
+      find.byType(LegendSlider),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    final before = tester.widget<CustomPaint>(paint()).painter;
+
+    // Register the level-3 override through the panel's slider knob
+    // (swatch 4 is the violet, unused by any active preset).
+    await tester.scrollUntilVisible(
+      find.textContaining('Slider active-track color'),
+      -200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('Slider active-track color #')).at(4),
+    );
+    await settleTheme();
+    await tester.tap(
+      find.bySemanticsLabel(RegExp('Slider active-track color #')).at(4),
+    );
+    await settleTheme();
+
+    // The live slider in the preview column repaints with the new
+    // active-track color.
+    await tester.scrollUntilVisible(
+      find.byType(LegendSlider),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    final after = tester.widget<CustomPaint>(paint()).painter;
+    expect(after!.shouldRepaint(before!), isTrue);
+  });
+
   testWidgets('playground: drawer width knob restyles the live drawer', (
     tester,
   ) async {

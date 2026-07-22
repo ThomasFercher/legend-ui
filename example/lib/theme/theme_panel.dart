@@ -251,6 +251,12 @@ class ThemePanel extends StatelessWidget {
           ),
 
           ColorField(
+            label: 'Slider active-track color',
+            value: controller.sliderActiveTrack,
+            onChanged: controller.setSliderActiveTrack,
+          ),
+
+          ColorField(
             label: 'Empty-state icon color (LegendEmpty.iconColor)',
             value: controller.emptyIconColor,
             onChanged: controller.setEmptyIconColor,

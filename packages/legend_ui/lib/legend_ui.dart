@@ -42,6 +42,7 @@ export 'src/components/popover/legend_popover.dart';
 export 'src/components/progress/legend_progress.dart';
 export 'src/components/radio/legend_radio.dart';
 export 'src/components/segmented/legend_segmented.dart';
+export 'src/components/slider/legend_slider.dart';
 export 'src/components/switch/legend_switch.dart';
 export 'src/components/tabs/legend_tabs.dart';
 export 'src/components/text/legend_text.dart';

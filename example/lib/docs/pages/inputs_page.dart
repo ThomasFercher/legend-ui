@@ -25,6 +25,8 @@ class _InputsPageState extends State<InputsPage> {
   var _submitted = '—';
   double? _amount = 1.5;
   double? _slippage = 0.5;
+  var _volume = 0.4;
+  var _quality = 50.0;
 
   @override
   void dispose() {
@@ -167,6 +169,59 @@ LegendNumberField(
   step: 0.5,
   decimals: 2,              // typing and formatting precision
   onChanged: (value) => setState(() => amount = value),
+)''',
+        ),
+        DocSection(
+          title: 'Slider',
+          description:
+              'A draggable value selector — drag the thumb or tap the '
+              'track; arrow keys step the value while focused (one '
+              'division when snapping, 5% of the range otherwise) and '
+              'Home/End jump to the ends. Announced to assistive tech as '
+              'a real slider with increase/decrease actions, never as a '
+              'button.',
+          demo: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: tokens.sizes.sm,
+            children: [
+              LegendText(
+                'Volume — ${(_volume * 100).round()}%',
+                variant: LegendTextVariant.b3,
+              ),
+              LegendSlider(
+                value: _volume,
+                semanticLabel: 'Volume',
+                onChanged: (v) => setState(() => _volume = v),
+              ),
+              LegendText(
+                'Quality — ${_quality.round()} (10 steps)',
+                variant: LegendTextVariant.b3,
+              ),
+              LegendSlider(
+                value: _quality,
+                max: 100,
+                divisions: 10,
+                semanticLabel: 'Quality',
+                semanticFormatter: (v) => '${v.round()} of 100',
+                onChanged: (v) => setState(() => _quality = v),
+              ),
+              const LegendText('Disabled', variant: LegendTextVariant.b3),
+              const LegendSlider(value: 0.3, onChanged: null),
+            ],
+          ),
+          code: r'''
+LegendSlider(
+  value: volume,              // 0..1 by default
+  semanticLabel: 'Volume',
+  onChanged: (v) => setState(() => volume = v),
+)
+
+LegendSlider(
+  value: quality,
+  max: 100,
+  divisions: 10,              // snaps every delivered value
+  semanticFormatter: (v) => '${v.round()} of 100',
+  onChanged: (v) => setState(() => quality = v),
 )''',
         ),
         DocSection(

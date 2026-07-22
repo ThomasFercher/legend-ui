@@ -198,6 +198,9 @@ class PlaygroundPage extends StatelessWidget {
               // A live LegendSegmented — its thumb color follows the
               // theme panel's knob (level-3 override).
               const _SegmentedPreview(),
+              // A live LegendSlider — its active-track color follows the
+              // theme panel's knob (level-3 override).
+              const _SliderPreview(),
               // A live LegendVerticalMenu — its selected color follows the
               // theme panel's knob (level-3 override).
               const SizedBox(width: 260, child: _MenuPreview()),
@@ -491,6 +494,29 @@ class _ListPreviewState extends State<_ListPreview> {
             onTap: () => setState(() => _selected = index),
           ),
       ],
+    );
+  }
+}
+
+/// A self-contained live [LegendSlider] for the playground preview
+/// column. Its active-track color is themed by the panel's level-3
+/// override.
+class _SliderPreview extends StatefulWidget {
+  const _SliderPreview();
+
+  @override
+  State<_SliderPreview> createState() => _SliderPreviewState();
+}
+
+class _SliderPreviewState extends State<_SliderPreview> {
+  var _value = 0.6;
+
+  @override
+  Widget build(BuildContext context) {
+    return LegendSlider(
+      value: _value,
+      semanticLabel: 'Slider preview',
+      onChanged: (value) => setState(() => _value = value),
     );
   }
 }

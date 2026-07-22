@@ -69,6 +69,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendSegmented]'s selected-segment thumb color.
   Color? segmentedThumb;
 
+  /// Level-3 override for [LegendSlider]'s active-track color.
+  Color? sliderActiveTrack;
+
   /// Level-3 override for [LegendEmpty]'s inherited icon color.
   Color? emptyIconColor;
 
@@ -194,6 +197,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setSliderActiveTrack(Color? value) {
+    sliderActiveTrack = value;
+    notifyListeners();
+  }
+
   void setEmptyIconColor(Color? value) {
     emptyIconColor = value;
     notifyListeners();
@@ -236,6 +244,7 @@ class ThemeController extends ChangeNotifier {
     radioFill = null;
     avatarRadius = null;
     segmentedThumb = null;
+    sliderActiveTrack = null;
     emptyIconColor = null;
     drawerWidth = null;
     comboboxHighlight = null;
@@ -385,6 +394,11 @@ class ThemeController extends ChangeNotifier {
         if (segmentedThumb != null)
           LegendSegmented: LegendSegmentedThemeNullable(
             thumb: InteractiveColors(normal: segmentedThumb),
+          ),
+        // LegendSlider's active-track (filled-portion) color.
+        if (sliderActiveTrack != null)
+          LegendSlider: LegendSliderThemeNullable(
+            activeTrack: sliderActiveTrack,
           ),
         // LegendEmpty's zero-state glyph color (inherited via IconTheme).
         if (emptyIconColor != null)
