@@ -61,7 +61,7 @@ The three lenses converged sharply: **the tappable list item/tile is the #1 gap 
 | 19 | `LegendCombobox` | [L] | 6/8 | W+A | on #2 + `LegendFieldCore` (typeahead; distinct from Dropdown) |
 | 20 | `LegendAccordion` | upgrade | 6/8 | A | single-open controller over `LegendExpandable` |
 
-### Wave 3 — domain & specialized
+### Wave 3 — domain & specialized — **LANDED 2026-07-22** (8/9; #24 QrCode parked pending dep approval, #30 covered by LegendChip)
 | # | Name | Kind | Demand | Notes |
 |---|---|---|---|---|
 | 21 | `LegendMarkdown` | [L] | A | block renderer (lists/tables/headings/code) over `LegendText.rich` — the biggest AI-workspace gap |
