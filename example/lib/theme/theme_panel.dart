@@ -232,6 +232,13 @@ class ThemePanel extends StatelessWidget {
             value: controller.segmentedThumb,
             onChanged: controller.setSegmentedThumb,
           ),
+          ColorField(
+            label:
+                'Number-field stepper color '
+                '(LegendNumberField.stepperForeground)',
+            value: controller.numberStepperColor,
+            onChanged: controller.setNumberStepperColor,
+          ),
 
           const LegendDivider(),
           SecondaryLegendButton(

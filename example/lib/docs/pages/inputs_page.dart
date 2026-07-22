@@ -13,6 +13,8 @@ class _InputsPageState extends State<InputsPage> {
   String? _emailError;
   final _form = LegendFormController();
   var _submitted = '—';
+  double? _amount = 1.5;
+  double? _slippage = 0.5;
 
   @override
   void dispose() {
@@ -70,6 +72,55 @@ LegendTextField(
   placeholder: 'jane@example.com',
   errorText: _error,          // shown below the field
   onChanged: validate,
+)''',
+        ),
+        DocSection(
+          title: 'Number fields',
+          description:
+              'LegendNumberField filters typing to a decimal pattern, clamps '
+              'to min/max on commit (blur or Enter), and steps via the '
+              'trailing buttons (press-and-hold repeats) or the up/down '
+              'arrow keys. The steppers disable at the bounds.',
+          demo: Column(
+            spacing: tokens.sizes.sm,
+            children: [
+              LegendNumberField(
+                title: 'Amount (0 – 100, step 0.5)',
+                value: _amount,
+                min: 0,
+                max: 100,
+                step: 0.5,
+                placeholder: '0',
+                onChanged: (value) => setState(() => _amount = value),
+              ),
+              LegendNumberField(
+                title: 'Slippage % (2 decimals)',
+                value: _slippage,
+                min: 0,
+                max: 5,
+                step: 0.1,
+                decimals: 2,
+                onChanged: (value) => setState(() => _slippage = value),
+              ),
+              const LegendNumberField(
+                title: 'Disabled',
+                value: 42,
+                enabled: false,
+              ),
+              LegendText(
+                'Amount: ${_amount ?? '—'} · Slippage: ${_slippage ?? '—'}',
+                variant: LegendTextVariant.b3,
+              ),
+            ],
+          ),
+          code: '''
+LegendNumberField(
+  value: amount,
+  min: 0,
+  max: 100,
+  step: 0.5,
+  decimals: 2,              // typing and formatting precision
+  onChanged: (value) => setState(() => amount = value),
 )''',
         ),
         DocSection(
