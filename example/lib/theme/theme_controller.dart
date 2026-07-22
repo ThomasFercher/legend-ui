@@ -90,6 +90,12 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendCombobox]'s option-highlight color.
   Color? comboboxHighlight;
 
+  /// Level-3 override for [LegendBreadcrumb]'s separator-chevron color.
+  Color? breadcrumbSeparatorColor;
+
+  /// Level-3 override for [LegendPagination]'s current-page fill.
+  Color? paginationSelectedFill;
+
   /// Level-3 override for [LegendNumberField]'s stepper-arrow color.
   Color? numberStepperColor;
 
@@ -246,6 +252,16 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setBreadcrumbSeparatorColor(Color? value) {
+    breadcrumbSeparatorColor = value;
+    notifyListeners();
+  }
+
+  void setPaginationSelectedFill(Color? value) {
+    paginationSelectedFill = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -276,6 +292,8 @@ class ThemeController extends ChangeNotifier {
     drawerWidth = null;
     comboboxHighlight = null;
     numberStepperColor = null;
+    breadcrumbSeparatorColor = null;
+    paginationSelectedFill = null;
     notifyListeners();
   }
 
@@ -460,6 +478,18 @@ class ThemeController extends ChangeNotifier {
         if (numberStepperColor != null)
           LegendNumberField: LegendNumberFieldThemeNullable(
             stepperForeground: numberStepperColor,
+          ),
+        // LegendBreadcrumb's separator-chevron color.
+        if (breadcrumbSeparatorColor != null)
+          LegendBreadcrumb: LegendBreadcrumbThemeNullable(
+            separatorColor: breadcrumbSeparatorColor,
+          ),
+        // LegendPagination's current-page fill — a sparse
+        // InteractiveColors: only `normal` is set, the other states keep
+        // resolving downward.
+        if (paginationSelectedFill != null)
+          LegendPagination: LegendPaginationThemeNullable(
+            selectedFill: InteractiveColors(normal: paginationSelectedFill),
           ),
       },
     );

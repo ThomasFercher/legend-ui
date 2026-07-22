@@ -191,6 +191,12 @@ class PlaygroundPage extends StatelessWidget {
               // A live LegendTabs — its active indicator follows the
               // theme panel's knob (level-3 override).
               const _TabsPreview(),
+              // A live LegendBreadcrumb — its separator chevrons follow
+              // the theme panel's knob (level-3 override).
+              const _BreadcrumbPreview(),
+              // A live LegendPagination — its current-page fill follows
+              // the theme panel's knob (level-3 override).
+              const _PaginationPreview(),
               LegendSurface(
                 color: tokens.colors.background1,
                 borderRadius: tokens.sizes.borderRadiusMd,
@@ -615,6 +621,48 @@ class _DrawerPreview extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// A live [LegendBreadcrumb] trail for the playground preview column. Its
+/// separator chevrons are themed by the panel's level-3 override.
+class _BreadcrumbPreview extends StatelessWidget {
+  const _BreadcrumbPreview();
+
+  @override
+  Widget build(BuildContext context) {
+    void noop() {}
+    return LegendBreadcrumb(
+      items: [
+        LegendBreadcrumbItem(label: 'Home', onTap: noop),
+        LegendBreadcrumbItem(label: 'Wallet', onTap: noop),
+        LegendBreadcrumbItem(label: 'Tokens', onTap: noop),
+        const LegendBreadcrumbItem(label: 'Ethereum'),
+      ],
+    );
+  }
+}
+
+/// A self-contained live [LegendPagination] for the playground preview
+/// column. Its current-page fill is themed by the panel's level-3
+/// override.
+class _PaginationPreview extends StatefulWidget {
+  const _PaginationPreview();
+
+  @override
+  State<_PaginationPreview> createState() => _PaginationPreviewState();
+}
+
+class _PaginationPreviewState extends State<_PaginationPreview> {
+  var _page = 5;
+
+  @override
+  Widget build(BuildContext context) {
+    return LegendPagination(
+      page: _page,
+      pageCount: 20,
+      onChanged: (page) => setState(() => _page = page),
     );
   }
 }

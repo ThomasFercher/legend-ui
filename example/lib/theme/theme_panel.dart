@@ -263,6 +263,19 @@ class ThemePanel extends StatelessWidget {
           ),
 
           ColorField(
+            label:
+                'Breadcrumb separator color '
+                '(LegendBreadcrumb.separatorColor)',
+            value: controller.breadcrumbSeparatorColor,
+            onChanged: controller.setBreadcrumbSeparatorColor,
+          ),
+          ColorField(
+            label: 'Pagination selected fill (LegendPagination.selectedFill)',
+            value: controller.paginationSelectedFill,
+            onChanged: controller.setPaginationSelectedFill,
+          ),
+
+          ColorField(
             label: 'Slider active-track color',
             value: controller.sliderActiveTrack,
             onChanged: controller.setSliderActiveTrack,
