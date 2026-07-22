@@ -232,6 +232,11 @@ class ThemePanel extends StatelessWidget {
             value: controller.segmentedThumb,
             onChanged: controller.setSegmentedThumb,
           ),
+          ColorField(
+            label: 'Menu destructive color (LegendMenu.destructiveColor)',
+            value: controller.menuDestructiveColor,
+            onChanged: controller.setMenuDestructiveColor,
+          ),
 
           const LegendDivider(),
           SecondaryLegendButton(

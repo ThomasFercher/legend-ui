@@ -66,6 +66,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendSegmented]'s selected-segment thumb color.
   Color? segmentedThumb;
 
+  /// Level-3 override for [LegendMenu]'s destructive-item label color.
+  Color? menuDestructiveColor;
+
   bool get dark => preset == ThemePreset.dark;
 
   void setPreset(ThemePreset value) {
@@ -174,6 +177,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setMenuDestructiveColor(Color? value) {
+    menuDestructiveColor = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -195,6 +203,7 @@ class ThemeController extends ChangeNotifier {
     checkboxFill = null;
     avatarRadius = null;
     segmentedThumb = null;
+    menuDestructiveColor = null;
     notifyListeners();
   }
 
@@ -334,6 +343,11 @@ class ThemeController extends ChangeNotifier {
         if (segmentedThumb != null)
           LegendSegmented: LegendSegmentedThemeNullable(
             thumb: InteractiveColors(normal: segmentedThumb),
+          ),
+        // LegendMenu's destructive-item label color.
+        if (menuDestructiveColor != null)
+          LegendMenu: LegendMenuThemeNullable(
+            destructiveColor: menuDestructiveColor,
           ),
       },
     );

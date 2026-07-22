@@ -85,6 +85,24 @@ class PlaygroundPage extends StatelessWidget {
                 ),
                 child: const LegendCard(child: LegendText('Tap for a popover')),
               ),
+              // A live LegendMenu — its destructive-item color follows the
+              // theme panel's knob (level-3 override).
+              LegendMenu(
+                semanticLabel: 'Open actions menu',
+                trigger: const LegendCard(
+                  child: LegendText('Tap for an action menu'),
+                ),
+                items: [
+                  LegendMenuItem(label: 'Rename', onSelected: () {}),
+                  LegendMenuItem(label: 'Duplicate', onSelected: () {}),
+                  const LegendMenuDivider(),
+                  LegendMenuItem(
+                    label: 'Delete',
+                    destructive: true,
+                    onSelected: () {},
+                  ),
+                ],
+              ),
               // A live LegendTooltip — how long you hover before it shows
               // follows the theme panel's delay knob (level-3 override).
               const LegendTooltip(

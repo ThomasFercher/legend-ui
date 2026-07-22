@@ -257,6 +257,84 @@ void main() {
     expect(panel.borderRadius, BorderRadius.circular(12));
   });
 
+  testWidgets('overlays page: menu opens, selects, and shows the choice', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const DocsApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Overlays'));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.text('File actions'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    // scrollUntilVisible stops as soon as the sliver cache builds the
+    // target, which can still be off-screen — align it for the tap.
+    await tester.ensureVisible(find.text('File actions'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('File actions'));
+    await tester.pumpAndSettle();
+    expect(find.text('Rename'), findsOneWidget);
+    expect(find.text('Delete'), findsOneWidget);
+
+    await tester.tap(find.text('Duplicate'));
+    await tester.pumpAndSettle();
+    expect(find.text('Duplicate'), findsNothing);
+    expect(find.text('Ran: Duplicate'), findsOneWidget);
+  });
+
+  testWidgets('playground: menu destructive knob restyles the live menu', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's menu knob.
+    await tester.scrollUntilVisible(
+      find.textContaining('Menu destructive color'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    // Swatch 4 is violet (0xFF8B5CF6).
+    await tester.tap(
+      find.bySemanticsLabel(RegExp('Menu destructive color .* #8B5CF6')),
+    );
+    await settleTheme();
+
+    // The live menu in the preview column picks it up.
+    await tester.scrollUntilVisible(
+      find.text('Tap for an action menu'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('Tap for an action menu'));
+    await settleTheme();
+    await tester.tap(find.text('Tap for an action menu'));
+    await settleTheme();
+    final label = tester.widget<Text>(find.text('Delete'));
+    expect(label.style?.color, const Color(0xFF8B5CF6));
+  });
+
   testWidgets('layout page: badge demo shows label, counts, and overflow', (
     tester,
   ) async {
