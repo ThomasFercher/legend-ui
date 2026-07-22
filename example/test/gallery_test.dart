@@ -1365,4 +1365,60 @@ void main() {
       isTrue,
     );
   });
+
+  testWidgets('playground: code-block fill knob restyles the live panel', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's code-block knob
+    // (swatch 4 is the violet, unused by any active preset).
+    await tester.scrollUntilVisible(
+      find.textContaining('Code-block panel fill'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('Code-block panel fill .* #')).at(4),
+    );
+    await settleTheme();
+    await tester.tap(
+      find.bySemanticsLabel(RegExp('Code-block panel fill .* #')).at(4),
+    );
+    await settleTheme();
+
+    // The live code block in the preview column refills its panel.
+    await tester.scrollUntilVisible(
+      find.byType(LegendCodeBlock),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    final container = tester.widget<Container>(
+      find
+          .descendant(
+            of: find.byType(LegendCodeBlock),
+            matching: find.byType(Container),
+          )
+          .first,
+    );
+    expect(
+      (container.decoration! as BoxDecoration).color,
+      const Color(0xFF8B5CF6),
+    );
+  });
 }

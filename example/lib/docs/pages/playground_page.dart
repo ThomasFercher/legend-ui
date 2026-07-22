@@ -241,6 +241,13 @@ class PlaygroundPage extends StatelessWidget {
                 'markdown knob in the theme panel.',
                 onTapLink: (_) {},
               ),
+              // A live LegendCodeBlock — its panel fill follows the theme
+              // panel's knob (level-3 override).
+              const LegendCodeBlock(
+                '// The panel fill follows the code-block knob.\n'
+                'final theme = _theme(context);',
+                language: 'dart',
+              ),
               // Live LegendChips — the selected fill follows the theme
               // panel's knob (level-3 override).
               const _ChipPreview(),
