@@ -1,4 +1,5 @@
 import 'package:example/docs/doc_page.dart';
+import 'package:example/docs/manifest_props_table.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/legend_ui.dart';
@@ -161,6 +162,8 @@ LegendButtonCore(
   text: 'Danger',
 )''',
         ),
+        const ThemeSurfaceSection(component: SecondaryLegendButton),
+        const ThemeSurfaceSection(component: LegendTextButton),
       ],
     );
   }

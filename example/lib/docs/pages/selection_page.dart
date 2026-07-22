@@ -1,4 +1,5 @@
 import 'package:example/docs/doc_page.dart';
+import 'package:example/docs/manifest_props_table.dart';
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/legend_ui.dart';
 
@@ -470,6 +471,8 @@ LegendSegmented<String>(
             ],
           ),
         ),
+        const ThemeSurfaceSection(component: LegendCheckbox),
+        const ThemeSurfaceSection(component: LegendSwitch),
       ],
     );
   }

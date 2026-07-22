@@ -1856,16 +1856,153 @@ void main() {
     await reach(find.text('Expandable — tap to toggle'));
     await tester.tap(find.text('Expandable — tap to toggle'));
     await settleTheme();
-    expect(
-      find.textContaining('revealed content animates'),
-      findsOneWidget,
-    );
+    expect(find.textContaining('revealed content animates'), findsOneWidget);
 
     // Feedback & status: shimmer placeholders are live.
     await reach(find.byType(LegendShimmer));
 
     // Content & typography closes the column.
     await reach(find.text('Content & typography'));
+  });
+
+  testWidgets('docs pages: every shipped widget exposes a theme-surface '
+      'table', (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // Feedback (LegendLoading/LegendShimmer) animates unbounded, so pump
+    // explicitly instead of pumpAndSettle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    // Nav label -> theme-surface sections that page must carry (the
+    // buttons/selection pages keep their older hand-written tables for
+    // Primary/Radio/Chip/Dropdown/Segmented on top of these).
+    const expectations = {
+      'Buttons': ['SecondaryLegendButton', 'LegendTextButton'],
+      'Typography': [
+        'LegendMarkdown',
+        'LegendMarkdownEditor',
+        'LegendCodeBlock',
+        'LegendAddress',
+        'LegendCopyButton',
+      ],
+      'Inputs': [
+        'LegendTextField',
+        'LegendCombobox',
+        'LegendNumberField',
+        'LegendPinField',
+        'LegendSlider',
+      ],
+      'Selection': ['LegendCheckbox', 'LegendSwitch'],
+      'Overlays': [
+        'LegendDialog',
+        'LegendDrawer',
+        'LegendToast',
+        'LegendPopover',
+        'LegendTooltip',
+        'LegendMenu',
+        'LegendContextMenu',
+      ],
+      'Layout': [
+        'LegendCard',
+        'LegendDivider',
+        'LegendSplitPane',
+        'LegendExpandable',
+        'LegendAccordion',
+        'LegendBody',
+        'LegendAvatar',
+        'LegendInfoItem',
+        'LegendStat',
+        'LegendList',
+        'LegendListItem',
+        'LegendTimeline',
+        'LegendBadge',
+      ],
+      'Feedback': [
+        'LegendBanner',
+        'LegendEmpty',
+        'LegendLoading',
+        'LegendProgress',
+        'LegendSteps',
+        'LegendShimmer',
+      ],
+      'Shell': [
+        'LegendScaffold',
+        'LegendAppBar',
+        'LegendSider',
+        'LegendBottomBar',
+        'LegendTabs',
+        'LegendBreadcrumb',
+        'LegendPagination',
+        'LegendVerticalMenu',
+      ],
+    };
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    for (final page in expectations.entries) {
+      await tester.tap(find.text(page.key).first);
+      await settleTheme();
+      for (final component in page.value) {
+        expect(
+          find.text('$component theme surface'),
+          findsOneWidget,
+          reason: '${page.key} page must document $component',
+        );
+      }
+    }
+  });
+
+  testWidgets('typography page: one custom syntax registration feeds the '
+      'editor and the renderer', (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Typography'));
+    await settleTheme();
+
+    // Renderer side: the #LEG-42 reference renders as the custom span —
+    // semibold, not plain prose.
+    bool hasTicket(InlineSpan span) =>
+        span is TextSpan &&
+        ((span.text == '#LEG-42' && span.style?.fontWeight == FontWeight.w600) ||
+            (span.children ?? const []).any(hasTicket));
+    final texts = tester.widgetList<Text>(
+      find.descendant(
+        of: find.byType(LegendMarkdown),
+        matching: find.byType(Text),
+      ),
+    );
+    expect(
+      texts.any((text) {
+        final span = text.textSpan;
+        return span != null && hasTicket(span);
+      }),
+      isTrue,
+      reason: 'the renderer must build the ticketRef span',
+    );
+
+    // Editor side: the very same registration is wired into the editing
+    // controller, so the raw source highlights while typing.
+    final controller = tester
+        .widgetList<EditableText>(find.byType(EditableText))
+        .map((editable) => editable.controller)
+        .whereType<LegendMarkdownEditingController>()
+        .firstWhere((candidate) => candidate.text.contains('#LEG-42'));
+    expect(controller.syntaxes.single.tag, 'ticketRef');
+    expect(controller.syntaxes.single.highlight, isNotNull);
   });
 
   testWidgets('playground: steps completed knob restyles the live steps', (

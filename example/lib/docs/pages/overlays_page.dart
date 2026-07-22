@@ -1,4 +1,5 @@
 import 'package:example/docs/doc_page.dart';
+import 'package:example/docs/manifest_props_table.dart';
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/legend_ui.dart';
 
@@ -412,6 +413,13 @@ LegendContextMenu(
   child: const FileTile(...),
 )''',
         ),
+        const ThemeSurfaceSection(component: LegendDialog),
+        const ThemeSurfaceSection(component: LegendDrawer),
+        const ThemeSurfaceSection(component: LegendToast),
+        const ThemeSurfaceSection(component: LegendPopover),
+        const ThemeSurfaceSection(component: LegendTooltip),
+        const ThemeSurfaceSection(component: LegendMenu),
+        const ThemeSurfaceSection(component: LegendContextMenu),
       ],
     );
   }

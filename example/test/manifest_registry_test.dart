@@ -68,9 +68,7 @@ void main() {
     // Dot-path members group into their @Style value class — a sparse
     // InteractiveColors whose unset states keep deriving (RFC-002 R6).
     expect(
-      compileOverride(button, const {
-        'background.hovered': Color(0xFF8B5CF6),
-      }),
+      compileOverride(button, const {'background.hovered': Color(0xFF8B5CF6)}),
       const PrimaryLegendButtonThemeNullable(
         background: InteractiveColors(hovered: Color(0xFF8B5CF6)),
       ),
@@ -134,10 +132,7 @@ void main() {
     expect(_surfaceColorOf(tester, 'Mainnet'), const Color(0xFF2563EB));
 
     // The emitted-code block shows exactly what the edit registered.
-    expect(
-      find.textContaining('LegendBadgeThemeNullable('),
-      findsOneWidget,
-    );
+    expect(find.textContaining('LegendBadgeThemeNullable('), findsOneWidget);
 
     // Clearing the component's overrides falls back down the ladder.
     await tester.scrollUntilVisible(
@@ -150,10 +145,7 @@ void main() {
     await tester.tap(find.text('Clear LegendBadge overrides'));
     await settleTheme();
     expect(find.textContaining('LegendBadgeThemeNullable('), findsNothing);
-    expect(
-      _surfaceColorOf(tester, 'Mainnet'),
-      isNot(const Color(0xFF2563EB)),
-    );
+    expect(_surfaceColorOf(tester, 'Mainnet'), isNot(const Color(0xFF2563EB)));
   });
 
   testWidgets('theme explorer: a dot-path member compiles into a sparse '

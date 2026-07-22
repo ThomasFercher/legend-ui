@@ -1,4 +1,5 @@
 import 'package:example/docs/doc_page.dart';
+import 'package:example/docs/manifest_props_table.dart';
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/legend_ui.dart';
 
@@ -221,6 +222,14 @@ LegendVerticalMenu(
   onSelected: (item) => setState(() => current = item),
 )''',
         ),
+        const ThemeSurfaceSection(component: LegendScaffold),
+        const ThemeSurfaceSection(component: LegendAppBar),
+        const ThemeSurfaceSection(component: LegendSider),
+        const ThemeSurfaceSection(component: LegendBottomBar),
+        const ThemeSurfaceSection(component: LegendTabs),
+        const ThemeSurfaceSection(component: LegendBreadcrumb),
+        const ThemeSurfaceSection(component: LegendPagination),
+        const ThemeSurfaceSection(component: LegendVerticalMenu),
       ],
     );
   }
