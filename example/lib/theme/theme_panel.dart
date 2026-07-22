@@ -261,6 +261,26 @@ class ThemePanel extends StatelessWidget {
             value: controller.numberStepperColor,
             onChanged: controller.setNumberStepperColor,
           ),
+          ColorField(
+            label:
+                'Copy confirmation color '
+                '(LegendCopyButton.confirmationColor)',
+            value: controller.copyConfirmationColor,
+            onChanged: controller.setCopyConfirmationColor,
+          ),
+          ColorField(
+            label:
+                'PIN-field active-cell border '
+                '(LegendPinField.focusedBorderColor)',
+            value: controller.pinActiveBorder,
+            onChanged: controller.setPinActiveBorder,
+          ),
+
+          ColorField(
+            label: 'Stat positive-delta color (LegendStat.positiveColor)',
+            value: controller.statPositiveColor,
+            onChanged: controller.setStatPositiveColor,
+          ),
 
           ColorField(
             label: 'Slider active-track color',
@@ -301,6 +321,12 @@ class ThemePanel extends StatelessWidget {
                 '(LegendMarkdownEditor.syntaxMarkColor)',
             value: controller.editorSyntaxMarkColor,
             onChanged: controller.setEditorSyntaxMarkColor,
+          ),
+
+          ColorField(
+            label: 'Code-block panel fill (LegendCodeBlock.background)',
+            value: controller.codeBlockBackground,
+            onChanged: controller.setCodeBlockBackground,
           ),
 
           const LegendDivider(),

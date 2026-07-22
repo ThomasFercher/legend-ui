@@ -12,7 +12,7 @@ class LayoutPage extends StatelessWidget {
       title: 'Layout',
       intro:
           'Structural pieces: cards, dividers, expandables, info rows, '
-          'lists, badges, and avatars — all thin compositions over '
+          'stats, lists, badges, and avatars — all thin compositions over '
           'LegendSurface and LegendInteractive.',
       children: [
         DocSection(
@@ -215,6 +215,49 @@ LegendAvatar(
             ],
           ),
           code: "LegendInfoItem(label: 'Fee', value: '0.0021 ETH')",
+        ),
+        DocSection(
+          title: 'Stat',
+          description:
+              'An emphasized KPI — a small muted label over a large value, '
+              'with an optional colored delta (a painted arrow spoken as '
+              '"up"/"down" by screen readers) and a muted caption. Derive '
+              'the direction from a signed change with '
+              'LegendStatDirection.fromChange; lay several out with a Wrap.',
+          demo: Wrap(
+            spacing: tokens.sizes.xl,
+            runSpacing: tokens.sizes.md,
+            children: const [
+              LegendStat(
+                label: 'Balance',
+                value: r'$12,480.30',
+                delta: '4.2%',
+                deltaDirection: LegendStatDirection.up,
+                caption: 'vs last week',
+              ),
+              LegendStat(
+                label: 'ETH',
+                value: r'$3,120.55',
+                delta: '1.8%',
+                deltaDirection: LegendStatDirection.down,
+                caption: '24h',
+              ),
+              LegendStat(
+                label: 'USDC',
+                value: r'$1.00',
+                delta: '0.0%',
+                caption: '24h',
+              ),
+            ],
+          ),
+          code: '''
+LegendStat(
+  label: 'Balance',
+  value: formatUsd(total),
+  delta: formatPercent(change),
+  deltaDirection: LegendStatDirection.fromChange(change),
+  caption: 'vs last week',
+)''',
         ),
         const DocSection(
           title: 'List',

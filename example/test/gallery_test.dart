@@ -360,6 +360,89 @@ void main() {
     expect(find.bySemanticsLabel('Online'), findsOneWidget);
   });
 
+  testWidgets('layout page: stat demo shows deltas in direction colors', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const DocsApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Layout'));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.text(r'$12,480.30'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    const tokens = LegendTokens.light;
+    final up = tester.widget<Text>(find.text('4.2%'));
+    expect(up.style?.color, tokens.colors.secondary);
+    final down = tester.widget<Text>(find.text('1.8%'));
+    expect(down.style?.color, tokens.colors.error);
+    final flat = tester.widget<Text>(find.text('0.0%'));
+    expect(flat.style?.color, tokens.colors.foreground2);
+    // One merged node per stat, with the arrow spoken as a direction.
+    expect(
+      find.bySemanticsLabel('Balance\n\$12,480.30\nup 4.2%\nvs last week'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('playground: stat positive-color knob restyles the live stat', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's stat swatch.
+    await tester.scrollUntilVisible(
+      find.text('Stat positive-delta color (LegendStat.positiveColor)'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(
+      find.bySemanticsLabel(
+        'Stat positive-delta color (LegendStat.positiveColor) #D97706',
+      ),
+    );
+    await settleTheme();
+    await tester.tap(
+      find.bySemanticsLabel(
+        'Stat positive-delta color (LegendStat.positiveColor) #D97706',
+      ),
+    );
+    await settleTheme();
+
+    // The live stat's upward delta in the preview column picks it up; the
+    // downward one keeps its token color.
+    await tester.scrollUntilVisible(
+      find.text('4.2%'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    final up = tester.widget<Text>(find.text('4.2%'));
+    expect(up.style?.color, const Color(0xFFD97706));
+    final down = tester.widget<Text>(find.text('1.8%'));
+    expect(down.style?.color, LegendTokens.light.colors.error);
+  });
+
   testWidgets('playground: badge background knob restyles the live badge', (
     tester,
   ) async {
@@ -1220,6 +1303,59 @@ void main() {
     );
   });
 
+  testWidgets('playground: PIN-field knob recolors the live active-cell '
+      'border', (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's PIN-field knob.
+    await tester.scrollUntilVisible(
+      find.textContaining('PIN-field active-cell border'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('PIN-field active-cell border .*#8B5CF6')),
+    );
+    await settleTheme();
+    await tester.tap(
+      find.bySemanticsLabel(RegExp('PIN-field active-cell border .*#8B5CF6')),
+    );
+    await settleTheme();
+
+    // Focus the live pin field; its active cell shows the override.
+    await tester.scrollUntilVisible(
+      find.byType(LegendPinField),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    await tester.tap(find.byType(LegendPinField));
+    await settleTheme();
+    final firstCell = tester
+        .widgetList<LegendSurface>(
+          find.descendant(
+            of: find.byType(LegendPinField),
+            matching: find.byType(LegendSurface),
+          ),
+        )
+        .first;
+    expect((firstCell.border! as Border).top.color, const Color(0xFF8B5CF6));
+  });
+
   testWidgets('playground: markdown link knob restyles the live markdown', (
     tester,
   ) async {
@@ -1290,6 +1426,8 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
     Future<void> settleTheme() async {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
@@ -1332,5 +1470,119 @@ void main() {
     );
     final controller = editable.controller as LegendMarkdownEditingController;
     expect(controller.sourceStyle.syntaxMarkColor, const Color(0xFF8B5CF6));
+  });
+
+  testWidgets('playground: code-block fill knob restyles the live panel', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's code-block knob
+    // (swatch 4 is the violet, unused by any active preset).
+    await tester.scrollUntilVisible(
+      find.textContaining('Code-block panel fill'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('Code-block panel fill .* #')).at(4),
+    );
+    await settleTheme();
+    await tester.tap(
+      find.bySemanticsLabel(RegExp('Code-block panel fill .* #')).at(4),
+    );
+    await settleTheme();
+
+    // The live code block in the preview column refills its panel.
+    await tester.scrollUntilVisible(
+      find.byType(LegendCodeBlock),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    final container = tester.widget<Container>(
+      find
+          .descendant(
+            of: find.byType(LegendCodeBlock),
+            matching: find.byType(Container),
+          )
+          .first,
+    );
+    expect(
+      (container.decoration! as BoxDecoration).color,
+      const Color(0xFF8B5CF6),
+    );
+  });
+
+  testWidgets('playground: copy confirmation knob restyles the live address', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's copy knob
+    // (swatch 4 is the violet, unused by any active preset).
+    await tester.scrollUntilVisible(
+      find.textContaining('Copy confirmation color'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('Copy confirmation color .*#8B5CF6')),
+    );
+    await settleTheme();
+    await tester.tap(
+      find.bySemanticsLabel(RegExp('Copy confirmation color .*#8B5CF6')),
+    );
+    await settleTheme();
+
+    // The live LegendAddress's built-in copy button resolves it — the
+    // truncated run itself is untouched by the knob.
+    await tester.scrollUntilVisible(
+      find.byType(LegendAddress),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    expect(find.text('0x8f3C…A063'), findsOneWidget);
+    final buttonContext = tester.element(
+      find
+          .descendant(
+            of: find.byType(LegendAddress),
+            matching: find.byType(LegendCopyButton),
+          )
+          .first,
+    );
+    expect(
+      LegendCopyButtonTheme.of(buttonContext).confirmationColor,
+      const Color(0xFF8B5CF6),
+    );
   });
 }
