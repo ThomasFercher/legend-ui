@@ -227,6 +227,12 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setAvatarRadius,
           ),
 
+          ColorField(
+            label: 'Segmented thumb color',
+            value: controller.segmentedThumb,
+            onChanged: controller.setSegmentedThumb,
+          ),
+
           const LegendDivider(),
           SecondaryLegendButton(
             text: 'Reset everything',

@@ -176,6 +176,9 @@ class PlaygroundPage extends StatelessWidget {
               // Live LegendChips — the selected fill follows the theme
               // panel's knob (level-3 override).
               const _ChipPreview(),
+              // A live LegendSegmented — its thumb color follows the
+              // theme panel's knob (level-3 override).
+              const _SegmentedPreview(),
               // A live LegendVerticalMenu — its selected color follows the
               // theme panel's knob (level-3 override).
               const SizedBox(width: 260, child: _MenuPreview()),
@@ -376,6 +379,32 @@ class _ListPreviewState extends State<_ListPreview> {
             onTap: () => setState(() => _selected = index),
           ),
       ],
+    );
+  }
+}
+
+class _SegmentedPreview extends StatefulWidget {
+  const _SegmentedPreview();
+
+  @override
+  State<_SegmentedPreview> createState() => _SegmentedPreviewState();
+}
+
+class _SegmentedPreviewState extends State<_SegmentedPreview> {
+  String _timeframe = '1d';
+
+  @override
+  Widget build(BuildContext context) {
+    return LegendSegmented<String>(
+      segments: const [
+        LegendSegment(value: '1h', label: '1H'),
+        LegendSegment(value: '1d', label: '1D'),
+        LegendSegment(value: '1w', label: '1W'),
+        LegendSegment(value: '1m', label: '1M'),
+        LegendSegment(value: '1y', label: '1Y'),
+      ],
+      value: _timeframe,
+      onChanged: (value) => setState(() => _timeframe = value),
     );
   }
 }

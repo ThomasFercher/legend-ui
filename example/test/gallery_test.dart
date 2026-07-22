@@ -746,4 +746,61 @@ void main() {
       reason: 'level-3 components map restyles the selected row fill',
     );
   });
+
+  testWidgets('playground: segmented thumb knob restyles the live segmented', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's segmented knob
+    // (swatch 4 is the violet, unused by any active preset).
+    await tester.scrollUntilVisible(
+      find.textContaining('Segmented thumb color'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('Segmented thumb color #')).at(4),
+    );
+    await settleTheme();
+    await tester.tap(
+      find.bySemanticsLabel(RegExp('Segmented thumb color #')).at(4),
+    );
+    await settleTheme();
+
+    // The live segmented in the preview column picks it up as its thumb.
+    // (Scoped to the control — the ColorField swatches paint the same
+    // violet on their own LegendSurfaces.)
+    await tester.scrollUntilVisible(
+      find.text('1H'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    expect(
+      find.descendant(
+        of: find.byType(LegendSegmented<String>),
+        matching: find.byWidgetPredicate(
+          (widget) =>
+              widget is LegendSurface &&
+              widget.color == const Color(0xFF8B5CF6),
+        ),
+      ),
+      findsOneWidget,
+    );
+  });
 }

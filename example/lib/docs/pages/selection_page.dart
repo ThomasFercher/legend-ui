@@ -17,6 +17,8 @@ class _SelectionPageState extends State<SelectionPage> {
   var _tags = ['Design', 'Engineering', 'Research'];
   var _backup = false;
   bool? _sources = false;
+  var _timeframe = '1d';
+  var _currency = 'crypto';
 
   @override
   Widget build(BuildContext context) {
@@ -292,6 +294,102 @@ LegendChip(label: '3', onTap: openCitation)  // compact action chip''',
                 name: 'textStyle',
                 type: 'TextStyle',
                 defaultsTo: 't.typography.b2',
+              ),
+            ],
+          ),
+        ),
+        DocSection(
+          title: 'Segmented',
+          description:
+              'An exclusive one-of-N choice as joined equal-width segments '
+              'with a sliding thumb. Each segment announces selected-state '
+              'semantics; arrow keys move focus between segments and '
+              'Enter/Space selects — tapping the selected segment never '
+              'deselects.',
+          demo: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: tokens.sizes.sm,
+            children: [
+              LegendSegmented<String>(
+                segments: const [
+                  LegendSegment(value: '1h', label: '1H'),
+                  LegendSegment(value: '1d', label: '1D'),
+                  LegendSegment(value: '1w', label: '1W'),
+                  LegendSegment(value: '1m', label: '1M'),
+                  LegendSegment(value: '1y', label: '1Y'),
+                ],
+                value: _timeframe,
+                onChanged: (value) => setState(() => _timeframe = value),
+              ),
+              LegendSegmented<String>(
+                segments: const [
+                  LegendSegment(value: 'crypto', label: 'Crypto'),
+                  LegendSegment(value: 'fiat', label: 'Fiat'),
+                ],
+                value: _currency,
+                onChanged: (value) => setState(() => _currency = value),
+              ),
+              LegendSegmented<String>(
+                segments: const [
+                  LegendSegment(value: 'crypto', label: 'Crypto'),
+                  LegendSegment(value: 'fiat', label: 'Fiat'),
+                ],
+                value: _currency,
+                enabled: false,
+                onChanged: (_) {},
+              ),
+            ],
+          ),
+          code: '''
+LegendSegmented<String>(
+  segments: const [
+    LegendSegment(value: '1h', label: '1H'),
+    LegendSegment(value: '1d', label: '1D'),
+    LegendSegment(value: '1w', label: '1W'),
+  ],
+  value: timeframe,
+  onChanged: (value) => setState(() => timeframe = value),
+)''',
+        ),
+        const DocSection(
+          title: 'LegendSegmented theme surface',
+          demo: PropsTable(
+            rows: [
+              (
+                name: 'background',
+                type: 'Color',
+                defaultsTo: 't.colors.background2',
+              ),
+              (
+                name: 'thumb',
+                type: 'InteractiveColors',
+                defaultsTo: 'normal: t.colors.surface',
+              ),
+              (
+                name: 'labelStyle',
+                type: 'TextStyle',
+                defaultsTo: 't.typography.b3 in foreground2',
+              ),
+              (
+                name: 'selectedLabelStyle',
+                type: 'TextStyle',
+                defaultsTo: 't.typography.b3 w600 in foreground1',
+              ),
+              (
+                name: 'borderRadius',
+                type: 'BorderRadius',
+                defaultsTo: 't.sizes.borderRadiusMd',
+              ),
+              (
+                name: 'padding',
+                type: 'EdgeInsetsGeometry',
+                defaultsTo: 'EdgeInsets.all(t.sizes.xs)',
+              ),
+              (
+                name: 'segmentPadding',
+                type: 'EdgeInsetsGeometry',
+                defaultsTo:
+                    'EdgeInsets.symmetric(h: t.sizes.sm, v: t.sizes.xs)',
               ),
             ],
           ),
