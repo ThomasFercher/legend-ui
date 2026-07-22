@@ -228,9 +228,7 @@ void main() {
   });
 
   group('LegendDrawer theming', () {
-    testWidgets('level-3 registry override restyles the width', (
-      tester,
-    ) async {
+    testWidgets('level-3 registry override restyles the width', (tester) async {
       await tester.pumpWidget(
         _app(
           edge: LegendDrawerEdge.start,
@@ -245,12 +243,12 @@ void main() {
 
     testWidgets('constructor param wins over the registry', (tester) async {
       await tester.pumpWidget(
-        LegendApp(
-          theme: const LegendThemeData(
+        const LegendApp(
+          theme: LegendThemeData(
             tokens: LegendTokens.light,
             components: {LegendDrawer: LegendDrawerThemeNullable(width: 260)},
           ),
-          home: const Align(
+          home: Align(
             alignment: Alignment.centerLeft,
             child: LegendDrawer(width: 200, child: Text('Inline')),
           ),
@@ -272,7 +270,7 @@ void main() {
           matching: find.byType(LegendSurface),
         ),
       );
-      final tokens = LegendTokens.light;
+      const tokens = LegendTokens.light;
       expect(
         surface.borderRadius,
         BorderRadius.vertical(top: Radius.circular(tokens.sizes.radiusLg)),
