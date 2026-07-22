@@ -153,6 +153,11 @@ class ThemePanel extends StatelessWidget {
             value: controller.checkboxFill,
             onChanged: controller.setCheckboxFill,
           ),
+          ColorField(
+            label: 'Radio fill (LegendRadio.fill)',
+            value: controller.radioFill,
+            onChanged: controller.setRadioFill,
+          ),
 
           const LegendText(
             'Popover panel radius (LegendPopover.borderRadius)',
