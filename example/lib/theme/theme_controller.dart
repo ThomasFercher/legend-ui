@@ -66,6 +66,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendSegmented]'s selected-segment thumb color.
   Color? segmentedThumb;
 
+  /// Level-3 override for [LegendAccordion]'s section background.
+  Color? accordionBackground;
+
   bool get dark => preset == ThemePreset.dark;
 
   void setPreset(ThemePreset value) {
@@ -174,6 +177,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setAccordionBackground(Color? value) {
+    accordionBackground = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -195,6 +203,7 @@ class ThemeController extends ChangeNotifier {
     checkboxFill = null;
     avatarRadius = null;
     segmentedThumb = null;
+    accordionBackground = null;
     notifyListeners();
   }
 
@@ -334,6 +343,12 @@ class ThemeController extends ChangeNotifier {
         if (segmentedThumb != null)
           LegendSegmented: LegendSegmentedThemeNullable(
             thumb: InteractiveColors(normal: segmentedThumb),
+          ),
+        // LegendAccordion's section background (the sparse per-state
+        // bundle: unset states keep deriving through the overlays).
+        if (accordionBackground != null)
+          LegendAccordion: LegendAccordionThemeNullable(
+            background: InteractiveColors(normal: accordionBackground),
           ),
       },
     );

@@ -79,6 +79,52 @@ LegendExpandable(
 )''',
         ),
         DocSection(
+          title: 'Accordion',
+          description:
+              'A group of expandables where opening one closes the others '
+              '— the FAQ pattern. Pass allowMultiple to let several stay '
+              'open, or expandedIndices/onChanged to control the open set '
+              'yourself.',
+          demo: LegendAccordion(
+            items: const [
+              LegendAccordionItem(
+                title: 'Is it Material-free?',
+                child: LegendText(
+                  'Yes — components compose the five kit primitives; no '
+                  'Scaffold, InkWell, or Material theme anywhere.',
+                  variant: LegendTextVariant.b2,
+                ),
+              ),
+              LegendAccordionItem(
+                title: 'How is it themed?',
+                child: LegendText(
+                  'Design tokens are the only global theme; component '
+                  'themes are generated from decorators on the widget.',
+                  variant: LegendTextVariant.b2,
+                ),
+              ),
+              LegendAccordionItem(
+                title: 'Can I keep several open?',
+                child: LegendText(
+                  'Pass allowMultiple: true and every section toggles '
+                  'independently.',
+                  variant: LegendTextVariant.b2,
+                ),
+              ),
+            ],
+          ),
+          code: '''
+LegendAccordion(
+  // allowMultiple: true,        // let several sections stay open
+  // expandedIndices: {0},       // or control the open set yourself
+  // onChanged: (open) => ...,
+  items: const [
+    LegendAccordionItem(title: 'Is it Material-free?', child: LegendText('Yes ...')),
+    LegendAccordionItem(title: 'How is it themed?', child: LegendText('Tokens ...')),
+  ],
+)''',
+        ),
+        DocSection(
           title: 'Body',
           description:
               'The page scroll pipeline: one always-CustomScrollView core '

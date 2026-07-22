@@ -232,6 +232,11 @@ class ThemePanel extends StatelessWidget {
             value: controller.segmentedThumb,
             onChanged: controller.setSegmentedThumb,
           ),
+          ColorField(
+            label: 'Accordion section background (LegendAccordion.background)',
+            value: controller.accordionBackground,
+            onChanged: controller.setAccordionBackground,
+          ),
 
           const LegendDivider(),
           SecondaryLegendButton(

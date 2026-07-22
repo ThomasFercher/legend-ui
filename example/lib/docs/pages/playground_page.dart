@@ -185,6 +185,30 @@ class PlaygroundPage extends StatelessWidget {
               // A live LegendList — the selected row's fill follows the
               // theme panel's knob (level-3 override).
               const SizedBox(width: 300, child: _ListPreview()),
+              // A live single-open LegendAccordion — its section background
+              // follows the theme panel's knob (level-3 override).
+              SizedBox(
+                width: 300,
+                child: LegendAccordion(
+                  items: const [
+                    LegendAccordionItem(
+                      title: 'Accordion',
+                      child: LegendText(
+                        'Opening a section closes the others; the section '
+                        'fill follows the accordion knob in the theme panel.',
+                        variant: LegendTextVariant.b3,
+                      ),
+                    ),
+                    LegendAccordionItem(
+                      title: 'Second section',
+                      child: LegendText(
+                        'Only one of us is open at a time.',
+                        variant: LegendTextVariant.b3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
