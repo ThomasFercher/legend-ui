@@ -93,6 +93,12 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendCodeBlock]'s panel fill.
   Color? codeBlockBackground;
 
+  /// Level-3 override for [LegendSteps]' completed-indicator fill.
+  Color? stepsCompletedColor;
+
+  /// Level-3 override for [LegendTimeline]'s dot-indicator fill.
+  Color? timelineIndicatorColor;
+
   /// Level-3 override for [LegendNumberField]'s stepper-arrow color.
   Color? numberStepperColor;
 
@@ -268,6 +274,16 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setStepsCompletedColor(Color? value) {
+    stepsCompletedColor = value;
+    notifyListeners();
+  }
+
+  void setTimelineIndicatorColor(Color? value) {
+    timelineIndicatorColor = value;
+    notifyListeners();
+  }
+
   void setStatPositiveColor(Color? value) {
     statPositiveColor = value;
     notifyListeners();
@@ -310,6 +326,8 @@ class ThemeController extends ChangeNotifier {
     numberStepperColor = null;
     copyConfirmationColor = null;
     pinActiveBorder = null;
+    stepsCompletedColor = null;
+    timelineIndicatorColor = null;
     statPositiveColor = null;
     codeBlockBackground = null;
     notifyListeners();
@@ -507,6 +525,16 @@ class ThemeController extends ChangeNotifier {
         if (pinActiveBorder != null)
           LegendPinField: LegendPinFieldThemeNullable(
             focusedBorderColor: pinActiveBorder,
+          ),
+        // LegendSteps' completed-indicator fill (behind the check).
+        if (stepsCompletedColor != null)
+          LegendSteps: LegendStepsThemeNullable(
+            completedColor: stepsCompletedColor,
+          ),
+        // LegendTimeline's default dot-indicator fill.
+        if (timelineIndicatorColor != null)
+          LegendTimeline: LegendTimelineThemeNullable(
+            indicatorColor: timelineIndicatorColor,
           ),
         // LegendStat's upward-delta color.
         if (statPositiveColor != null)

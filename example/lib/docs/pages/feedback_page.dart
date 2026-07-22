@@ -21,8 +21,9 @@ class _FeedbackPageState extends State<FeedbackPage> {
     return DocPage(
       title: 'Feedback',
       intro:
-          'Persistent banners, progress, loading indicators and shimmer '
-          'placeholders. Toasts live on the Overlays page — same engine.',
+          'Persistent banners, progress, steps, loading indicators and '
+          'shimmer placeholders. Toasts live on the Overlays page — same '
+          'engine.',
       children: [
         DocSection(
           title: 'Banner',
@@ -161,6 +162,58 @@ LegendEmpty(
           code: '''
 const LegendProgress.bar(value: 0.35)
 const LegendProgress.circle() // value: null → indeterminate''',
+        ),
+        DocSection(
+          title: 'Steps',
+          description:
+              'Sequential progress through a linear flow — onboarding, '
+              'transaction confirmation, checkout. Completed steps show a '
+              'painted check, the current step is emphasized, future steps '
+              'are muted. Purely presentational: the flow controller '
+              'decides currentIndex.',
+          demo: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: tokens.sizes.lg,
+            children: [
+              LegendSteps(
+                currentIndex: 2,
+                steps: const [
+                  LegendStep(title: 'Create'),
+                  LegendStep(title: 'Back up'),
+                  LegendStep(title: 'Verify'),
+                  LegendStep(title: 'Done'),
+                ],
+              ),
+              LegendSteps(
+                axis: Axis.vertical,
+                currentIndex: 1,
+                steps: const [
+                  LegendStep(
+                    title: 'Create a wallet',
+                    description: 'Pick a name and a strong password.',
+                  ),
+                  LegendStep(
+                    title: 'Back up the seed phrase',
+                    description: 'Write the 12 words down — offline.',
+                  ),
+                  LegendStep(
+                    title: 'Verify the backup',
+                    description: 'Re-enter three of the words to confirm.',
+                  ),
+                ],
+              ),
+            ],
+          ),
+          code: '''
+LegendSteps(
+  currentIndex: 1, // steps before it render completed
+  axis: Axis.vertical,
+  steps: const [
+    LegendStep(title: 'Create a wallet', description: '...'),
+    LegendStep(title: 'Back up the seed phrase'),
+    LegendStep(title: 'Verify the backup'),
+  ],
+)''',
         ),
         DocSection(
           title: 'Shimmer',

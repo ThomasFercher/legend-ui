@@ -12,8 +12,8 @@ class LayoutPage extends StatelessWidget {
       title: 'Layout',
       intro:
           'Structural pieces: cards, dividers, expandables, info rows, '
-          'stats, lists, badges, and avatars — all thin compositions over '
-          'LegendSurface and LegendInteractive.',
+          'stats, lists, timelines, badges, and avatars — all thin '
+          'compositions over LegendSurface and LegendInteractive.',
       children: [
         DocSection(
           title: 'Card',
@@ -283,6 +283,60 @@ LegendList(
         selected: token == selected,
         onTap: () => select(token),
       ),
+  ],
+)''',
+        ),
+        DocSection(
+          title: 'Timeline',
+          description:
+              'A vertical dot-and-line event history for transaction lists '
+              'and activity feeds. Each entry is a title with an optional '
+              'description, trailing timestamp, custom indicator slot '
+              '(defaults to a themed dot), and a free-form child slot for '
+              'anything richer. Purely presentational — its sibling '
+              'LegendSteps is the forward-looking flow with completion '
+              'states.',
+          demo: LegendTimeline(
+            entries: [
+              const LegendTimelineEntry(
+                title: 'Sent 0.4 ETH',
+                description: 'To 0x12ab…89cd',
+                timestamp: '2 min ago',
+              ),
+              LegendTimelineEntry(
+                title: 'Swap confirmed',
+                description: '12.5 SOL for 2,180 USDC',
+                timestamp: 'Yesterday',
+                indicator: LegendSurface(
+                  color: tokens.colors.secondary,
+                  borderRadius: BorderRadius.circular(999),
+                  child: const SizedBox(width: 10, height: 10),
+                ),
+              ),
+              LegendTimelineEntry(
+                title: 'Backup verified',
+                timestamp: 'Jul 18',
+                child: LegendTextButton(text: 'View details', onPressed: () {}),
+              ),
+              const LegendTimelineEntry(
+                title: 'Wallet created',
+                timestamp: 'Jul 12',
+              ),
+            ],
+          ),
+          code: '''
+LegendTimeline(
+  entries: [
+    LegendTimelineEntry(
+      title: 'Sent 0.4 ETH',
+      description: 'To 0x12ab…89cd',
+      timestamp: '2 min ago',
+    ),
+    LegendTimelineEntry(
+      title: 'Swap confirmed',
+      indicator: NetworkDot(),      // custom indicator slot
+      child: ReceiptRow(),          // free-form entry body
+    ),
   ],
 )''',
         ),

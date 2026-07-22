@@ -1532,4 +1532,56 @@ void main() {
       const Color(0xFF8B5CF6),
     );
   });
+
+  testWidgets('playground: steps completed knob restyles the live steps', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's steps knob.
+    await tester.scrollUntilVisible(
+      find.textContaining('Steps completed fill'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('Steps completed fill .*#8B5CF6')),
+    );
+    await settleTheme();
+    await tester.tap(
+      find.bySemanticsLabel(RegExp('Steps completed fill .*#8B5CF6')),
+    );
+    await settleTheme();
+
+    // The live steps in the preview column repaint their completed
+    // indicators; the pending one keeps resolving downward.
+    await tester.scrollUntilVisible(
+      find.byType(LegendSteps),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    final completed = find.descendant(
+      of: find.byType(LegendSteps),
+      matching: find.byWidgetPredicate(
+        (widget) =>
+            widget is LegendSurface && widget.color == const Color(0xFF8B5CF6),
+      ),
+    );
+    expect(completed, findsNWidgets(2));
+  });
 }

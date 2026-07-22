@@ -294,6 +294,34 @@ class PlaygroundPage extends StatelessWidget {
                   ],
                 ),
               ),
+              // A live LegendSteps — its completed-indicator fill follows
+              // the theme panel's knob (level-3 override).
+              LegendSteps(
+                currentIndex: 2,
+                steps: const [
+                  LegendStep(title: 'Create'),
+                  LegendStep(title: 'Back up'),
+                  LegendStep(title: 'Verify'),
+                  LegendStep(title: 'Done'),
+                ],
+              ),
+              // A live LegendTimeline — its dot color follows the theme
+              // panel's knob (level-3 override).
+              LegendTimeline(
+                entries: const [
+                  LegendTimelineEntry(
+                    title: 'Sent 0.4 ETH',
+                    description:
+                        'The dot color follows the timeline knob in the '
+                        'theme panel.',
+                    timestamp: '2 min ago',
+                  ),
+                  LegendTimelineEntry(
+                    title: 'Wallet created',
+                    timestamp: 'Jul 12',
+                  ),
+                ],
+              ),
               // Live LegendDrawer openers — the side drawer's width
               // follows the theme panel's knob (level-3 override).
               const _DrawerPreview(),
