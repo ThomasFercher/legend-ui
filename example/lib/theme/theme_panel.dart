@@ -295,6 +295,14 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setMarkdownLinkColor,
           ),
 
+          ColorField(
+            label:
+                'Markdown editor mark color '
+                '(LegendMarkdownEditor.syntaxMarkColor)',
+            value: controller.editorSyntaxMarkColor,
+            onChanged: controller.setEditorSyntaxMarkColor,
+          ),
+
           const LegendDivider(),
           SecondaryLegendButton(
             text: 'Reset everything',

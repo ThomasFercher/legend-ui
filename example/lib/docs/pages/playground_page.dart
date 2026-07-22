@@ -219,6 +219,10 @@ class PlaygroundPage extends StatelessWidget {
                 'markdown knob in the theme panel.',
                 onTapLink: (_) {},
               ),
+              // A live LegendMarkdownEditor — the muted `#`/`**`/backtick
+              // marks follow the editor knob in the theme panel (level-3
+              // override).
+              const SizedBox(width: 360, child: _MarkdownEditorPreview()),
               // Live LegendChips — the selected fill follows the theme
               // panel's knob (level-3 override).
               const _ChipPreview(),
@@ -642,5 +646,33 @@ class _SegmentedPreviewState extends State<_SegmentedPreview> {
       value: _timeframe,
       onChanged: (value) => setState(() => _timeframe = value),
     );
+  }
+}
+
+/// A live markdown editor whose muted syntax marks follow the theme
+/// panel's editor knob (level-3 override).
+class _MarkdownEditorPreview extends StatefulWidget {
+  const _MarkdownEditorPreview();
+
+  @override
+  State<_MarkdownEditorPreview> createState() => _MarkdownEditorPreviewState();
+}
+
+class _MarkdownEditorPreviewState extends State<_MarkdownEditorPreview> {
+  final _controller = LegendMarkdownEditingController(
+    text:
+        '# LegendMarkdownEditor\n\nThe `#` and `**marks**` follow the '
+        'editor knob in the theme panel.',
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LegendMarkdownEditor(controller: _controller, minLines: 3);
   }
 }

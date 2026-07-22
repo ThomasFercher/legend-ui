@@ -1282,4 +1282,55 @@ void main() {
       isTrue,
     );
   });
+
+  testWidgets('playground: editor mark knob restyles the live editor', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's editor knob
+    // (swatch 4 is the violet, unused by any active preset).
+    await tester.scrollUntilVisible(
+      find.textContaining('Markdown editor mark color'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('Markdown editor mark color .* #')).at(4),
+    );
+    await settleTheme();
+    await tester.tap(
+      find.bySemanticsLabel(RegExp('Markdown editor mark color .* #')).at(4),
+    );
+    await settleTheme();
+
+    // The live editor hands its resolved source style to the controller —
+    // the syntax marks now carry the override.
+    await tester.scrollUntilVisible(
+      find.byType(LegendMarkdownEditor),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    final editable = tester.widget<EditableText>(
+      find.descendant(
+        of: find.byType(LegendMarkdownEditor),
+        matching: find.byType(EditableText),
+      ),
+    );
+    final controller = editable.controller as LegendMarkdownEditingController;
+    expect(controller.sourceStyle.syntaxMarkColor, const Color(0xFF8B5CF6));
+  });
 }

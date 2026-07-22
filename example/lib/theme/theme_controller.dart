@@ -69,6 +69,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendMarkdown]'s link color.
   Color? markdownLinkColor;
 
+  /// Level-3 override for [LegendMarkdownEditor]'s syntax-mark color.
+  Color? editorSyntaxMarkColor;
+
   /// Level-3 override for [LegendSegmented]'s selected-segment thumb color.
   Color? segmentedThumb;
 
@@ -206,6 +209,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setEditorSyntaxMarkColor(Color? value) {
+    editorSyntaxMarkColor = value;
+    notifyListeners();
+  }
+
   void setSegmentedThumb(Color? value) {
     segmentedThumb = value;
     notifyListeners();
@@ -268,6 +276,7 @@ class ThemeController extends ChangeNotifier {
     radioFill = null;
     avatarRadius = null;
     markdownLinkColor = null;
+    editorSyntaxMarkColor = null;
     segmentedThumb = null;
     sliderActiveTrack = null;
     menuDestructiveColor = null;
@@ -420,6 +429,12 @@ class ThemeController extends ChangeNotifier {
         if (markdownLinkColor != null)
           LegendMarkdown: LegendMarkdownThemeNullable(
             linkColor: markdownLinkColor,
+          ),
+        // LegendMarkdownEditor's muted syntax-mark color (the #, **, and
+        // backtick characters in the source).
+        if (editorSyntaxMarkColor != null)
+          LegendMarkdownEditor: LegendMarkdownEditorThemeNullable(
+            syntaxMarkColor: editorSyntaxMarkColor,
           ),
         // LegendSegmented's selected-segment thumb (the sparse per-state
         // bundle: unset states keep deriving through the overlays).

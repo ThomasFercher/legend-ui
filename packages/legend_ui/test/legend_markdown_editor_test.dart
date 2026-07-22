@@ -181,7 +181,10 @@ void main() {
       final text = _styleOf(span, 'the docs');
       expect(text?.color, _style.linkColor);
       expect(text?.decoration, TextDecoration.underline);
-      expect(_styleOf(span, 'https://legend.app')?.color, _style.syntaxMarkColor);
+      expect(
+        _styleOf(span, 'https://legend.app')?.color,
+        _style.syntaxMarkColor,
+      );
       expect(_styleOf(span, '[')?.color, _style.syntaxMarkColor);
     });
 
@@ -293,9 +296,7 @@ void main() {
     });
 
     test('Enter increments an ordered list and keeps the indent', () {
-      final next = LegendMarkdownEdits.continueList(
-        _value('  3. three', 10),
-      );
+      final next = LegendMarkdownEdits.continueList(_value('  3. three', 10));
       expect(next?.text, '  3. three\n  4. ');
       expect(next?.selection.baseOffset, 16);
     });
@@ -550,10 +551,7 @@ void main() {
         _wrap(LegendMarkdownEditor(controller: controller)),
       );
       const tokens = LegendTokens.light;
-      expect(
-        controller.sourceStyle.syntaxMarkColor,
-        tokens.colors.foreground3,
-      );
+      expect(controller.sourceStyle.syntaxMarkColor, tokens.colors.foreground3);
       expect(
         controller.sourceStyle.h1Style?.fontSize,
         tokens.typography.h1.fontSize,
