@@ -96,6 +96,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendCopyButton]'s post-copy check color.
   Color? copyConfirmationColor;
 
+  /// Level-3 override for [LegendStat]'s positive-delta color.
+  Color? statPositiveColor;
+
   bool get dark => preset == ThemePreset.dark;
 
   void setPreset(ThemePreset value) {
@@ -254,6 +257,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setStatPositiveColor(Color? value) {
+    statPositiveColor = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -285,6 +293,7 @@ class ThemeController extends ChangeNotifier {
     comboboxHighlight = null;
     numberStepperColor = null;
     copyConfirmationColor = null;
+    statPositiveColor = null;
     notifyListeners();
   }
 
@@ -476,6 +485,9 @@ class ThemeController extends ChangeNotifier {
           LegendCopyButton: LegendCopyButtonThemeNullable(
             confirmationColor: copyConfirmationColor,
           ),
+        // LegendStat's upward-delta color.
+        if (statPositiveColor != null)
+          LegendStat: LegendStatThemeNullable(positiveColor: statPositiveColor),
       },
     );
   }
