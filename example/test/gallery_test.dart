@@ -966,4 +966,64 @@ void main() {
     await settleTheme();
     expect(find.byType(LegendDrawer), findsNothing);
   });
+
+  testWidgets('playground: combobox highlight knob restyles the live panel', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's combobox knob
+    // (swatch 4 is the violet, unused by any active preset).
+    await tester.scrollUntilVisible(
+      find.textContaining('Combobox option highlight'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('Combobox option highlight.* #')).at(4),
+    );
+    await settleTheme();
+    await tester.tap(
+      find.bySemanticsLabel(RegExp('Combobox option highlight.* #')).at(4),
+    );
+    await settleTheme();
+
+    // Open the live combobox; its highlighted option paints the override.
+    await tester.scrollUntilVisible(
+      find.text('Combobox — type to filter'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    await tester.tap(find.byType(LegendCombobox<String>));
+    await settleTheme();
+
+    // (Scoped to the combobox — the ColorField swatches paint the same
+    // violet on their own LegendSurfaces.)
+    expect(
+      find.descendant(
+        of: find.byType(LegendCombobox<String>),
+        matching: find.byWidgetPredicate(
+          (widget) =>
+              widget is LegendSurface &&
+              widget.color == const Color(0xFF8B5CF6),
+        ),
+      ),
+      findsOneWidget,
+    );
+  });
 }

@@ -57,6 +57,9 @@ class PlaygroundPage extends StatelessWidget {
                 ],
                 onChanged: (_) {},
               ),
+              // A live LegendCombobox — its option highlight follows the
+              // theme panel's knob (level-3 override).
+              const _ComboboxPreview(),
               const LegendCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -269,6 +272,37 @@ class _ChipPreviewState extends State<_ChipPreview> {
           ),
         LegendChip(label: '3', onTap: () {}),
       ],
+    );
+  }
+}
+
+/// A self-contained live [LegendCombobox] for the playground preview
+/// column. Its option highlight is themed by the panel's level-3 override.
+class _ComboboxPreview extends StatefulWidget {
+  const _ComboboxPreview();
+
+  @override
+  State<_ComboboxPreview> createState() => _ComboboxPreviewState();
+}
+
+class _ComboboxPreviewState extends State<_ComboboxPreview> {
+  static const _tokens = [
+    LegendComboboxItem(value: 'eth', label: 'Ethereum'),
+    LegendComboboxItem(value: 'btc', label: 'Bitcoin'),
+    LegendComboboxItem(value: 'sol', label: 'Solana'),
+    LegendComboboxItem(value: 'ada', label: 'Cardano'),
+    LegendComboboxItem(value: 'dot', label: 'Polkadot'),
+  ];
+
+  String? _token;
+
+  @override
+  Widget build(BuildContext context) {
+    return LegendCombobox<String>(
+      items: _tokens,
+      value: _token,
+      placeholder: 'Combobox — type to filter',
+      onChanged: (value) => setState(() => _token = value),
     );
   }
 }

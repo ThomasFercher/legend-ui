@@ -20,6 +20,7 @@ export 'src/components/buttons/secondary_legend_button.dart';
 export 'src/components/card/legend_card.dart';
 export 'src/components/checkbox/legend_checkbox.dart';
 export 'src/components/chip/legend_chip.dart';
+export 'src/components/combobox/legend_combobox.dart';
 export 'src/components/context_menu/legend_context_menu.dart';
 export 'src/components/dialog/legend_dialog.dart';
 export 'src/components/divider/legend_divider.dart';

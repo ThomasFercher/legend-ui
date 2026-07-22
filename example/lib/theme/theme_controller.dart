@@ -75,6 +75,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendDrawer]'s side-drawer width.
   double? drawerWidth;
 
+  /// Level-3 override for [LegendCombobox]'s option-highlight color.
+  Color? comboboxHighlight;
+
   bool get dark => preset == ThemePreset.dark;
 
   void setPreset(ThemePreset value) {
@@ -198,6 +201,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setComboboxHighlight(Color? value) {
+    comboboxHighlight = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -222,6 +230,7 @@ class ThemeController extends ChangeNotifier {
     segmentedThumb = null;
     emptyIconColor = null;
     drawerWidth = null;
+    comboboxHighlight = null;
     notifyListeners();
   }
 
@@ -374,6 +383,13 @@ class ThemeController extends ChangeNotifier {
         // LegendDrawer's side-drawer width.
         if (drawerWidth != null)
           LegendDrawer: LegendDrawerThemeNullable(width: drawerWidth),
+        // LegendCombobox's option highlight — a sparse InteractiveColors:
+        // only `hovered` is set (the pointer/keyboard highlight), the
+        // panel fill keeps resolving downward.
+        if (comboboxHighlight != null)
+          LegendCombobox: LegendComboboxThemeNullable(
+            menuBackground: InteractiveColors(hovered: comboboxHighlight),
+          ),
       },
     );
   }
