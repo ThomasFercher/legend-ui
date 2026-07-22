@@ -657,10 +657,10 @@ class _BreadcrumbPreview extends StatelessWidget {
     void noop() {}
     return LegendBreadcrumb(
       items: [
-        LegendBreadcrumbItem(label: 'Home', onTap: noop),
-        LegendBreadcrumbItem(label: 'Wallet', onTap: noop),
-        LegendBreadcrumbItem(label: 'Tokens', onTap: noop),
-        const LegendBreadcrumbItem(label: 'Ethereum'),
+        LegendBreadcrumbItem(label: 'Portfolio', onTap: noop),
+        LegendBreadcrumbItem(label: 'Accounts', onTap: noop),
+        LegendBreadcrumbItem(label: 'Savings', onTap: noop),
+        const LegendBreadcrumbItem(label: 'Overview'),
       ],
     );
   }
