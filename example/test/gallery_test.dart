@@ -1421,4 +1421,62 @@ void main() {
       const Color(0xFF8B5CF6),
     );
   });
+
+  testWidgets('playground: copy confirmation knob restyles the live address', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's copy knob
+    // (swatch 4 is the violet, unused by any active preset).
+    await tester.scrollUntilVisible(
+      find.textContaining('Copy confirmation color'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('Copy confirmation color .*#8B5CF6')),
+    );
+    await settleTheme();
+    await tester.tap(
+      find.bySemanticsLabel(RegExp('Copy confirmation color .*#8B5CF6')),
+    );
+    await settleTheme();
+
+    // The live LegendAddress's built-in copy button resolves it — the
+    // truncated run itself is untouched by the knob.
+    await tester.scrollUntilVisible(
+      find.byType(LegendAddress),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    expect(find.text('0x8f3C…A063'), findsOneWidget);
+    final buttonContext = tester.element(
+      find
+          .descendant(
+            of: find.byType(LegendAddress),
+            matching: find.byType(LegendCopyButton),
+          )
+          .first,
+    );
+    expect(
+      LegendCopyButtonTheme.of(buttonContext).confirmationColor,
+      const Color(0xFF8B5CF6),
+    );
+  });
 }

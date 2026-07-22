@@ -96,6 +96,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendNumberField]'s stepper-arrow color.
   Color? numberStepperColor;
 
+  /// Level-3 override for [LegendCopyButton]'s post-copy check color.
+  Color? copyConfirmationColor;
+
   /// Level-3 override for [LegendStat]'s positive-delta color.
   Color? statPositiveColor;
 
@@ -252,6 +255,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setCopyConfirmationColor(Color? value) {
+    copyConfirmationColor = value;
+    notifyListeners();
+  }
+
   void setStatPositiveColor(Color? value) {
     statPositiveColor = value;
     notifyListeners();
@@ -292,6 +300,7 @@ class ThemeController extends ChangeNotifier {
     drawerWidth = null;
     comboboxHighlight = null;
     numberStepperColor = null;
+    copyConfirmationColor = null;
     statPositiveColor = null;
     codeBlockBackground = null;
     notifyListeners();
@@ -478,6 +487,12 @@ class ThemeController extends ChangeNotifier {
         if (numberStepperColor != null)
           LegendNumberField: LegendNumberFieldThemeNullable(
             stepperForeground: numberStepperColor,
+          ),
+        // LegendCopyButton's post-copy check color (LegendAddress's
+        // built-in copy affordance follows it too).
+        if (copyConfirmationColor != null)
+          LegendCopyButton: LegendCopyButtonThemeNullable(
+            confirmationColor: copyConfirmationColor,
           ),
         // LegendStat's upward-delta color.
         if (statPositiveColor != null)

@@ -261,6 +261,13 @@ class ThemePanel extends StatelessWidget {
             value: controller.numberStepperColor,
             onChanged: controller.setNumberStepperColor,
           ),
+          ColorField(
+            label:
+                'Copy confirmation color '
+                '(LegendCopyButton.confirmationColor)',
+            value: controller.copyConfirmationColor,
+            onChanged: controller.setCopyConfirmationColor,
+          ),
 
           ColorField(
             label: 'Stat positive-delta color (LegendStat.positiveColor)',
