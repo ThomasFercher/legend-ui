@@ -90,6 +90,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendCombobox]'s option-highlight color.
   Color? comboboxHighlight;
 
+  /// Level-3 override for [LegendSplitPane]'s divider-line color.
+  Color? splitPaneDivider;
+
   /// Level-3 override for [LegendCodeBlock]'s panel fill.
   Color? codeBlockBackground;
 
@@ -265,6 +268,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setSplitPaneDivider(Color? value) {
+    splitPaneDivider = value;
+    notifyListeners();
+  }
+
   void setNumberStepperColor(Color? value) {
     numberStepperColor = value;
     notifyListeners();
@@ -346,6 +354,7 @@ class ThemeController extends ChangeNotifier {
     timelineIndicatorColor = null;
     breadcrumbSeparatorColor = null;
     paginationSelectedFill = null;
+    splitPaneDivider = null;
     statPositiveColor = null;
     codeBlockBackground = null;
     notifyListeners();
@@ -565,6 +574,11 @@ class ThemeController extends ChangeNotifier {
         if (paginationSelectedFill != null)
           LegendPagination: LegendPaginationThemeNullable(
             selectedFill: InteractiveColors(normal: paginationSelectedFill),
+          ),
+        // LegendSplitPane's at-rest divider-line color.
+        if (splitPaneDivider != null)
+          LegendSplitPane: LegendSplitPaneThemeNullable(
+            divider: splitPaneDivider,
           ),
         // LegendStat's upward-delta color.
         if (statPositiveColor != null)
