@@ -383,6 +383,60 @@ void main() {
     expect(box.color, const Color(0xFF8B5CF6));
   });
 
+  testWidgets('playground: radio fill knob restyles the live radio group', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's radio knob.
+    await tester.scrollUntilVisible(
+      find.textContaining('Radio fill'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    // scrollUntilVisible stops as soon as the sliver cache builds the
+    // target, which can still be off-screen — align it for the tap.
+    await tester.ensureVisible(
+      find.bySemanticsLabel(RegExp('Radio fill .*#8B5CF6')),
+    );
+    await settleTheme();
+    await tester.tap(find.bySemanticsLabel(RegExp('Radio fill .*#8B5CF6')));
+    await settleTheme();
+
+    // The selected radio in the preview column picks it up — a sparse
+    // InteractiveColors(normal: …) whose other states keep deriving.
+    await tester.scrollUntilVisible(
+      find.text('Monthly'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settleTheme();
+    final circle = tester.widget<LegendSurface>(
+      find.descendant(
+        of: find.ancestor(
+          of: find.text('Monthly'),
+          matching: find.byType(LegendSelectionControl),
+        ),
+        matching: find.byType(LegendSurface),
+      ),
+    );
+    expect(circle.color, const Color(0xFF8B5CF6));
+  });
+
   testWidgets('playground: avatar shape knob restyles the live avatars', (
     tester,
   ) async {

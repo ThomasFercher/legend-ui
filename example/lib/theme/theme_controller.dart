@@ -60,6 +60,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendCheckbox]'s checked box fill.
   Color? checkboxFill;
 
+  /// Level-3 override for [LegendRadio]'s selected circle fill.
+  Color? radioFill;
+
   /// Level-3 override for [LegendAvatar]'s corner radius.
   double? avatarRadius;
 
@@ -164,6 +167,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setRadioFill(Color? value) {
+    radioFill = value;
+    notifyListeners();
+  }
+
   void setAvatarRadius(double? value) {
     avatarRadius = value;
     notifyListeners();
@@ -193,6 +201,7 @@ class ThemeController extends ChangeNotifier {
     badgeBackground = null;
     progressFill = null;
     checkboxFill = null;
+    radioFill = null;
     avatarRadius = null;
     segmentedThumb = null;
     notifyListeners();
@@ -323,6 +332,12 @@ class ThemeController extends ChangeNotifier {
         if (checkboxFill != null)
           LegendCheckbox: LegendCheckboxThemeNullable(
             box: InteractiveColors(normal: checkboxFill),
+          ),
+        // LegendRadio's selected circle fill — a sparse InteractiveColors:
+        // hover/press/disabled keep deriving from the lower levels.
+        if (radioFill != null)
+          LegendRadio: LegendRadioThemeNullable(
+            fill: InteractiveColors(normal: radioFill),
           ),
         // LegendAvatar's shape — circle by default, squircle/square here.
         if (avatarRadius != null)

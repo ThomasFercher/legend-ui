@@ -136,6 +136,9 @@ class PlaygroundPage extends StatelessWidget {
               // A live LegendCheckbox — its checked fill follows the theme
               // panel's knob (level-3 override).
               const _CheckboxPreview(),
+              // A live LegendRadioGroup — the selected circle's fill
+              // follows the theme panel's radio knob (level-3 override).
+              const _RadioPreview(),
               const LegendLoading(),
               // A live LegendBanner — its info strip follows the theme
               // panel's banner knob (level-3 override).
@@ -277,6 +280,38 @@ class _CheckboxPreviewState extends State<_CheckboxPreview> {
       tristate: true,
       label: 'Checkbox — tap to cycle tristate',
       onChanged: (value) => setState(() => _value = value),
+    );
+  }
+}
+
+/// A self-contained live [LegendRadioGroup] for the playground preview
+/// column. Its selected circle's fill is themed by the panel's level-3
+/// override.
+class _RadioPreview extends StatefulWidget {
+  const _RadioPreview();
+
+  @override
+  State<_RadioPreview> createState() => _RadioPreviewState();
+}
+
+class _RadioPreviewState extends State<_RadioPreview> {
+  String? _plan = 'monthly';
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = LegendTheme.of(context).tokens;
+    return LegendRadioGroup<String>(
+      value: _plan,
+      onChanged: (value) => setState(() => _plan = value),
+      child: Wrap(
+        spacing: tokens.sizes.md,
+        runSpacing: tokens.sizes.xs,
+        children: const [
+          LegendRadio(value: 'monthly', label: 'Monthly'),
+          LegendRadio(value: 'yearly', label: 'Yearly'),
+          LegendRadio(value: 'lifetime', label: 'Lifetime'),
+        ],
+      ),
     );
   }
 }
