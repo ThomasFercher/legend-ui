@@ -195,6 +195,9 @@ class PlaygroundPage extends StatelessWidget {
               // A live LegendList — the selected row's fill follows the
               // theme panel's knob (level-3 override).
               const SizedBox(width: 300, child: _ListPreview()),
+              // Live LegendDrawer openers — the side drawer's width
+              // follows the theme panel's knob (level-3 override).
+              const _DrawerPreview(),
             ],
           ),
         ),
@@ -388,6 +391,53 @@ class _ListPreviewState extends State<_ListPreview> {
             selected: index == _selected,
             onTap: () => setState(() => _selected = index),
           ),
+      ],
+    );
+  }
+}
+
+/// Buttons opening a live [LegendDrawer] from the start edge and the
+/// bottom, for the playground preview column. The side drawer's width is
+/// themed by the panel's level-3 override.
+class _DrawerPreview extends StatelessWidget {
+  const _DrawerPreview();
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = LegendTheme.of(context).tokens;
+    return Wrap(
+      spacing: tokens.sizes.sm,
+      runSpacing: tokens.sizes.sm,
+      children: [
+        SecondaryLegendButton(
+          text: 'Open side drawer',
+          onPressed: () => LegendDrawer.show<void>(
+            context,
+            builder: (context) => const Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                LegendText('Drawer', variant: LegendTextVariant.h3),
+                LegendText(
+                  "This side drawer's width follows the drawer knob in "
+                  'the theme panel.',
+                  variant: LegendTextVariant.b2,
+                ),
+              ],
+            ),
+          ),
+        ),
+        SecondaryLegendButton(
+          text: 'Open bottom sheet',
+          onPressed: () => LegendDrawer.show<void>(
+            context,
+            edge: LegendDrawerEdge.bottom,
+            builder: (context) => const LegendText(
+              'Drag down past a third of the height to dismiss.',
+              variant: LegendTextVariant.b2,
+            ),
+          ),
+        ),
       ],
     );
   }

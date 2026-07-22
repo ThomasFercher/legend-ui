@@ -858,4 +858,58 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('playground: drawer width knob restyles the live drawer', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // Register the level-3 override through the panel's drawer knob.
+    await tester.scrollUntilVisible(
+      find.text('Standard (320)'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('Standard (320)'));
+    await settleTheme();
+    await tester.tap(find.text('Standard (320)'));
+    await settleTheme();
+    await tester.tap(find.text('Narrow (280)'));
+    await settleTheme();
+
+    // The live drawer opener in the preview column picks it up.
+    await tester.scrollUntilVisible(
+      find.text('Open side drawer'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('Open side drawer'));
+    await settleTheme();
+    await tester.tap(find.text('Open side drawer'));
+    await settleTheme();
+    expect(
+      tester.getRect(find.byType(LegendDrawer)).width,
+      280,
+      reason: 'level-3 components map restyles the side-drawer width',
+    );
+
+    // Escape closes it again (the modal engine's dismissal).
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await settleTheme();
+    expect(find.byType(LegendDrawer), findsNothing);
+  });
 }

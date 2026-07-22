@@ -239,6 +239,21 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setEmptyIconColor,
           ),
 
+          const LegendText(
+            'Side-drawer width (LegendDrawer.width)',
+            variant: LegendTextVariant.b3,
+          ),
+          LegendDropdown<double>(
+            value: controller.drawerWidth,
+            placeholder: 'Standard (320)',
+            items: const [
+              LegendDropdownItem(value: 280, label: 'Narrow (280)'),
+              LegendDropdownItem(value: 360, label: 'Wide (360)'),
+              LegendDropdownItem(value: 440, label: 'Extra wide (440)'),
+            ],
+            onChanged: controller.setDrawerWidth,
+          ),
+
           const LegendDivider(),
           SecondaryLegendButton(
             text: 'Reset everything',

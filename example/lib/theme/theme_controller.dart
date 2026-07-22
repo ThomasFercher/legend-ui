@@ -69,6 +69,9 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendEmpty]'s inherited icon color.
   Color? emptyIconColor;
 
+  /// Level-3 override for [LegendDrawer]'s side-drawer width.
+  double? drawerWidth;
+
   bool get dark => preset == ThemePreset.dark;
 
   void setPreset(ThemePreset value) {
@@ -182,6 +185,11 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setDrawerWidth(double? value) {
+    drawerWidth = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -204,6 +212,7 @@ class ThemeController extends ChangeNotifier {
     avatarRadius = null;
     segmentedThumb = null;
     emptyIconColor = null;
+    drawerWidth = null;
     notifyListeners();
   }
 
@@ -347,6 +356,9 @@ class ThemeController extends ChangeNotifier {
         // LegendEmpty's zero-state glyph color (inherited via IconTheme).
         if (emptyIconColor != null)
           LegendEmpty: LegendEmptyThemeNullable(iconColor: emptyIconColor),
+        // LegendDrawer's side-drawer width.
+        if (drawerWidth != null)
+          LegendDrawer: LegendDrawerThemeNullable(width: drawerWidth),
       },
     );
   }
