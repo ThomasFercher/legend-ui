@@ -263,6 +263,12 @@ class ThemePanel extends StatelessWidget {
           ),
 
           ColorField(
+            label: 'Stat positive-delta color (LegendStat.positiveColor)',
+            value: controller.statPositiveColor,
+            onChanged: controller.setStatPositiveColor,
+          ),
+
+          ColorField(
             label: 'Slider active-track color',
             value: controller.sliderActiveTrack,
             onChanged: controller.setSliderActiveTrack,
@@ -299,6 +305,12 @@ class ThemePanel extends StatelessWidget {
             label: 'Markdown link color (LegendMarkdown.linkColor)',
             value: controller.markdownLinkColor,
             onChanged: controller.setMarkdownLinkColor,
+          ),
+
+          ColorField(
+            label: 'Code-block panel fill (LegendCodeBlock.background)',
+            value: controller.codeBlockBackground,
+            onChanged: controller.setCodeBlockBackground,
           ),
 
           const LegendDivider(),

@@ -93,8 +93,14 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendSplitPane]'s divider-line color.
   Color? splitPaneDivider;
 
+  /// Level-3 override for [LegendCodeBlock]'s panel fill.
+  Color? codeBlockBackground;
+
   /// Level-3 override for [LegendNumberField]'s stepper-arrow color.
   Color? numberStepperColor;
+
+  /// Level-3 override for [LegendStat]'s positive-delta color.
+  Color? statPositiveColor;
 
   bool get dark => preset == ThemePreset.dark;
 
@@ -254,6 +260,16 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setStatPositiveColor(Color? value) {
+    statPositiveColor = value;
+    notifyListeners();
+  }
+
+  void setCodeBlockBackground(Color? value) {
+    codeBlockBackground = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -285,6 +301,8 @@ class ThemeController extends ChangeNotifier {
     comboboxHighlight = null;
     numberStepperColor = null;
     splitPaneDivider = null;
+    statPositiveColor = null;
+    codeBlockBackground = null;
     notifyListeners();
   }
 
@@ -474,6 +492,14 @@ class ThemeController extends ChangeNotifier {
         if (splitPaneDivider != null)
           LegendSplitPane: LegendSplitPaneThemeNullable(
             divider: splitPaneDivider,
+          ),
+        // LegendStat's upward-delta color.
+        if (statPositiveColor != null)
+          LegendStat: LegendStatThemeNullable(positiveColor: statPositiveColor),
+        // LegendCodeBlock's panel fill.
+        if (codeBlockBackground != null)
+          LegendCodeBlock: LegendCodeBlockThemeNullable(
+            background: codeBlockBackground,
           ),
       },
     );

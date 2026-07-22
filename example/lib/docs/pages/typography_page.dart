@@ -128,6 +128,29 @@ LegendMarkdown(
   ],
 )''',
         ),
+        const DocSection(
+          title: 'Code block',
+          description:
+              'LegendCodeBlock is the standalone monospace panel — long '
+              'lines scroll horizontally, the text stays selectable, and '
+              'the copy affordance writes the source to the clipboard with '
+              'a transient check. No built-in syntax highlighting: the '
+              'highlighter callback is the span-builder hook a highlighter '
+              'plugs into.',
+          demo: LegendCodeBlock(
+            'LegendTokens.fromSeed(\n'
+            '  LegendSeed(brand: Color(0xFF0059FF)),\n'
+            ');',
+            language: 'dart',
+          ),
+          code: '''
+LegendCodeBlock(
+  source,
+  language: 'dart',
+  maxHeight: 320,
+  highlighter: (code) => myHighlighter.spans(code),
+)''',
+        ),
         DocSection(
           title: 'Size tokens (live)',
           description:

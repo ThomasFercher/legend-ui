@@ -137,6 +137,28 @@ class PlaygroundPage extends StatelessWidget {
                   ),
                 ],
               ),
+              // Live LegendStats — the upward delta's color follows the
+              // theme panel's stat knob (level-3 override).
+              Wrap(
+                spacing: tokens.sizes.xl,
+                runSpacing: tokens.sizes.sm,
+                children: const [
+                  LegendStat(
+                    label: 'Balance',
+                    value: r'$12,480.30',
+                    delta: '4.2%',
+                    deltaDirection: LegendStatDirection.up,
+                    caption: 'vs last week',
+                  ),
+                  LegendStat(
+                    label: 'ETH',
+                    value: r'$3,120.55',
+                    delta: '1.8%',
+                    deltaDirection: LegendStatDirection.down,
+                    caption: '24h',
+                  ),
+                ],
+              ),
               // Live LegendAvatars — their shape follows the avatar knob in
               // the theme panel (level-3 override); the seeded pair keeps
               // its deterministic identity colors through every preset.
@@ -218,6 +240,13 @@ class PlaygroundPage extends StatelessWidget {
                 '[a link](https://legend.app) whose color follows the '
                 'markdown knob in the theme panel.',
                 onTapLink: (_) {},
+              ),
+              // A live LegendCodeBlock — its panel fill follows the theme
+              // panel's knob (level-3 override).
+              const LegendCodeBlock(
+                '// The panel fill follows the code-block knob.\n'
+                'final theme = _theme(context);',
+                language: 'dart',
               ),
               // Live LegendChips — the selected fill follows the theme
               // panel's knob (level-3 override).
