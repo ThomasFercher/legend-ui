@@ -1,6 +1,7 @@
 import 'package:example/docs/doc_page.dart';
 import 'package:example/theme/theme_controller.dart';
 import 'package:example/theme/theme_panel.dart';
+import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 import 'package:legend_ui/legend_ui.dart';
 
@@ -144,6 +145,15 @@ class PlaygroundPage extends StatelessWidget {
                 message:
                     'The strip fill follows the banner knob in the theme '
                     'panel.',
+              ),
+              // A live LegendEmpty — its zero-state glyph follows the theme
+              // panel's empty-state icon knob (level-3 override).
+              const LegendEmpty(
+                title: 'LegendEmpty',
+                description:
+                    'The glyph color follows the empty-state icon knob in '
+                    'the theme panel.',
+                icon: Icon(Icons.inbox_outlined),
               ),
               // A live LegendProgress — its fill color follows the theme
               // panel's knob (level-3 override).
