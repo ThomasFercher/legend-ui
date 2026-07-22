@@ -23,6 +23,7 @@ export 'src/components/chip/legend_chip.dart';
 export 'src/components/context_menu/legend_context_menu.dart';
 export 'src/components/dialog/legend_dialog.dart';
 export 'src/components/divider/legend_divider.dart';
+export 'src/components/drawer/legend_drawer.dart';
 export 'src/components/dropdown/legend_dropdown.dart';
 export 'src/components/expandable/legend_expandable.dart';
 export 'src/components/form/legend_form.dart';
