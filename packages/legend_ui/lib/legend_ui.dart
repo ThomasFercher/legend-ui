@@ -34,6 +34,8 @@ export 'src/components/list/legend_list.dart';
 export 'src/components/list/legend_list_item.dart';
 export 'src/components/loading/legend_loading.dart';
 export 'src/components/loading/legend_shimmer.dart';
+export 'src/components/markdown/legend_markdown.dart';
+export 'src/components/markdown/legend_markdown_syntax.dart';
 export 'src/components/popover/legend_popover.dart';
 export 'src/components/progress/legend_progress.dart';
 export 'src/components/segmented/legend_segmented.dart';
