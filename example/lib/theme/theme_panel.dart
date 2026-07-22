@@ -263,6 +263,17 @@ class ThemePanel extends StatelessWidget {
           ),
 
           ColorField(
+            label: 'Steps completed fill (LegendSteps.completedColor)',
+            value: controller.stepsCompletedColor,
+            onChanged: controller.setStepsCompletedColor,
+          ),
+          ColorField(
+            label: 'Timeline dot color (LegendTimeline.indicatorColor)',
+            value: controller.timelineIndicatorColor,
+            onChanged: controller.setTimelineIndicatorColor,
+          ),
+
+          ColorField(
             label: 'Slider active-track color',
             value: controller.sliderActiveTrack,
             onChanged: controller.setSliderActiveTrack,

@@ -90,6 +90,12 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendCombobox]'s option-highlight color.
   Color? comboboxHighlight;
 
+  /// Level-3 override for [LegendSteps]' completed-indicator fill.
+  Color? stepsCompletedColor;
+
+  /// Level-3 override for [LegendTimeline]'s dot-indicator fill.
+  Color? timelineIndicatorColor;
+
   /// Level-3 override for [LegendNumberField]'s stepper-arrow color.
   Color? numberStepperColor;
 
@@ -246,6 +252,16 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setStepsCompletedColor(Color? value) {
+    stepsCompletedColor = value;
+    notifyListeners();
+  }
+
+  void setTimelineIndicatorColor(Color? value) {
+    timelineIndicatorColor = value;
+    notifyListeners();
+  }
+
   void reset() {
     preset = ThemePreset.light;
     primary = null;
@@ -276,6 +292,8 @@ class ThemeController extends ChangeNotifier {
     drawerWidth = null;
     comboboxHighlight = null;
     numberStepperColor = null;
+    stepsCompletedColor = null;
+    timelineIndicatorColor = null;
     notifyListeners();
   }
 
@@ -460,6 +478,16 @@ class ThemeController extends ChangeNotifier {
         if (numberStepperColor != null)
           LegendNumberField: LegendNumberFieldThemeNullable(
             stepperForeground: numberStepperColor,
+          ),
+        // LegendSteps' completed-indicator fill (behind the check).
+        if (stepsCompletedColor != null)
+          LegendSteps: LegendStepsThemeNullable(
+            completedColor: stepsCompletedColor,
+          ),
+        // LegendTimeline's default dot-indicator fill.
+        if (timelineIndicatorColor != null)
+          LegendTimeline: LegendTimelineThemeNullable(
+            indicatorColor: timelineIndicatorColor,
           ),
       },
     );
