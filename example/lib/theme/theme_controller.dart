@@ -99,6 +99,12 @@ class ThemeController extends ChangeNotifier {
   /// Level-3 override for [LegendTimeline]'s dot-indicator fill.
   Color? timelineIndicatorColor;
 
+  /// Level-3 override for [LegendBreadcrumb]'s separator-chevron color.
+  Color? breadcrumbSeparatorColor;
+
+  /// Level-3 override for [LegendPagination]'s current-page fill.
+  Color? paginationSelectedFill;
+
   /// Level-3 override for [LegendNumberField]'s stepper-arrow color.
   Color? numberStepperColor;
 
@@ -284,6 +290,16 @@ class ThemeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setBreadcrumbSeparatorColor(Color? value) {
+    breadcrumbSeparatorColor = value;
+    notifyListeners();
+  }
+
+  void setPaginationSelectedFill(Color? value) {
+    paginationSelectedFill = value;
+    notifyListeners();
+  }
+
   void setStatPositiveColor(Color? value) {
     statPositiveColor = value;
     notifyListeners();
@@ -328,6 +344,8 @@ class ThemeController extends ChangeNotifier {
     pinActiveBorder = null;
     stepsCompletedColor = null;
     timelineIndicatorColor = null;
+    breadcrumbSeparatorColor = null;
+    paginationSelectedFill = null;
     statPositiveColor = null;
     codeBlockBackground = null;
     notifyListeners();
@@ -535,6 +553,18 @@ class ThemeController extends ChangeNotifier {
         if (timelineIndicatorColor != null)
           LegendTimeline: LegendTimelineThemeNullable(
             indicatorColor: timelineIndicatorColor,
+          ),
+        // LegendBreadcrumb's separator-chevron color.
+        if (breadcrumbSeparatorColor != null)
+          LegendBreadcrumb: LegendBreadcrumbThemeNullable(
+            separatorColor: breadcrumbSeparatorColor,
+          ),
+        // LegendPagination's current-page fill — a sparse
+        // InteractiveColors: only `normal` is set, the other states keep
+        // resolving downward.
+        if (paginationSelectedFill != null)
+          LegendPagination: LegendPaginationThemeNullable(
+            selectedFill: InteractiveColors(normal: paginationSelectedFill),
           ),
         // LegendStat's upward-delta color.
         if (statPositiveColor != null)

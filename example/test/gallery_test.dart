@@ -767,6 +767,139 @@ void main() {
     expect(indicatorColor('NFTs'), const Color(0xFFDC2626));
   });
 
+  testWidgets('playground: breadcrumb separator knob recolors the live '
+      'chevrons', (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // The live trail starts on the token default.
+    await tester.scrollUntilVisible(
+      find.text('Portfolio'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('Portfolio'));
+    await settleTheme();
+    Color separatorColor() => tester
+        .widget<LegendCaret>(
+          find
+              .descendant(
+                of: find.byType(LegendBreadcrumb),
+                matching: find.byType(LegendCaret),
+              )
+              .first,
+        )
+        .color;
+    expect(separatorColor(), LegendTokens.light.colors.foreground3);
+
+    // Register the level-3 override through the panel's breadcrumb knob
+    // (swatch 3 is 0xFFDC2626 in ColorField.defaultSwatches).
+    await tester.scrollUntilVisible(
+      find.textContaining('Breadcrumb separator color'),
+      -200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    final swatch = find
+        .bySemanticsLabel(RegExp('Breadcrumb separator color .* #'))
+        .at(3);
+    await tester.ensureVisible(swatch);
+    await settleTheme();
+    await tester.tap(swatch);
+    await settleTheme();
+
+    // The live trail in the preview column picks it up.
+    await tester.scrollUntilVisible(
+      find.text('Portfolio'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('Portfolio'));
+    await settleTheme();
+    expect(separatorColor(), const Color(0xFFDC2626));
+  });
+
+  testWidgets('playground: pagination selected-fill knob restyles the '
+      'live pagination', (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // The playground preview contains LegendLoading (an unbounded
+    // animation), so pumpAndSettle would never settle.
+    Future<void> settleTheme() async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    Color currentPageFill(String label) {
+      final container = tester.widget<AnimatedContainer>(
+        find
+            .ancestor(
+              of: find.text(label),
+              matching: find.byType(AnimatedContainer),
+            )
+            .first,
+      );
+      return (container.decoration! as BoxDecoration).color!;
+    }
+
+    await tester.pumpWidget(const DocsApp());
+    await settleTheme();
+    await tester.tap(find.text('Playground'));
+    await settleTheme();
+
+    // The live pagination starts on the token default and tracks taps.
+    await tester.scrollUntilVisible(
+      find.byType(LegendPagination),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.byType(LegendPagination));
+    await settleTheme();
+    expect(currentPageFill('5'), LegendTokens.light.colors.primary);
+    await tester.tap(find.text('6'));
+    await settleTheme();
+    expect(currentPageFill('6'), LegendTokens.light.colors.primary);
+
+    // Register the level-3 override through the panel's pagination knob
+    // (swatch 3 is 0xFFDC2626 in ColorField.defaultSwatches).
+    await tester.scrollUntilVisible(
+      find.textContaining('Pagination selected fill'),
+      -200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    final swatch = find
+        .bySemanticsLabel(RegExp('Pagination selected fill .* #'))
+        .at(3);
+    await tester.ensureVisible(swatch);
+    await settleTheme();
+    await tester.tap(swatch);
+    await settleTheme();
+
+    // The live pagination in the preview column picks it up.
+    await tester.scrollUntilVisible(
+      find.byType(LegendPagination),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.byType(LegendPagination));
+    await settleTheme();
+    expect(currentPageFill('6'), const Color(0xFFDC2626));
+  });
+
   testWidgets('playground: banner knob restyles the live banner', (
     tester,
   ) async {

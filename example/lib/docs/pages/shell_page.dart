@@ -31,6 +31,8 @@ class _ShellPageState extends State<ShellPage> {
 
   LegendNavItem _menuSelected = _menuItems.first;
   var _tabSelected = 0;
+  String? _crumbTarget;
+  var _page = 5;
 
   @override
   Widget build(BuildContext context) {
@@ -123,6 +125,69 @@ LegendTabs(
   ],
   selectedIndex: selected,
   onSelected: (index) => setState(() => selected = index),
+)''',
+        ),
+        DocSection(
+          title: 'Breadcrumb',
+          description:
+              'LegendBreadcrumb is an inline trail of ancestor links on '
+              'LegendInteractive, separated by painted LegendCaret '
+              'chevrons. Every item but the last navigates; the last is '
+              'the current page — muted, inert, announced selected. Long '
+              'trails collapse through maxVisible into a middle ellipsis.',
+          demo: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: tokens.sizes.sm,
+            children: [
+              LegendBreadcrumb(
+                maxVisible: 4,
+                items: [
+                  for (final label in ['Home', 'Wallet', 'Tokens', 'Ethereum'])
+                    LegendBreadcrumbItem(
+                      label: label,
+                      onTap: () => setState(() => _crumbTarget = label),
+                    ),
+                ],
+              ),
+              LegendText('Navigated to: ${_crumbTarget ?? '—'}'),
+            ],
+          ),
+          code: '''
+LegendBreadcrumb(
+  maxVisible: 4,
+  items: [
+    LegendBreadcrumbItem(label: 'Home', onTap: goHome),
+    LegendBreadcrumbItem(label: 'Wallet', onTap: goWallet),
+    LegendBreadcrumbItem(label: 'Tokens', onTap: goTokens),
+    LegendBreadcrumbItem(label: 'Ethereum'),  // current page
+  ],
+)''',
+        ),
+        DocSection(
+          title: 'Pagination',
+          description:
+              'LegendPagination pages through a long range — a controlled '
+              'component on LegendInteractive + LegendSurface. The range '
+              'collapses through the standard window (1 … 4 5 6 … 20), '
+              'the chevrons step one page and disable at the ends, and '
+              'the current page announces selected semantics.',
+          demo: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: tokens.sizes.sm,
+            children: [
+              LegendPagination(
+                page: _page,
+                pageCount: 20,
+                onChanged: (page) => setState(() => _page = page),
+              ),
+              LegendText('Page $_page of 20'),
+            ],
+          ),
+          code: '''
+LegendPagination(
+  page: page,
+  pageCount: 20,
+  onChanged: (next) => setState(() => page = next),
 )''',
         ),
         DocSection(

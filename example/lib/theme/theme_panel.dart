@@ -287,6 +287,18 @@ class ThemePanel extends StatelessWidget {
             onChanged: controller.setTimelineIndicatorColor,
           ),
           ColorField(
+            label:
+                'Breadcrumb separator color '
+                '(LegendBreadcrumb.separatorColor)',
+            value: controller.breadcrumbSeparatorColor,
+            onChanged: controller.setBreadcrumbSeparatorColor,
+          ),
+          ColorField(
+            label: 'Pagination selected fill (LegendPagination.selectedFill)',
+            value: controller.paginationSelectedFill,
+            onChanged: controller.setPaginationSelectedFill,
+          ),
+          ColorField(
             label: 'Stat positive-delta color (LegendStat.positiveColor)',
             value: controller.statPositiveColor,
             onChanged: controller.setStatPositiveColor,
