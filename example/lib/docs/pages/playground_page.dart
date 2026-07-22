@@ -52,6 +52,9 @@ class PlaygroundPage extends StatelessWidget {
               // A live LegendNumberField — its stepper-arrow color follows
               // the theme panel's knob (level-3 override).
               const _NumberFieldPreview(),
+              // A live LegendPinField — its active-cell border follows the
+              // theme panel's knob (level-3 override).
+              const _PinFieldPreview(),
               LegendDropdown<int>(
                 placeholder: 'Dropdown',
                 items: const [
@@ -387,6 +390,36 @@ class _NumberFieldPreviewState extends State<_NumberFieldPreview> {
       step: 0.5,
       placeholder: '0',
       onChanged: (value) => setState(() => _value = value),
+    );
+  }
+}
+
+/// A self-contained live [LegendPinField] for the playground preview
+/// column. Its active-cell border is themed by the panel's level-3
+/// override.
+class _PinFieldPreview extends StatefulWidget {
+  const _PinFieldPreview();
+
+  @override
+  State<_PinFieldPreview> createState() => _PinFieldPreviewState();
+}
+
+class _PinFieldPreviewState extends State<_PinFieldPreview> {
+  var _status = 'PIN field — tap and type 6 digits';
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = LegendTheme.of(context).tokens;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      spacing: tokens.sizes.xs,
+      children: [
+        LegendPinField(
+          onCompleted: (code) => setState(() => _status = 'Entered: $code'),
+        ),
+        LegendText(_status, variant: LegendTextVariant.b3),
+      ],
     );
   }
 }

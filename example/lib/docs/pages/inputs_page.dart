@@ -27,6 +27,7 @@ class _InputsPageState extends State<InputsPage> {
   double? _slippage = 0.5;
   var _volume = 0.4;
   var _quality = 50.0;
+  var _pinStatus = 'Waiting for a code…';
 
   @override
   void dispose() {
@@ -169,6 +170,46 @@ LegendNumberField(
   step: 0.5,
   decimals: 2,              // typing and formatting precision
   onChanged: (value) => setState(() => amount = value),
+)''',
+        ),
+        DocSection(
+          title: 'PIN & one-time codes',
+          description:
+              'LegendPinField is one hidden field driving painted cells — '
+              'never N separate inputs, so there is no focus-hopping to '
+              'break. Tap anywhere to focus, type to fill left to right, '
+              'backspace to clear; pasting a full code fills every cell. '
+              'onCompleted fires the moment the last cell fills.',
+          demo: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: tokens.sizes.sm,
+            children: [
+              const LegendText('Unlock PIN (obscured)'),
+              LegendPinField(
+                length: 4,
+                obscure: true,
+                semanticLabel: 'Unlock PIN',
+                onCompleted: (_) => setState(() => _pinStatus = 'Unlocked'),
+              ),
+              const LegendText('2FA code (visible)'),
+              LegendPinField(
+                semanticLabel: 'Authentication code',
+                onCompleted: (code) =>
+                    setState(() => _pinStatus = 'Code entered: $code'),
+              ),
+              const LegendText('Wrong code (error state)'),
+              const LegendPinField(length: 4, errorText: 'Wrong code'),
+              const LegendText('Disabled'),
+              const LegendPinField(length: 4, enabled: false),
+              LegendText(_pinStatus, variant: LegendTextVariant.b3),
+            ],
+          ),
+          code: '''
+LegendPinField(
+  length: 6,                  // 6 cells, one hidden field
+  obscure: true,              // dots for a PIN, visible for 2FA
+  errorText: _error,          // inline error below the cells
+  onCompleted: (code) => unlock(code),
 )''',
         ),
         DocSection(

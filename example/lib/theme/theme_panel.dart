@@ -261,6 +261,13 @@ class ThemePanel extends StatelessWidget {
             value: controller.numberStepperColor,
             onChanged: controller.setNumberStepperColor,
           ),
+          ColorField(
+            label:
+                'PIN-field active-cell border '
+                '(LegendPinField.focusedBorderColor)',
+            value: controller.pinActiveBorder,
+            onChanged: controller.setPinActiveBorder,
+          ),
 
           ColorField(
             label: 'Slider active-track color',
