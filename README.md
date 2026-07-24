@@ -1,18 +1,18 @@
 # Legend UI
 
-[![CI](https://github.com/ThomasFercher/legend-ui/actions/workflows/ci.yml/badge.svg?branch=rewrite)](https://github.com/ThomasFercher/legend-ui/actions/workflows/ci.yml)
-[![Lint](https://github.com/ThomasFercher/legend-ui/actions/workflows/lint.yml/badge.svg?branch=rewrite)](https://github.com/ThomasFercher/legend-ui/actions/workflows/lint.yml)
-[![Tests](https://github.com/ThomasFercher/legend-ui/actions/workflows/test.yml/badge.svg?branch=rewrite)](https://github.com/ThomasFercher/legend-ui/actions/workflows/test.yml)
+[![CI](https://github.com/ThomasFercher/legend-ui/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ThomasFercher/legend-ui/actions/workflows/ci.yml)
+[![Lint](https://github.com/ThomasFercher/legend-ui/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/ThomasFercher/legend-ui/actions/workflows/lint.yml)
+[![Tests](https://github.com/ThomasFercher/legend-ui/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/ThomasFercher/legend-ui/actions/workflows/test.yml)
 
 A Material-free Flutter UI kit built on design tokens, decorator-declared component themes, and a standalone codegen CLI — configurable at every level, with good defaults at the bottom.
 
-This branch (`rewrite`) is the **active development branch** for Legend UI — the full rewrite of the legacy Nomo UI Kit. It shares no history with the legacy code.
+`main` is Legend UI — the full rewrite of the legacy Nomo UI Kit. It shares no history with the legacy code.
 
 | Branch | Contents |
 |---|---|
-| `rewrite` (this) | Legend UI — Dart workspace; foundations + widget catalog (RFC-002–005) landed |
+| `main` (default) | Legend UI — Dart workspace; foundations + widget catalog (RFC-002–005) landed |
 | `legacy-docs` | Complete documentation of the legacy codebase + the accepted design RFC |
-| `main` | The legacy kit (nomo_ui_kit v0.0.36), **frozen** as reference |
+| `legacy` | The legacy kit (nomo_ui_kit v0.0.36), **frozen** as reference — no shared history with `main` |
 
 ## Design
 
@@ -40,13 +40,13 @@ Planned additions: `packages/legend_gen_builder` (optional thin build_runner wra
 - **Tokens & theming**: `LegendTokens` (colors/sizes/typography/shadows/state overlays), `LegendTokens.fromSeed` (`LegendSeed` + AntD-adapted ramp, contrast-guaranteed pairs), `LegendThemeData` open registry, `AnimatedLegendTheme` (one token lerp per theme switch), `LegendBreakpoints`.
 - **Primitives**: `LegendSurface`, `LegendInteractive`, `LegendButtonCore`, `LegendFieldCore`, `LegendAnchoredOverlay`, `LegendPopover`, `LegendModalRoute`/`showLegendModal`, `LegendCaret`, `LegendSelectionControl`.
 - **Buttons & actions**: Primary/Secondary/Text buttons, `LegendCopyButton`, `LegendAddress` (copy + truncation).
-- **Inputs & forms**: `LegendTextField`, `LegendNumberField` (decimal + stepper), `LegendPinField` (fixed-length code), `LegendDropdown`, `LegendCombobox` (typeahead), `LegendSlider`, and `LegendForm`/`LegendFormController` + `LegendFormField<T>` + `LegendValidators` (fields register/unregister with their lifecycle).
+- **Inputs & forms**: `LegendTextField`, `LegendNumberField` (decimal + stepper), `LegendPinField` (fixed-length code), `LegendDropdown`, `LegendCombobox` (typeahead), `LegendSlider`, and `LegendForm`/`LegendFormController` + `LegendFormField<T>` + `LegendValidator` (fields register/unregister with their lifecycle).
 - **Selection**: `LegendCheckbox`, `LegendRadio`/`LegendRadioGroup`, `LegendSwitch`, `LegendSegmented`, `LegendChip` (all over the shared `LegendSelectionControl`).
 - **Text & content**: `LegendText`(+`.rich`), `LegendMarkdown` (block renderer), `LegendMarkdownEditor` (in-house, style-only highlighting over `LegendFieldCore` with an extensible `LegendMarkdownSyntax` registry shared with the renderer), `LegendCodeBlock`.
 - **Data display & layout**: `LegendCard`, `LegendList`/`LegendListItem`, `LegendInfoItem`, `LegendBadge`, `LegendAvatar`, `LegendStat`, `LegendTabs`, `LegendAccordion`, `LegendExpandable`, `LegendDivider`, `LegendSplitPane`, `LegendSteps`, `LegendTimeline`, `LegendBreadcrumb`, `LegendPagination`, `LegendEmpty`, `LegendProgress`.
 - **Overlays**: `LegendTooltip`, `LegendMenu` (button-anchored), `LegendContextMenu` (right-click), `LegendDialog`/`showLegendDialog`, `LegendDrawer` (edge/bottom sheet, drag-dismiss), `showLegendModal`.
 - **Feedback**: `showLegendToast` (queued, overlay engine), `LegendBanner` (inline alert), `LegendLoading`, `LegendShimmer`.
-- **Shell**: `LegendApp`, `LegendScaffold`, `LegendAppBar`, `LegendSider`, `LegendBottomBar`, `LegendBody` + `LegendSliver*` — chrome flips by breakpoint tier.
+- **Shell & navigation**: `LegendApp`, `LegendScaffold`, `LegendAppBar`, `LegendSider`, `LegendBottomBar`, `LegendVerticalMenu` (expandable sections), `LegendBody` + `LegendSliver*` — chrome flips by breakpoint tier.
 - **Codegen**: `legend_gen themes` / `docs` / `tokens` (each with `--check` for CI and a never-crash `--watch`), plus `create`, `doctor`, `update`, and shell completion — golden-tested; consumers annotate their own widgets and register them in the same theme map as kit components. Doc comments double as the theme-docs CMS via generated `*.docs.g.dart` manifests.
 - **Docs & playground**: the `example/` app is a documentation site with live demos of every shipped component, an interactive four-level resolution ladder, a theme playground (presets, brand colors, per-component overrides), and a manifest-driven **Theme Explorer** that configures any of the kit's components straight from their generated `*.docs.g.dart` manifests — selectable text on web included.
 
@@ -67,7 +67,7 @@ cd packages/legend_ui && dart run legend_gen themes lib test/consumer   # regene
 
 ## CI
 
-Three workflows run on every push and PR to `rewrite`:
+Three workflows run on every push and PR to `main`:
 
 | Badge | Workflow | Covers |
 |---|---|---|

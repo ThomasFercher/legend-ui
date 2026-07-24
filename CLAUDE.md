@@ -1,10 +1,12 @@
 # CLAUDE.md
 
-Guidance for Claude Code when working on this branch (`rewrite`).
+Guidance for Claude Code when working in this repository.
 
 ## What this is
 
-**Legend UI** — the full rewrite of the legacy Nomo UI Kit as a Dart workspace (rebranded 2026-07-09; "Nomo" only ever refers to the legacy kit). `main` is the frozen legacy kit — never merge from it. `legacy-docs` holds the complete legacy documentation and the accepted design RFC; a working copy of the RFC is [docs/DESIGN.md](docs/DESIGN.md). **Read DESIGN.md before designing or implementing anything** — the architecture decisions there are settled.
+**Legend UI** — the full rewrite of the legacy Nomo UI Kit as a Dart workspace (rebranded 2026-07-09; "Nomo" only ever refers to the legacy kit). Legend UI is now the trunk on `main`. `legacy` is the frozen legacy kit — it shares **no history** with `main`, so never merge from it. `legacy-docs` holds the complete legacy documentation and the accepted design RFC; a working copy of the RFC is [docs/DESIGN.md](docs/DESIGN.md). **Read DESIGN.md before designing or implementing anything** — the architecture decisions there are settled.
+
+> **Branch rename (2026-07-25)**: the repo was detached from the `nomo-app/nomo-ui-kit` fork network and recreated. The old `rewrite` branch is now `main`; the old `main` (legacy kit) is now `legacy`. Dated entries in ROADMAP.md still say "rewrite" — that is the historical record, left intact.
 
 ## Layout
 

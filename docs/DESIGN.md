@@ -1,10 +1,25 @@
 # Legend UI — Design (accepted RFC)
 
 > Status: **accepted** (2026-07-09) — the architecture for the full rewrite of the legacy Nomo UI Kit.
-> **Rebrand (2026-07-09)**: the rewrite ships as **Legend UI** (`legend_ui` + `legend_gen`); every public symbol uses the `Legend` prefix. "Nomo" survives only in references to the legacy kit on `main`/`legacy-docs`.
+> **Rebrand (2026-07-09)**: the rewrite ships as **Legend UI** (`legend_ui` + `legend_gen`); every public symbol uses the `Legend` prefix. "Nomo" survives only in references to the legacy kit on `legacy`/`legacy-docs`.
 > Grounded in the legacy documentation on the `legacy-docs` branch (chapter references like “01 §4” point there).
 > **Decisions locked**: annotation-driven codegen stays (§2); consumer widgets get identical theming support via the open Type-keyed registry (§2.3); the generator is a **published standalone CLI, `legend_gen`** — chosen over build_runner (§5.3); repo becomes a Dart workspace (§6).
-> This is the working copy on the `rewrite` branch — it evolves with the code; the snapshot at acceptance lives on `legacy-docs` as `09-rewrite-proposal.md`.
+> This is the working copy on `main` — it evolves with the code; the snapshot at acceptance lives on `legacy-docs` as `09-rewrite-proposal.md`.
+
+## 0. Design-time names → shipped names
+
+This document and the RFCs were written before or during implementation, and some working names changed on the way in. **The record below is left intact** — dated entries are history, not instructions. Use this table to translate; the right-hand column is what actually compiles.
+
+| Written as (design/RFC) | Shipped as | Where it appears |
+|---|---|---|
+| `LegendTextCore` | **`LegendText`** (+ `.rich`) | DESIGN §3 |
+| `LegendOverlayEngine` | **`LegendAnchoredOverlay`** (anchored) + **`LegendModalRoute`** / `showLegendModal` (modal) | DESIGN §3 |
+| `LegendModal` | **`LegendModalRoute`** | RFC-004 §1 |
+| `LegendValidators` | **`LegendValidator`** (singular; `required`, `email`, `minLength`, `maxLength`, `compose`) | RFC-004 §1 |
+| `LegendColorsRef`, `LegendSizesRef`, `LegendTokensRef` | **`ColorRef`, `SizeRef`, `TokenRef`** (plus `ShadowRef`, `StateRef`, `TextRef` — six total) | RFC-002 C2, ROADMAP C2 |
+| `LegendStates<T>` | **custom `@Style` classes**; `InteractiveColors` is the predefined one | RFC-002 R6 / step E |
+
+Named in the docs but **not shipped**, deliberately: `LegendQrCode` (parked pending dependency sign-off), `LegendSelectionArea` (open audit follow-up), `LegendTable` / `LegendCitationChip` (RFC-004 future waves), `LegendResponsive<T>` (sketched, dropped — see §3).
 
 ## 1. Goals and non-goals
 
@@ -258,7 +273,7 @@ test/                       # per package; incl. generator golden tests
 2. **Phase 1 — primitives complete**: overlay engine, text core, field core; golden-test infrastructure; `legend_gen` hardened (diagnostics, `--check`, watch mode).
 3. **Phase 2 — component ports** in dependency order (buttons → surfaces → menus/selection → input/form → shell), consolidating duplicates per §3. Each port closes out the corresponding legacy bugs from 01 §4.2 with a regression test.
 4. **Phase 3 — icons unbundling** (`legend_gen icons`) + example-app rebuild (no stubs) + docs.
-5. Consuming apps migrate per component behind their own abstraction; legacy `main` stays frozen as reference (this docs branch is the map).
+5. Consuming apps migrate per component behind their own abstraction; the legacy kit on `legacy` stays frozen as reference (this docs branch is the map).
 
 ## 9. Open questions
 

@@ -28,7 +28,7 @@
 
 ## 1.0.0-dev.3 (unreleased) — Phase 2 completion + review hardening
 
-- Form system: `LegendForm`/`LegendFormController`, `LegendFormField<T>`, `LegendValidators`; `LegendTextField` plugs in via `formField`/`validator`. Closes legacy bugs: fields now unregister on dispose, validator-less fields no longer pin forms invalid (regression-tested).
+- Form system: `LegendForm`/`LegendFormController`, `LegendFormField<T>`, `LegendValidator`; `LegendTextField` plugs in via `formField`/`validator`. Closes legacy bugs: fields now unregister on dispose, validator-less fields no longer pin forms invalid (regression-tested).
 - Feedback: queued `LegendToast` on the overlay engine (no ScaffoldMessenger — the last Material service dependency is gone), `LegendLoading`, `LegendShimmer`.
 - Small components: `LegendDivider`, `LegendExpandable`, `LegendInfoItem`, `LegendContextMenu`; shared `LegendCaret` primitive.
 - `legend_gen create` (scaffold an annotated widget) and `legend_gen doctor` (workspace sanity checks).
