@@ -2,6 +2,8 @@
 
 Phases per [docs/DESIGN.md](docs/DESIGN.md) §8. Check items off as they land; add regression-test references when closing legacy bugs (DESIGN §1 / legacy-docs 01 §4.2).
 
+> **2026-07-25 — repo reorganized**: the repository was detached from the `nomo-app/nomo-ui-kit` fork network and recreated. The `rewrite` branch is now **`main`** (the default); the old legacy-kit `main` is now **`legacy`**. Dated entries below still refer to `rewrite` — they are left as the historical record.
+>
 > **2026-07-09 — direction set**: the kit is rebranded **Legend UI** (`legend_ui`/`legend_gen`, `Legend*` symbols). Next milestone: the **showcase/playground** (below). Distribution decision deferred; screenshot goldens deferred until visual regressions bite.
 >
 > **2026-07-23 — catalog complete**: RFC-002–005 all landed. RFC-004 widget expansion Waves 0–3 (30+ components) + RFC-005 `LegendMarkdownEditor` shipped, and Phase 2.7 grew the example app to a live instance of every widget plus a manifest-driven Theme Explorer. Suites: kit 690 · generator 115 · example 44. Only `LegendQrCode` is parked (QR-encode dep needs sign-off). Next: the two flagship apps (crypto wallet, AI workspace) and the flagged follow-ups (success/warning token pair, CodeBlock↔CopyButton / Markdown-fence dedups).
@@ -45,7 +47,7 @@ Consolidations per DESIGN §3; every port closes its legacy bugs.
 - [x] Menus/selection: one `LegendDropdown` (one item model), `LegendSwitch` (no Cupertino fork)
 - [x] Shell: `LegendScaffold` + `LegendAppBar` (plain Row, no custom RenderBox) + `LegendSider` + `LegendBottomBar`, chrome driven by breakpoint tier not theme swaps; one `LegendNavItem` model
 - [x] Dialog: `LegendDialog` + `showLegendDialog` on the kit's own modal engine (no Material `showDialog`)
-- [x] Form system: `LegendForm`/`LegendFormController` + `LegendFormField<T>` + `LegendValidators` — **closes legacy "fields never unregistered" and "validator-less fields pin forms invalid"** with regression tests; `LegendTextField` integrates via `formField`/`validator`
+- [x] Form system: `LegendForm`/`LegendFormController` + `LegendFormField<T>` + `LegendValidator` — **closes legacy "fields never unregistered" and "validator-less fields pin forms invalid"** with regression tests; `LegendTextField` integrates via `formField`/`validator`
 - [x] Feedback: queued `LegendToast` (overlay engine, no ScaffoldMessenger — resolves DESIGN §9.6 toward the overlay engine), `LegendLoading`, `LegendShimmer`
 - [x] Small components: `LegendDivider`, `LegendExpandable`, `LegendInfoItem`, `LegendContextMenu` (+ shared `LegendCaret` primitive)
 - [x] Post-review hardening (2026-07-09): generated files import their own source (C1); `LegendInteractive` keyboard activation without WidgetsApp, toggle semantics, no stuck-pressed after mid-press disable (I1/I3); transparent disabled text buttons (I2); dropdown `menuMaxHeight` + scrollable menu (I4); `LegendApp` locale passthrough + navigatorKey/routerConfig assert (I5); `LegendThemeData` value equality (I7); RTL switch thumb (M1); `lerp:` type validation in legend_gen (M4); crash-proof `--watch` (M5); upward bottom-bar shadow + translatable modal `barrierLabel` (M6)
